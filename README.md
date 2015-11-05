@@ -4,6 +4,42 @@ The blueskyweb package contains a tornado web service, wrapping
 [bluesky][https://github.com/pnwairfire/bluesky],
 that can be started by simply running ```bsp-web```.
 
+## Non-python Dependencies
+
+See the [bluesky github page](https://github.com/pnwairfire/bluesky)
+for information about it's dependencies.
+
+## Development
+
+### Clone Repo
+
+Via ssh:
+
+    git clone git@bitbucket.org:fera/airfire-bluesky-web.git
+
+or http:
+
+    git clone https://jdubowy@bitbucket.org/fera/airfire-bluesky-web.git
+
+### Install Dependencies
+
+First, install pip (with sudo if necessary):
+
+    apt-get install python-pip
+
+Run the following to install python dependencies:
+
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+
+Run the following to install packages required for development:
+
+    pip install -r requirements-dev.txt
+
+### Notes:
+
+See the [bluesky github page](https://github.com/pnwairfire/bluesky)
+for notes on potential pip and gdal issues.
+
 ## Running
 
 Use the help (-h) option to see usage and available config options:
