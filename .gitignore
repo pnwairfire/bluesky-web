@@ -1,0 +1,7 @@
+.DS_Store
+*.pyc
+tmp/
+build/
+dist/
+blueskyweb.egg-info/
+logs/
