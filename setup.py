@@ -11,11 +11,8 @@ setup(
     scripts=[
         'bin/bsp-web'
     ],
-    package_data={
-        'hysplit': ['bdyfiles/*.']
-    },
-    url='https://github.com/pnwairfire/bluesky',
-    description='Tornado web app wrapping BlueSky pipeline.',
+    url='https://bitbucket.org/fera/airfire-bluesky-web',
+    description='Tornado web app wrapping bluesky (https://github.com/pnwairfire/bluesky).',
     install_requires=[
         "pyairfire>=0.8.21",
         "tornado==4.2.1",
