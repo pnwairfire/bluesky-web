@@ -9,6 +9,16 @@ that can be started by simply running ```bsp-web```.
 See the [bluesky github page](https://github.com/pnwairfire/bluesky)
 for information about it's dependencies.
 
+## Python dependencies to install manually
+
+blueskyweb depends on the
+[bluesky scheduler](https://bitbucket.org/fera/airfire-bluesky-scheduler),
+another repo in AirFire's private bitbucket account.  Install it with the following:
+
+    git clone git@bitbucket.org:fera/airfire-bluesky-scheduler.git
+    cd airfire-bluesky-scheduler
+    python setup.py install
+
 ## Development
 
 ### Clone Repo
