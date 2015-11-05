@@ -13,11 +13,32 @@ import tornado.web
 from bluesky import modules, models, process
 from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 
+# TODO: import vs call executable?
+from bsslib.scheduling.scheduler.bsp.runs import BspRunScheduler
 
 class RunExecuter(tornado.web.RequestHandler):
     # def _bad_request(self, msg):
     #     self.set_status(400)
     #     self.write({"error": msg})
+
+    def _must_run_asynchronously(self, data):
+      # if computing hysplit dispersion, run asynch
+      if "dispersion" in data['modules']:
+          d_config = data.get('config', {}).get('dispersion', {})
+          # default model is hysplit
+          if not d_config.get('module') or d_config['module'] == 'hysplit':
+              return True
+
+      # Also asynch if *visualizing* hysplit dispersion
+      if "visualization" in data['modules']:
+          v_config = data.get('config',{}).get('visualization', {})
+          # default target is hysplit
+          if not v_config.get('target') or v_config['target'] == 'dispersion':
+              if data.get('dispersion', {}).get('model') == 'hysplit':
+                  return True
+
+      # Otherwise, run in process
+      return False
 
     def post(self):
         if not self.request.body:
@@ -31,15 +52,23 @@ class RunExecuter(tornado.web.RequestHandler):
             self.set_status(400, "Bad request: 'fire_information' not specified")
         else:
             try:
-                includes_hysplit = ("dispersion" in data['modules'] and
-                    data.get('config', {}).get('dispersion', {}).get('module') == 'hysplit')
-                if includes_hysplit:
-                    # TODO: CALL run_asynchrously AND RETURN TRUE RUN ID
-                    #run_id = process.run_asynchrously(data)
-                    self.write({
-                        "run_id": str(uuid.uuid1()),
-                        "IS_DUMMY_DATA": True
-                    })
+                if self._must_run_asynchronously(data):
+                    run_id = str(uuid.uuid1())
+                    if "dispersion" in data['modules']:
+                        data['config'] = data.get('config', {})
+                        data['config']['dispersion'] =  data['config'].get('dispersion', {})
+                        data['config']['dispersion']['hysplit'] = data['config']['dispersion'].get('hysplit', {})
+                        data['config']['dispersion']['hysplit']['run_id'] = run_id
+                    else:
+                        data['dispersion'] = data.get('dispersion', {})
+                        data['dispersion']['output'] =  data['config'].get('output', {})
+                        data['dispersion']['output']['run_id'] = run_id
+
+                    # TODO: determine appropriate queue from met domain
+                    queue_name = 'all-met'
+                    # TODO: import vs call bss-scheduler?
+                    BspRunScheduler().schedule(queue_name, data)
+                    self.write({"run_id": run_id})
                 else:
                     fires_manager = models.fires.FiresManager()
                     try:
