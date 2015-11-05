@@ -8,13 +8,13 @@ import tornado.ioloop
 from pyairfire import scripting
 
 try:
-    from bluesky.web.app import main
+    from blueskyweb.app import main
 except:
     import os
     import sys
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky.web.app import main
+    from blueskyweb.app import main
 
 OPTIONAL_ARGS = [
     {
