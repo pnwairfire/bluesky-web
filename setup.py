@@ -1,13 +1,9 @@
 from setuptools import setup, find_packages
 
-from bluesky import __version__
-
-test_requirements = []
-with open('requirements-test.txt') as f:
-    test_requirements = [r for r in f.read().splitlines()]
+from blueskyweb import __version__
 
 setup(
-    name='bluesky',
+    name='blueskyweb',
     version=__version__,
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
@@ -22,10 +18,10 @@ setup(
     description='Tornado web app wrapping BlueSky pipeline.',
     install_requires=[
         "pyairfire>=0.8.21",
-        "tornado==4.2.1"
+        "tornado==4.2.1",
+        "bluesky>=0.5.0"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/"
-    ],
-    tests_require=test_requirements
+    ]
 )
