@@ -82,6 +82,7 @@ To see documentation for a specific task, use the '-d' option. E.g.:
     export PYTHON_VERSION=2.7.8
     export VIRTUALENV_NAME=vm-playground
     export BLUESKYWEB_SERVERS=vagrant@127.0.0.1:2222
+    export PROXY_VIA_APACHE=
     fab -A setup
     fab -A provision
     fab -A provision
