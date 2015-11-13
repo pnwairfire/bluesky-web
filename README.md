@@ -17,6 +17,7 @@ another repo in AirFire's private bitbucket account.  Install it with the follow
 
     git clone git@bitbucket.org:fera/airfire-bluesky-scheduler.git
     cd airfire-bluesky-scheduler
+    pip install --trusted-host pypi.smoke.airfire.org -r requirements.txt
     python setup.py install
 
 ## Development
@@ -101,6 +102,7 @@ Note that the deploy task takes care of restarting.
     export PYTHON_VERSION=2.7.8
     export VIRTUALENV_NAME=playground
     export BLUESKYWEB_SERVERS=user@server2
+    export PROXY_VIA_APACHE=
     fab -A setup
     fab -A provision
     fab -A deploy
