@@ -1,5 +1,5 @@
-ErrorLog /var/www/bsp/logs/error.log
-CustomLog /var/www/bsp/logs/access.log combined
+ErrorLog /var/www/blueskyweb/logs/error.log
+CustomLog /var/www/blueskyweb/logs/access.log combined
 
 ProxyPass /bluesky/ http://127.0.0.1:8888/
 ProxyPassReverse /bluesky/ http://127.0.0.1:8888/
