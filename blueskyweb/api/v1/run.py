@@ -14,7 +14,7 @@ from bluesky import modules, models, process
 from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 
 # TODO: import vs call executable?
-from bsslib.scheduling.scheduler.bsp.runs import BspRunScheduler
+from bsslib.scheduling.schedulers.bsp.runs import BspRunScheduler
 
 class RunExecuter(tornado.web.RequestHandler):
     # def _bad_request(self, msg):
