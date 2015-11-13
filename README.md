@@ -75,12 +75,36 @@ To see documentation for a specific task, use the '-d' option. E.g.:
 
     BLUESKYWEB_SERVERS=username@hostname fab -d deploy
 
-An example with two remote servers
+#### Examples
 
-    BLUESKYWEB_SERVERS=username-a@hostname-a,username-b@hostname-b fab setup
-    BLUESKYWEB_SERVERS=username-a@hostname-a,username-b@hostname-b fab deploy
+##### VM managed by vagrant
+
+    export PYTHON_VERSION=2.7.8
+    export VIRTUALENV_NAME=vm-playground
+    export BLUESKYWEB_SERVERS=vagrant@127.0.0.1:2222
+    fab -A setup
+    fab -A provision
+    fab -A provision
 
 Note that the deploy task takes care of restarting.
+
+##### Two remote servers
+
+    export BLUESKYWEB_SERVERS=username-a@hostname-a,username-b@hostname-b
+    fab -A setup
+    fab -A provision
+    fab -A deploy
+
+##### Playground
+
+    export PYTHON_VERSION=2.7.8
+    export VIRTUALENV_NAME=playground
+    export BLUESKYWEB_SERVERS=user@server2
+    fab -A setup
+    fab -A provision
+    fab -A deploy
+
+
 
 ## APIs
 
