@@ -123,7 +123,7 @@ class RunOutput(tornado.web.RequestHandler):
     def get(self, run_id):
         self.write({
            "output": {
-               "directory": "http://smoke.airfire.org/bluesky-daily/output/standard/PNW-4km/2015082800/",
+               "root_url": "http://smoke.airfire.org/bluesky-daily/output/standard/PNW-4km/2015082800/",
                "images": {
                    "hourly": [
                        "images/hourly/1RedColorBar/hourly_201508280000.png",

@@ -626,7 +626,7 @@ This API returns the output location for a specific run
 
     {
        "output": {
-           "directory": <absolute_path>,
+           "root_url": <absolute_path>,
            "images": {
                "hourly": [
                    <filename|relative_path>,
