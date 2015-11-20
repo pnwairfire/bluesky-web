@@ -32,12 +32,42 @@ OPTIONAL_ARGS = [
         'help': 'run the server in debug mode (with auto-reloading of code, etc.)',
         'action': "store_true",
         'default': False
-    },
-
+    }
 ]
+
+# Note: the trailing space seems to be the only way to add an extra trailing line
+EPILOG_STR = """
+Configuration
+
+ Some configuration is enabled via env vars.
+
+  - BSPWEB_EXPORT_MODE -- 'upload' or 'localsave'
+  - BSPWEB_EXPORT_LOCALSAVE_DEST_DIR -- where to mv export, of 'localsave' mode
+  - BSPWEB_EXPORT_UPLOAD_SCP_USER
+  - BSPWEB_EXPORT_UPLOAD_SCP_HOST
+  - BSPWEB_EXPORT_UPLOAD_SCP_PORT
+  - BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR
+
+Examples
+
+ Localsave (debug mode):
+  $ BSPWEB_EXPORT_MODE=localsave \\
+     BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=~/bluesky-exports/ \\
+     ./bin/bsp-web -d --log-level=DEBUG
+
+ Upload to vagrant VM (debug mode):
+  $ BSPWEB_EXPORT_MODE=upload \\
+    BSPWEB_EXPORT_UPLOAD_SCP_USER=vagrant \\
+    BSPWEB_EXPORT_UPLOAD_SCP_HOST=127.0.0.1 \\
+    BSPWEB_EXPORT_UPLOAD_SCP_PORT=2222 \\
+    BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR=/home/vagrant/bsp-remote-exports/ \\
+    ./bin/bsp-web -d --log-level=DEBUG
+ """
 
 if __name__ == "__main__":
     parser = scripting.args.ArgumentParser()
+    parser.epilog = EPILOG_STR
+    parser.formatter_class = scripting.args.RawTextHelpFormatter
     scripting.args.add_arguments(parser, OPTIONAL_ARGS)
     # Use pyairfire to add logging options to the parser object, but we'll
     # configure logging oureselves in app.main
