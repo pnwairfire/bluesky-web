@@ -7,16 +7,31 @@ __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 
 import datetime
+import json
+import logging
+import requests
 import subprocess
+import sys
+import time
 
 from pyairfire import scripting
+
+# Note: the trailing space seems to be the only way to add an extra trailing line
+EPILOG_STR = """
+Examples:
+
+ Simple case, running only through emissions
+  $ ./test/scripts/test-asynch-request.py --simple --hostname=localhost:8888
+
+ Full run (ingestiont through visualization)
+  $ ./test/scripts/test-asynch-request.py --hostname=localhost:8888 \\
+        -s 2014053000/ -n 12
+ """
 
 REQUIRED_ARGS = [
     {
         'long': '--hostname',
-        'dest': 'hostname',
         'help': 'hostname of web service; default localhost:8888',
-        'action': 'store',
         'default': 'localhost:8888'
     }
 ]
@@ -24,16 +39,13 @@ REQUIRED_ARGS = [
 OPTIONAL_ARGS = [
     {
         'long': '--simple',
-        'dest': 'simple',
         'help': 'Run simple asynchrounous request (through emissions',
         'action': "store_true",
-        'type': bool,
         'default': False
     },
     {
         'short': '-s',
         'long': '--start',
-        'dest': 'start',
         'help': "UTC start time of hysplit run; e.g. '2015-08-15T00:00:00'",
         'action': scripting.args.ParseDatetimeAction,
         'default': datetime.datetime.utcnow().date()
@@ -41,9 +53,7 @@ OPTIONAL_ARGS = [
     {
         'short': '-n',
         'long': '--num-hours',
-        'dest': 'num_hours',
         'help': 'number of hours in hysplit run',
-        'action': "store",
         "type": int,
         'default': 24
     }
@@ -127,7 +137,8 @@ WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 DT_STR = '%Y-%m-%dT%H:%M:%S'
 
 if __name__ == "__main__":
-    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS)
+    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+        epilog=EPILOG_STR)
     REQUEST['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
     if not args.simple:
         REQUEST['modules'].extend(['timeprofiling', 'findmetdata', 'localmet',
@@ -153,14 +164,24 @@ if __name__ == "__main__":
         url += '?run_asynch='
     logging.info("Testing {} ... ".format(url))
 
-    response = subprocess.check_output([
-       'curl', '"{}"'.format(url),
-        '--write-out',  '"{}"'.format(WRITE_OUT_PATTERN),
-        '--silent', '-H', '"Content-Type: application/json"',
-        '-X', 'POST', '-d', "'{}'".format(REQUEST)])
+    headers = {
+        'Content-type': 'application/json',
+        'Accept': 'text/plain'
+    }
 
-    import pdb;pdb.set_trace()
-    logging.info("Response: {}".format(response))
-    # TODO: log response, parse run_id, and poll for results, printing progress
+    response = requests.post(url, data=json.dumps(REQUEST), headers=headers)
+    logging.info("Response: {} - {}".format(response.status_code, response.content))
+
+    if response.status_code != 200:
+        logging.error("Failed")
+        sys.exit(1)
+
+    run_id = json.loads(response.content)['run_id']
+    logging.info("Run id: {}".format(run_id))
+    while True:
+        time.sleep(1)
+        logging.info("Checking status...")
+
+    # poll for results, printing progress
 
     # echo -n "http://$BLUESKY_API_HOSTNAME/api/v1/run/ - " >> $OUTPUT_FILE
