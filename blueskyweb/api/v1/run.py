@@ -71,7 +71,7 @@ EXPORT_CONFIGURATION = EXPORT_CONFIGURATIONS[EXPORT_MODE]
 
 class RunHandlerBase(tornado.web.RequestHandler):
 
-    def _get_host(self, data):
+    def _get_host(self):
         import pdb; pdb.set_trace()
         # TODO: set it to hostname in request?
         pass
@@ -103,7 +103,7 @@ class RunExecuter(RunHandlerBase):
                 self._configure_visualization(data, domain)
                 # TODO: configure anything else (e.g. setting domain where
                 #  appropriate)
-                self._run_asynchronously(data)
+                self._run_asynchronously(data, domain=domain)
             else:
                 data['modules'] = ['ingestion', 'dispersion', 'emissions']
                 if self.get_query_argument('run_asynch', default=None) is not None:
@@ -124,7 +124,7 @@ class RunExecuter(RunHandlerBase):
     #     self.set_status(400)
     #     self.write({"error": msg})
 
-    def _run_asynchronously(self, data):
+    def _run_asynchronously(self, data, domain=None):
 
         if not data.get('run_id'):
             data['run_id'] = str(uuid.uuid1())
@@ -164,7 +164,7 @@ class RunExecuter(RunHandlerBase):
     def _configure_findmetdata(self, data, domain):
         data['config'] = data.get('config', {})
         data['config']['findmetdata'] = {
-            "met_root_dir": DOMAIN[domain]['met_root_dir']
+            "met_root_dir": DOMAINS[domain]['met_root_dir']
         }
     def _configure_dispersion(self, data, domain):
         # TODO: allow some config in data?  maybe *expect* some in data (like
@@ -226,6 +226,8 @@ class RunStatus(RunHandlerBase):
     def get(self, run_id):
         # This simply looks for the existence of
         if EXPORT_MODE == 'upload':
+            # TODO: use EXPORT_CONFIGURATIONS along with _get_host to find out where
+            #   to look for output
             self.set_status(501, "Not yet able to check on status of uploaded output")
             return
         else:
