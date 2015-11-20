@@ -64,9 +64,6 @@ REQUEST = {
         "emissions": {
             "species": ["PM25"]
         },
-        "findmetdata": {
-            "met_root_dir": "/DRI_6km/"
-        },
         "dispersion": {
             "start": None,  # WILL BE FILLED IN
             "num_hours": None,  # WILL BE FILLED IN
