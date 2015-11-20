@@ -16,7 +16,8 @@ setup(
     install_requires=[
         "pyairfire>=0.8.21",
         "tornado==4.2.1",
-        "bluesky>=0.6.0"
+        "bluesky>=0.6.0",
+        "requests>=2.8.1"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/"
