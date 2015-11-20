@@ -16,20 +16,20 @@ import tornado.web
 ## ***
 
 DUMMY_DOMAIN_DATA = {
-    "PNW-4km": {
+    "NAM84": {
         "dates": [
             datetime.date.today().strftime("%Y%m%d"),
             (datetime.date.today() - datetime.timedelta(1)).strftime("%Y%m%d"),
             (datetime.date.today() - datetime.timedelta(2)).strftime("%Y%m%d")
         ],
         "boundary": {
-            "center_latitude": 45.0,
-            "center_longitude": -118.3,
-            "width_longitude": 20.0,
-            "height_latitude": 10.0
+            "center_latitude": 37.5,
+            "center_longitude": -95.0,
+            "width_longitude": 70.0,
+            "height_latitude": 30.0
         }
     },
-    "CANSAC-6km": {
+    "DRI2km": {
         "dates": [
             datetime.date.today().strftime("%Y%m%d"),
             (datetime.date.today() - datetime.timedelta(1)).strftime("%Y%m%d"),
