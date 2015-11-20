@@ -181,7 +181,6 @@ if __name__ == "__main__":
     while True:
         time.sleep(1)
         logging.info("Checking status...")
+        # TODO: get status and print get output
 
-    # poll for results, printing progress
-
-    # echo -n "http://$BLUESKY_API_HOSTNAME/api/v1/run/ - " >> $OUTPUT_FILE
+    # TODO: get output information and print response
