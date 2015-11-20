@@ -19,12 +19,6 @@ from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 # TODO: import vs call executable?
 from bsslib.scheduling.schedulers.bsp.runs import BspRunScheduler
 
-# TODO: not sure where is the best place to define this...maybe it should be
-#  defined in bsslib?...or let it be defined as env var
-QUEUES = {
-    'DRI2km': 'dri',
-    'NAM84': 'name'
-}
 
 ## ***
 ## *** TODO: REPLACE HARDCODED MET DATA WITH REAL!!!
@@ -33,8 +27,21 @@ QUEUES = {
 ## *** to source of data (e.g. url of mongodb containing the data vs.
 ## *** root url or path to crawl for data vs. something else...)
 ## ***
+# TODO: not sure where is the best place to define queues...maybe they should be
+#  defined in bsslib?...or let them be defined as env vars with defaults
+DOMAINS = {
+    'DRI2km': {
+        'queue': 'dri', # TODO: define elsewhere ? (see above)
+        'met_root_dir': '/DRI_2km/' # TODO: don't hardcode (see above)
+    },
+    'NAM84': {
+        'queue': 'nam', # TODO: define elsewhere ? (see above)
+        'met_root_dir': '/NAM84/' # TODO: don't hardcode (see above)
+    }
+}
+
 MET_ROOT_DIRS = {
-    'DRI2km': '/DRI_2km/',
+    'DRI2km':
     'NAM84': '/NAM84/'
 }
 
@@ -78,6 +85,10 @@ class RunHandlerBase(tornado.web.RequestHandler):
 class RunExecuter(RunHandlerBase):
 
     def post(self, domain=None):
+        if domain and domain not in DOMAINS:
+            self.set_status(404, 'Bad request: Unrecognized domain')
+            return
+
         if not self.request.body:
             self.set_status(400, 'Bad request: empty post data')
             return
@@ -92,23 +103,25 @@ class RunExecuter(RunHandlerBase):
             if domain:
                 data['modules'] = ['timeprofiling', 'findmetdata', 'localmet',
                     'plumerising', 'dispersion', 'visualization', 'export']
-                # TODO: configure dispersion (dest_dir, etc.) ?
-                # TODO: configure visualization (dest_dir, etc.) ?
-                # TODO: configure
-                self._run_dispersion(data, domain)
+                self._configure_findmetdata(data, domain)
+                self._configure_dispersion(data, domain)
+                self._configure_visualization(data, domain)
+                # TODO: configure anything else (e.g. setting domain where
+                #  appropriate)
+                self._run_asynchronously(data)
             else:
                 data['modules'] = ['ingestion', 'dispersion', 'emissions']
                 if self.get_query_argument('run_asynch', default=None) is not None:
-                    self._run_asynchronously(data
+                    self._run_asynchronously(data)
                 else:
                     self._run_in_process(data)
+
         except Exception, e:
             # IF exceptions aren't caught, the traceback is returned as
             # the response body
             logging.debug(traceback.format_exc())
             logging.error('Exception: {}'.format(e))
             self.set_status(500)
-
 
     ## Helpers
 
@@ -124,7 +137,7 @@ class RunExecuter(RunHandlerBase):
         self._configure_export(data)
 
         # TODO: determine appropriate queue from met domain
-        queue_name = QUEUES.get(domain) or 'all-met'
+        queue_name = DOMAINS.get(domain, {}).get('queue') or 'all-met'
 
         # TODO: import vs call bss-scheduler?
         BspRunScheduler().schedule(queue_name, data)
@@ -152,6 +165,21 @@ class RunExecuter(RunHandlerBase):
         # we'll manaually set the header adn dump the json
         self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
         fires_manager.dumps(output_stream=self)
+
+    def _configure_findmetdata(self, data, domain):
+        data['config'] = data.get('config', {})
+        data['config']['findmetdata'] = {
+            "met_root_dir": DOMAIN[domain]['met_root_dir']
+        }
+    def _configure_dispersion(self, data, domain):
+        # TODO: allow some config in data?  maybe *expect* some in data (like
+        #   start and end dates)?
+        # TODO: set dest_dir, etc?
+        pass
+
+    def _configure_visualization(self, data, domain):
+        # TODO: set dest_dir, etc?
+        pass
 
 
     def _configure_export(self, data):
@@ -184,7 +212,6 @@ class RunExecuter(RunHandlerBase):
         elif EXPORT_MODE == 'localsave':
             # TODO: set any values?
             pass
-
 
 
 ## ***
