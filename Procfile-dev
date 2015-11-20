@@ -1,0 +1,1 @@
+web: BSPWEB_EXPORT_MODE=localsave BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=~/bluesky-exports/ ./bin/bsp-web -d --log-level=DEBUG
