@@ -191,21 +191,44 @@ class RunExecuter(RunHandlerBase):
 class RunStatus(RunHandlerBase):
 
     def get(self, run_id):
-        # TODO: Look at EXPORT_MODE and EXPORT_CONFIGURATION to decide where
-        # to look for exported output
-        self.write({
-            "complete": False,
-            "percent": 90.0,
-            "failed": False,
-            "message": "This is dummy data",
-            "IS_DUMMY_DATA": True
-        })
+        # This simply looks for the existence of
+        if EXPORT_MODE == 'upload':
+            self.set_status(501, "Not yet able to check on status of uploaded output")
+            return
+        else:
+            # if bsp workers are on another machine, this will never return an
+            # accurate response. ('localsave' should only be used when running
+            # everything on one server)
+            output_dir = os.path.join(EXPORT_CONFIGURATIONS['dest_dir'], run_id)
+            if os.path.exists(output_dir):
+                output_json_file = os.path.join(output_dir, 'output.json')
+                failed = True
+                if os.path.exists(output_json_file):
+                    with open(output_json_file) as f:
+                        try:
+                            failed = "error" not in json.loads(f.getvalue())
+                        except:
+                            pass
+                self.write({
+                    "complete": True,
+                    "percent": 100.0,
+                    "failed": failed
+                    # TODO: include 'message'
+                })
+            else:
+                self.write({
+                    "complete": False,
+                    "percent": 0.0  # TODO: determine % from output directories
+                    # TODO: include 'message'
+                })
 
 class RunOutput(RunHandlerBase):
 
     def get(self, run_id):
         # TODO: Look at EXPORT_MODE and EXPORT_CONFIGURATION to decide where
         # to look for exported output
+        # TODO: return 404 if it doesn't exist
+        # TODO: set response values based on what's in output.json
         self.write({
            "output": {
                "root_url": "http://smoke.airfire.org/bluesky-daily/output/standard/PNW-4km/2015082800/",
