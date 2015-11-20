@@ -78,7 +78,6 @@ class RunHandlerBase(tornado.web.RequestHandler):
 class RunExecuter(RunHandlerBase):
 
     def post(self, domain=None):
-
         if not self.request.body:
             self.set_status(400, 'Bad request: empty post data')
             return
@@ -89,42 +88,20 @@ class RunExecuter(RunHandlerBase):
         if "modules" in data:
             self.set_status(400, "Bad request: Don't specify modules")
 
-        if domain:
-            self._run_dispersion(data, domain)
-        else:
-            self._run_emissions(data)
-
-    # def _bad_request(self, msg):
-    #     self.set_status(400)
-    #     self.write({"error": msg})
-
-
-    ## Emissions
-
-    def _run_emissions(self, data):
-        data['modules'] = ['ingestion', 'dispersion', 'emissions']
         try:
-            fires_manager = models.fires.FiresManager()
-            try:
-                fires_manager.load(data)
-                fires_manager.run()
-            except BlueSkyModuleError, e:
-                # Exception was caught while running modules and added to
-                # fires_manager's meta data, and so will be included in
-                # the output data
-                # TODO: should module error not be reflected in http error status?
-                pass
-            except BlueSkyImportError, e:
-                self.set_status(400, "Bad request: {}".format(e.message))
-            except Exception, e:
-                logging.error('Exception: {}'.format(e))
-                self.set_status(500)
-
-            # If you pass a dict into self.write, it will dump it to json and set
-            # content-type to json;  we need to specify a json encoder, though, so
-            # we'll manaually set the header adn dump the json
-            self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
-            fires_manager.dumps(output_stream=self)
+            if domain:
+                data['modules'] = ['timeprofiling', 'findmetdata', 'localmet',
+                    'plumerising', 'dispersion', 'visualization', 'export']
+                # TODO: configure dispersion (dest_dir, etc.) ?
+                # TODO: configure visualization (dest_dir, etc.) ?
+                # TODO: configure
+                self._run_dispersion(data, domain)
+            else:
+                data['modules'] = ['ingestion', 'dispersion', 'emissions']
+                if self.get_query_argument('run_asynch', default=None) is not None:
+                    self._run_asynchronously(data
+                else:
+                    self._run_in_process(data)
         except Exception, e:
             # IF exceptions aren't caught, the traceback is returned as
             # the response body
@@ -132,37 +109,50 @@ class RunExecuter(RunHandlerBase):
             logging.error('Exception: {}'.format(e))
             self.set_status(500)
 
-    ## Hysplit
 
-    def _run_dispersion(self, data, domain):
-        data['modules'] = ['timeprofiling', 'findmetdata', 'localmet',
-            'plumerising', 'dispersion', 'visualization', 'export']
+    ## Helpers
 
-
+    # def _bad_request(self, msg):
+    #     self.set_status(400)
+    #     self.write({"error": msg})
 
     def _run_asynchronously(self, data):
-      # TODO: check if request query string contains 'run_asynch';
-      # if so, return True;  this is probably only for development
-      if self.get_query_argument('run_asynch', default=None) is not None:
-          return True
 
-      # if computing hysplit dispersion, run asynch
-      if "dispersion" in data['modules']:
-          d_config = data.get('config', {}).get('dispersion', {})
-          # default model is hysplit
-          if not d_config.get('module') or d_config['module'] == 'hysplit':
-              return True
+        if not data.get('run_id'):
+            data['run_id'] = str(uuid.uuid1())
 
-      # Also asynch if *visualizing* hysplit dispersion
-      if "visualization" in data['modules']:
-          v_config = data.get('config',{}).get('visualization', {})
-          # default target is hysplit
-          if not v_config.get('target') or v_config['target'] == 'dispersion':
-              if data.get('dispersion', {}).get('model') == 'hysplit':
-                  return True
+        self._configure_export(data)
 
-      # Otherwise, run in process
-      return False
+        # TODO: determine appropriate queue from met domain
+        queue_name = QUEUES.get(domain) or 'all-met'
+
+        # TODO: import vs call bss-scheduler?
+        BspRunScheduler().schedule(queue_name, data)
+        self.write({"run_id": data['run_id']})
+
+    def _run_in_process(self, data):
+        fires_manager = models.fires.FiresManager()
+        try:
+            fires_manager.load(data)
+            fires_manager.run()
+        except BlueSkyModuleError, e:
+            # Exception was caught while running modules and added to
+            # fires_manager's meta data, and so will be included in
+            # the output data
+            # TODO: should module error not be reflected in http error status?
+            pass
+        except BlueSkyImportError, e:
+            self.set_status(400, "Bad request: {}".format(e.message))
+        except Exception, e:
+            logging.error('Exception: {}'.format(e))
+            self.set_status(500)
+
+        # If you pass a dict into self.write, it will dump it to json and set
+        # content-type to json;  we need to specify a json encoder, though, so
+        # we'll manaually set the header adn dump the json
+        self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
+        fires_manager.dumps(output_stream=self)
+
 
     def _configure_export(self, data):
         # only allow email export to be specified nin request
@@ -194,63 +184,6 @@ class RunExecuter(RunHandlerBase):
         elif EXPORT_MODE == 'localsave':
             # TODO: set any values?
             pass
-
-    def _run_emissions(self, data):
-
-
-        # make sure domain is specified if necessary
-        domain = self.get_query_argument('domain', default=None) or
-        if set(data['modules']).intersection() :
-
-        else:
-            try:
-                if self._run_asynchronously(data):
-                    if not data.get('run_id'):
-                        data['run_id'] = str(uuid.uuid1())
-
-                    self._configure_export(data)
-                    # TODO: configure dispersion (dest_dir, etc.) ?
-                    # TODO: configure visualization (dest_dir, etc.) ?
-
-                    # TODO: determine appropriate queue from met domain
-                    queue_name = QUEUES.get(domain) or 'all-met'
-
-                    # TODO: import vs call bss-scheduler?
-                    BspRunScheduler().schedule(queue_name, data)
-                    self.write({"run_id": data['run_id']})
-                else:
-                    # Don't allow any export when run synchrounously
-                    if 'export' in data['modules']:
-                        self.set_status(400, 'Bad request: empty post data')
-                        return
-
-                    fires_manager = models.fires.FiresManager()
-                    try:
-                        fires_manager.load(data)
-                        fires_manager.run()
-                    except BlueSkyModuleError, e:
-                        # Exception was caught while running modules and added to
-                        # fires_manager's meta data, and so will be included in
-                        # the output data
-                        # TODO: should module error not be reflected in http error status?
-                        pass
-                    except BlueSkyImportError, e:
-                        self.set_status(400, "Bad request: {}".format(e.message))
-                    except Exception, e:
-                        logging.error('Exception: {}'.format(e))
-                        self.set_status(500)
-
-                    # If you pass a dict into self.write, it will dump it to json and set
-                    # content-type to json;  we need to specify a json encoder, though, so
-                    # we'll manaually set the header adn dump the json
-                    self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
-                    fires_manager.dumps(output_stream=self)
-            except Exception, e:
-                # IF exceptions aren't caught, the traceback is returned as
-                # the response body
-                logging.debug(traceback.format_exc())
-                logging.error('Exception: {}'.format(e))
-                self.set_status(500)
 
 
 

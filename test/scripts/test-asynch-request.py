@@ -39,7 +39,7 @@ REQUIRED_ARGS = [
 OPTIONAL_ARGS = [
     {
         'long': '--simple',
-        'help': 'Run simple asynchrounous request (through emissions',
+        'help': 'Run simple emissions request asynchronously',
         'action': "store_true",
         'default': False
     },
@@ -139,10 +139,6 @@ DT_STR = '%Y-%m-%dT%H:%M:%S'
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EPILOG_STR)
-    REQUEST['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
-    if not args.simple:
-        REQUEST['modules'].extend(['timeprofiling', 'findmetdata', 'localmet',
-            'plumerising', 'dispersion', 'visualization', 'export'])
 
     start_str = args.start.strftime(DT_STR)
     REQUEST['config']['dispersion']['start'] = start_str
@@ -161,7 +157,9 @@ if __name__ == "__main__":
 
     url = "http://{}/api/v1/run/".format(args.hostname)
     if args.simple:
-        url += '?run_asynch='
+        url += 'emissions/?run_asynch='
+    else:
+        url += 'dispersion/DRI2km/'
     logging.info("Testing {} ... ".format(url))
 
     headers = {
