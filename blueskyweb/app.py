@@ -21,7 +21,8 @@ from .api.v1.domain import (
     DomainAvailableDates as DomainAvailableDatesV1
 )
 from .api.v1.run import (
-    RunExecuter as RunExecuterV1,
+    RunEmissions as RunEmissionsV1,
+    RunDispersion as RunDispersionV1,
     RunStatus as RunStatusV1,
     RunOutput as RunOutputV1
 )
@@ -33,7 +34,8 @@ routes = [
     (r"/api/v1/domains/([^/]+)/?", DomainInfoV1),
     (r"/api/v1/domains/([^/]+)/available-dates/?", DomainAvailableDatesV1),
     (r"/api/v1/available-dates/?", DomainAvailableDatesV1),
-    (r"/api/v1/run/?", RunExecuterV1),
+    (r"/api/v1/run/emissions/?", RunExecuterV1),
+    (r"/api/v1/run/dispersion/([^/]+)/?", RunExecuterV1),
     (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
     (r"/api/v1/run/([^/]+)/output/?", RunOutputV1)
 ]

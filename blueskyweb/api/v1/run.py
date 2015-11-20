@@ -21,11 +21,22 @@ from bsslib.scheduling.schedulers.bsp.runs import BspRunScheduler
 
 # TODO: not sure where is the best place to define this...maybe it should be
 #  defined in bsslib?...or let it be defined as env var
-# QUEUES = {
-#     'DRI6km': 'dri',
-#     'DRI2km': 'dri',
-#     ''
-# }
+QUEUES = {
+    'DRI2km': 'dri',
+    'NAM84': 'name'
+}
+
+## ***
+## *** TODO: REPLACE HARDCODED MET DATA WITH REAL!!!
+## ***
+## *** Will need to add configuration options to web service to point
+## *** to source of data (e.g. url of mongodb containing the data vs.
+## *** root url or path to crawl for data vs. something else...)
+## ***
+MET_ROOT_DIRS = {
+    'DRI2km': '/DRI_2km/',
+    'NAM84': '/NAM84/'
+}
 
 EXPORT_CONFIGURATIONS = {
     "localsave": {
@@ -39,7 +50,9 @@ EXPORT_CONFIGURATIONS = {
             "host": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_HOST'),
             "port": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_PORT') or 22,
             "dest_dir": (os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR')
-                or "/bluesky/playground-output/")
+                or "/bluesky/playground-output/"),
+            "dest_url_root": (os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_DEST_URL_ROOT')
+                or "/playground-output/")
         }
     }
 }
@@ -57,13 +70,75 @@ EXPORT_CONFIGURATION = EXPORT_CONFIGURATIONS[EXPORT_MODE]
 class RunHandlerBase(tornado.web.RequestHandler):
 
     def _get_host(self, data):
+        import pdb; pdb.set_trace()
         # TODO: set it to hostname in request?
         pass
 
+
 class RunExecuter(RunHandlerBase):
+
+    def post(self, domain=None):
+
+        if not self.request.body:
+            self.set_status(400, 'Bad request: empty post data')
+            return
+
+        data = json.loads(self.request.body)
+        if "fire_information" not in data:
+            self.set_status(400, "Bad request: 'fire_information' not specified")
+        if "modules" in data:
+            self.set_status(400, "Bad request: Don't specify modules")
+
+        if domain:
+            self._run_dispersion(data, domain)
+        else:
+            self._run_emissions(data)
+
     # def _bad_request(self, msg):
     #     self.set_status(400)
     #     self.write({"error": msg})
+
+
+    ## Emissions
+
+    def _run_emissions(self, data):
+        data['modules'] = ['ingestion', 'dispersion', 'emissions']
+        try:
+            fires_manager = models.fires.FiresManager()
+            try:
+                fires_manager.load(data)
+                fires_manager.run()
+            except BlueSkyModuleError, e:
+                # Exception was caught while running modules and added to
+                # fires_manager's meta data, and so will be included in
+                # the output data
+                # TODO: should module error not be reflected in http error status?
+                pass
+            except BlueSkyImportError, e:
+                self.set_status(400, "Bad request: {}".format(e.message))
+            except Exception, e:
+                logging.error('Exception: {}'.format(e))
+                self.set_status(500)
+
+            # If you pass a dict into self.write, it will dump it to json and set
+            # content-type to json;  we need to specify a json encoder, though, so
+            # we'll manaually set the header adn dump the json
+            self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
+            fires_manager.dumps(output_stream=self)
+        except Exception, e:
+            # IF exceptions aren't caught, the traceback is returned as
+            # the response body
+            logging.debug(traceback.format_exc())
+            logging.error('Exception: {}'.format(e))
+            self.set_status(500)
+
+    ## Hysplit
+
+    def _run_dispersion(self, data, domain):
+        data['modules'] = ['timeprofiling', 'findmetdata', 'localmet',
+            'plumerising', 'dispersion', 'visualization', 'export']
+
+
 
     def _run_asynchronously(self, data):
       # TODO: check if request query string contains 'run_asynch';
@@ -120,16 +195,13 @@ class RunExecuter(RunHandlerBase):
             # TODO: set any values?
             pass
 
-    def post(self):
-        if not self.request.body:
-            self.set_status(400, 'Bad request: empty post data')
-            return
+    def _run_emissions(self, data):
 
-        data = json.loads(self.request.body)
-        if "modules" not in data:
-            self.set_status(400, "Bad request: 'modules' not specified")
-        elif "fire_information" not in data:
-            self.set_status(400, "Bad request: 'fire_information' not specified")
+
+        # make sure domain is specified if necessary
+        domain = self.get_query_argument('domain', default=None) or
+        if set(data['modules']).intersection() :
+
         else:
             try:
                 if self._run_asynchronously(data):
@@ -137,9 +209,11 @@ class RunExecuter(RunHandlerBase):
                         data['run_id'] = str(uuid.uuid1())
 
                     self._configure_export(data)
+                    # TODO: configure dispersion (dest_dir, etc.) ?
+                    # TODO: configure visualization (dest_dir, etc.) ?
 
                     # TODO: determine appropriate queue from met domain
-                    queue_name = 'all-met'
+                    queue_name = QUEUES.get(domain) or 'all-met'
 
                     # TODO: import vs call bss-scheduler?
                     BspRunScheduler().schedule(queue_name, data)
