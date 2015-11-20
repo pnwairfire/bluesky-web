@@ -169,6 +169,10 @@ class RunExecuter(RunHandlerBase):
     def _configure_dispersion(self, data, domain):
         # TODO: allow some config in data?  maybe *expect* some in data (like
         #   start and end dates)?
+        # TODO: set grid and grid spacing? based on what's in
+        #   api.v1.domain.DUMMY_DOMAIN_DATA or what's in redis/mongodb...
+        #   *or* is dispersion grid independent of met grid (e.x. it can be a
+        #   smaller region within met domain)
         # TODO: set dest_dir, etc?
         pass
 
