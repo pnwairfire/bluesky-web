@@ -40,11 +40,6 @@ DOMAINS = {
     }
 }
 
-MET_ROOT_DIRS = {
-    'DRI2km':
-    'NAM84': '/NAM84/'
-}
-
 EXPORT_CONFIGURATIONS = {
     "localsave": {
         "dest_dir": (os.environ.get('BSPWEB_EXPORT_LOCALSAVE_DEST_DIR')
