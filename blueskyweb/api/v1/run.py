@@ -105,7 +105,7 @@ class RunExecuter(RunHandlerBase):
                 #  appropriate)
                 self._run_asynchronously(data, domain=domain)
             else:
-                data['modules'] = ['ingestion', 'dispersion', 'emissions']
+                data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
                 if self.get_query_argument('run_asynch', default=None) is not None:
                     self._run_asynchronously(data)
                 else:
