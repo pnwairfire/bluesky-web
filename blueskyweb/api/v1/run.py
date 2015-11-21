@@ -135,6 +135,8 @@ class RunExecuter(RunHandlerBase):
         queue_name = DOMAINS.get(domain, {}).get('queue') or 'all-met'
 
         # TODO: import vs call bss-scheduler?
+        # TODO: dump data to json?  works fine without doing so, so this may
+        #  only serve the purpose of being able to read data in scheduler ui
         BspRunScheduler().schedule(queue_name, data)
         self.write({"run_id": data['run_id']})
 
