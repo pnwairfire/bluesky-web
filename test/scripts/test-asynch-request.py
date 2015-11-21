@@ -161,14 +161,14 @@ if __name__ == "__main__":
 
     headers = {
         'Content-type': 'application/json',
-        'Accept': 'text/plain'
+        'Accept': 'application/json'
     }
 
     response = requests.post(url, data=json.dumps(REQUEST), headers=headers)
     logging.info("Response: {} - {}".format(response.status_code, response.content))
 
     if response.status_code != 200:
-        logging.error("Failed")
+        logging.error("Failed initiate run")
         sys.exit(1)
 
     run_id = json.loads(response.content)['run_id']
@@ -176,6 +176,24 @@ if __name__ == "__main__":
     while True:
         time.sleep(1)
         logging.info("Checking status...")
-        # TODO: get status and print get output
+        url = "http://{}/api/v1/run/{}/status/".format(args.hostname, run_id)
+        response = requests.get(url, headers)
+        if response.status_code == 200:
+            data = json.loads(response.content)
+            if data['complete']:
+                logging.info("Complete")
+                break
+            else:
+                logging.info("{} Complete".format(data['percent']))
 
-    # TODO: get output information and print response
+    url =  "http://{}/api/v1/run/{}/output/".format(args.hostname, run_id)
+    response = requests.get(url, headers)
+    if response.status_code != 200:
+        # TODO: add retry logic, since the run did succeed and complete
+        logging.error("Failed to get output")
+        sys.exit(1)
+
+    data = json.loads(response.content)
+    # TODO: log individual bits of information
+    logging.info("Reponse: {}".format(data))
+
