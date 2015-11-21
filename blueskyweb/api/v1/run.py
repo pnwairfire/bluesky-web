@@ -234,14 +234,15 @@ class RunStatus(RunHandlerBase):
             # if bsp workers are on another machine, this will never return an
             # accurate response. ('localsave' should only be used when running
             # everything on one server)
-            output_dir = os.path.join(EXPORT_CONFIGURATIONS['dest_dir'], run_id)
+            output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
             if os.path.exists(output_dir):
                 output_json_file = os.path.join(output_dir, 'output.json')
                 failed = True
                 if os.path.exists(output_json_file):
                     with open(output_json_file) as f:
                         try:
-                            failed = "error" not in json.loads(f.getvalue())
+                            output_json = json.loads(f.read())
+                            failed = "error" in output_json
                         except:
                             pass
                 self.write({
