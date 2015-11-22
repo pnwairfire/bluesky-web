@@ -43,7 +43,12 @@ DOMAINS = {
 EXPORT_CONFIGURATIONS = {
     "localsave": {
         "dest_dir": (os.environ.get('BSPWEB_EXPORT_LOCALSAVE_DEST_DIR')
-            or "/bluesky/playground-output/")  # TODO: fill in appropriate default
+            or "/bluesky/playground-output/"),  # TODO: fill in appropriate default
+        "url_root_dir": (os.environ.get('BSPWEB_EXPORT_LOCALSAVE_URL_ROOT_DIR')
+            or "/playground-output/"),
+        # host will be set to hostname in api request if not defined in env var
+        "host": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_HOST'),
+
     },
     "upload": {
         "scp": {
@@ -53,12 +58,13 @@ EXPORT_CONFIGURATIONS = {
             "port": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_PORT') or 22,
             "dest_dir": (os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR')
                 or "/bluesky/playground-output/"),
-            "dest_url_root": (os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_DEST_URL_ROOT')
+            "url_root_dir": (os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_URL_ROOT_DIR')
                 or "/playground-output/")
         }
     }
 }
-EXPORT_MODE = (os.environ.get('BSPWEB_EXPORT_MODE') or 'upload').lower()
+# TODO: change default export mode to 'upload' once fab tasks support setting the mode
+EXPORT_MODE = (os.environ.get('BSPWEB_EXPORT_MODE') or 'localsave').lower()
 if EXPORT_MODE not in EXPORT_CONFIGURATIONS:
     raise ValueError("Invalid value for BSPWEB_EXPORT_MODE - {}. Must be one"
         " of the following: {}".format(EXPORT_MODE,
@@ -72,10 +78,7 @@ EXPORT_CONFIGURATION = EXPORT_CONFIGURATIONS[EXPORT_MODE]
 class RunHandlerBase(tornado.web.RequestHandler):
 
     def _get_host(self):
-        import pdb; pdb.set_trace()
-        # TODO: set it to hostname in request?
-        pass
-
+        return self.request.host
 
 class RunExecuter(RunHandlerBase):
 
@@ -226,7 +229,8 @@ class RunExecuter(RunHandlerBase):
 class RunStatus(RunHandlerBase):
 
     def get(self, run_id):
-        # This simply looks for the existence of
+        # This simply looks for the existence of output
+        # TODO: actually look for status
         if EXPORT_MODE == 'upload':
             # TODO: use EXPORT_CONFIGURATIONS along with _get_host to find out where
             #   to look for output
@@ -262,39 +266,68 @@ class RunStatus(RunHandlerBase):
 
 class RunOutput(RunHandlerBase):
 
+    def _parse_output(output_json):
+        # TODO: set values based on what's in output.json
+        # TODO: return something like:
+        #    {
+        #        "images": {
+        #            "hourly": [
+        #                "images/hourly/1RedColorBar/hourly_201508280000.png",
+        #                "images/hourly/1RedColorBar/hourly_201508280100.png",
+        #                "images/hourly/1RedColorBar/hourly_201508280200.png",
+        #                "images/hourly/1RedColorBar/hourly_201508280300.png",
+        #                "images/hourly/1RedColorBar/hourly_201508280400.png",
+        #                "images/hourly/1RedColorBar/hourly_201508280500.png",
+        #                "images/hourly/1RedColorBar/hourly_201508280600.png"
+        #            ],
+        #            "daily": {
+        #                "average": [
+        #                    "images/daily_average/1RedColorBar/daily_average_20150828.png",
+        #                     "images/daily_average/1RedColorBar/daily_average_20150829.png"
+        #                ],
+        #                "maximum": [
+        #                     "images/daily_average/1RedColorBar/daily_maximum_20150828.png",
+        #                     "images/daily_average/1RedColorBar/daily_maximum_20150829.png"
+        #                ],
+        #            }
+        #        },
+        #        "netCDF": "data/smoke_dispersion.nc",
+        #        "kmz": "smoke_dispersion.kmz",
+        #        "fireLocations": "data/fire_locations.csv",
+        #        "fireEvents": "data/fire_events.csv",
+        #        "fireEmissions": "data/fire_emissions.csv"
+        #    }
+        return {}
+
     def get(self, run_id):
-        # TODO: Look at EXPORT_MODE and EXPORT_CONFIGURATION to decide where
-        # to look for exported output
-        # TODO: return 404 if it doesn't exist
-        # TODO: set response values based on what's in output.json
-        self.write({
-           "output": {
-               "root_url": "http://smoke.airfire.org/bluesky-daily/output/standard/PNW-4km/2015082800/",
-               "images": {
-                   "hourly": [
-                       "images/hourly/1RedColorBar/hourly_201508280000.png",
-                       "images/hourly/1RedColorBar/hourly_201508280100.png",
-                       "images/hourly/1RedColorBar/hourly_201508280200.png",
-                       "images/hourly/1RedColorBar/hourly_201508280300.png",
-                       "images/hourly/1RedColorBar/hourly_201508280400.png",
-                       "images/hourly/1RedColorBar/hourly_201508280500.png",
-                       "images/hourly/1RedColorBar/hourly_201508280600.png"
-                   ],
-                   "daily": {
-                       "average": [
-                           "images/daily_average/1RedColorBar/daily_average_20150828.png",
-                            "images/daily_average/1RedColorBar/daily_average_20150829.png"
-                       ],
-                       "maximum": [
-                            "images/daily_average/1RedColorBar/daily_maximum_20150828.png",
-                            "images/daily_average/1RedColorBar/daily_maximum_20150829.png"
-                       ],
-                   }
-               },
-               "netCDF": "data/ smoke_dispersion.nc",
-               "kmz": "smoke_dispersion.kmz",
-               "fireLocations": "data/fire_locations.csv",
-               "fireEvents": "data/fire_events.csv",
-               "fireEmissions": "data/fire_emissions.csv"
-           }
-        })
+        if EXPORT_MODE == 'upload':
+            # TODO: use EXPORT_CONFIGURATIONS along with _get_host to find out where
+            #   to look for output
+            self.set_status(501, "Not yet able to check on status of uploaded output")
+            return
+        else:
+            # if bsp workers are on another machine, this will never return an
+            # accurate response. ('localsave' should only be used when running
+            # everything on one server)
+            output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
+            if not os.path.exists(output_dir):
+                self.set_status(404)
+            else:
+                r = {
+                    "root_url": "{}://{}{}".format(
+                        self.request.protocol,
+                        # TODO: use self.request.remote_ip instead of self.request.host
+                        # TODO: call _get_host
+                        EXPORT_CONFIGURATION['host'] or self.request.host,
+                        EXPORT_CONFIGURATION['url_root_dir'])
+                }
+                output_json_file = os.path.join(output_dir, 'output.json')
+                if os.path.exists(output_json_file):
+                    with open(output_json_file) as f:
+                        try:
+                            r.update(self._parse_output(json.loads(f.read())))
+                            # TODO: set fields here, using , etc.
+                        except:
+                            pass
+
+                self.write(r)
