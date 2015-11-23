@@ -290,8 +290,9 @@ class RunOutput(RunHandlerBase):
 
         disp_info = export_info.get('dispersion')
         if disp_info:
-            r.update(**{k: disp_info[k.lower()] for k in ('netCDF', 'netCDFs')
-                if k.lower() in disp_info})
+            r.update(**{
+                k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
+                for k in ('netCDF', 'netCDFs') if k.lower() in disp_info})
 
         # TODO: list fire_*.csv if specified in output_json
 
