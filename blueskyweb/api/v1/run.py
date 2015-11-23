@@ -313,12 +313,11 @@ class RunOutput(RunHandlerBase):
                 self.set_status(404)
             else:
                 r = {
-                    "root_url": "{}://{}{}".format(
-                        self.request.protocol,
+                    "root_url": "{}://{}{}".format(self.request.protocol,
                         # TODO: use self.request.remote_ip instead of self.request.host
                         # TODO: call _get_host
                         EXPORT_CONFIGURATION['host'] or self.request.host,
-                        EXPORT_CONFIGURATION['url_root_dir'])
+                        os.path.join(EXPORT_CONFIGURATION['url_root_dir'], run_id))
                 }
                 output_json_file = os.path.join(output_dir, 'output.json')
                 if os.path.exists(output_json_file):
