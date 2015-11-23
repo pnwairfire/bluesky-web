@@ -217,15 +217,6 @@ class RunExecuter(RunHandlerBase):
             # TODO: set any values?
             pass
 
-
-## ***
-## *** TODO: REPLACE DUMMY DATA WITH REAL!!!
-## ***
-## *** Will need to add configuration options to web service to point
-## *** to source of data (e.g. url of mongodb containing the data vs.
-## *** root url or path to crawl for data given run id vs. something else...)
-## ***
-
 class RunStatus(RunHandlerBase):
 
     def get(self, run_id):
@@ -267,37 +258,40 @@ class RunStatus(RunHandlerBase):
 class RunOutput(RunHandlerBase):
 
     def _parse_output(output_json):
-        # TODO: set values based on what's in output.json
-        # TODO: return something like:
-        #    {
-        #        "images": {
-        #            "hourly": [
-        #                "images/hourly/1RedColorBar/hourly_201508280000.png",
-        #                "images/hourly/1RedColorBar/hourly_201508280100.png",
-        #                "images/hourly/1RedColorBar/hourly_201508280200.png",
-        #                "images/hourly/1RedColorBar/hourly_201508280300.png",
-        #                "images/hourly/1RedColorBar/hourly_201508280400.png",
-        #                "images/hourly/1RedColorBar/hourly_201508280500.png",
-        #                "images/hourly/1RedColorBar/hourly_201508280600.png"
-        #            ],
-        #            "daily": {
-        #                "average": [
-        #                    "images/daily_average/1RedColorBar/daily_average_20150828.png",
-        #                     "images/daily_average/1RedColorBar/daily_average_20150829.png"
-        #                ],
-        #                "maximum": [
-        #                     "images/daily_average/1RedColorBar/daily_maximum_20150828.png",
-        #                     "images/daily_average/1RedColorBar/daily_maximum_20150829.png"
-        #                ],
-        #            }
-        #        },
-        #        "netCDF": "data/smoke_dispersion.nc",
-        #        "kmz": "smoke_dispersion.kmz",
-        #        "fireLocations": "data/fire_locations.csv",
-        #        "fireEvents": "data/fire_events.csv",
-        #        "fireEmissions": "data/fire_emissions.csv"
-        #    }
-        return {}
+        export_info = output_json.get('export', {}).get(EXPORT_MODE)
+        if not export_info:
+           return {}
+
+        r = {}
+        vis_info = export_info.get('visualization')
+        if vis_info:
+            # images
+            images_info = vis_info.get('images', {})
+            if images_info:
+                r['images'] = {
+                    "hourly": ['{}/{}'.format(vis_info['sub_directory'], e)
+                        for e in images_info.get('hourly', [])],
+                    "daily": {
+                        "average": ['{}/{}'.format(vis_info['sub_directory'], e)
+                            for e in images_info.get('daily', {}).get('average', [])],
+                        "maximum": ['{}/{}'.format(vis_info['sub_directory'], e)
+                            for e in images_info.get('daily', {}).get('maximum', [])],
+                    }
+                }
+            # kmzs
+            kmz_info = vis_info.get('kmzs', {})
+            if kmz_info:
+                r['kmzs'] = {k: '{}/{}'.format(vis_info['sub_directory'], v)
+                    for k, v in kmz_info.items() if k in ('fire', 'smoke')}
+
+        disp_info = export_info.get('dispersion')
+        if disp_info:
+            r.update(**{k: disp_info[k.lower()] for k in ('netCDF', 'netCDFs')
+                if k.lower() in disp_info})
+
+        # TODO: list fire_*.csv if specified in output_json
+
+        return r
 
     def get(self, run_id):
         if EXPORT_MODE == 'upload':
