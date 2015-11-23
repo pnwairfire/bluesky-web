@@ -217,6 +217,10 @@ class RunExecuter(RunHandlerBase):
             # TODO: set any values?
             pass
 
+        # TODO: update bsp to allow configuring export to exclude absolute
+        #   output dir (at least for 'localsave', for 'upload' too if
+        #   necessary), and configure it to do so
+
 class RunStatus(RunHandlerBase):
 
     def get(self, run_id):
