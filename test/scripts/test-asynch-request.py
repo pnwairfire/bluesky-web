@@ -162,6 +162,9 @@ if __name__ == "__main__":
     logging.info("Local start: {}".format(local_start_str))
     logging.info("Locatl end: {}".format(local_end_str))
 
+    data = json.dumps(REQUEST)
+    logging.info("Request JSON: {}".format(data))
+
     url = "http://{}/api/v1/run/".format(args.hostname)
     if args.simple:
         url += 'emissions/?run_asynch='
@@ -174,7 +177,7 @@ if __name__ == "__main__":
         'Accept': 'application/json'
     }
 
-    response = requests.post(url, data=json.dumps(REQUEST), headers=headers)
+    response = requests.post(url, data=data, headers=headers)
     logging.info("Response: {} - {}".format(response.status_code, response.content))
 
     if response.status_code != 200:
