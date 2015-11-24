@@ -187,7 +187,7 @@ if __name__ == "__main__":
     run_id = json.loads(response.content)['run_id']
     logging.info("Run id: {}".format(run_id))
     while True:
-        time.sleep(1)
+        time.sleep(5)
         logging.info("Checking status...")
         url = "http://{}/api/v1/run/{}/status/".format(args.hostname, run_id)
         response = requests.get(url, headers)
