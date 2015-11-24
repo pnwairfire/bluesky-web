@@ -36,6 +36,7 @@ REQUIRED_ARGS = [
     }
 ]
 
+_NOW = datetime.datetime.utcnow()
 OPTIONAL_ARGS = [
     {
         'long': '--simple',
@@ -48,7 +49,7 @@ OPTIONAL_ARGS = [
         'long': '--start',
         'help': "UTC start time of hysplit run; e.g. '2015-08-15T00:00:00'",
         'action': scripting.args.ParseDatetimeAction,
-        'default': datetime.datetime.utcnow().date()
+        'default': datetime.datetime(_NOW.year, _NOW.month, _NOW.day)
     },
     {
         'short': '-n',
