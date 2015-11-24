@@ -19,21 +19,23 @@ echo "Outputing to $OUTPUT_FILE"
 
 echo -n "" > $OUTPUT_FILE
 
+# Note: this test does not include dispersion related apis, i.e.
+#   - /api/v1/run/dispersion/
+#   - /api/v1/run/all/
+#   - /api/v1/run/RUN_ID/status/
+#   - /api/v1/run/RUN_ID/output/
+
 GET_URLS=(
     http://$BLUESKY_API_HOSTNAME/api/ping
     http://$BLUESKY_API_HOSTNAME/api/ping/
     http://$BLUESKY_API_HOSTNAME/api/v1/domains
     http://$BLUESKY_API_HOSTNAME/api/v1/domains/
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/PNW-4km
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/PNW-4km/
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/PNW-4km/available-dates
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/PNW-4km/available-dates/
+    http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km
+    http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/
+    http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/available-dates
+    http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/available-dates/
     http://$BLUESKY_API_HOSTNAME/api/v1/available-dates
     http://$BLUESKY_API_HOSTNAME/api/v1/available-dates/
-    http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/status
-    http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/status/
-    http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output
-    http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output/
 )
 WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 for i in "${GET_URLS[@]}"
@@ -47,10 +49,9 @@ for i in "${GET_URLS[@]}"
     rm $OUTPUT_FILE-t
 done
 
-echo -n "Testing http://$BLUESKY_API_HOSTNAME/api/v1/run/ ... "
+echo -n "Testing http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/ ... "
 echo -n "http://$BLUESKY_API_HOSTNAME/api/v1/run/ - " >> $OUTPUT_FILE
-response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
-        "modules": ["fuelbeds", "consumption", "emissions"],
+response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
