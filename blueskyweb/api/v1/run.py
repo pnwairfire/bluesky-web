@@ -299,7 +299,7 @@ class RunStatus(RunHandlerBase):
 
 class RunOutput(RunHandlerBase):
 
-    def _parse_output(output_json):
+    def _parse_output(self, output_json):
         export_info = output_json.get('export', {}).get(EXPORT_MODE)
         if not export_info:
            return {}
