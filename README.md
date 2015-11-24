@@ -582,36 +582,32 @@ This API returns the output location for a specific run
 
 #### Response
 
-    ... ADD EXAMPLE ...
+    ... ADD SPEC ...
 
 #### Example:
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output"
 
-    ... ADD EXAMPLE ...
-    <!-- {
-       "output": {
-           "root_url": <absolute_path>,
-           "images": {
-               "hourly": [
-                   <filename|relative_path>,
-                   ...
-               ],
-               "daily": {
-                   "average": [
-                       <filename|relative_path>,
-                       ...
-                   ],
-                   "maximum": [
-                       <filename|relative_path>,
-                       ...
-                   ],
-               }
-           },
-           "netCDF": <filename|relative_path>,
-           "kmz": <filename|relative_path>,
-           "fireLocations": <filename|relative_path>, (needed?)
-           "fireEvents": <filename|relative_path>, (needed?)
-           "fireEmissions": <filename|relative_path> (needed?)
-       }
-    } -->
+    {
+        "root_url": "http://foo.com/playground-output/1bfbe6b6-7cc4-11e5-8782-080027880ca6",
+        "images": {
+            "daily": {
+                "average": [
+                    "dispersion-visualization/images/daily_average/RedColorBar/daily_average_20140530.png"
+                ],
+                "maximum": [
+                    "dispersion-visualization/images/daily_maximum/RedColorBar/daily_maximum_20140530.png"
+                ]
+            },
+            "hourly": [
+                "dispersion-visualization/images/hourly/RedColorBar/hourly_201405300500.png",
+                "dispersion-visualization/images/hourly/RedColorBar/hourly_201405300600.png"
+            ]
+        },
+        "kmzs": {
+            "fire": "dispersion-visualization/fire_information.kmz",
+            "smoke": "dispersion-visualization/smoke_dispersion.kmz"
+        },
+        "netCDF": "dispersion-visualization/hysplit_conc.nc"
+
+    }
