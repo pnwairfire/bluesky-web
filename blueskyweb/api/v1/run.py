@@ -19,6 +19,8 @@ from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 # TODO: import vs call executable?
 from bsslib.scheduling.schedulers.bsp.runs import BspRunScheduler
 
+# TODO: pass configuration settings into bsp-web (and on to
+#   blueskyweb.app.main) as arg options rather than as env vars ?
 
 ## ***
 ## *** TODO: REPLACE HARDCODED MET DATA WITH REAL!!!
@@ -51,8 +53,7 @@ EXPORT_CONFIGURATIONS = {
         "url_root_dir": (os.environ.get('BSPWEB_EXPORT_LOCALSAVE_URL_ROOT_DIR')
             or "/playground-output/"),
         # host will be set to hostname in api request if not defined in env var
-        "host": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_HOST'),
-
+        "host": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_HOST')
     },
     "upload": {
         "scp": {

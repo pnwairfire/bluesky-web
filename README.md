@@ -84,6 +84,7 @@ To see documentation for a specific task, use the '-d' option. E.g.:
     export VIRTUALENV_NAME=vm-playground
     export BLUESKYWEB_SERVERS=vagrant@127.0.0.1:2222
     export PROXY_VIA_APACHE=
+    export EXPORT_MODE=localsave
     fab -A setup
     fab -A provision
     fab -A provision
@@ -93,6 +94,7 @@ Note that the deploy task takes care of restarting.
 ##### Two remote servers
 
     export BLUESKYWEB_SERVERS=username-a@hostname-a,username-b@hostname-b
+    export EXPORT_MODE=upload
     fab -A setup
     fab -A provision
     fab -A deploy
@@ -103,6 +105,7 @@ Note that the deploy task takes care of restarting.
     export VIRTUALENV_NAME=playground
     export BLUESKYWEB_SERVERS=user@server2
     export PROXY_VIA_APACHE=
+    export EXPORT_MODE=localsave
     fab -A setup
     fab -A provision
     fab -A deploy
