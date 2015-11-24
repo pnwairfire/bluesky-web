@@ -182,19 +182,38 @@ class RunExecuter(RunHandlerBase):
         data['config']['findmetdata'] = {
             "met_root_dir": DOMAINS[domain]['met_root_dir']
         }
+
     def _configure_dispersion(self, data, domain):
-        # TODO: allow some config in data?  maybe *expect* some in data (like
-        #   start and end dates)?
-        # TODO: set grid and grid spacing? based on what's in
-        #   api.v1.domain.DUMMY_DOMAIN_DATA or what's in redis/mongodb...
-        #   *or* is dispersion grid independent of met grid (e.x. it can be a
-        #   smaller region within met domain)
-        # TODO: set dest_dir, etc?
-        pass
+        if (not data.get('config', {}).get('dispersion', {}) or not
+                data['config']['dispersion'].get('start') or not
+                data['config']['dispersion'].get('num_hours')):
+            self.set_status(400,
+                "Bad request: dispersion 'start' and 'num_hours' must be specified")
+            return
+
+        data['config']['dispersion']['dest_dir'] = (
+            '/tmp/bsp-dispersion-outpt/{}'.format(data['run_id']))
+
+        # Don't set grid and grid spacing;  if it's set in request, leave it
+        # as is; otherwise, let bluesky default it to met domain
 
     def _configure_visualization(self, data, domain):
-        # TODO: set dest_dir, etc?
-        pass
+        # Force visualization of dispersion, and let output go into dispersion
+        # output directory; in case dispersion model was hysplit, specify
+        # images and data sub-directories;
+        # TODO: if other dispersion models are supported in the future, and if
+        #  their visualization results in images and data files, they will
+        #  have to be configured here as well.
+        data['config'] = data.get('config', {})
+        data['config']['visualization'] =  {
+            "target": "dispersion",
+            "hysplit": {
+                "images_dir": "images/",
+                "data_dir": "data/"
+            }
+        }
+
+        # TODO: set anything else?
 
 
     def _configure_export(self, data):
