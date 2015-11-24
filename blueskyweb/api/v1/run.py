@@ -101,6 +101,10 @@ class RunExecuter(RunHandlerBase):
         if "modules" in data:
             self.set_status(400, "Bad request: Don't specify modules")
 
+        # TODO: should no configuration be allowed at all?  or only some? if
+        #  any restrictions, check here or check in specific _configure_*
+        #  methods, below
+
         # run_id is only necessary if running asynchronously, but it doesn't
         # hurt to set it anyway; it's needed in configuring dispersion, so
         # it has to be set before _run_asynchronously
