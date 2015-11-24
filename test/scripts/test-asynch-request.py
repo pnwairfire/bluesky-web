@@ -56,6 +56,32 @@ OPTIONAL_ARGS = [
         'help': 'number of hours in hysplit run',
         "type": int,
         'default': 24
+    },
+    {
+        'long': '--smtp-server',
+        'help': 'SMTP server; ex. localhost:25'
+    },
+    {
+        'long': "--latitude",
+        'help': 'latitude of fire location; default: 37.909644',
+        'default':  37.909644,
+        'type': float
+    },
+    {
+        'long': "--longitude",
+        'help': 'longitude of fire location; default: -119.7615805',
+        'default': -119.7615805,
+        'type': float
+    },
+    {
+        'long': "--utc-offset",
+        'help': 'utc offest of fire location; default: "-07:00"',
+        'default': '-07:00'
+    },
+    {
+        'long': "--met-domain",
+        'help': "met domain; default 'DRI2km'",
+        'default': 'DRI2km'
     }
 ]
 
@@ -66,42 +92,10 @@ REQUEST = {
         },
         "dispersion": {
             "start": None,  # WILL BE FILLED IN
-            "num_hours": None,  # WILL BE FILLED IN
-            "model": "hysplit",
-            "dest_dir": "/home/vagrant/bsp-dispersion-output/",
-            "hysplit": {
-                "grid": {
-                    "spacing": 6.0,
-                    "boundary": {
-                        "ne": {
-                            "lat": 45.25,
-                            "lng": -106.5
-                        },
-                        "sw": {
-                            "lat": 27.75,
-                            "lng": -131.5
-                        }
-                    }
-                }
-            }
-        },
-        "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "images_dir": "images/",
-                "data_dir": "data/"
-            }
+            "num_hours": None  # WILL BE FILLED IN
         },
         "export": {
-            "modes": ["email"],
-            "extra_exports": ["dispersion", "visualization"],
-            "email": {
-                "recipients": ["foo@bar.com"],
-                "sender": "bluesky@blueskywebhost.com",
-                "subject": "BSP output",
-                "smtp_server": "127.0.0.1",
-                "smtp_port": 1025
-            }
+            "extra_exports": ["dispersion", "visualization"]
         }
     },
     "fire_information": [
@@ -115,9 +109,9 @@ REQUEST = {
             "location": {
                 "area": 10000,
                 "ecoregion": "western",
-                "latitude": 37.909644,
-                "longitude": -119.7615805,
-                "utc_offset": "-07:00"
+                "latitude": None,  # WILL BE FILLED IN
+                "longitude": None,  # WILL BE FILLED IN
+                "utc_offset": None,  # WILL BE FILLED IN
             },
             "growth": [
                 {
@@ -146,6 +140,21 @@ if __name__ == "__main__":
         args.start + datetime.timedelta(hours=args.num_hours-7)).strftime(DT_STR)
     REQUEST['fire_information'][0]['growth'][0]['start'] = local_start_str
     REQUEST['fire_information'][0]['growth'][0]['end'] = local_end_str
+    REQUEST['fire_information'][0]['location']['latitude'] = args.latitude
+    REQUEST['fire_information'][0]['location']['longitude'] = args.longitude
+    REQUEST['fire_information'][0]['location']['utc_offset'] = args.utc_offset
+
+    if args.smtp_server:
+        smtp_server, smtp_port = args.smtp_server.split(':')
+        REQUEST['config']['export']['modes'] = ["email"]
+        REQUEST['config']['export']["email"] = {
+            "recipients": ["foo@bar.com"],
+            "sender": "bluesky@blueskywebhost.com",
+            "subject": "BSP output",
+            "smtp_server": smtp_server,
+            "smtp_port": smtp_port
+        }
+
 
     logging.info("UTC start: {}".format(start_str))
     logging.info("Num hours: {}".format(args.num_hours))
@@ -156,7 +165,7 @@ if __name__ == "__main__":
     if args.simple:
         url += 'emissions/?run_asynch='
     else:
-        url += 'dispersion/DRI2km/'
+        url += 'dispersion/{}/'.format(args.met_domain)
     logging.info("Testing {} ... ".format(url))
 
     headers = {
