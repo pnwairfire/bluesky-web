@@ -165,7 +165,7 @@ if __name__ == "__main__":
     if args.simple:
         url += 'emissions/?run_asynch='
     else:
-        url += 'dispersion/{}/'.format(args.met_domain)
+        url += 'all/{}/'.format(args.met_domain)
     logging.info("Testing {} ... ".format(url))
 
     headers = {

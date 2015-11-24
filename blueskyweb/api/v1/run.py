@@ -86,7 +86,7 @@ class RunHandlerBase(tornado.web.RequestHandler):
 
 class RunExecuter(RunHandlerBase):
 
-    def post(self, domain=None):
+    def post(self, mode=None, domain=None):
         if domain and domain not in DOMAINS:
             self.set_status(404, 'Bad request: Unrecognized domain')
             return
@@ -113,14 +113,21 @@ class RunExecuter(RunHandlerBase):
 
         try:
             if domain:
-                data['modules'] = ['timeprofiling', 'findmetdata', 'localmet',
-                    'plumerising', 'dispersion', 'visualization', 'export']
+                if mode == 'all':
+                    data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
+                else:
+                    data['modules'] = []
+                data['modules'].extend(['timeprofiling', 'findmetdata', 'localmet',
+                    'plumerising', 'dispersion', 'visualization', 'export'])
+
                 self._configure_findmetdata(data, domain)
                 self._configure_dispersion(data, domain)
                 self._configure_visualization(data, domain)
                 # TODO: configure anything else (e.g. setting domain where
                 #  appropriate)
+
                 self._run_asynchronously(data, domain=domain)
+
             else:
                 data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
                 if self.get_query_argument('run_asynch', default=None) is not None:
