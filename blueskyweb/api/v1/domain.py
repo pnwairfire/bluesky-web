@@ -36,6 +36,19 @@ DUMMY_DOMAIN_DATA = {
             (datetime.date.today() - datetime.timedelta(2)).strftime("%Y%m%d")
         ],
         "boundary": {
+            "center_latitude": 37.0,
+            "center_longitude": -119.0,
+            "width_longitude": 13.0,
+            "height_latitude": 11.5
+        }
+    },
+    "DRI6km": {
+        "dates": [
+            datetime.date.today().strftime("%Y%m%d"),
+            (datetime.date.today() - datetime.timedelta(1)).strftime("%Y%m%d"),
+            (datetime.date.today() - datetime.timedelta(2)).strftime("%Y%m%d")
+        ],
+        "boundary": {
             "center_latitude": 36.5,
             "center_longitude": -119.0,
             "width_longitude": 25.0,

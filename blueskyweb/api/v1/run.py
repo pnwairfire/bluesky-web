@@ -34,6 +34,10 @@ DOMAINS = {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/DRI_2km/' # TODO: don't hardcode (see above)
     },
+    'DRI6km': {
+        'queue': 'dri', # TODO: define elsewhere ? (see above)
+        'met_root_dir': '/DRI_6km/' # TODO: don't hardcode (see above)
+    },
     'NAM84': {
         'queue': 'nam', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/NAM84/' # TODO: don't hardcode (see above)
