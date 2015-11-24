@@ -101,6 +101,12 @@ class RunExecuter(RunHandlerBase):
         if "modules" in data:
             self.set_status(400, "Bad request: Don't specify modules")
 
+        # run_id is only necessary if running asynchronously, but it doesn't
+        # hurt to set it anyway; it's needed in configuring dispersion, so
+        # it has to be set before _run_asynchronously
+        if not data.get('run_id'):
+            data['run_id'] = str(uuid.uuid1())
+
         try:
             if domain:
                 data['modules'] = ['timeprofiling', 'findmetdata', 'localmet',
@@ -132,9 +138,6 @@ class RunExecuter(RunHandlerBase):
     #     self.write({"error": msg})
 
     def _run_asynchronously(self, data, domain=None):
-
-        if not data.get('run_id'):
-            data['run_id'] = str(uuid.uuid1())
 
         self._configure_export(data)
 
