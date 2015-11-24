@@ -120,7 +120,7 @@ This API returns information about all domains with ARL data
 
 #### Request
 
- - url: http://bluesky-api-hostname/api/v1/domains/
+ - url: http://$BLUESKY_API_HOSTNAME/api/v1/domains/
  - method: GET
 
 #### Response
@@ -147,10 +147,23 @@ This API returns information about all domains with ARL data
 
 #### Example
 
-    $ curl 'http://bluesky-api-hostname/api/v1/domains/'
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/domains/" | python -m json.tool
     {
-        "domains": {
-            "CANSAC-6km": {
+         "domains": {
+            "DRI2km": {
+                "boundary": {
+                    "center_latitude": 37.0,
+                    "center_longitude": -119.0,
+                    "height_latitude": 11.5,
+                    "width_longitude": 13.0
+                },
+                "dates": [
+                    "20151124",
+                    "20151123",
+                    "20151122"
+                ]
+            },
+            "DRI6km": {
                 "boundary": {
                     "center_latitude": 36.5,
                     "center_longitude": -119.0,
@@ -158,22 +171,22 @@ This API returns information about all domains with ARL data
                     "width_longitude": 25.0
                 },
                 "dates": [
-                    "20150922",
-                    "20150921",
-                    "20150920"
+                    "20151124",
+                    "20151123",
+                    "20151122"
                 ]
             },
-            "PNW-4km": {
+            "NAM84": {
                 "boundary": {
-                    "center_latitude": 45.0,
-                    "center_longitude": -118.3,
-                    "height_latitude": 10.0,
-                    "width_longitude": 20.0
+                    "center_latitude": 37.5,
+                    "center_longitude": -95.0,
+                    "height_latitude": 30.0,
+                    "width_longitude": 70.0
                 },
                 "dates": [
-                    "20150922",
-                    "20150921",
-                    "20150920"
+                    "20151124",
+                    "20151123",
+                    "20151122"
                 ]
             }
         }
@@ -185,7 +198,7 @@ This API returns information about a specific domain with ARL data
 
 #### Request
 
- - url: http://bluesky-api-hostname/api/v1/domains/<domain_id>/
+ - url: http://$BLUESKY_API_HOSTNAME/api/v1/domains/<domain_id>/
  - method: GET
 
 #### Response
@@ -209,19 +222,19 @@ This API returns information about a specific domain with ARL data
 
 #### Example
 
-    $ curl 'http://bluesky-api-hostname/api/v1/domains/PNW-4km/'
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/" | python -m json.tool
     {
-        "PNW-4km": {
+        "DRI2km": {
             "boundary": {
-                "center_latitude": 45.0,
-                "center_longitude": -118.3,
-                "height_latitude": 10.0,
-                "width_longitude": 20.0
+                "center_latitude": 37.0,
+                "center_longitude": -119.0,
+                "height_latitude": 11.5,
+                "width_longitude": 13.0
             },
             "dates": [
-                "20150922",
-                "20150921",
-                "20150920"
+                "20151124",
+                "20151123",
+                "20151122"
             ]
         }
     }
@@ -232,7 +245,7 @@ This API returns the dates for which a specific d has ARL data
 
 #### Request
 
- - url: http://bluesky-api-hostname/api/v1/domains/<domain_id>/available-dates
+ - url: http://$BLUESKY_API_HOSTNAME/api/v1/domains/<domain_id>/available-dates
  - method: GET
 
 #### Response
@@ -247,24 +260,24 @@ This API returns the dates for which a specific d has ARL data
 
 #### Example
 
-    $ curl 'http://bluesky-api-hostname/api/v1/domains/PNW-4km/available-dates
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/available-dates" | python -m json.tool
 
     {
         "dates": [
-            "20150922",
-            "20150921",
-            "20150920"
+            "20151124",
+            "20151123",
+            "20151122"
         ]
     }
 
 
-### GET /api/v1/domains/available-dates/
+### GET /api/v1/available-dates/
 
 This API returns the dates, by domain, for which there exist ARL data
 
 #### Request
 
- - url: http://bluesky-api-hostname/api/v1/available-dates/
+ - url: http://$BLUESKY_API_HOSTNAME/api/v1/available-dates/
  - method: GET
 
 #### Response
@@ -282,41 +295,41 @@ This API returns the dates, by domain, for which there exist ARL data
 
 #### Example
 
-    $ curl 'http://bluesky-api-hostname/api/v1/available-dates
-
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/available-dates" | python -m json.tool
     {
         "dates": {
-            "CANSAC-6km": [
-                "20150922",
-                "20150921",
-                "20150920"
+            "DRI2km": [
+                "20151124",
+                "20151123",
+                "20151122"
             ],
-            "PNW-4km": [
-                "20150922",
-                "20150921",
-                "20150920"
+            "DRI6km": [
+                "20151124",
+                "20151123",
+                "20151122"
+            ],
+            "NAM84": [
+                "20151124",
+                "20151123",
+                "20151122"
             ]
         }
     }
 
+### POST /api/v1/run/emissions/
 
-### POST /api/v1/run/
-
-This API requires posted JSON with three top level keys -
-'modules', 'fire_information', and 'config'.
-The 'fire_information' key lists the one or more fires to process. The
-'modules' key is the order specific list of modules through which the fires
-should be run. The optional 'config' key specifies configuration data and
-other control parameters.
+This API requires posted JSON with two possible top level keys -
+'fire_information', and 'config'. The 'fire_information' key is required,
+and it lists the one or more fires to process. The 'config' key is optional,
+and it specifies configuration data and other control parameters.
 
 #### Request
 
- - url: http://bluesky-api-hostname/api/v1/run/
+ - url: http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/
  - method: POST
  - post data:
 
         {
-            "modules": [ ... ],
             "fire_information": [ ... ],
             "config": { ... }
         }
@@ -326,40 +339,27 @@ and optional post data
 
 #### Response
 
-What you get in response depends on which modules you're executing.  If
-your run does ***not*** include hysplit, then bluesky will be run in realtime,
-and the results will be in the API response.  The response data will be the
+In handling this request, blueskyweb will run bluesky in realtime, and the
+bluesky results will be in the API response.  The response data will be the
 modified version of the request data.  It will include the
-"fire_information" keys, the "config" key (if specified), a "processing"
+"fire_information" key, the "config" key (if specified), a "processing"
 key that includes information from the modules that processed the data, and
-possibly a "summary" key (depending on whether or not the modules run add
-summary data)
+a "summary" key.
 
     {
-        "fire_information": [ ... ],
         "config": { ... },
+        "fire_information": [ ... ],
         "processing": [ ... ],
+        "run_id": "<RUN_ID>",
         "summary": { ... }
-    }
-
-If hysplit is run, however, bluesky will be run asynchronously, and the
-API reponse will include a guid to identify the run in subsequent
-status and output API requests (described below).
-
-    {
-        run_id: <guid>
     }
 
 #### Examples
 
-##### Running ```fuelbeds```, ```consumption```, and ```emissions```:
+An example with fire location data specifeid as a perimeter
 
-This example requires very little data, since it's starting off with ```fuelbeds```,
-one of the earlier modules in the pipeline.
-
-    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
     {
-        "modules": ["fuelbeds", "consumption", "emissions"],
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
@@ -385,11 +385,11 @@ one of the earlier modules in the pipeline.
                 }
             }
         ]
-    }'
+    }' | python -m json.tool
 
 Another exmaple, with fire location data specified as lat + lng + size
 
-    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
     {
         "modules": ["fuelbeds", "consumption", "emissions"],
         "fire_information": [
@@ -408,65 +408,31 @@ Another exmaple, with fire location data specified as lat + lng + size
                 }
             }
         ]
-    }'
+    }' | python -m json.tool
 
-##### Running ```consumption```, and ```emissions```:
+### POST /api/v1/run/dispersion/<met_domain>/
 
-This example starts with fire data that already had fuelbed information and
-passes it through consumption and emissions.  Note that is passes in some
-custom fuel loadings information.
+Like with the emissions API, This API requires posted JSON with two
+possible top level keys - 'fire_information' and 'config'. The
+'fire_information' key is required, and must contain emissions data and growth
+time windows for each fire. The 'config' key is also required, to specify,
+at the very least, dispersion start time and num_hours.
 
-    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+Since dispersion is run, bluesky will be run asynchronously, and the
+API reponse will include a guid to identify the run in subsequent
+status and output API requests (described below).
+
     {
-        "modules": ["consumption", "emissions"],
-        "config": {
-            "consumption": {
-                "fuel_loadings": {
-                    "10046": {
-                        "based_on_fccs_id": "46",
-                        "w_sound_9_20_loading": 0.42,
-                        "w_sound_gt20_loading": 0.43,
-                        "w_sound_quarter_1_loading": 0.44,
-                        "w_stump_lightered_loading": 0.45,
-                        "w_stump_rotten_loading": 0.46,
-                        "w_stump_sound_loading": 0.47
-                    }
-                }
-            }
-        },
-        "fire_information": [
-            {
-                "id": "SF11C14225236095807750",
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Snoqualmie Pass, WA"
-                },
-                "fuelbeds": [
-                    {
-                        "fccs_id": "10046",
-                        "pct": 100.0
-                    }
-                ],
-                "location": {
-                    "area": 200,
-                    "ecoregion": "southern",
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "utc_offset": "-09:00"
-                }
-            }
-        ]
-    }'
+        run_id: <guid>
+    }
 
-##### Running  ```localmet```, ```timeprofiling```, ```plumerise```, ```dispersion```, ```visualization```, ```export```:
+#### Example
 
-This example assumes you've already run up through emissions.  The consumption data
-that would have nested along side the emissions data has been stripped out, since
-it's not needed.
+Since this API requires emissions data, consumption data is not required,
+and so has been optionally stripped from the following request
 
-    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
     {
-        "modules": ["localmet", "timeprofiling", "plumerise", "dispersion", "visualization", "export"],
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
@@ -483,62 +449,44 @@ it's not needed.
                         "fccs_id": "49",
                         "pct": 50.0,
                         "emissions": {
-                            'ground fuels': {
-                                'basal accumulations': {
-                                    'flaming': {
-                                        'PM2.5': [
+                            "ground fuels": {
+                                "basal accumulations": {
+                                    "flaming": {
+                                        "PM2.5": [
                                             3.3815120047017005e-05
                                         ]
                                     },
-                                    'residual': {
-                                        'PM2.5': [
+                                    "residual": {
+                                        "PM2.5": [
                                             4.621500211796271e-01
                                         ]
                                     },
-                                    'smoldering': {
-                                        'PM2.5': [
+                                    "smoldering": {
+                                        "PM2.5": [
                                             6.424985839975172e-06
                                         ]
                                     }
                                 }
                             }
-                            /* ... (other emissions data) ... */
                         }
                     }
                 ],
                 "growth": [
                     {
-                        "start": "20150120",
-                        "end": "20150121",
+                        "start": "2015-11-23T15:00:00",
+                        "end": "2015-11-24T15:00:00",
                         "pct": 100.0
                     }
                 ]
             }
         ],
         "config": {
-            "localmet": {
-                /* ... */
-            },
-            "timeprofiling": {
-                "module": "standard" /* or "feps_rx_timing" or "custom" */
-            },
-            "plumerise": {
-                "module": "sev"
-            },
             "dispersion": {
-                "module": "hysplit",
-                "start": "20150121T000000Z",
-                "end": "20150123T000000Z",
-                "met_domain": "PNW-4km"
-            },
-            "visualization": {
-                /* ... */
-            },
-            "export": {
-                "module": "playground" /* or "bs_daily" */
+                "start": "2015-11-24T00:00:00",
+                "num_hours": 24
             }
         }
-    }'
+    }' | python -m json.tool
 
 The nested keys in the emissions data are arbitrary.  The timeprofiling
 module simply expects a hierarchy of keys.  Generally speaking, the hiearchy
@@ -555,11 +503,19 @@ The length of each array equals the number of fuelbeds passed into consume.
 Since consume is called on each fuelbed separately, the arrays of consumption
 and emissions data will all be of length 1.
 
-##### Running ```ingestion```, ```fuelbeds```, ```consumption```, ```emissions```, ```localmet```, ```timeprofiling```, ```plumerise```, ```dispersion```, ```visualization```, ```export```:
+Note that the growth start and end timestamps are local time, whereas the
+dispersion start time is in UTC.
 
-    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+### POST /api/v1/run/all/<met_domain>/
+
+This API is very similar to dispersion, except that it starts off with the
+'ingestion' module rather than with 'findmetdata', and so doesn't require
+emissions data.
+
+#### Example
+
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/all/DRI2km/" -H 'Content-Type: application/json' -d '
     {
-        "modules": ["timeprofiling", "plumerise", "dispersion"],
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
@@ -570,17 +526,23 @@ and emissions data will all be of length 1.
                     "longitude": -121.3990506,
                     "area": 200,
                     "utc_offset": "-09:00"
-                }
+                },
                 "growth": [
                     {
-                        "start": "20150120",
-                        "end": "20150121",
+                        "start": "2015-11-23T15:00:00",
+                        "end": "2015-11-24T15:00:00",
                         "pct": 100.0
                     }
                 ]
             }
-        ]
-    }
+        ],
+        "config": {
+            "dispersion": {
+                "start": "2015-11-24T00:00:00",
+                "num_hours": 24
+            }
+        }
+    }' | python -m json.tool
 
 ### GET /api/v1/run/<guid>/status
 
@@ -588,7 +550,7 @@ This API returns the status of a specific hysplit run
 
 #### Request
 
- - url: http://bluesky-api-hostname/api/v1/run/<guid>/status
+ - url: http://$BLUESKY_API_HOSTNAME/api/v1/run/<guid>/status
  - method: GET
 
 #### Response
@@ -596,19 +558,17 @@ This API returns the status of a specific hysplit run
     {
         "complete": <boolean>,
         "percent": <double>, /* (if available) */
-        "failed": <boolean>,
-        "message": <string>
+        "failed": <boolean>  /* (if known) */
     }
 
 #### Example:
 
-    $ curl 'http://bluesky-api-hostname/api/v1/run/abc123/status'
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/status"
 
     {
         "complete": false,
         "percent": 62.3, /* (if available) */
-        "failed": false,
-        "message": "Started HYSPLIT"
+        "failed": false  /* (if known) */
     }
 
 ### GET /api/v1/run/<guid>/output
@@ -617,17 +577,19 @@ This API returns the output location for a specific run
 
 #### Request
 
- - url: http://bluesky-api-hostname/api/v1/run/<guid>/output
+ - url: http://$BLUESKY_API_HOSTNAME/api/v1/run/<guid>/output
  - method: GET
 
 #### Response
 
+    ... ADD EXAMPLE ...
 
 #### Example:
 
-    $ curl 'http://bluesky-api-hostname/api/v1/run/abc123/output'
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output"
 
-    {
+    ... ADD EXAMPLE ...
+    <!-- {
        "output": {
            "root_url": <absolute_path>,
            "images": {
@@ -652,81 +614,4 @@ This API returns the output location for a specific run
            "fireEvents": <filename|relative_path>, (needed?)
            "fireEmissions": <filename|relative_path> (needed?)
        }
-    }
-
-## API Aliases (Proposed)
-
-### POST /api/v1/playground/1/
-
-This is just an alias for ```/api/v1/run/```, and running ```ingestion```,
-```fuelbeds```, ```consumption```, ```emissions``` - i.e. you don't have
-to specify the 'modules' key.  Also
-
-### POST /api/v1/playground/2/
-
-This is just an alias for ```/api/v1/run/```, and running ```localmet```,
-```timeprofiling```, ```plumerise```, ```dispersion```, ```visualization```,
-```export```.  As with /1/, you don't have to specify either the 'modules'
-key or the export type.
-
-Example:
-
-    $ curl 'http://bluesky-api-hostname/api/v1/playground/2/' -H 'Content-Type: application/json' -d '
-    {
-        "fire_information": [
-            {
-                "id": "SF11C14225236095807750",
-                "event_id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA",
-                "location": {
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "area": 200,
-                    "utc_offset": "-09:00"
-                },
-                "fuelbeds": [
-                    {
-                        "fccs_id": "49",
-                        "pct": 50.0,
-                        "emissions": {
-                            'ground fuels': {
-                                'basal accumulations': {
-                                    'flaming': {
-                                        'PM2.5': [
-                                            3.3815120047017005e-05
-                                        ]
-                                    },
-                                    'residual': {
-                                        'PM2.5': [
-                                            4.621500211796271e-01
-                                        ]
-                                    },
-                                    'smoldering': {
-                                        'PM2.5': [
-                                            6.424985839975172e-06
-                                        ]
-                                    }
-                                }
-                            }
-                            /* ... (other emissions data) ... */
-                        }
-                    }
-                ],
-                "growth": [
-                    {
-                        "start": "20150120",
-                        "end": "20150121",
-                        "pct": 100.0
-                    }
-                ]
-            }
-        ],
-        "config": {
-            "start": "20150121T000000Z",
-            "end": "20150123T000000Z",
-            "met_domain": "PNW-4km",
-            "timeprofiling": {
-                "module": "custom"
-            }
-        }
-    }'
+    } -->
