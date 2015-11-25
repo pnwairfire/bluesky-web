@@ -176,8 +176,9 @@ class RunExecuter(RunHandlerBase):
                     data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
                 else:
                     data['modules'] = []
+                  # Note: export module is added in _configure_export when necessary
                 data['modules'].extend(['timeprofiling', 'findmetdata', 'localmet',
-                    'plumerising', 'dispersion', 'visualization', 'export'])
+                    'plumerising', 'dispersion', 'visualization'])
 
         else:
             data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
@@ -279,7 +280,7 @@ class RunExecuter(RunHandlerBase):
             if set(data.get('config', {}).get('export', {}).get('modes', [])) - set(['email']):
                 self.set_status(400, "Bad request: only 'email' export mode allowed")
                 return
-            # Make sure 'export' module is executed only once, at that it
+            # Make sure 'export' module is executed only once, and that it
             # happens at the end
             data['modules'] = [e for e in data['modules'] if e != 'export'] + ['export']
         else:
