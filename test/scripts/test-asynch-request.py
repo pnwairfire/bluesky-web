@@ -83,6 +83,14 @@ OPTIONAL_ARGS = [
         'long': "--met-domain",
         'help': "met domain; default 'DRI2km'",
         'default': 'DRI2km'
+    },
+    {
+        'short': '-m',
+        'long': '--module',
+        'dest': 'modules',
+        'help': "alternate module(s) to run",
+        'default': [],
+        'action': scripting.args.AppendOrSplitAndExtendAction
     }
 ]
 
@@ -132,6 +140,10 @@ if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EPILOG_STR)
 
+    if args.simple and args.modules:
+        logging.error("Don't specify both '--simple' and '--modules'")
+        sys.exit(1)
+
     start_str = args.start.strftime(DT_STR)
     REQUEST['config']['dispersion']['start'] = start_str
     REQUEST['config']['dispersion']['num_hours'] = args.num_hours
@@ -156,20 +168,24 @@ if __name__ == "__main__":
             "smtp_port": smtp_port
         }
 
-
     logging.info("UTC start: {}".format(start_str))
     logging.info("Num hours: {}".format(args.num_hours))
     logging.info("Local start: {}".format(local_start_str))
-    logging.info("Locatl end: {}".format(local_end_str))
+    logging.info("Local end: {}".format(local_end_str))
+    if args.modules:
+        logging.info("Modules: {}".format(args.modules))
 
     data = json.dumps(REQUEST)
     logging.info("Request JSON: {}".format(data))
 
     url = "http://{}/api/v1/run/".format(args.hostname)
     if args.simple:
-        url += 'emissions/?run_asynch='
+        url += 'emissions/?_a='
     else:
         url += 'all/{}/'.format(args.met_domain)
+        if args.modules:
+            #url += '?{}'.format('&'.join(['_m[]='+m for m in args.modules]))
+            url += '?_m={}'.format(','.join(args.modules))
     logging.info("Testing {} ... ".format(url))
 
     headers = {

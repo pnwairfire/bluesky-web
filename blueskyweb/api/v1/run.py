@@ -113,14 +113,9 @@ class RunExecuter(RunHandlerBase):
             data['run_id'] = str(uuid.uuid1())
 
         try:
-            if domain:
-                if mode == 'all':
-                    data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
-                else:
-                    data['modules'] = []
-                data['modules'].extend(['timeprofiling', 'findmetdata', 'localmet',
-                    'plumerising', 'dispersion', 'visualization', 'export'])
+            self._set_modules(domain, mode, data)
 
+            if domain:
                 self._configure_findmetdata(data, domain)
                 self._configure_dispersion(data, domain)
                 self._configure_visualization(data, domain)
@@ -130,8 +125,7 @@ class RunExecuter(RunHandlerBase):
                 self._run_asynchronously(data, domain=domain)
 
             else:
-                data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
-                if self.get_query_argument('run_asynch', default=None) is not None:
+                if self.get_query_argument('_a', default=None) is not None:
                     self._run_asynchronously(data)
                 else:
                     self._run_in_process(data)
@@ -144,6 +138,28 @@ class RunExecuter(RunHandlerBase):
             self.set_status(500)
 
     ## Helpers
+
+    def _set_modules(self, domain, mode, data):
+        if domain:
+            # TODO: support modules being specified either as comma-delimited
+            # string or separately to create array (if tornado supports it)
+            modules = self.get_query_argument('_m', default=None)
+            logging.debug('modules (_m): %s', modules)
+            if mode == 'all' and modules:
+                data['modules'] = modules.split(',')
+            else:
+                if mode == 'all':
+                    data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
+                else:
+                    data['modules'] = []
+                data['modules'].extend(['timeprofiling', 'findmetdata', 'localmet',
+                    'plumerising', 'dispersion', 'visualization', 'export'])
+
+        else:
+            data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
+
+        logging.debug("Set modules: {}".format(', '.join(data['modules'])))
+
 
     # def _bad_request(self, msg):
     #     self.set_status(400)
