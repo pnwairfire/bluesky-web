@@ -435,47 +435,46 @@ and so has been optionally stripped from the following request
     {
         "fire_information": [
             {
-                "id": "SF11C14225236095807750",
-                "event_id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA",
-                "location": {
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "area": 200,
-                    "utc_offset": "-09:00",
-                    "ecoregion": "southern"
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
                 },
+                "id": "SF11C14225236095807750",
+                "location": {
+                    "area": 10000,
+                    "ecoregion": "western",
+                    "latitude": 37.909644,
+                    "longitude": -119.7615805,
+                    "utc_offset": "-07:00"
+                },
+                "type": "natural",
                 "fuelbeds": [
                     {
                         "fccs_id": "49",
                         "pct": 50.0,
                         "emissions": {
-                            "ground fuels": {
-                                "basal accumulations": {
-                                    "flaming": {
-                                        "PM2.5": [
-                                            3.3815120047017005e-05
-                                        ]
-                                    },
-                                    "residual": {
-                                        "PM2.5": [
-                                            4.621500211796271e-01
-                                        ]
-                                    },
-                                    "smoldering": {
-                                        "PM2.5": [
-                                            6.424985839975172e-06
-                                        ]
-                                    }
-                                }
+                            "flaming": {
+                                "PM2.5": [
+                                    3.3815120047017005e-05
+                                ]
+                            },
+                            "residual": {
+                                "PM2.5": [
+                                    4.621500211796271e-01
+                                ]
+                            },
+                            "smoldering": {
+                                "PM2.5": [
+                                    6.424985839975172e-06
+                                ]
                             }
                         }
                     }
                 ],
                 "growth": [
                     {
-                        "start": "2015-11-23T15:00:00",
-                        "end": "2015-11-24T15:00:00",
+                        "start": "2015-11-24T17:00:00",
+                        "end": "2015-11-25T17:00:00",
                         "pct": 100.0
                     }
                 ]
@@ -483,7 +482,7 @@ and so has been optionally stripped from the following request
         ],
         "config": {
             "dispersion": {
-                "start": "2015-11-24T00:00:00",
+                "start": "2015-11-25T00:00:00",
                 "num_hours": 24
             },
             "export": {
@@ -494,15 +493,6 @@ and so has been optionally stripped from the following request
             }
         }
     }' | python -m json.tool
-
-The nested keys in the emissions data are arbitrary.  The timeprofiling
-module simply expects a hierarchy of keys.  Generally speaking, the hiearchy
-is of the form:
-
-    'emissions' > 'category' > 'subcategory' > 'phase' > 'species'
-
-where the 'category' and 'subcategory' keys correspond to fuel types, but could
-be anything.
 
 The fact that the emissions data is in an array is because the consumption
 module (more specifically, the underlying 'consume' module) outputs arrays.
