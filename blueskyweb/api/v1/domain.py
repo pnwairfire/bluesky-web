@@ -26,7 +26,9 @@ DUMMY_DOMAIN_DATA = {
             "center_latitude": 37.5,
             "center_longitude": -95.0,
             "width_longitude": 70.0,
-            "height_latitude": 30.0
+            "height_latitude": 30.0,
+            "spacing_longitude": 12,  # TODO: is this correct?
+            "spacing_latitude": 12  # TODO: is this correct?
         }
     },
     "DRI2km": {
@@ -39,7 +41,9 @@ DUMMY_DOMAIN_DATA = {
             "center_latitude": 37.0,
             "center_longitude": -119.0,
             "width_longitude": 13.0,
-            "height_latitude": 11.5
+            "height_latitude": 11.5,
+            "spacing_longitude": 2,
+            "spacing_latitude": 2
         }
     },
     "DRI6km": {
@@ -52,7 +56,9 @@ DUMMY_DOMAIN_DATA = {
             "center_latitude": 36.5,
             "center_longitude": -119.0,
             "width_longitude": 25.0,
-            "height_latitude": 17.5
+            "height_latitude": 17.5,
+            "spacing_longitude": 6,
+            "spacing_latitude": 6
         }
     }
 }

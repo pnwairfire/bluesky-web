@@ -34,15 +34,39 @@ from bsslib.scheduling.schedulers.bsp.runs import BspRunScheduler
 DOMAINS = {
     'DRI2km': {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/DRI_2km/' # TODO: don't hardcode (see above)
+        'met_root_dir': '/DRI_2km/', # TODO: don't hardcode (see above)
+        "boundary": {  # TODO: don't hardcode (see above)
+            "center_latitude": 37.0,
+            "center_longitude": -119.0,
+            "width_longitude": 13.0,
+            "height_latitude": 11.5,
+            "spacing_longitude": 2,
+            "spacing_latitude": 2
+        }
     },
     'DRI6km': {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/DRI_6km/' # TODO: don't hardcode (see above)
+        'met_root_dir': '/DRI_6km/', # TODO: don't hardcode (see above)
+        "boundary": {  # TODO: don't hardcode (see above)
+            "center_latitude": 36.5,
+            "center_longitude": -119.0,
+            "width_longitude": 25.0,
+            "height_latitude": 17.5,
+            "spacing_longitude": 6,
+            "spacing_latitude": 6
+        }
     },
     'NAM84': {
         'queue': 'nam', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/NAM84/' # TODO: don't hardcode (see above)
+        'met_root_dir': '/NAM84/', # TODO: don't hardcode (see above)
+        "boundary": {   # TODO: don't hardcode (see above)
+            "center_latitude": 37.5,
+            "center_longitude": -95.0,
+            "width_longitude": 70.0,
+            "height_latitude": 30.0,
+            "spacing_longitude": 12,  # TODO: is this correct?
+            "spacing_latitude": 12  # TODO: is this correct?
+        }
     }
 }
 
@@ -218,8 +242,17 @@ class RunExecuter(RunHandlerBase):
         data['config']['dispersion']['dest_dir'] = (
             '/tmp/bsp-dispersion-outpt/{}'.format(data['run_id']))
 
-        # Don't set grid and grid spacing;  if it's set in request, leave it
-        # as is; otherwise, let bluesky default it to met domain
+        if data['config']['dispersion'].get('model') in ('hysplit', None):
+            # set grid and grid spacing if it's not already set in request
+            if not data['config']['dispersion'].get('hysplit', {}).get('grid'):
+                if not data['config']['dispersion'].get('hysplit'):
+                    data['config']['dispersion']['hysplit'] = {}
+                if not data['config']['dispersion']['hysplit'].get('grid'):
+                    data['config']['dispersion']['hysplit']['USER_DEFINED_GRID'] = True
+                    for k, v in DOMAINS[domain]['boundary'].items():
+                        data['config']['dispersion']['hysplit'][k.upper()] = v
+
+        # TODO: any other model-specific configuration?
 
     def _configure_visualization(self, data, domain):
         # Force visualization of dispersion, and let output go into dispersion
