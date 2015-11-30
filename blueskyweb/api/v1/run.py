@@ -40,8 +40,8 @@ DOMAINS = {
             "center_longitude": -119.0,
             "width_longitude": 13.0,
             "height_latitude": 11.5,
-            "spacing_longitude": 2,
-            "spacing_latitude": 2
+            "spacing_longitude": 0.1,
+            "spacing_latitude": 0.1
         }
     },
     'DRI6km': {
@@ -52,8 +52,8 @@ DOMAINS = {
             "center_longitude": -119.0,
             "width_longitude": 25.0,
             "height_latitude": 17.5,
-            "spacing_longitude": 6,
-            "spacing_latitude": 6
+            "spacing_longitude": 0.5,
+            "spacing_latitude": 0.5
         }
     },
     'NAM84': {
@@ -64,8 +64,8 @@ DOMAINS = {
             "center_longitude": -95.0,
             "width_longitude": 70.0,
             "height_latitude": 30.0,
-            "spacing_longitude": 12,  # TODO: is this correct?
-            "spacing_latitude": 12  # TODO: is this correct?
+            "spacing_longitude": 0.5,  # TODO: is this correct?
+            "spacing_latitude": 0.5  # TODO: is this correct?
         }
     }
 }
