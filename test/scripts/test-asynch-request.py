@@ -59,6 +59,13 @@ OPTIONAL_ARGS = [
         'default': 24
     },
     {
+        'short': '-a',
+        'long': '--area',
+        'help': 'area of fire, in acres; default 10000',
+        "type": float,
+        'default': 10000.0
+    },
+    {
         'long': '--smtp-server',
         'help': 'SMTP server; ex. localhost:25'
     },
@@ -116,7 +123,7 @@ REQUEST = {
             "id": "SF11C14225236095807750",
             "type": "natural",
             "location": {
-                "area": 10000,
+                "area": None,  # WILL BE FILLED IN
                 "ecoregion": "western",
                 "latitude": None,  # WILL BE FILLED IN
                 "longitude": None,  # WILL BE FILLED IN
@@ -153,6 +160,7 @@ if __name__ == "__main__":
         args.start + datetime.timedelta(hours=args.num_hours-7)).strftime(DT_STR)
     REQUEST['fire_information'][0]['growth'][0]['start'] = local_start_str
     REQUEST['fire_information'][0]['growth'][0]['end'] = local_end_str
+    REQUEST['fire_information'][0]['location']['area'] = args.area
     REQUEST['fire_information'][0]['location']['latitude'] = args.latitude
     REQUEST['fire_information'][0]['location']['longitude'] = args.longitude
     REQUEST['fire_information'][0]['location']['utc_offset'] = args.utc_offset
@@ -172,6 +180,9 @@ if __name__ == "__main__":
     logging.info("Num hours: {}".format(args.num_hours))
     logging.info("Local start: {}".format(local_start_str))
     logging.info("Local end: {}".format(local_end_str))
+    logging.info("Lat: {}".format(args.latitude))
+    logging.info("Lng: {}".format(args.longitude))
+    logging.info("Area: {}".format(args.area))
     if args.modules:
         logging.info("Modules: {}".format(args.modules))
 
