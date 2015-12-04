@@ -1,15 +1,16 @@
-if [ $# -lt 1 ] || [ $# -gt 2 ]
+if [ $# -lt 2 ] || [ $# -gt 3 ]
   then
-    echo "Usage: $0 <hostname> [response output file]"
-    echo "Ex:  $0 localhost:8888 /tmp/web-regression-out"
+    echo "Usage: $0 <hostname> <domain> [response output file]"
+    echo "Ex:  $0 localhost:8888 DRI2km /tmp/web-regression-out"
     echo ""
     exit 1
 fi
 
 BLUESKY_API_HOSTNAME=$1
-if [ $# -eq 2 ]
+DOMAIN=$2
+if [ $# -eq 3 ]
   then
-    OUTPUT_FILE=$2
+    OUTPUT_FILE=$3
 else
     OUTPUT_FILE=/dev/null
 fi
@@ -30,10 +31,10 @@ GET_URLS=(
     http://$BLUESKY_API_HOSTNAME/api/ping/
     http://$BLUESKY_API_HOSTNAME/api/v1/domains
     http://$BLUESKY_API_HOSTNAME/api/v1/domains/
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/available-dates
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/available-dates/
+    http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN
+    http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN/
+    http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN/available-dates
+    http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN/available-dates/
     http://$BLUESKY_API_HOSTNAME/api/v1/available-dates
     http://$BLUESKY_API_HOSTNAME/api/v1/available-dates/
 )
