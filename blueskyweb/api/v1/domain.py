@@ -1,4 +1,4 @@
-"""bluesky.web.api.v1.domain"""
+"""blueskyweb.api.v1.domain"""
 
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"

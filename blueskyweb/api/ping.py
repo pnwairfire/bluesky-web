@@ -1,4 +1,4 @@
-"""bluesky.web.api.v1.run"""
+"""blueskyweb.api.ping"""
 
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
