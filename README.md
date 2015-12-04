@@ -87,7 +87,7 @@ To see documentation for a specific task, use the '-d' option. E.g.:
     export EXPORT_MODE=localsave
     fab -A setup
     fab -A provision
-    fab -A provision
+    fab -A deploy
 
 Note that the deploy task takes care of restarting.
 
