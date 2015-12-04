@@ -6,3 +6,4 @@ dist/
 blueskyweb.egg-info/
 logs/
 Procfile-dev-*
+db/
