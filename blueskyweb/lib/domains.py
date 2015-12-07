@@ -15,16 +15,19 @@ MONGODB_URL = os.environ.get('MONGODB_URL')
 #   if going with mongodb, then don't hard code DOMAINS here, but instead
 #   wrap with methods in DomainDB and memoize
 DOMAINS = {
+    # TODO: add PNW 4km with boundaries [-128, 41, -109, 50]
+    # TODO: add LS (Great Lakes?) 4km with boundaries [-96.1, 41.5, -81.5, 49.5]
     'DRI2km': {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/DRI_2km/', # TODO: don't hardcode (see above)
         "boundary": {
-            "center_latitude": 37.0,
-            "center_longitude": -119.0,
-            "width_longitude": 13.0,
-            "height_latitude": 11.5,
-            "spacing_longitude": 0.1,
-            "spacing_latitude": 0.1
+            # from STI: CANV 2km - [-124.3549, 32.5479, -113.2558, 41.8884]
+            "center_latitude": 37.21815, # 37.0,
+            "center_longitude": -118.80535, # -119.0,
+            "width_longitude": 11.0991, # 13.0,
+            "height_latitude": 9.3405, #11.5,
+            "spacing_longitude": 0.1,  # TODO: is this correct?
+            "spacing_latitude": 0.1  # TODO: is this correct?
         },
         "index_filename_pattern": "arl12hrindex.csv"
     },
@@ -36,8 +39,8 @@ DOMAINS = {
             "center_longitude": -119.0,
             "width_longitude": 25.0,
             "height_latitude": 17.5,
-            "spacing_longitude": 0.5,
-            "spacing_latitude": 0.5
+            "spacing_longitude": 0.5,  # TODO: is this correct?
+            "spacing_latitude": 0.5  # TODO: is this correct?
         },
         "index_filename_pattern": "arl12hrindex.csv"
     },
@@ -45,10 +48,11 @@ DOMAINS = {
         'queue': 'nam', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/NAM84/', # TODO: don't hardcode (see above)
         "boundary": {
-            "center_latitude": 37.5,
-            "center_longitude": -95.0,
-            "width_longitude": 70.0,
-            "height_latitude": 30.0,
+            # from STI: NAM 12km - [-131, 18, -64, 55]
+            "center_latitude": 36.5, # 37.5,
+            "center_longitude": -97.5, # -95.0,
+            "width_longitude": 67.0, # 70.0,
+            "height_latitude": 37.0, # 30.0,
             "spacing_longitude": 0.5,  # TODO: is this correct?
             "spacing_latitude": 0.5  # TODO: is this correct?
         },
