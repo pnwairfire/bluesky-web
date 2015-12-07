@@ -183,7 +183,11 @@ class RunExecuter(RunHandlerBase):
     def _configure_findmetdata(self, data, domain):
         data['config'] = data.get('config', {})
         data['config']['findmetdata'] = {
-            "met_root_dir": domains.DOMAINS[domain]['met_root_dir']
+            "met_root_dir": domains.DOMAINS[domain]['met_root_dir'],
+            "arl": {
+                "index_filename_pattern":
+                    domains.DOMAINS[domain]['index_filename_pattern']
+            }
         }
 
     def _configure_dispersion(self, data, domain):

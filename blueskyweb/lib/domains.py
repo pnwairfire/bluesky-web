@@ -25,7 +25,8 @@ DOMAINS = {
             "height_latitude": 11.5,
             "spacing_longitude": 0.1,
             "spacing_latitude": 0.1
-        }
+        },
+        "index_filename_pattern": "arl12hrindex.csv"
     },
     'DRI6km': {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
@@ -37,7 +38,8 @@ DOMAINS = {
             "height_latitude": 17.5,
             "spacing_longitude": 0.5,
             "spacing_latitude": 0.5
-        }
+        },
+        "index_filename_pattern": "arl12hrindex.csv"
     },
     'NAM84': {
         'queue': 'nam', # TODO: define elsewhere ? (see above)
@@ -49,7 +51,8 @@ DOMAINS = {
             "height_latitude": 30.0,
             "spacing_longitude": 0.5,  # TODO: is this correct?
             "spacing_latitude": 0.5  # TODO: is this correct?
-        }
+        },
+        "index_filename_pattern": "NAM84_ARL_index.csv"
     }
 }
 
