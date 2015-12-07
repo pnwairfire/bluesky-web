@@ -1,5 +1,9 @@
 """blueskyweb.api.v1.run"""
 
+# TODO: replace each reference to domains.DOMAINS with call
+#   to some method (to be implemented) in domains.DomainDB or to
+#   a module level function in domains wrapping the hardcoded data
+
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
