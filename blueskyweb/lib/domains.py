@@ -58,6 +58,7 @@ DOMAINS = {
 
 class DomainDB(object):
 
+    # TODO: memoize/cache find
     def find(self, domain_id=None):
         data = {}
         for d in MetDatesCollection(MONGODB_URL).find(domain=domain_id):
