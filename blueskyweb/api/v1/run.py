@@ -208,7 +208,8 @@ class RunExecuter(RunHandlerBase):
 
         data['config']['dispersion']['dest_dir'] = (
             '/tmp/bsp-dispersion-outpt/{}'.format(data['run_id']))
-
+        # TODO: if data['config']['dispersion']['hysplit']['grid'] is not defined
+        #   *and* if grid isn't defined in hardcoded data, then raise exception
         if data['config']['dispersion'].get('model') in ('hysplit', None):
             # set grid and grid spacing if it's not already set in request
             if not data['config']['dispersion'].get('hysplit', {}).get('grid'):
