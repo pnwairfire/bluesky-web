@@ -104,11 +104,12 @@ class RunExecuter(RunHandlerBase):
                 #   findmetdata if indexed data isn't there or if mongodb query
                 #   fails or if web service isn't configured with mongodb
                 self._configure_findmetdata(data, domain)
+                self._configure_localmet(data, domain)
                 self._configure_dispersion(data, domain)
                 self._configure_visualization(data, domain)
                 # TODO: configure anything else (e.g. setting domain where
                 #  appropriate)
-
+                #logging.debug("BSP input data: %s", json.dumps(data))
                 self._run_asynchronously(data, domain=domain)
 
             else:
@@ -196,6 +197,12 @@ class RunExecuter(RunHandlerBase):
                 "index_filename_pattern":
                     domains.DOMAINS[domain]['index_filename_pattern']
             }
+        }
+
+    def _configure_localmet(self, data, domain):
+        data['config'] = data.get('config', {})
+        data['config']['localmet'] = {
+            "time_step": domains.DOMAINS[domain]['time_step']
         }
 
     def _configure_dispersion(self, data, domain):
