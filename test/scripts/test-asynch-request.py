@@ -98,6 +98,12 @@ OPTIONAL_ARGS = [
         'help': "alternate module(s) to run",
         'default': [],
         'action': scripting.args.AppendOrSplitAndExtendAction
+    },
+    {
+        'long': "--vsmoke",
+        'help': "run VSMOKE dispersion model (if not running '--simple' mode)",
+        'action': "store_true",
+        'default': False
     }
 ]
 
@@ -116,6 +122,12 @@ REQUEST = {
     },
     "fire_information": [
         {
+            "meta": {
+                "vsmoke": {
+                    "ws": 12,
+                    "wd": 232
+                }
+            },
             "event_of": {
                 "id": "SF11E826544",
                 "name": "Natural Fire near Yosemite, CA"
@@ -193,7 +205,10 @@ if __name__ == "__main__":
     if args.simple:
         url += 'emissions/?_a='
     else:
-        url += 'all/{}/'.format(args.met_domain)
+        url += 'all/'
+        if not args.vsmoke:
+            url += '{}/'.format(args.met_domain)
+
         if args.modules:
             #url += '?{}'.format('&'.join(['_m[]='+m for m in args.modules]))
             url += '?_m={}'.format(','.join(args.modules))
