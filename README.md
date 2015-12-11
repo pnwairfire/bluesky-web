@@ -318,10 +318,11 @@ This API returns the dates, by domain, for which there exist ARL data
 
 ### POST /api/v1/run/emissions/
 
-This API requires posted JSON with two possible top level keys -
+This API runs bluesky from ingestion through emissions.
+It requires posted JSON with two possible top level keys -
 'fire_information', and 'config'. The 'fire_information' key is required,
-and it lists the one or more fires to process. The 'config' key is optional,
-and it specifies configuration data and other control parameters.
+and it lists the one or more fires to process. The 'config' key is
+optional, and it specifies configuration data and other control parameters.
 
 #### Request
 
@@ -412,14 +413,20 @@ Another exmaple, with fire location data specified as lat + lng + size
 
 ### POST /api/v1/run/dispersion/<met_domain>/
 
+This API takes emissions data and runs bluesky through dispersion and
+visualization.  It's the dispersion API to be used for met-dependent
+dispersion models (e.g. hysplit, which currently the only such model
+supported).
+
 Like with the emissions API, This API requires posted JSON with two
 possible top level keys - 'fire_information' and 'config'. The
-'fire_information' key is required, and must contain emissions data and growth
-time windows for each fire. The 'config' key is also required, to specify,
-at the very least, dispersion start time and num_hours.
+'fire_information' key is required, and must contain emissions data
+and growth time windows for each fire. The 'config' key is also
+required, to specify, at the very least, dispersion start time
+and num_hours.
 
 Since dispersion is run, bluesky will be run asynchronously, and the
-API reponse will include a guid to identify the run in subsequent
+API response will include a guid to identify the run in subsequent
 status and output API requests (described below).
 
     {
@@ -505,9 +512,10 @@ dispersion start time is in UTC.
 
 ### POST /api/v1/run/all/<met_domain>/
 
-This API is very similar to dispersion, except that it starts off with the
-'ingestion' module rather than with 'findmetdata', and so doesn't require
-emissions data.
+This API is very similar to the met-dependent dispersion API,
+described above, except that it starts off with the
+'ingestion' module rather than with 'findmetdata', and so doesn't
+require emissions data.
 
 #### Example
 
@@ -556,9 +564,187 @@ emissions data.
         ]
     }' | python -m json.tool
 
+
+
+
+
+
+### POST /api/v1/run/dispersion/
+
+Like the met-dependent API described above, this API takes emissions
+data and runs bluesky through dispersion and
+visualization.  This API, however, is to be used for dispersion
+models not requiring met data (e.g. vsmoke, which currently is the
+only such model supported).
+
+Again, this API requires posted JSON with two
+possible top level keys - 'fire_information' and 'config'. The
+'fire_information' key is required, and must contain emissions data,
+consumption data, growth time windows, and vsmoke meta fields (wind
+speed and wind direction) for each fire. The 'config' key is also
+required, to specify, at the very least, dispersion start time
+and num_hours.
+
+Since dispersion is run, bluesky will be run asynchronously, and the
+API response will include a guid to identify the run in subsequent
+status and output API requests (described below).
+
+    {
+        run_id: <guid>
+    }
+
+#### Example
+
+Unlike the hysplit request, above, this API requires both emissions
+and consumption data.
+
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
+    {
+        "fire_information": [
+            {
+                "meta": {
+                    "vsmoke": {
+                        "wd": 232,
+                        "ws": 12
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
+                },
+                "id": "SF11C14225236095807750",
+                "location": {
+                    "area": 10000,
+                    "ecoregion": "western",
+                    "latitude": 37.909644,
+                    "longitude": -119.7615805,
+                    "utc_offset": "-07:00"
+                },
+                "type": "natural",
+                "fuelbeds": [
+                    {
+                        "fccs_id": "49",
+                        "pct": 50.0,
+                        "consumption": {
+                            "smoldering": [21712.600892425173],
+                            "flaming": [40988.711969791053],
+                            "residual": [13823.389194227209]
+                        },
+                        "emissions": {
+                            "flaming": {
+                                "PM2.5": [3.3815120047017005e-05]
+                            },
+                            "residual": {
+                                "PM2.5": [4.621500211796271e-01]
+                            },
+                            "smoldering": {
+                                "PM2.5": [6.424985839975172e-06]
+                            }
+                        }
+                    }
+                ],
+                "growth": [
+                    {
+                        "start": "2015-11-24T17:00:00",
+                        "end": "2015-11-25T17:00:00",
+                        "pct": 100.0
+                    }
+                ]
+            }
+        ],
+        "config": {
+            "dispersion": {
+                "start": "2015-11-25T00:00:00",
+                "num_hours": 24,
+                "model": "vsmoke"
+            },
+            "export": {
+                "extra_exports": [
+                    "dispersion"
+                ]
+            }
+        }
+    }' | python -m json.tool
+
+As mentioned earlier, the fact that the emissions data is in an array
+is because the consumption module (more specifically, the underlying
+'consume' module) outputs arrays. The consumption data in this example is
+much simpler than what would be produced by bluesky (which breaks out
+consumption into a hierarchy of fuel categories), but is sufficient
+for vsmoke.  The consumption data just needs to be categorized by
+categorized by phase (flaming, residual, smoldering) at the inner-most
+level.
+
+Note that the growth start and end timestamps are local time, whereas the
+dispersion start time is in UTC.
+
+Also note that 'visualization' is not included in 'extra_exports', since
+the vsmoke dispersion model includes kml generation.
+
+### POST /api/v1/run/all/
+
+This API is very similar to met-independent dispersion API, except that
+it starts off with the
+'ingestion' module rather than with 'findmetdata', and so doesn't require
+consumption and emissions data.
+
+#### Example
+
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/all/DRI2km/" -H 'Content-Type: application/json' -d '
+    {
+        "config": {
+            "emissions": {
+                "species": [
+                    "PM25"
+                ]
+            },
+            "dispersion": {
+                "num_hours": 24,
+                "start": "2015-11-25T00:00:00",
+                "model": "vsmoke"
+            },
+            "export": {
+                "extra_exports": [
+                    "dispersion"
+                ]
+            }
+        },
+        "fire_information": [
+            {
+                "meta": {
+                    "vsmoke": {
+                        "wd": 232,
+                        "ws": 12
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
+                },
+                "growth": [
+                    {
+                        "start": "2015-11-24T17:00:00",
+                        "end": "2015-11-25T17:00:00",
+                        "pct": 100.0
+                    }
+                ],
+                "id": "SF11C14225236095807750",
+                "location": {
+                    "area": 10000,
+                    "ecoregion": "western",
+                    "latitude": 37.909644,
+                    "longitude": -119.7615805,
+                    "utc_offset": "-07:00"
+                },
+                "type": "natural"
+            }
+        ]
+    }' | python -m json.tool
+
+
 ### GET /api/v1/run/<guid>/status
 
-This API returns the status of a specific hysplit run
+This API returns the status of a specific dispersion run
 
 #### Request
 
