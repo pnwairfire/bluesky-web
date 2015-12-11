@@ -115,7 +115,8 @@ class RunExecuter(RunHandlerBase):
 
             elif mode:
                 # VSMOKE request
-                self._configure_dispersion(data, domain)
+                self._configure_dispersion(data)
+                self._run_asynchronously(data)
             else:
                 # emissions request
                 if self.get_query_argument('_a', default=None) is not None:
@@ -215,7 +216,7 @@ class RunExecuter(RunHandlerBase):
             "time_step": domains.DOMAINS[domain]['time_step']
         }
 
-    def _configure_dispersion(self, data, domain):
+    def _configure_dispersion(self, data, domain=None):
         if (not data.get('config', {}).get('dispersion', {}) or not
                 data['config']['dispersion'].get('start') or not
                 data['config']['dispersion'].get('num_hours')):
