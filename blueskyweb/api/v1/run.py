@@ -99,6 +99,7 @@ class RunExecuter(RunHandlerBase):
             self._set_modules(domain, mode, data)
 
             if domain:
+                # Hysplit request
                 # TODO: instead of running findmetdata, get met data from
                 #   indexed met data in mongodb;  maybe fall back on running
                 #   findmetdata if indexed data isn't there or if mongodb query
@@ -112,7 +113,11 @@ class RunExecuter(RunHandlerBase):
                 #logging.debug("BSP input data: %s", json.dumps(data))
                 self._run_asynchronously(data, domain=domain)
 
+            elif mode:
+                # VSMOKE request
+                self._configure_dispersion(data, domain)
             else:
+                # emissions request
                 if self.get_query_argument('_a', default=None) is not None:
                     self._run_asynchronously(data)
                 else:
@@ -128,7 +133,7 @@ class RunExecuter(RunHandlerBase):
     ## Helpers
 
     def _set_modules(self, domain, mode, data):
-        if domain:
+        if mode:
             # TODO: support modules being specified either as comma-delimited
             # string or separately to create array (if tornado supports it)
             modules = self.get_query_argument('_m', default=None)
@@ -140,9 +145,14 @@ class RunExecuter(RunHandlerBase):
                     data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
                 else:
                     data['modules'] = []
-                  # Note: export module is added in _configure_export when necessary
-                data['modules'].extend(['timeprofiling', 'findmetdata', 'localmet',
-                    'plumerising', 'dispersion', 'visualization'])
+
+                # Note: export module is added in _configure_export when necessary
+                if domain:
+                    data['modules'].extend(['timeprofiling', 'findmetdata', 'localmet',
+                        'plumerising', 'dispersion', 'visualization'])
+                else:
+                    data['modules'].extend(['timeprofiling', 'dispersion'])
+
 
         else:
             data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
@@ -156,7 +166,7 @@ class RunExecuter(RunHandlerBase):
 
     def _run_asynchronously(self, data, domain=None):
 
-        self._configure_export(data)
+        self._configure_export(data, domain is not None)
 
         queue_name = domains.DOMAINS.get(domain, {}).get('queue') or 'all-met'
 
@@ -215,6 +225,10 @@ class RunExecuter(RunHandlerBase):
 
         data['config']['dispersion']['dest_dir'] = (
             '/tmp/bsp-dispersion-outpt/{}'.format(data['run_id']))
+
+        if not domain:
+            data['config']['dispersion']['model'] = 'vsmoke'
+
         # TODO: if data['config']['dispersion']['hysplit']['grid'] is not defined
         #   *and* if grid isn't defined in hardcoded data, then raise exception
         if data['config']['dispersion'].get('model') in ('hysplit', None):
@@ -251,7 +265,7 @@ class RunExecuter(RunHandlerBase):
         # TODO: set anything else?
 
 
-    def _configure_export(self, data):
+    def _configure_export(self, data, include_visualization):
         # only allow email export to be specified nin request
         if 'export' in data['modules']:
             if set(data.get('config', {}).get('export', {}).get('modes', [])) - set(['email']):
@@ -272,7 +286,9 @@ class RunExecuter(RunHandlerBase):
         data['config']['export'] = data['config'].get('export', {})
         data['config']['export']['modes'] = data['config']['export'].get('modes', [])
         data['config']['export']['modes'].append(EXPORT_MODE)
-        data['config']['export']['extra_exports'] = ["dispersion", "visualization"]
+        data['config']['export']['extra_exports'] = ["dispersion"]
+        if include_visualization:
+            data['config']['export']['extra_exports'].append("visualization")
         # TODO: no real need to copy.deepcopy
         data['config']['export'][EXPORT_MODE] = copy.deepcopy(EXPORT_CONFIGURATION)
         if EXPORT_MODE == 'upload':
