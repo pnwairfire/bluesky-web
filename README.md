@@ -461,19 +461,13 @@ and so has been optionally stripped from the following request
                         "pct": 50.0,
                         "emissions": {
                             "flaming": {
-                                "PM2.5": [
-                                    3.3815120047017005e-05
-                                ]
+                                "PM2.5": [3002.3815120047017005]
                             },
                             "residual": {
-                                "PM2.5": [
-                                    4.621500211796271e-01
-                                ]
+                                "PM2.5": [4002.621500211796271]
                             },
                             "smoldering": {
-                                "PM2.5": [
-                                    6.424985839975172e-06
-                                ]
+                                "PM2.5": [623.424985839975172]
                             }
                         }
                     }
@@ -598,7 +592,7 @@ status and output API requests (described below).
 Unlike the hysplit request, above, this API requires both emissions
 and consumption data.
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -632,13 +626,13 @@ and consumption data.
                         },
                         "emissions": {
                             "flaming": {
-                                "PM2.5": [3.3815120047017005e-05]
+                                "PM2.5": [3000.3815120047017005]
                             },
                             "residual": {
-                                "PM2.5": [4.621500211796271e-01]
+                                "PM2.5": [4200.621500211796271]
                             },
                             "smoldering": {
-                                "PM2.5": [6.424985839975172e-06]
+                                "PM2.5": [634.424985839975172]
                             }
                         }
                     }
@@ -690,7 +684,7 @@ consumption and emissions data.
 
 #### Example
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/all/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/all/" -H 'Content-Type: application/json' -d '
     {
         "config": {
             "emissions": {
