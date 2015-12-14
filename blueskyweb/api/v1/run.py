@@ -343,6 +343,13 @@ class RunStatus(RunHandlerBase):
 
 class RunOutput(RunHandlerBase):
 
+    def _parse_kmzs_info(self, r, section_info):
+        kmz_info = section_info.get('kmzs', {})
+        if kmz_info:
+            r['kmzs'] = {k: '{}/{}'.format(section_info['sub_directory'], v)
+                for k, v in kmz_info.items() if k in ('fire', 'smoke')}
+
+
     def _parse_output(self, output_json):
         export_info = output_json.get('export', {}).get(EXPORT_MODE)
         if not export_info:
@@ -365,16 +372,16 @@ class RunOutput(RunHandlerBase):
                     }
                 }
             # kmzs
-            kmz_info = vis_info.get('kmzs', {})
-            if kmz_info:
-                r['kmzs'] = {k: '{}/{}'.format(vis_info['sub_directory'], v)
-                    for k, v in kmz_info.items() if k in ('fire', 'smoke')}
+            self._parse_kmzs_info(r, vis_info)
 
         disp_info = export_info.get('dispersion')
         if disp_info:
             r.update(**{
                 k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
                 for k in ('netCDF', 'netCDFs') if k.lower() in disp_info})
+
+            # kmzs (vsmoke dispersion produces kmzs)
+            self._parse_kmzs_info(r, disp_info)
 
         # TODO: list fire_*.csv if specified in output_json
 
