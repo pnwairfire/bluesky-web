@@ -103,10 +103,10 @@ class RunExecuter(RunHandlerBase):
                 #   indexed met data in mongodb;  maybe fall back on running
                 #   findmetdata if indexed data isn't there or if mongodb query
                 #   fails or if web service isn't configured with mongodb
-                self._configure_findmetdata(data, domain)
-                self._configure_localmet(data, domain)
-                self._configure_dispersion(data, domain)
-                self._configure_visualization(data, domain)
+                for m in ('findmetdata', 'localmet', 'dispersion', 'visualization'):
+                    if m in data['modules']:
+                        getattr(self, '_configure_{}'.format(m))(data, domain)
+
                 # TODO: configure anything else (e.g. setting domain where
                 #  appropriate)
                 #logging.debug("BSP input data: %s", json.dumps(data))
