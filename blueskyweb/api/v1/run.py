@@ -17,7 +17,7 @@ import tornado.web
 import traceback
 
 #from bluesky.web.lib.auth import b_auth
-from bluesky import modules, models, process
+from bluesky import models, process
 from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 
 # TODO: import vs call executable?
