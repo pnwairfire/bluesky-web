@@ -16,23 +16,23 @@ class TestGetMetBoundary(object):
 
     def test_invalid(self):
         with raises(BlueSkyConfigurationError) as e_info:
-            get_met_boundary('dfsdf')
+            domains.get_met_boundary('dfsdf')
         assert e_info.value.message == "Unsupported met domain dfsdf"
 
         domains.DOMAINS['sdf'] = {}
         with raises(BlueSkyConfigurationError) as e_info:
-            get_met_boundary('sdf')
+            domains.get_met_boundary('sdf')
         assert e_info.value.message == "Boundary not defined for met domain sdf"
 
     def test_valid(self):
-        assert domains.DOMAINS['DRI2km']['boundary'] == get_met_boundary('DRI2km')
+        assert domains.DOMAINS['DRI2km']['boundary'] == domains.get_met_boundary('DRI2km')
 
 def TestKmPerLng(self):
 
     def test_basic(self):
-        assert 111.32 == domains.km_per_lng(0)
-        assert 78.71512688168647 == domains.km_per_lng(45)
-        assert 0 == domains.km_per_lng(90)
+        assert 111.32 == domains.km_per_deg_lng(0)
+        assert 78.71512688168647 == domains.km_per_deg_lng(45)
+        assert 0 == domains.km_per_deg_lng(90)
 
 class TestSquareGridFromLatLng(object):
 
