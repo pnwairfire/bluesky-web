@@ -229,6 +229,8 @@ class RunExecuter(RunHandlerBase):
             "time_step": domains.DOMAINS[domain]['time_step']
         }
 
+    DEFAULT_HYSPLIT_GRID_LENGTH = 2000
+
     def _configure_dispersion(self, data, domain):
         logging.debug('Configuring dispersion')
         if (not data.get('config', {}).get('dispersion', {}) or not
@@ -258,8 +260,10 @@ class RunExecuter(RunHandlerBase):
                     # set grid to 2000km wide square around fire
                     lat = data['fire_information'][0]['location']['latitude']
                     lng = data['fire_information'][0]['location']['longitude']
+                    length = (data['config']['dispersion']['hysplit'].get('grid_length')
+                        or self.DEFAULT_HYSPLIT_GRID_LENGTH)
                     data['config']['dispersion']['hysplit'].update(
-                        domains.square_grid_from_lat_lng(lat, lng, 2000, domain))
+                        domains.square_grid_from_lat_lng(lat, lng, length, domain))
 
                 else:
                     # just use met domain
