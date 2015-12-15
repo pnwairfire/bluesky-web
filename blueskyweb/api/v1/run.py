@@ -169,7 +169,7 @@ class RunExecuter(RunHandlerBase):
             # 'emissions' request
             _set(self.EMISSIONS_MODULES)
 
-        logging.debug("Set modules: {}".format(', '.join(data['modules'])))
+        logging.debug("Modules be run: {}".format(', '.join(data['modules'])))
 
 
     # def _bad_request(self, msg):
@@ -212,6 +212,7 @@ class RunExecuter(RunHandlerBase):
         fires_manager.dumps(output_stream=self)
 
     def _configure_findmetdata(self, data, domain):
+        logging.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
         data['config']['findmetdata'] = {
             "met_root_dir": domains.DOMAINS[domain]['met_root_dir'],
@@ -222,12 +223,14 @@ class RunExecuter(RunHandlerBase):
         }
 
     def _configure_localmet(self, data, domain):
+        logging.debug('Configuring localmet')
         data['config'] = data.get('config', {})
         data['config']['localmet'] = {
             "time_step": domains.DOMAINS[domain]['time_step']
         }
 
     def _configure_dispersion(self, data, domain):
+        logging.debug('Configuring dispersion')
         if (not data.get('config', {}).get('dispersion', {}) or not
                 data['config']['dispersion'].get('start') or not
                 data['config']['dispersion'].get('num_hours')):
@@ -268,6 +271,7 @@ class RunExecuter(RunHandlerBase):
         # TODO: any other model-specific configuration?
 
     def _configure_visualization(self, data, domain):
+        logging.debug('Configuring visualization')
         # Force visualization of dispersion, and let output go into dispersion
         # output directory; in case dispersion model was hysplit, specify
         # images and data sub-directories;
@@ -287,6 +291,7 @@ class RunExecuter(RunHandlerBase):
 
 
     def _configure_export(self, data, include_visualization):
+        logging.debug('Configuring export')
         # only allow email export to be specified nin request
         if 'export' in data['modules']:
             if set(data.get('config', {}).get('export', {}).get('modes', [])) - set(['email']):
