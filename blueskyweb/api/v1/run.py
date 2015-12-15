@@ -249,13 +249,20 @@ class RunExecuter(RunHandlerBase):
             if not data['config']['dispersion'].get('hysplit', {}).get('grid'):
                 if not data['config']['dispersion'].get('hysplit'):
                     data['config']['dispersion']['hysplit'] = {}
-                if not data['config']['dispersion']['hysplit'].get('grid'):
-                    # TDOO: set grid to 2000km wide square around fire, truncating
-                    #  boundary to met domain grid boundary if the square extends
-                    #  ouside of met domain
-                    data['config']['dispersion']['hysplit']['USER_DEFINED_GRID'] = True
-                    for k, v in domains.DOMAINS[domain]['boundary'].items():
-                        data['config']['dispersion']['hysplit'][k.upper()] = v
+
+                data['config']['dispersion']['hysplit']["USER_DEFINED_GRID"] = True
+
+                if len(data['fire_information'] == 1):
+                    # set grid to 2000km wide square around fire
+                    data['config']['dispersion']['hysplit'].update(
+                        domains.square_grid_from_lat_lng(lat, lng, 2000, domain))
+
+                else:
+                    # just use met domain
+                    met_boundary = domains.get_met_boundary(domain)
+                    data['config']['dispersion']['hysplit'].update(
+                        k.upper(): v for k, v in met_boundary.items)
+
 
         # TODO: any other model-specific configuration?
 
