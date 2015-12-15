@@ -210,8 +210,7 @@ if __name__ == "__main__":
             url += '{}/'.format(args.met_domain)
 
         if args.modules:
-            #url += '?{}'.format('&'.join(['_m[]='+m for m in args.modules]))
-            url += '?_m={}'.format(','.join(args.modules))
+            REQUEST['modules'] = args.modules
     logging.info("Testing {} ... ".format(url))
 
     headers = {

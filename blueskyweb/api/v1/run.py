@@ -82,8 +82,6 @@ class RunExecuter(RunHandlerBase):
         data = json.loads(self.request.body)
         if "fire_information" not in data:
             self.set_status(400, "Bad request: 'fire_information' not specified")
-        if "modules" in data:
-            self.set_status(400, "Bad request: Don't specify modules")
 
         # TODO: should no configuration be allowed at all?  or only some? if
         #  any restrictions, check here or check in specific _configure_*
@@ -133,30 +131,43 @@ class RunExecuter(RunHandlerBase):
 
     ## Helpers
 
+    EMISSIONS_MODULES = [
+        'ingestion', 'fuelbeds', 'consumption', 'emissions'
+    ]
+    # Note: export module is added in _configure_export when necessary
+    MET_DISPERSION_MODULES = [
+        'timeprofiling', 'findmetdata', 'localmet',
+        'plumerising', 'dispersion', 'visualization'
+    ]
+    METLESS_DISPERSION_MODULES = [
+        'timeprofiling', 'dispersion'
+    ]
+
     def _set_modules(self, domain, mode, data):
-        if mode:
-            # TODO: support modules being specified either as comma-delimited
-            # string or separately to create array (if tornado supports it)
-            modules = self.get_query_argument('_m', default=None)
-            logging.debug('modules (_m): %s', modules)
-            if mode == 'all' and modules:
-                data['modules'] = modules.split(',')
+        def _set(default_modules):
+            if "modules" in data:  #data.get('modules'):
+                invalid_modules = set(data['modules']).difference(
+                    default_modules)
+                if invalid_modules:
+                    self.set_status(400, "Bad request: invalid module(s) for "
+                        "emissions request: {}".format(','.join(invalid_modules)))
+                    self.finish()
+                # else, leave as is
             else:
-                if mode == 'all':
-                    data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
-                else:
-                    data['modules'] = []
-
-                # Note: export module is added in _configure_export when necessary
-                if domain:
-                    data['modules'].extend(['timeprofiling', 'findmetdata', 'localmet',
-                        'plumerising', 'dispersion', 'visualization'])
-                else:
-                    data['modules'].extend(['timeprofiling', 'dispersion'])
+                data['modules'] = default_modules
 
 
+        if mode:
+            dispersion_modules = (self.MET_DISPERSION_MODULES
+                if domain else self.METLESS_DISPERSION_MODULES)
+            if mode == 'all':
+                _set(self.EMISSIONS_MODULES + dispersion_modules)
+
+            else:
+                _set(dispersion_modules)
         else:
-            data['modules'] = ['ingestion', 'fuelbeds', 'consumption', 'emissions']
+            # 'emissions' request
+            _set(self.EMISSIONS_MODULES)
 
         logging.debug("Set modules: {}".format(', '.join(data['modules'])))
 
