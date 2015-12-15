@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import logging
 import math
 import os
 
@@ -113,6 +114,8 @@ def square_grid_from_lat_lng(lat, lng, length, domain):
      - lng -- longitude of grid center
      - length -- length of each side of grid
     """
+    logging.debug("calculating {length}x{length} grid around {lat},{lng}".format(
+        length=length, lat=lat, lng=lng))
     met_boundary = get_met_boundary(domain)
     width_lng = length / km_per_deg_lng(lat)
     d = {
