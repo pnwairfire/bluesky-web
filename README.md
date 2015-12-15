@@ -392,7 +392,6 @@ Another exmaple, with fire location data specified as lat + lng + size
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
     {
-        "modules": ["fuelbeds", "consumption", "emissions"],
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
