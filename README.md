@@ -319,10 +319,13 @@ This API returns the dates, by domain, for which there exist ARL data
 ### POST /api/v1/run/emissions/
 
 This API runs bluesky from ingestion through emissions.
-It requires posted JSON with two possible top level keys -
-'fire_information', and 'config'. The 'fire_information' key is required,
-and it lists the one or more fires to process. The 'config' key is
-optional, and it specifies configuration data and other control parameters.
+It requires posted JSON with three possible top level keys -
+'fire_information', and 'config', and 'modules'. The
+'fire_information' key is required, and it lists the one or
+more fires to process. The 'config' key is
+optional, and it specifies configuration data and other control
+parameters.  The 'modules' is also optional, and is used to
+specify a subset of the modules normally run by this API.
 
 #### Request
 
@@ -332,7 +335,8 @@ optional, and it specifies configuration data and other control parameters.
 
         {
             "fire_information": [ ... ],
-            "config": { ... }
+            "config": { ... },
+            "modules": [ ... ]
         }
 
 See [BlueSky Pipeline](../../README.md) for more information about required
@@ -350,6 +354,7 @@ a "summary" key.
     {
         "config": { ... },
         "fire_information": [ ... ],
+        "modules": [ ... ],
         "processing": [ ... ],
         "run_id": "<RUN_ID>",
         "summary": { ... }
@@ -357,7 +362,7 @@ a "summary" key.
 
 #### Examples
 
-An example with fire location data specifeid as a perimeter
+An example with fire location data specified as a perimeter
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
     {
@@ -388,10 +393,12 @@ An example with fire location data specifeid as a perimeter
         ]
     }' | python -m json.tool
 
-Another exmaple, with fire location data specified as lat + lng + size
+Another exmaple, this time running only the ingestion and fuelbeds
+modules, and with fire location data specified as lat + lng + size.
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
     {
+        "modules": ["ingestion", "fuelbeds"],
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
@@ -417,12 +424,12 @@ visualization.  It's the dispersion API to be used for met-dependent
 dispersion models (e.g. hysplit, which currently the only such model
 supported).
 
-Like with the emissions API, This API requires posted JSON with two
-possible top level keys - 'fire_information' and 'config'. The
-'fire_information' key is required, and must contain emissions data
+Like with the emissions API, This API requires posted JSON with three
+possible top level keys - 'fire_information', 'config', and 'modules.
+The 'fire_information' key is required, and must contain emissions data
 and growth time windows for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
-and num_hours.
+and num_hours.  The 'modules' key is optional.
 
 Since dispersion is run, bluesky will be run asynchronously, and the
 API response will include a guid to identify the run in subsequent
@@ -557,11 +564,6 @@ require emissions data.
         ]
     }' | python -m json.tool
 
-
-
-
-
-
 ### POST /api/v1/run/dispersion/
 
 Like the met-dependent API described above, this API takes emissions
@@ -570,13 +572,13 @@ visualization.  This API, however, is to be used for dispersion
 models not requiring met data (e.g. vsmoke, which currently is the
 only such model supported).
 
-Again, this API requires posted JSON with two
-possible top level keys - 'fire_information' and 'config'. The
-'fire_information' key is required, and must contain emissions data,
+Again, this API requires posted JSON with three
+possible top level keys - 'fire_information', 'config', and 'modules'.
+The 'fire_information' key is required, and must contain emissions data,
 consumption data, growth time windows, and vsmoke meta fields (wind
 speed and wind direction) for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
-and num_hours.
+and num_hours. The 'modules' key is optional.
 
 Since dispersion is run, bluesky will be run asynchronously, and the
 API response will include a guid to identify the run in subsequent
