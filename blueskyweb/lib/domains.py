@@ -114,7 +114,7 @@ def square_grid_from_lat_lng(lat, lng, length, domain):
      - length -- length of each side of grid
     """
     met_boundary = get_met_boundary(domain)
-    width_lng = 2000 / km_per_lng(lng)
+    width_lng = length / km_per_deg_lng(lat)
     d = {
         "CENTER_LATITUDE": lat,
         "CENTER_LONGITUDE": lng,
