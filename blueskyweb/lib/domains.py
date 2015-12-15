@@ -97,13 +97,13 @@ def get_met_boundary(domain):
 
     return DOMAINS[domain]['boundary']
 
-KM_PER_LAT = 111
-DEG_LAT_PER_KM = 1.0 / KM_PER_LAT
-RADIANS_PER_DEG = math.pi / 180;
+KM_PER_DEG_LAT = 111
+DEG_LAT_PER_KM = 1.0 / KM_PER_DEG_LAT
+RADIANS_PER_DEG = math.pi / 180
 KM_PER_DEG_LNG_AT_EQUATOR = 111.32
 
-def km_per_lng(lat):
-    return (KM_PER_DEG_LNG_AT_EQUATOR * math.cos(RADIANS_PER_DEG * lat));
+def km_per_deg_lng(lat):
+    return KM_PER_DEG_LNG_AT_EQUATOR * math.cos(RADIANS_PER_DEG * lat)
 
 def square_grid_from_lat_lng(lat, lng, length, domain):
     """
