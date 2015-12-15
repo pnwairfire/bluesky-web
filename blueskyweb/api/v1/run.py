@@ -97,25 +97,20 @@ class RunExecuter(RunHandlerBase):
         try:
             self._set_modules(domain, mode, data)
 
-            if domain:
-                # Hysplit request
-                # TODO: instead of running findmetdata, get met data from
-                #   indexed met data in mongodb;  maybe fall back on running
-                #   findmetdata if indexed data isn't there or if mongodb query
-                #   fails or if web service isn't configured with mongodb
-                for m in ('findmetdata', 'localmet', 'dispersion', 'visualization'):
-                    if m in data['modules']:
-                        getattr(self, '_configure_{}'.format(m))(data, domain)
+            if mode:
+                # Hysplit or VSMOKE request
+                for m in data['modules']:
+                    # 'export' module is configured in _run_asynchronously
+                    if m != 'export':
+                        f = getattr(self, '_configure_{}'.format(m), None)
+                        if f:
+                            f(data, domain)
 
                 # TODO: configure anything else (e.g. setting domain where
                 #  appropriate)
                 #logging.debug("BSP input data: %s", json.dumps(data))
                 self._run_asynchronously(data, domain=domain)
 
-            elif mode:
-                # VSMOKE request
-                self._configure_dispersion(data)
-                self._run_asynchronously(data)
             else:
                 # emissions request
                 if self.get_query_argument('_a', default=None) is not None:
@@ -136,6 +131,10 @@ class RunExecuter(RunHandlerBase):
         'ingestion', 'fuelbeds', 'consumption', 'emissions'
     ]
     # Note: export module is added in _configure_export when necessary
+    # TODO: for hysplit requests, instead of running findmetdata, get
+    #   met data from indexed met data in mongodb;  maybe fall back on running
+    #   findmetdata if indexed data isn't there or if mongodb query
+    #   fails or if web service isn't configured with mongodb
     MET_DISPERSION_MODULES = [
         'timeprofiling', 'findmetdata', 'localmet',
         'plumerising', 'dispersion', 'visualization'
@@ -228,7 +227,7 @@ class RunExecuter(RunHandlerBase):
             "time_step": domains.DOMAINS[domain]['time_step']
         }
 
-    def _configure_dispersion(self, data, domain=None):
+    def _configure_dispersion(self, data, domain):
         if (not data.get('config', {}).get('dispersion', {}) or not
                 data['config']['dispersion'].get('start') or not
                 data['config']['dispersion'].get('num_hours')):
