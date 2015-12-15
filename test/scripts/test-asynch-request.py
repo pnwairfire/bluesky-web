@@ -188,6 +188,9 @@ if __name__ == "__main__":
             "smtp_port": smtp_port
         }
 
+    if args.modules:
+        REQUEST['modules'] = args.modules
+
     logging.info("UTC start: {}".format(start_str))
     logging.info("Num hours: {}".format(args.num_hours))
     logging.info("Local start: {}".format(local_start_str))
@@ -209,8 +212,6 @@ if __name__ == "__main__":
         if not args.vsmoke:
             url += '{}/'.format(args.met_domain)
 
-        if args.modules:
-            REQUEST['modules'] = args.modules
     logging.info("Testing {} ... ".format(url))
 
     headers = {
