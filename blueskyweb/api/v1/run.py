@@ -254,6 +254,8 @@ class RunExecuter(RunHandlerBase):
 
                 if len(data['fire_information'] == 1):
                     # set grid to 2000km wide square around fire
+                    lat = data['fire_information']['location']['latitude']
+                    lng = data['fire_information']['location']['longitude']
                     data['config']['dispersion']['hysplit'].update(
                         domains.square_grid_from_lat_lng(lat, lng, 2000, domain))
 

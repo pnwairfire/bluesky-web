@@ -95,7 +95,7 @@ def get_met_boundary(domain):
         raise BlueSkyConfigurationError(
             "Boundary not defined for met domain {}".format(domain))
 
-    return domains.DOMAINS[domain]['boundary']
+    return DOMAINS[domain]['boundary']
 
 KM_PER_LAT = 111
 DEG_LAT_PER_KM = 1.0 / KM_PER_LAT
@@ -114,8 +114,6 @@ def square_grid_from_lat_lng(lat, lng, length, domain):
      - length -- length of each side of grid
     """
     met_boundary = get_met_boundary(domain)
-    lat = data['fire_information']['location']['latitude']
-    lng = data['fire_information']['location']['longitude']
     width_lng = 2000 / km_per_lng(lng)
     d = {
         "CENTER_LATITUDE": lat,
