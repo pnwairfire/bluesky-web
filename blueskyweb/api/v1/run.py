@@ -82,6 +82,7 @@ class RunExecuter(RunHandlerBase):
         data = json.loads(self.request.body)
         if "fire_information" not in data:
             self.set_status(400, "Bad request: 'fire_information' not specified")
+            return
 
         # TODO: should no configuration be allowed at all?  or only some? if
         #  any restrictions, check here or check in specific _configure_*
