@@ -252,10 +252,10 @@ class RunExecuter(RunHandlerBase):
 
                 data['config']['dispersion']['hysplit']["USER_DEFINED_GRID"] = True
 
-                if len(data['fire_information'] == 1):
+                if len(data['fire_information']) == 1:
                     # set grid to 2000km wide square around fire
-                    lat = data['fire_information']['location']['latitude']
-                    lng = data['fire_information']['location']['longitude']
+                    lat = data['fire_information'][0]['location']['latitude']
+                    lng = data['fire_information'][0]['location']['longitude']
                     data['config']['dispersion']['hysplit'].update(
                         domains.square_grid_from_lat_lng(lat, lng, 2000, domain))
 
@@ -263,7 +263,7 @@ class RunExecuter(RunHandlerBase):
                     # just use met domain
                     met_boundary = domains.get_met_boundary(domain)
                     data['config']['dispersion']['hysplit'].update(
-                        k.upper(): v for k, v in met_boundary.items)
+                        {k.upper(): v for k, v in met_boundary.items()})
 
 
         # TODO: any other model-specific configuration?
