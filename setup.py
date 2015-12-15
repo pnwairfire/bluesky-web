@@ -15,7 +15,7 @@ setup(
     description='Tornado web app wrapping bluesky (https://github.com/pnwairfire/bluesky).',
     install_requires=[
         "pyairfire>=0.9.2",
-        "tornado==4.2.1",
+        "tornado==4.3.0",
         "bluesky>=0.7.6",
         "requests>=2.7.0"
     ],
