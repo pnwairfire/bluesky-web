@@ -97,36 +97,3 @@ def get_met_boundary(domain):
             "Boundary not defined for met domain {}".format(domain))
 
     return DOMAINS[domain]['boundary']
-
-KM_PER_DEG_LAT = 111
-DEG_LAT_PER_KM = 1.0 / KM_PER_DEG_LAT
-RADIANS_PER_DEG = math.pi / 180
-KM_PER_DEG_LNG_AT_EQUATOR = 111.32
-
-def km_per_deg_lng(lat):
-    return KM_PER_DEG_LNG_AT_EQUATOR * math.cos(RADIANS_PER_DEG * lat)
-
-def square_grid_from_lat_lng(lat, lng, length, domain):
-    """
-
-    args
-     - lat -- latitude of grid center
-     - lng -- longitude of grid center
-     - length -- length of each side of grid
-    """
-    logging.debug("calculating {length}x{length} grid around {lat},{lng}".format(
-        length=length, lat=lat, lng=lng))
-    met_boundary = get_met_boundary(domain)
-    width_lng = length / km_per_deg_lng(lat)
-    d = {
-        "CENTER_LATITUDE": lat,
-        "CENTER_LONGITUDE": lng,
-        "HEIGHT_LATITUDE": DEG_LAT_PER_KM * length,
-        "WIDTH_LONGITUDE": width_lng,
-        "SPACING_LONGITUDE": met_boundary["spacing_longitude"],
-        "SPACING_LATITUDE": met_boundary["spacing_latitude"]
-    }
-    # TODO: truncate grid to keep within met domain grid
-    #  boundary if the square extends ouside of met domain
-    # TODO: truncate grid to keep from crossing pole and equator?
-    return d

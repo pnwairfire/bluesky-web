@@ -249,28 +249,28 @@ class RunExecuter(RunHandlerBase):
         # TODO: if data['config']['dispersion']['hysplit']['grid'] is not defined
         #   *and* if grid isn't defined in hardcoded data, then raise exception
         if data['config']['dispersion'].get('model') in ('hysplit', None):
-            # set grid and grid spacing if it's not already set in request
-            if not data['config']['dispersion'].get('hysplit', {}).get('grid'):
-                if not data['config']['dispersion'].get('hysplit'):
-                    data['config']['dispersion']['hysplit'] = {}
+            if not data['config']['dispersion'].get('hysplit'):
+                data['config']['dispersion']['hysplit'] = {}
 
-                data['config']['dispersion']['hysplit']["USER_DEFINED_GRID"] = True
-
-                if len(data['fire_information']) == 1:
-                    # set grid to 2000km wide square around fire
-                    lat = data['fire_information'][0]['location']['latitude']
-                    lng = data['fire_information'][0]['location']['longitude']
-                    length = (data['config']['dispersion']['hysplit'].get('grid_length')
-                        or self.DEFAULT_HYSPLIT_GRID_LENGTH)
-                    data['config']['dispersion']['hysplit'].update(
-                        domains.square_grid_from_lat_lng(lat, lng, length, domain))
-
-                else:
+            # configure grid spacing if it's not already set in request
+            if not any([
+                    data['config']['dispersion']['hysplit'].get(k) or
+                    data['config']['dispersion']['hysplit'].get(k.lower())
+                    for k in ('GRID', 'USER_DEFINED_GRID', 'COMPUTE_GRID')]):
+                met_boundary = domains.get_met_boundary(domain)
+                if len(data['fire_information']) != 1:
                     # just use met domain
-                    met_boundary = domains.get_met_boundary(domain)
+                    data['config']['dispersion']['hysplit']["USER_DEFINED_GRID"] = True
                     data['config']['dispersion']['hysplit'].update(
                         {k.upper(): v for k, v in met_boundary.items()})
+                else:
+                    data['config']['dispersion']['hysplit'].update({
+                        "compute_grid": True,
+                        "spacing_latitude": met_boundary["spacing_latitude"],
+                        "spacing_longitude": met_boundary["spacing_longitude"]
+                    })
 
+            logging.debug("hysplit configuration: %s", data['config']['dispersion']['hysplit'])
 
         # TODO: any other model-specific configuration?
 
