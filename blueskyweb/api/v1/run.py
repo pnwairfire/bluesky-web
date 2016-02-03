@@ -287,7 +287,13 @@ class RunExecuter(RunHandlerBase):
             "target": "dispersion",
             "hysplit": {
                 "images_dir": "images/",
-                "data_dir": "data/"
+                "data_dir": "data/",
+                # Note: the following is for playground
+                "blueskykml_config": {
+                    "DispersionImages": {
+                        "REPROJECT_IMAGES": "True"
+                    }
+                }
             }
         }
 
