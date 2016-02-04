@@ -283,16 +283,13 @@ class RunExecuter(RunHandlerBase):
         #  their visualization results in images and data files, they will
         #  have to be configured here as well.
         data['config'] = data.get('config', {})
-        data['config']['visualization'] =  {
-            "target": "dispersion",
-            "hysplit": {
-                "images_dir": "images/",
-                "data_dir": "data/"
-            }
-        }
-
+        data['config']['visualization'] =  data['config'].get('visualization', {})
+        data['config']['visualization']["target"] = "dispersion"
+        data['config']['visualization']["hysplit"] = data['config']['visualization'].get("hysplit", {})
+        data['config']['visualization']["hysplit"]["images_dir"] = "images/"
+        data['config']['visualization']["hysplit"]["data_dir"] = "data/"
+        logging.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
-
 
     def _configure_export(self, data, include_visualization):
         logging.debug('Configuring export')
