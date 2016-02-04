@@ -450,6 +450,7 @@ class RunOutput(RunHandlerBase):
             # accurate response. ('localsave' should only be used when running
             # everything on one server)
             output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
+            logging.debug('Checking output dir %s', output_dir)
             if not os.path.exists(output_dir):
                 self.set_status(404)
             else:
