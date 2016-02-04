@@ -321,6 +321,13 @@ class RunExecuter(RunHandlerBase):
             data['config']['export']['extra_exports'].append("visualization")
         # TODO: no real need to copy.deepcopy
         data['config']['export'][EXPORT_MODE] = copy.deepcopy(EXPORT_CONFIGURATION)
+
+        # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
+        image_results_version = self.get_argument('image_results_version')
+        if image_results_version:
+            data['config']['export'][EXPORT_MODE]['image_results_version'] = image_results_version
+        # ***** END
+
         if EXPORT_MODE == 'upload':
             if not data['config']['export']['upload']['scp']['host']:
                 data['config']['export']['upload']['scp']['host'] = self._get_host()

@@ -13,6 +13,7 @@ import requests
 import subprocess
 import sys
 import time
+import urllib
 
 from pyairfire import scripting
 
@@ -105,6 +106,13 @@ OPTIONAL_ARGS = [
         'action': "store_true",
         'default': False
     }
+    # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
+    ,{
+        'long': "--image-results-version",
+        'help': "v1 or v2",
+        'default': 'v1'
+    }
+    # ***** END
 ]
 
 REQUEST = {
@@ -200,17 +208,26 @@ if __name__ == "__main__":
     logging.info("Area: {}".format(args.area))
     if args.modules:
         logging.info("Modules: {}".format(args.modules))
+    logging.info("Image Results Version: %s", args.image_results_version)
 
     data = json.dumps(REQUEST)
     logging.info("Request JSON: {}".format(data))
 
     url = "http://{}/api/v1/run/".format(args.hostname)
+    query = {}
     if args.simple:
-        url += 'emissions/?_a='
+        url += 'emissions/'
+        query['_a'] = ''
     else:
         url += 'all/'
         if not args.vsmoke:
             url += '{}/'.format(args.met_domain)
+
+    # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
+    query["image_results_version"] = "v1"
+    # ***** END
+
+    url = '?'.join([url, urllib.urlencode(query)])
 
     logging.info("Testing {} ... ".format(url))
 
