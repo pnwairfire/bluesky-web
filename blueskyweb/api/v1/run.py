@@ -17,7 +17,7 @@ import tornado.web
 import traceback
 
 #from bluesky.web.lib.auth import b_auth
-from bluesky import models, process
+from bluesky import models, process, configuration
 from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 
 # TODO: import vs call executable?
@@ -382,6 +382,28 @@ class RunOutput(RunHandlerBase):
             r['kmzs'] = {k: '{}/{}'.format(section_info['sub_directory'], v)
                 for k, v in kmz_info.items() if k in ('fire', 'smoke')}
 
+    ## ******************** TO DELETE - BEGIN  <-- (once v1 is obsoleted)
+    def _parse_images_v1(self, r, vis_info):
+        images_info = vis_info.get('images')
+        if images_info:
+            r['images'] = {
+                "hourly": ['{}/{}'.format(vis_info['sub_directory'], e)
+                    for e in images_info.get('hourly', [])],
+                "daily": {
+                    "average": ['{}/{}'.format(vis_info['sub_directory'], e)
+                        for e in images_info.get('daily', {}).get('average', [])],
+                    "maximum": ['{}/{}'.format(vis_info['sub_directory'], e)
+                        for e in images_info.get('daily', {}).get('maximum', [])],
+                }
+            }
+    ## ******************** TO DELETE - END
+
+    def _parse_images_v2(self, r, vis_info):
+        r["images"] = vis_info.get('images')
+        for d in r['images']:
+            for c in r['images'][d]:
+                r['images'][d][c]["directory"] = os.path.join(
+                    vis_info['sub_directory'], r['images'][d][c]["directory"])
 
     def _parse_output(self, output_json):
         export_info = output_json.get('export', {}).get(EXPORT_MODE)
@@ -392,18 +414,15 @@ class RunOutput(RunHandlerBase):
         vis_info = export_info.get('visualization')
         if vis_info:
             # images
-            images_info = vis_info.get('images', {})
-            if images_info:
-                r['images'] = {
-                    "hourly": ['{}/{}'.format(vis_info['sub_directory'], e)
-                        for e in images_info.get('hourly', [])],
-                    "daily": {
-                        "average": ['{}/{}'.format(vis_info['sub_directory'], e)
-                            for e in images_info.get('daily', {}).get('average', [])],
-                        "maximum": ['{}/{}'.format(vis_info['sub_directory'], e)
-                            for e in images_info.get('daily', {}).get('maximum', [])],
-                    }
-                }
+            # TODO: simplify code once v1 is obsoleted
+            image_results_version = configuration.get_config_value(
+                output_json.get('config', {}), 'export', EXPORT_MODE,
+                'image_results_version')
+            if image_results_version == 'v2':
+                self._parse_images_v2(r, vis_info)
+            else:
+                self._parse_images_v1(r, vis_info)
+
             # kmzs
             self._parse_kmzs_info(r, vis_info)
 
