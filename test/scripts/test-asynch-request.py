@@ -105,6 +105,12 @@ OPTIONAL_ARGS = [
         'help': "run VSMOKE dispersion model (if not running '--simple' mode)",
         'action': "store_true",
         'default': False
+    },
+    {
+        'long': "--reproject-images",
+        'help': "reproject images in blueskykml",
+        'action': "store_true",
+        'default': False
     }
     # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
     ,{
@@ -199,6 +205,17 @@ if __name__ == "__main__":
     if args.modules:
         REQUEST['modules'] = args.modules
 
+    if args.reproject_images:
+        REQUEST['config']['visualization'] = {
+            "hysplit": {
+                "blueskykml_config": {
+                    "DispersionImages": {
+                        "REPROJECT_IMAGES": "True"
+                    }
+                }
+            }
+        }
+
     logging.info("UTC start: {}".format(start_str))
     logging.info("Num hours: {}".format(args.num_hours))
     logging.info("Local start: {}".format(local_start_str))
@@ -208,6 +225,7 @@ if __name__ == "__main__":
     logging.info("Area: {}".format(args.area))
     if args.modules:
         logging.info("Modules: {}".format(args.modules))
+    logging.info("Reprojecting images?: %s", args.reproject_images)
     logging.info("Image Results Version: %s", args.image_results_version)
 
     data = json.dumps(REQUEST)
