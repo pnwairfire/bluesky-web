@@ -242,7 +242,7 @@ if __name__ == "__main__":
             url += '{}/'.format(args.met_domain)
 
     # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
-    query["image_results_version"] = "v1"
+    query["image_results_version"] = args.image_results_version
     # ***** END
 
     url = '?'.join([url, urllib.urlencode(query)])
