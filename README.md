@@ -781,8 +781,70 @@ This API returns the output location for a specific run
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output"
 
+There are currently two ways the visualization images will be specified in
+the results json object.  It depends on how you configured your run.  If you
+set 'image_results_version=v2' in the original post request, you'll get
+something like the following:
+
     {
-        "root_url": "http://foo.com/playground-output/1bfbe6b6-7cc4-11e5-8782-080027880ca6",
+        "images": {
+            "daily_average": {
+                "RedColorBar": {
+                    "directory": "dispersion-visualization/images/daily_average/RedColorBar",
+                    "legend": "colorbar_daily_average.png",
+                    "other_images": [],
+                    "series": [
+                        "daily_average_20140530.png"
+                    ]
+                }
+            },
+            "daily_maximum": {
+                "RedColorBar": {
+                    "directory": "dispersion-visualization/images/daily_maximum/RedColorBar",
+                    "legend": "colorbar_daily_maximum.png",
+                    "other_images": [],
+                    "series": [
+                        "daily_maximum_20140530.png"
+                    ]
+                }
+            },
+            "hourly": {
+                "RedColorBar": {
+                    "directory": "dispersion-visualization/images/hourly/RedColorBar",
+                    "legend": "colorbar_hourly.png",
+                    "other_images": [],
+                    "series": [
+                        "hourly_201405300000.png",
+                        ...,
+                        "hourly_201405302300.png"
+                    ]
+                }
+            },
+            "three_hour": {
+                "RedColorBar": {
+                    "directory": "dispersion-visualization/images/three_hour/RedColorBar",
+                    "legend": "colorbar_three_hour.png",
+                    "other_images": [],
+                    "series": [
+                        "three_hour_201405300100.png",
+                        ...,
+                        "three_hour_201405302200.png"
+                    ]
+                }
+            }
+        },
+        "kmzs": {
+            "fire": "dispersion-visualization/fire_information.kmz",
+            "smoke": "dispersion-visualization/smoke_dispersion.kmz"
+        },
+        "netCDF": "dispersion-visualization/hysplit_conc.nc",
+        "root_url": "http://localhost:8888/playground-output/abc123"
+    }
+
+Otherwise, if you set 'image_results_version=v1' or if you didn't set it at all,
+you'll get something like the following:
+
+    {
         "images": {
             "daily": {
                 "average": [
@@ -793,14 +855,15 @@ This API returns the output location for a specific run
                 ]
             },
             "hourly": [
-                "dispersion-visualization/images/hourly/RedColorBar/hourly_201405300500.png",
-                "dispersion-visualization/images/hourly/RedColorBar/hourly_201405300600.png"
+                "dispersion-visualization/images/hourly/RedColorBar/hourly_201405300000.png",
+                ...,
+                "dispersion-visualization/images/hourly/RedColorBar/hourly_201405302300.png"
             ]
         },
         "kmzs": {
             "fire": "dispersion-visualization/fire_information.kmz",
             "smoke": "dispersion-visualization/smoke_dispersion.kmz"
         },
-        "netCDF": "dispersion-visualization/hysplit_conc.nc"
-
+        "netCDF": "dispersion-visualization/hysplit_conc.nc",
+        "root_url": "http://localhost:8888/playground-output/812ee94a-cb78-11e5-9d7c-0242ac110003-image-format-v1"
     }
