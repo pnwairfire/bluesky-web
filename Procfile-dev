@@ -1,2 +1,2 @@
 mongo: mongod --dbpath ./db
-web: BSPWEB_EXPORT_MODE=localsave BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=~/bluesky-exports/ ./bin/bsp-web -d --log-level=DEBUG
+web: BSPWEB_EXPORT_MODE=localsave BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=/bsp-output/bsp-local-exports/ ./bin/bsp-web -d --log-level=DEBUG

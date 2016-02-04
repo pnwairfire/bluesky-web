@@ -53,7 +53,7 @@ Examples
 
  Localsave (debug mode):
   $ BSPWEB_EXPORT_MODE=localsave \\
-     BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=~/bluesky-exports/ \\
+     BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=/bsp-output/bsp-local-exports/ \\
      ./bin/bsp-web -d --log-level=DEBUG
 
  Upload to vagrant VM (debug mode):
