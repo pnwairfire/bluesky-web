@@ -65,6 +65,39 @@ EXPORT_CONFIGURATION = EXPORT_CONFIGURATIONS[EXPORT_MODE]
 # if EXPORT_MODE == "upload" and not EXPORT_CONFIGURATION['scp']['host']:
 #     raise ValueError("Specify scp host for upload")
 
+
+##
+## Utilities for working with remote output
+##
+
+class remote_open(object):
+    """Context manager that clones opens remote file and closes it on exit
+    """
+
+    def __init__(self, url):
+        self.url = url
+
+    def __enter__(self):
+        self.f = urllib2.urlopen(self.url)
+        return self.f
+
+    def __exit__(self, type, value, traceback):
+        self.f.close()
+
+def remote_exists(url):
+    return requests.head(url).status_code != 404
+
+def get_output_url(run_id):
+    return "http://{}".format(
+        os.path.join(EXPORT_CONFIGURATION["scp"]["host"],
+        EXPORT_CONFIGURATION["scp"]["url_root_dir"].strip('/'),
+        run_id))
+
+
+###
+### API Handlers
+###
+
 class RunHandlerBase(tornado.web.RequestHandler):
 
     def _get_host(self):
@@ -340,6 +373,8 @@ class RunExecuter(RunHandlerBase):
 
 class RunStatus(RunHandlerBase):
 
+    ## Generic status check method
+
     def _check(self, output_location, exists_func, open_func):
         """Checks output, which may be in local dir or on remote host
 
@@ -388,32 +423,10 @@ class RunStatus(RunHandlerBase):
 
     ## Upload
 
-    class remote_open(object):
-        """Context manager that clones opens remote file and closes it on exit
-        """
-
-        def __init__(self, url):
-            self.url = url
-
-        def __enter__(self):
-            self.f = urllib2.urlopen(self.url)
-            return self.f
-
-        def __exit__(self, type, value, traceback):
-            self.f.close()
-
-    @staticmethod
-    def remote_exists(url):
-        return requests.head(url).status_code != 404
-
     def _check_upload(self, run_id):
         # TODO: check if upload host is the same as host on which this web
         #   service is running; if so, call _check_localsave
-        output_url = "http://{}".format(
-            os.path.join(EXPORT_CONFIGURATION["scp"]["host"],
-            EXPORT_CONFIGURATION["scp"]["url_root_dir"].strip('/'),
-            run_id))
-        self._check(output_url, self.remote_exists, self.remote_open)
+        self._check(get_output_url(run_id), remote_exists, remote_open)
 
     ## CRUD API
 
@@ -456,7 +469,10 @@ class RunOutput(RunHandlerBase):
                     vis_info['sub_directory'], r['images'][d][c]["directory"])
 
     def _parse_output(self, output_json):
-        export_info = output_json.get('export', {}).get(EXPORT_MODE)
+        export_info = output_json.get('export', {})
+        # try both export modes, in case run was initiated with other mode
+        other_em = set(EXPORT_CONFIGURATIONS.keys()).difference([EXPORT_MODE]).pop()
+        export_info = export_info.get(EXPORT_MODE) or export_info.get(other_em)
         if not export_info:
            return {}
 
@@ -489,26 +505,34 @@ class RunOutput(RunHandlerBase):
 
         return r
 
-    ## localsace
-    def _get_localsave(self, run_id):
-        # if bsp workers are on another machine, this will never return an
-        # accurate response. ('localsave' should only be used when running
-        # everything on one server)
-        output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
-        logging.debug('Checking output dir %s', output_dir)
-        if not os.path.exists(output_dir):
+    ## Generic output get methdo
+
+    def _get(self, output_location, exists_func, open_func, config, run_id):
+        """Gets information about the outpu output, which may be in local dir
+        or on remote host
+
+        args:
+         - output_location -- local pathname or url
+         - exists_func -- function to check existence of dir or file
+            (local or via http)
+         - open_func -- function to open output json file (local or via http)
+        """
+        logging.debug('Looking for output in %s', output_location)
+        if not exists_func(output_location):
             self.set_status(404)
         else:
             r = {
+                # TODO: use get_output_url for form root_url
                 "root_url": "{}://{}{}".format(self.request.protocol,
                     # TODO: use self.request.remote_ip instead of self.request.host
                     # TODO: call _get_host
-                    EXPORT_CONFIGURATION['host'] or self.request.host,
-                    os.path.join(EXPORT_CONFIGURATION['url_root_dir'], run_id))
+                    config['host'] or self.request.host,
+                    os.path.join(config['url_root_dir'], run_id))
             }
-            output_json_file = os.path.join(output_dir, 'output.json')
-            if os.path.exists(output_json_file):
-                with open(output_json_file) as f:
+            # use join instead of os.path.join in case output_location is a remote url
+            output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
+            if exists_func(output_json_file):
+                with open_func(output_json_file) as f:
                     try:
                         r.update(self._parse_output(json.loads(f.read())))
                         # TODO: set fields here, using , etc.
@@ -517,12 +541,22 @@ class RunOutput(RunHandlerBase):
 
             self.write(r)
 
+    ## localsave
+
+    def _get_localsave(self, run_id):
+        # if bsp workers are on another machine, this will never return an
+        # accurate response. ('localsave' should only be used when running
+        # everything on one server)
+        output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
+        self._get(output_dir, os.path.exists, open, EXPORT_CONFIGURATION, run_id)
+
     ## upload
+
     def _get_upload(self, run_id):
-        # TODO: use EXPORT_CONFIGURATION along with _get_host to find out where
-        #   to look for output
-        self.set_status(501, "Not yet able to check on status of uploaded output")
-        return
+        # TODO: check if upload host is the same as host on which this web
+        #   service is running; if so, call _get_localsave
+        self._get(get_output_url(run_id), remote_exists, remote_open,
+            EXPORT_CONFIGURATION['scp'], run_id)
 
     ## CRUD API
 
