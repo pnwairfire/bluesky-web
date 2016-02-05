@@ -97,13 +97,22 @@ def get_output_url(run_id):
 
 PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
 def is_same_host(web_request_host):
+    """Checks to see if the uploaded exports are local to the web service
+
+    If they are local, the run status and output APIS can carry out their
+    checks more efficiently and quickly.
+
+    This function is a complete hack, but it works, at least some of the time.
+    (And when it fails, it should only result in false negatives, which
+    don't affect the correctness of the calling APIs - it just means they
+    don't take advantage of working with local files.)
+    """
     # first check if same hostname
-    upload_host = EXPORT_CONFIGURATION["scp"]["host"]
     try:
         web_service_host = socket.gethostbyaddr(socket.gethostname())[0]
     except:
         web_service_host = PORT_IN_HOSTNAME_MATCHER.sub('', web_request_host)
-    if upload_host == web_service_host:
+    if EXPORT_CONFIGURATION["scp"]["host"] == web_service_host:
         return True
 
     # TODO: determine ip address of upload host and web service host and
