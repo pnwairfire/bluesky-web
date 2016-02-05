@@ -1,25 +1,45 @@
-Using the following runs
- - Success: http://pg.blueskywebhost.com/playground-output/$RUN_ID_1/output.json
- - Non-existent: http://pg.blueskywebhost.com/playground-output/foobar1/output.json
- - Failed: http://pg.blueskywebhost.com/playground-output/$RUN_ID_2/output.json
-
+# Testing run status and output APIs using existing exported outputs
 
 ## setup
 
+Using the following runs, each in http://pg.blueskywebhost.com/playground-output/,
+ - Success: $RUN_ID_1
+ - Non-existent: foobar1
+ - Failed: $RUN_ID_2
+
+First, grab input
+
+    mkdir -p /bsp-output/from-playground/
+    mkdir /bsp-output/from-playground/$RUN_ID_1/
+    mkdir /bsp-output/from-playground/$RUN_ID_2
+
+    cd /bsp-output/from-playground/$RUN_ID_1/ && wget http://pg.blueskywebhost.com/playground-output/$RUN_ID_1/output.json
+    cd /bsp-output/from-playground/$RUN_ID_2 && wget http://pg.blueskywebhost.com/playground-output/$RUN_ID_2/output.json
+
+## start server
+
 ### Upload
 
-BSPWEB_EXPORT_MODE=upload BSPWEB_EXPORT_UPLOAD_SCP_USER=jdubowy BSPWEB_EXPORT_UPLOAD_SCP_HOST=pg.blueskywebhost.com ./bin/bsp-web -d --log-level=DEBUG
-## Testing run status and output APIs using existing exported outputs
+    BSPWEB_EXPORT_MODE=upload \
+        BSPWEB_EXPORT_UPLOAD_SCP_USER=jdubowy \
+        BSPWEB_EXPORT_UPLOAD_SCP_HOST=pg.blueskywebhost.com \
+        ./bin/bsp-web -d --log-level=DEBUG
 
-#### localsave
+### localsave
 
-mkdir -p /bsp-output/from-playground/
-mkdir /bsp-output/from-playground/$RUN_ID_1/
-mkdir /bsp-output/from-playground/$RUN_ID_2
+    BSPWEB_EXPORT_MODE=localsave \
+        BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=/bsp-output/from-playground/ \
+        ./bin/bsp-web -d --log-level=DEBUG
 
-cd /bsp-output/from-playground/$RUN_ID_1/ && wget http://pg.blueskywebhost.com/playground-output/$RUN_ID_1/output.json
-cd /bsp-output/from-playground/$RUN_ID_2 && wget http://pg.blueskywebhost.com/playground-output/$RUN_ID_2/output.json
+### upload where upload server is the same as request server
 
+this is really conrived, since he upload scp host wouldn't eveb localhost
+
+    BSPWEB_EXPORT_MODE=upload \
+        BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR=/bsp-output/from-playground/ \
+        BSPWEB_EXPORT_UPLOAD_SCP_USER=jdubowy \
+        BSPWEB_EXPORT_UPLOAD_SCP_HOST=localhost \
+        ./bin/bsp-web -d --log-level=DEBUG
 
 ## test
 
@@ -40,13 +60,6 @@ cd /bsp-output/from-playground/$RUN_ID_2 && wget http://pg.blueskywebhost.com/pl
 
 make sure scheduler system is working with bsp workers
 
-start server:
+post requests
 
-    BSPWEB_EXPORT_MODE=upload \
-    BSPWEB_EXPORT_UPLOAD_SCP_USER=jdubowy \
-    BSPWEB_EXPORT_UPLOAD_SCP_HOST=localhost:8888 \
-    ./bin/bsp-web -d --log-level=DEBUG
-
-post request:
-
-...
+    ...
