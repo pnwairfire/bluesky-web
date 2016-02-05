@@ -1,0 +1,52 @@
+Using the following runs
+ - Success: http://pg.blueskywebhost.com/playground-output/$RUN_ID_1/output.json
+ - Non-existent: http://pg.blueskywebhost.com/playground-output/foobar1/output.json
+ - Failed: http://pg.blueskywebhost.com/playground-output/$RUN_ID_2/output.json
+
+
+## setup
+
+### Upload
+
+BSPWEB_EXPORT_MODE=upload BSPWEB_EXPORT_UPLOAD_SCP_USER=jdubowy BSPWEB_EXPORT_UPLOAD_SCP_HOST=pg.blueskywebhost.com ./bin/bsp-web -d --log-level=DEBUG
+## Testing run status and output APIs using existing exported outputs
+
+#### localsave
+
+mkdir -p /bsp-output/from-playground/
+mkdir /bsp-output/from-playground/$RUN_ID_1/
+mkdir /bsp-output/from-playground/$RUN_ID_2
+
+cd /bsp-output/from-playground/$RUN_ID_1/ && wget http://pg.blueskywebhost.com/playground-output/$RUN_ID_1/output.json
+cd /bsp-output/from-playground/$RUN_ID_2 && wget http://pg.blueskywebhost.com/playground-output/$RUN_ID_2/output.json
+
+
+## test
+
+### status
+
+    curl -D - http://localhost:8888/api/v1/run/$RUN_ID_1/status  # success
+    curl -D - http://localhost:8888/api/v1/run/foobar1/status  # non-existent
+    curl -D - http://localhost:8888/api/v1/run/$RUN_ID_2/status  # failed
+
+### output:
+
+    curl -D - http://localhost:8888/api/v1/run/$RUN_ID_1/output  # success
+    curl -D - http://localhost:8888/api/v1/run/foobar1/output  # non-existent
+    curl -D - http://localhost:8888/api/v1/run/$RUN_ID_2/output  # failed
+
+
+## Testing end to end
+
+make sure scheduler system is working with bsp workers
+
+start server:
+
+    BSPWEB_EXPORT_MODE=upload \
+    BSPWEB_EXPORT_UPLOAD_SCP_USER=jdubowy \
+    BSPWEB_EXPORT_UPLOAD_SCP_HOST=localhost:8888 \
+    ./bin/bsp-web -d --log-level=DEBUG
+
+post request:
+
+...
