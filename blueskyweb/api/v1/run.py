@@ -338,41 +338,43 @@ class RunExecuter(RunHandlerBase):
 
 class RunStatus(RunHandlerBase):
 
+    def _check_localsave(self, run_id):
+        # if bsp workers are on another machine, this will never return an
+        # accurate response. ('localsave' should only be used when running
+        # everything on one server)
+        output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
+        if os.path.exists(output_dir):
+            output_json_file = os.path.join(output_dir, 'output.json')
+            failed = True
+            if os.path.exists(output_json_file):
+                with open(output_json_file) as f:
+                    try:
+                        output_json = json.loads(f.read())
+                        failed = "error" in output_json
+                    except:
+                        pass
+            self.write({
+                "complete": True,
+                "percent": 100.0,
+                "failed": failed
+                # TODO: include 'message'
+            })
+        else:
+            self.write({
+                "complete": False,
+                "percent": 0.0  # TODO: determine % from output directories
+                # TODO: include 'message'
+            })
+
+    def _check_upload(self, run_id):
+        # TODO: use EXPORT_CONFIGURATIONS along with _get_host to find out where
+        #   to look for output
+        self.set_status(501, "Not yet able to check on status of uploaded output")
+
     def get(self, run_id):
         # This simply looks for the existence of output
         # TODO: actually look for status
-        if EXPORT_MODE == 'upload':
-            # TODO: use EXPORT_CONFIGURATIONS along with _get_host to find out where
-            #   to look for output
-            self.set_status(501, "Not yet able to check on status of uploaded output")
-            return
-        else:
-            # if bsp workers are on another machine, this will never return an
-            # accurate response. ('localsave' should only be used when running
-            # everything on one server)
-            output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
-            if os.path.exists(output_dir):
-                output_json_file = os.path.join(output_dir, 'output.json')
-                failed = True
-                if os.path.exists(output_json_file):
-                    with open(output_json_file) as f:
-                        try:
-                            output_json = json.loads(f.read())
-                            failed = "error" in output_json
-                        except:
-                            pass
-                self.write({
-                    "complete": True,
-                    "percent": 100.0,
-                    "failed": failed
-                    # TODO: include 'message'
-                })
-            else:
-                self.write({
-                    "complete": False,
-                    "percent": 0.0  # TODO: determine % from output directories
-                    # TODO: include 'message'
-                })
+        getattr(self, '_check_{}'.format(EXPORT_MODE))(run_id)
 
 class RunOutput(RunHandlerBase):
 
