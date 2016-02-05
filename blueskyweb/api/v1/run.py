@@ -575,10 +575,13 @@ class RunOutput(RunHandlerBase):
     def _get_upload(self, run_id):
         if is_same_host(self.request.host):
             logging.debug("Uploaded export is local")
-            EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
-            EXPORT_CONFIGURATION['url_root_dir'] = EXPORT_CONFIGURATION['scp']['url_root_dir']
-            EXPORT_CONFIGURATION['host'] = EXPORT_CONFIGURATION['scp']['host']
-            self._get_localsave(run_id)
+            # Note: alternatively, we could do the following:
+            #  > EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
+            #  > EXPORT_CONFIGURATION['url_root_dir'] = EXPORT_CONFIGURATION['scp']['url_root_dir']
+            #  > EXPORT_CONFIGURATION['host'] = EXPORT_CONFIGURATION['scp']['host']
+            #  > self._get_localsave(run_id)
+            output_dir = os.path.join(EXPORT_CONFIGURATION['scp']['dest_dir'], run_id)
+            self._get(output_dir, os.path.exists, open, EXPORT_CONFIGURATION['scp'], run_id)
         else:
             self._get(get_output_url(run_id), remote_exists, remote_open,
                 EXPORT_CONFIGURATION['scp'], run_id)
