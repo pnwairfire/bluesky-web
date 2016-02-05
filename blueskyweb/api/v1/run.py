@@ -418,11 +418,13 @@ class RunStatus(RunHandlerBase):
     ## CRUD API
 
     def get(self, run_id):
-        # This simply looks for the existence of output
+        # This simply looks for the existence of output and absence of failure
         # TODO: actually look for status
         getattr(self, '_check_{}'.format(EXPORT_MODE))(run_id)
 
 class RunOutput(RunHandlerBase):
+
+    ## Output json parsing methods
 
     def _parse_kmzs_info(self, r, section_info):
         kmz_info = section_info.get('kmzs', {})
@@ -487,35 +489,42 @@ class RunOutput(RunHandlerBase):
 
         return r
 
-    def get(self, run_id):
-        if EXPORT_MODE == 'upload':
-            # TODO: use EXPORT_CONFIGURATION along with _get_host to find out where
-            #   to look for output
-            self.set_status(501, "Not yet able to check on status of uploaded output")
-            return
+    ## localsace
+    def _get_localsave(self, run_id):
+        # if bsp workers are on another machine, this will never return an
+        # accurate response. ('localsave' should only be used when running
+        # everything on one server)
+        output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
+        logging.debug('Checking output dir %s', output_dir)
+        if not os.path.exists(output_dir):
+            self.set_status(404)
         else:
-            # if bsp workers are on another machine, this will never return an
-            # accurate response. ('localsave' should only be used when running
-            # everything on one server)
-            output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
-            logging.debug('Checking output dir %s', output_dir)
-            if not os.path.exists(output_dir):
-                self.set_status(404)
-            else:
-                r = {
-                    "root_url": "{}://{}{}".format(self.request.protocol,
-                        # TODO: use self.request.remote_ip instead of self.request.host
-                        # TODO: call _get_host
-                        EXPORT_CONFIGURATION['host'] or self.request.host,
-                        os.path.join(EXPORT_CONFIGURATION['url_root_dir'], run_id))
-                }
-                output_json_file = os.path.join(output_dir, 'output.json')
-                if os.path.exists(output_json_file):
-                    with open(output_json_file) as f:
-                        try:
-                            r.update(self._parse_output(json.loads(f.read())))
-                            # TODO: set fields here, using , etc.
-                        except:
-                            pass
+            r = {
+                "root_url": "{}://{}{}".format(self.request.protocol,
+                    # TODO: use self.request.remote_ip instead of self.request.host
+                    # TODO: call _get_host
+                    EXPORT_CONFIGURATION['host'] or self.request.host,
+                    os.path.join(EXPORT_CONFIGURATION['url_root_dir'], run_id))
+            }
+            output_json_file = os.path.join(output_dir, 'output.json')
+            if os.path.exists(output_json_file):
+                with open(output_json_file) as f:
+                    try:
+                        r.update(self._parse_output(json.loads(f.read())))
+                        # TODO: set fields here, using , etc.
+                    except:
+                        pass
 
-                self.write(r)
+            self.write(r)
+
+    ## upload
+    def _get_upload(self, run_id):
+        # TODO: use EXPORT_CONFIGURATION along with _get_host to find out where
+        #   to look for output
+        self.set_status(501, "Not yet able to check on status of uploaded output")
+        return
+
+    ## CRUD API
+
+    def get(self, run_id):
+        getattr(self, '_get_{}'.format(EXPORT_MODE))(run_id)
