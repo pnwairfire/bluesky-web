@@ -12,6 +12,8 @@ import io
 import json
 import logging
 import os
+import requests
+import urllib2
 import uuid
 import tornado.web
 import traceback
@@ -338,19 +340,27 @@ class RunExecuter(RunHandlerBase):
 
 class RunStatus(RunHandlerBase):
 
-    def _check_localsave(self, run_id):
-        # if bsp workers are on another machine, this will never return an
-        # accurate response. ('localsave' should only be used when running
-        # everything on one server)
-        output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
-        if os.path.exists(output_dir):
-            output_json_file = os.path.join(output_dir, 'output.json')
+    def _check(self, output_location, exists_func, open_func):
+        """Checks output, which may be in local dir or on remote host
+
+        args:
+         - output_location -- local pathname or url
+         - exists_func -- function to check existence of dir or file
+            (local or via http)
+         - open_func -- function to open output json file (local or via http)
+        """
+        if exists_func(output_location):
+            logging.debug('%s exists', output_location)
+            # use join instead of os.path.join in case output_location is a remote url
+            output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
+            logging.debug('checking %s', output_json_file)
             failed = True
-            if os.path.exists(output_json_file):
-                with open(output_json_file) as f:
+            if exists_func(output_json_file):
+                logging.debug('%s exists', output_json_file)
+                with open_func(output_json_file) as f:
                     try:
                         output_json = json.loads(f.read())
-                        failed = "error" in output_json
+                        failed = "error" in output_json #[str(k) for k in output_json]
                     except:
                         pass
             self.write({
@@ -360,16 +370,52 @@ class RunStatus(RunHandlerBase):
                 # TODO: include 'message'
             })
         else:
+            logging.debug('%s does *NOT* exists', output_location)
             self.write({
                 "complete": False,
                 "percent": 0.0  # TODO: determine % from output directories
                 # TODO: include 'message'
             })
 
+    ## Localsave
+
+    def _check_localsave(self, run_id):
+        # if bsp workers are on another machine, this will never return an
+        # accurate response. ('localsave' should only be used when running
+        # everything on one server)
+        output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
+        self._check(output_dir, os.path.exists, open)
+
+    ## Upload
+
+    class remote_open(object):
+        """Context manager that clones opens remote file and closes it on exit
+        """
+
+        def __init__(self, url):
+            self.url = url
+
+        def __enter__(self):
+            self.f = urllib2.urlopen(self.url)
+            return self.f
+
+        def __exit__(self, type, value, traceback):
+            self.f.close()
+
+    @staticmethod
+    def remote_exists(url):
+        return requests.head(url).status_code != 404
+
     def _check_upload(self, run_id):
-        # TODO: use EXPORT_CONFIGURATIONS along with _get_host to find out where
-        #   to look for output
-        self.set_status(501, "Not yet able to check on status of uploaded output")
+        # TODO: check if upload host is the same as host on which this web
+        #   service is running; if so, call _check_localsave
+        output_url = "http://{}".format(
+            os.path.join(EXPORT_CONFIGURATION["scp"]["host"],
+            EXPORT_CONFIGURATION["scp"]["url_root_dir"].strip('/'),
+            run_id))
+        self._check(output_url, self.remote_exists, self.remote_open)
+
+    ## CRUD API
 
     def get(self, run_id):
         # This simply looks for the existence of output
@@ -443,7 +489,7 @@ class RunOutput(RunHandlerBase):
 
     def get(self, run_id):
         if EXPORT_MODE == 'upload':
-            # TODO: use EXPORT_CONFIGURATIONS along with _get_host to find out where
+            # TODO: use EXPORT_CONFIGURATION along with _get_host to find out where
             #   to look for output
             self.set_status(501, "Not yet able to check on status of uploaded output")
             return
