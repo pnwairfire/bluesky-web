@@ -12,7 +12,9 @@ import io
 import json
 import logging
 import os
+import re
 import requests
+import socket
 import urllib2
 import uuid
 import tornado.web
@@ -93,6 +95,21 @@ def get_output_url(run_id):
         EXPORT_CONFIGURATION["scp"]["url_root_dir"].strip('/'),
         run_id))
 
+PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
+def is_same_host(web_request_host):
+    # first check if same hostname
+    upload_host = EXPORT_CONFIGURATION["scp"]["host"]
+    try:
+        web_service_host = socket.gethostbyaddr(socket.gethostname())[0]
+    except:
+        web_service_host = PORT_IN_HOSTNAME_MATCHER.sub('', web_request_host)
+    if upload_host == web_service_host:
+        return True
+
+    # TODO: determine ip address of upload host and web service host and
+    #   check if ip addresses match
+
+    return False
 
 ###
 ### API Handlers
@@ -424,9 +441,12 @@ class RunStatus(RunHandlerBase):
     ## Upload
 
     def _check_upload(self, run_id):
-        # TODO: check if upload host is the same as host on which this web
-        #   service is running; if so, call _check_localsave
-        self._check(get_output_url(run_id), remote_exists, remote_open)
+        if is_same_host(self.request.host):
+            logging.debug("Uploaded export is local")
+            EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
+            self._check_localsave(run_id)
+        else:
+            self._check(get_output_url(run_id), remote_exists, remote_open)
 
     ## CRUD API
 
@@ -553,10 +573,15 @@ class RunOutput(RunHandlerBase):
     ## upload
 
     def _get_upload(self, run_id):
-        # TODO: check if upload host is the same as host on which this web
-        #   service is running; if so, call _get_localsave
-        self._get(get_output_url(run_id), remote_exists, remote_open,
-            EXPORT_CONFIGURATION['scp'], run_id)
+        if is_same_host(self.request.host):
+            logging.debug("Uploaded export is local")
+            EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
+            EXPORT_CONFIGURATION['url_root_dir'] = EXPORT_CONFIGURATION['scp']['url_root_dir']
+            EXPORT_CONFIGURATION['host'] = EXPORT_CONFIGURATION['scp']['host']
+            self._get_localsave(run_id)
+        else:
+            self._get(get_output_url(run_id), remote_exists, remote_open,
+                EXPORT_CONFIGURATION['scp'], run_id)
 
     ## CRUD API
 
