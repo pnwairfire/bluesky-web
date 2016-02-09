@@ -381,9 +381,15 @@ class RunExecuter(RunHandlerBase):
         data['config']['export'][EXPORT_MODE] = copy.deepcopy(EXPORT_CONFIGURATION)
 
         # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
-        image_results_version = self.get_argument('image_results_version')
-        if image_results_version:
-            data['config']['export'][EXPORT_MODE]['image_results_version'] = image_results_version
+        try:
+            image_results_version = self.get_argument('image_results_version')
+            if image_results_version:
+                logging.debug('Setting image_results_version: %s',
+                    image_results_version)
+                data['config']['export'][EXPORT_MODE]['image_results_version'] = image_results_version
+        except tornado.web.MissingArgumentError:
+            logging.debug('image_results_version not specified')
+            pass
         # ***** END
 
         if EXPORT_MODE == 'upload':
