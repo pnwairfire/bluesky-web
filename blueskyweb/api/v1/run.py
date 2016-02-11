@@ -421,19 +421,27 @@ class RunStatus(RunHandlerBase):
             # use join instead of os.path.join in case output_location is a remote url
             output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
             logging.debug('checking %s', output_json_file)
-            failed = True
+            failed = True  ## TODO: REMOVE
+            status = "Unknown"
             if exists_func(output_json_file):
                 logging.debug('%s exists', output_json_file)
                 with open_func(output_json_file) as f:
                     try:
                         output_json = json.loads(f.read())
-                        failed = "error" in output_json #[str(k) for k in output_json]
+                        if "error" in output_json: #[str(k) for k in output_json]:
+                            failed = True  ## TODO: REMOVE
+                            status = "Failure"
+                        else:
+                            failed = False  ## TODO: REMOVE
+                            status = "Success"
                     except:
+                        # Note that status is already defaulted to "Unknown"
                         pass
             self.write({
                 "complete": True,
                 "percent": 100.0,
-                "failed": failed
+                "failed": failed,  ## TODO: REMOVE
+                "status": status
                 # TODO: include 'message'
             })
         else:
