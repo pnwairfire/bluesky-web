@@ -448,7 +448,8 @@ class RunStatus(RunHandlerBase):
             logging.debug('%s does *NOT* exists', output_location)
             self.write({
                 "complete": False,
-                "percent": 0.0  # TODO: determine % from output directories
+                "percent": 0.0,  # TODO: determine % from output directories
+                "status": "Unknown"
                 # TODO: include 'message'
             })
 
