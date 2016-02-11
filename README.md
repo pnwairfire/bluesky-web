@@ -105,7 +105,7 @@ Note that the deploy task takes care of restarting.
     export VIRTUALENV_NAME=playground
     export BLUESKYWEB_SERVERS=user@server2
     export PROXY_VIA_APACHE=
-    export EXPORT_MODE=localsave
+    export EXPORT_MODE=upload
     fab -A setup
     fab -A provision
     fab -A deploy
