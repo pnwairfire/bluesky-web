@@ -751,7 +751,7 @@ This API returns the status of a specific dispersion run
     {
         "complete": <boolean>,
         "percent": <double>, /* (if available) */
-        "failed": <boolean>  /* (if known) */
+        "status": <string>  /* ('Success', 'Failure', or 'Unknown') */
     }
 
 #### Example:
@@ -760,8 +760,16 @@ This API returns the status of a specific dispersion run
 
     {
         "complete": false,
-        "percent": 62.3, /* (if available) */
-        "failed": false  /* (if known) */
+        "percent": 62.3,
+        "status": "Unknown"
+    }
+
+or
+
+    {
+        "complete": true,
+        "percent": 100.0,
+        "status": "Success"
     }
 
 ### GET /api/v1/run/<guid>/output
