@@ -328,7 +328,8 @@ class RunExecuter(RunHandlerBase):
                     data['config']['dispersion']['hysplit'].update({
                         "compute_grid": True,
                         "spacing_latitude": met_boundary["spacing_latitude"],
-                        "spacing_longitude": met_boundary["spacing_longitude"]
+                        "spacing_longitude": met_boundary["spacing_longitude"],
+                        "projection": met_boundary["projection"]
                     })
 
             logging.debug("hysplit configuration: %s", data['config']['dispersion']['hysplit'])

@@ -29,8 +29,9 @@ DOMAINS = {
             "center_longitude": -118.80535, # -119.0,
             "width_longitude": 11.0991, # 13.0,
             "height_latitude": 9.3405, #11.5,
-            "spacing_longitude": 0.1,  # TODO: is this correct?
-            "spacing_latitude": 0.1  # TODO: is this correct?
+            "spacing_longitude": 2.0,  # TODO: is this correct?
+            "spacing_latitude": 2.0,  # TODO: is this correct?
+            "projection": "LCC"  # TODO: is this correct?
         },
         "index_filename_pattern": "arl12hrindex.csv",
         "time_step": 1
@@ -43,8 +44,9 @@ DOMAINS = {
             "center_longitude": -119.0,
             "width_longitude": 25.0,
             "height_latitude": 17.5,
-            "spacing_longitude": 0.5,  # TODO: is this correct?
-            "spacing_latitude": 0.5  # TODO: is this correct?
+            "spacing_longitude": 6.0,  # TODO: is this correct?
+            "spacing_latitude": 6.0,  # TODO: is this correct?
+            "projection": "LCC"  # TODO: is this correct?
         },
         "index_filename_pattern": "arl12hrindex.csv",
         "time_step": 1
@@ -58,8 +60,9 @@ DOMAINS = {
             "center_longitude": -97.5, # -95.0,
             "width_longitude": 67.0, # 70.0,
             "height_latitude": 37.0, # 30.0,
-            "spacing_longitude": 0.5,  # TODO: is this correct?
-            "spacing_latitude": 0.5  # TODO: is this correct?
+            "spacing_longitude": 0.15,  # TODO: is this correct?
+            "spacing_latitude": 0.15,  # TODO: is this correct?
+            "projection": "LatLon"
         },
         "index_filename_pattern": "NAM84_ARL_index.csv",
         "time_step": 3
