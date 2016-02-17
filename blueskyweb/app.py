@@ -33,8 +33,7 @@ routes = [
     (r"/api/v1/domains/([^/]+)/?", DomainInfoV1),
     (r"/api/v1/domains/([^/]+)/available-dates/?", DomainAvailableDatesV1),
     (r"/api/v1/available-dates/?", DomainAvailableDatesV1),
-    (r"/api/v1/run/emissions/?", RunExecuterV1),
-    (r"/api/v1/run/(dispersion|all)/?", RunExecuterV1),
+    (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),
     (r"/api/v1/run/(dispersion|all)/([^/]+)/?", RunExecuterV1),
     (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
     (r"/api/v1/run/([^/]+)/output/?", RunOutputV1)

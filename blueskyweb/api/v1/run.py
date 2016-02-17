@@ -158,7 +158,9 @@ class RunExecuter(RunHandlerBase):
         try:
             self._set_modules(domain, mode, data)
 
-            if mode:
+            # TODO: check data['modules'] specifically for 'localmet',
+            # 'dispersion', 'visualization' (and 'export'?)
+            if mode not in ('fuelbeds', 'emissions'):
                 # Hysplit or VSMOKE request
                 for m in data['modules']:
                     # 'export' module is configured in _run_asynchronously
@@ -173,7 +175,7 @@ class RunExecuter(RunHandlerBase):
                 self._run_asynchronously(data, domain=domain)
 
             else:
-                # emissions request
+                # fuelbeds or emissions request
                 if self.get_query_argument('_a', default=None) is not None:
                     self._run_asynchronously(data)
                 else:
@@ -188,8 +190,11 @@ class RunExecuter(RunHandlerBase):
 
     ## Helpers
 
+    FUELBEDS_MODULES = [
+        'ingestion', 'fuelbeds'
+    ]
     EMISSIONS_MODULES = [
-        'ingestion', 'fuelbeds', 'consumption', 'emissions'
+        'consumption', 'emissions'
     ]
     # Note: export module is added in _configure_export when necessary
     # TODO: for hysplit requests, instead of running findmetdata, get
@@ -218,17 +223,20 @@ class RunExecuter(RunHandlerBase):
                 data['modules'] = default_modules
 
 
-        if mode:
+        if mode in ('dispersion', 'all'):
             dispersion_modules = (self.MET_DISPERSION_MODULES
                 if domain else self.METLESS_DISPERSION_MODULES)
             if mode == 'all':
-                _set(self.EMISSIONS_MODULES + dispersion_modules)
+                _set(self.FUELBEDS_MODULES + self.EMISSIONS_MODULES +
+                    dispersion_modules)
 
             else:
                 _set(dispersion_modules)
-        else:
-            # 'emissions' request
+        elif mode == 'emissions':
             _set(self.EMISSIONS_MODULES)
+        elif mode == 'fuelbeds':
+            _set(self.FUELBEDS_MODULES)
+        # There are no other possibilities for mode
 
         logging.debug("Modules be run: {}".format(', '.join(data['modules'])))
 
