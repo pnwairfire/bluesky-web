@@ -147,7 +147,37 @@ REQUEST = {
                 "name": "Natural Fire near Yosemite, CA"
             },
             "id": "SF11C14225236095807750",
-            "type": "natural",
+            "type": "wildfire",
+            "fuel_type": "natural",
+            "location": {
+                "area": None,  # WILL BE FILLED IN
+                "ecoregion": "western",
+                "latitude": None,  # WILL BE FILLED IN
+                "longitude": None,  # WILL BE FILLED IN
+                "utc_offset": None,  # WILL BE FILLED IN
+            },
+            "growth": [
+                {
+                    "start": None,  # WILL BE FILLED IN
+                    "end": None,  # WILL BE FILLED IN
+                    "pct": 100.0
+                }
+            ]
+        },
+        {
+            "meta": {
+                "vsmoke": {
+                    "ws": 12,
+                    "wd": 232
+                }
+            },
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Activity Fire near Yosemite, CA"
+            },
+            "id": "ljo4tosghsjfdsdkf",
+            "type": "rx",
+            "fuel_type": "activity",
             "location": {
                 "area": None,  # WILL BE FILLED IN
                 "ecoregion": "western",
@@ -184,12 +214,13 @@ if __name__ == "__main__":
         args.start + datetime.timedelta(hours=-7)).strftime(DT_STR)
     local_end_str = (
         args.start + datetime.timedelta(hours=args.num_hours-7)).strftime(DT_STR)
-    REQUEST['fire_information'][0]['growth'][0]['start'] = local_start_str
-    REQUEST['fire_information'][0]['growth'][0]['end'] = local_end_str
-    REQUEST['fire_information'][0]['location']['area'] = args.area
-    REQUEST['fire_information'][0]['location']['latitude'] = args.latitude
-    REQUEST['fire_information'][0]['location']['longitude'] = args.longitude
-    REQUEST['fire_information'][0]['location']['utc_offset'] = args.utc_offset
+    for i in range(2):
+        REQUEST['fire_information'][i]['growth'][0]['start'] = local_start_str
+        REQUEST['fire_information'][i]['growth'][0]['end'] = local_end_str
+        REQUEST['fire_information'][i]['location']['area'] = args.area
+        REQUEST['fire_information'][i]['location']['latitude'] = args.latitude + ((i-0.5)/10.0)
+        REQUEST['fire_information'][i]['location']['longitude'] = args.longitude
+        REQUEST['fire_information'][i]['location']['utc_offset'] = args.utc_offset
 
     if args.smtp_server:
         smtp_server, smtp_port = args.smtp_server.split(':')
