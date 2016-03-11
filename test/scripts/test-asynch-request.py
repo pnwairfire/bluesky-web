@@ -270,6 +270,13 @@ if __name__ == "__main__":
     url = "http://{}/api/v1/run/".format(args.hostname)
     query = {}
     if args.simple:
+        #first get fuelbeds
+        response = requests.post(url + 'fuelbeds/', data=data, headers=HEADERS)
+        if response.status_code != 200:
+            logging.error("Failed to look up fuelbeds to run emissions")
+            sys.exit(1)
+        data = response.content
+
         url += 'emissions/'
         query['_a'] = ''
     else:
