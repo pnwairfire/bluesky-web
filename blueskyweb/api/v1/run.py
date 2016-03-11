@@ -368,6 +368,7 @@ class RunExecuter(RunHandlerBase):
         data['config']['visualization']["hysplit"] = data['config']['visualization'].get("hysplit", {})
         data['config']['visualization']["hysplit"]["images_dir"] = "images/"
         data['config']['visualization']["hysplit"]["data_dir"] = "data/"
+        data['config']['visualization']["hysplit"]["create_summary_json"] = True
         logging.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
