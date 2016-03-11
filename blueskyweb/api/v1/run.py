@@ -298,6 +298,13 @@ class RunExecuter(RunHandlerBase):
             "time_step": domains.DOMAINS[domain]['time_step']
         }
 
+    def _configure_plumerising(self, data, domain):
+        logging.debug('Configuring plumerising')
+        data['config'] = data.get('config', {})
+        data['config']['plumerising'] = {
+            "model": "sev"
+        }
+
     DEFAULT_HYSPLIT_GRID_LENGTH = 2000
 
     def _configure_dispersion(self, data, domain):
