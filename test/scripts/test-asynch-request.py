@@ -199,6 +199,11 @@ WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 
 DT_STR = '%Y-%m-%dT%H:%M:%S'
 
+HEADERS = {
+    'Content-type': 'application/json',
+    'Accept': 'application/json'
+}
+
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EPILOG_STR)
@@ -280,12 +285,7 @@ if __name__ == "__main__":
 
     logging.info("Testing {} ... ".format(url))
 
-    headers = {
-        'Content-type': 'application/json',
-        'Accept': 'application/json'
-    }
-
-    response = requests.post(url, data=data, headers=headers)
+    response = requests.post(url, data=data, headers=HEADERS)
     logging.info("Response: {} - {}".format(response.status_code, response.content))
 
     if response.status_code != 200:
@@ -298,7 +298,7 @@ if __name__ == "__main__":
         time.sleep(5)
         logging.info("Checking status...")
         url = "http://{}/api/v1/run/{}/status/".format(args.hostname, run_id)
-        response = requests.get(url, headers)
+        response = requests.get(url, HEADERS)
         if response.status_code == 200:
             data = json.loads(response.content)
             if data['complete']:
@@ -308,7 +308,7 @@ if __name__ == "__main__":
                 logging.info("{} Complete".format(data['percent']))
 
     url =  "http://{}/api/v1/run/{}/output/".format(args.hostname, run_id)
-    response = requests.get(url, headers)
+    response = requests.get(url, HEADERS)
     if response.status_code != 200:
         # TODO: add retry logic, since the run did succeed and complete
         logging.error("Failed to get output")
