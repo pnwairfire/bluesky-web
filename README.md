@@ -103,9 +103,21 @@ Note that the deploy task takes care of restarting.
 
     export PYTHON_VERSION=2.7.8
     export VIRTUALENV_NAME=playground
-    export BLUESKYWEB_SERVERS=user@server2
+    export BLUESKYWEB_SERVERS=user@server1
     export PROXY_VIA_APACHE=
     export EXPORT_MODE=upload
+    fab -A setup
+    fab -A provision
+    fab -A deploy
+
+
+#### Old pg.blueskywebhost.com env (*** DELETE THIS SECTION ONCE RETIRED ***)
+
+    export PYTHON_VERSION=2.7.8
+    export VIRTUALENV_NAME=playground
+    export BLUESKYWEB_SERVERS=user@server2
+    export PROXY_VIA_APACHE=
+    export EXPORT_MODE=localsave  # WILL EVENTAULLY BE 'upload'
     fab -A setup
     fab -A provision
     fab -A deploy
