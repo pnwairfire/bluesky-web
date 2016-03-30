@@ -20,12 +20,9 @@ import uuid
 import tornado.web
 import traceback
 
-#from bluesky.web.lib.auth import b_auth
-from bluesky import models, process, configuration
-from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
-
 # TODO: import vs call executable?
 from bsslib.scheduling.schedulers.bsp.runs import BspRunScheduler
+from bsslib.jobs.bsp import launch_bsp
 
 from blueskyweb.lib import domains
 
@@ -258,27 +255,16 @@ class RunExecuter(RunHandlerBase):
         self.write({"run_id": data['run_id']})
 
     def _run_in_process(self, data):
-        fires_manager = models.fires.FiresManager()
         try:
-            fires_manager.load(data)
-            fires_manager.run()
-        except BlueSkyModuleError, e:
-            # Exception was caught while running modules and added to
-            # fires_manager's meta data, and so will be included in
-            # the output data
-            # TODO: should module error not be reflected in http error status?
-            pass
-        except BlueSkyImportError, e:
-            self.set_status(400, "Bad request: {}".format(e.message))
+            stdout_data, stderr_data = launch(data)
+            # TODO: make sure stdout_data is valid json?
+            self.write(stdout_data)
+
+        # TODO: return 404 if output has error related to bad module, etc.
         except Exception, e:
             logging.error('Exception: {}'.format(e))
             self.set_status(500)
 
-        # If you pass a dict into self.write, it will dump it to json and set
-        # content-type to json;  we need to specify a json encoder, though, so
-        # we'll manaually set the header adn dump the json
-        self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
-        fires_manager.dumps(output_stream=self)
 
     def _configure_findmetdata(self, data, domain):
         logging.debug('Configuring findmetdata')
@@ -545,9 +531,8 @@ class RunOutput(RunHandlerBase):
         if vis_info:
             # images
             # TODO: simplify code once v1 is obsoleted
-            image_results_version = configuration.get_config_value(
-                output_json.get('config', {}), 'export', EXPORT_MODE,
-                'image_results_version')
+            image_results_version = output_json.get('config', {}).get(
+                'export',{}).get(EXPORT_MODE, {}).get('image_results_version')
             if image_results_version == 'v2':
                 self._parse_images_v2(r, vis_info)
             else:
