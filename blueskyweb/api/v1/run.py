@@ -22,7 +22,7 @@ import traceback
 
 # TODO: import vs call executable?
 from bsslib.scheduling.schedulers.bsp.runs import BspRunScheduler
-from bsslib.jobs.bsp import launch_bsp
+from bsslib.jobs.bsp import _launch as _launch_bsp
 
 from blueskyweb.lib import domains
 
@@ -256,7 +256,7 @@ class RunExecuter(RunHandlerBase):
 
     def _run_in_process(self, data):
         try:
-            stdout_data, stderr_data = launch(data)
+            stdout_data, stderr_data = _launch_bsp(data, capture_output=True)
             # TODO: make sure stdout_data is valid json?
             self.write(stdout_data)
 
