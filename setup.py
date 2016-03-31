@@ -14,7 +14,7 @@ setup(
     url='https://bitbucket.org/fera/airfire-bluesky-web',
     description='Tornado web app wrapping bluesky (https://github.com/pnwairfire/bluesky).',
     install_requires=[
-        "pyairfire>=0.9.2",
+        "pyairfire>=0.9.4",
         "tornado==4.3.0",
         "requests>=2.7.0"
     ],

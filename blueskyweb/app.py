@@ -8,7 +8,6 @@ import tornado.ioloop
 #import tornado.log
 import tornado.web
 
-from bluesky.configuration import get_config_value
 # TODO: use path args for version and api module. ex:
 #  routes = [
 #    ('/api/<api_version:[^/]+>/<api_module:[^/]+>/'), Dispatcher

@@ -40,16 +40,11 @@ First, install pip (with sudo if necessary):
 
 Run the following to install python dependencies:
 
-    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+    pip install --trusted-host pypi.smoke.airfire.org -r requirements.txt
 
 Run the following to install packages required for development:
 
     pip install -r requirements-dev.txt
-
-### Notes:
-
-See the [bluesky github page](https://github.com/pnwairfire/bluesky)
-for notes on potential pip and gdal issues.
 
 ## Running
 

@@ -5,7 +5,6 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 from py.test import raises
 
-from bluesky.exceptions import BlueSkyConfigurationError
 from blueskyweb.lib import domains
 
 # from numpy.testing import assert_approx_equal
@@ -15,12 +14,12 @@ from blueskyweb.lib import domains
 class TestGetMetBoundary(object):
 
     def test_invalid(self):
-        with raises(BlueSkyConfigurationError) as e_info:
+        with raises(domains.BlueSkyConfigurationError) as e_info:
             domains.get_met_boundary('dfsdf')
         assert e_info.value.message == "Unsupported met domain dfsdf"
 
         domains.DOMAINS['sdf'] = {}
-        with raises(BlueSkyConfigurationError) as e_info:
+        with raises(domains.BlueSkyConfigurationError) as e_info:
             domains.get_met_boundary('sdf')
         assert e_info.value.message == "Boundary not defined for met domain sdf"
 

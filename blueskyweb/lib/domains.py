@@ -7,8 +7,11 @@ import logging
 import math
 import os
 
-from bluesky.exceptions import BlueSkyConfigurationError
-from bluesky.met.arlindexer import MetDatesCollection
+from pyairfire.met.arlindexer import MetDatesCollection
+
+class BlueSkyConfigurationError(ValueError):
+    pass
+
 
 MONGODB_URL = os.environ.get('MONGODB_URL')
 
