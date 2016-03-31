@@ -16,7 +16,6 @@ setup(
     install_requires=[
         "pyairfire>=0.9.2",
         "tornado==4.3.0",
-        "bluesky>=0.7.11",
         "requests>=2.7.0"
     ],
     dependency_links=[
