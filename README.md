@@ -105,7 +105,7 @@ Note that the deploy task takes care of restarting.
     export VIRTUALENV_NAME=playground
     export BLUESKYWEB_SERVERS=user@server1
     export PROXY_VIA_APACHE=
-    export EXPORT_MODE=upload
+    export EXPORT_MODE=localsave  # TODO: eventaully make it 'upload' if necessary
     fab -A setup
     fab -A provision
     fab -A deploy
@@ -117,7 +117,7 @@ Note that the deploy task takes care of restarting.
     export VIRTUALENV_NAME=playground
     export BLUESKYWEB_SERVERS=user@server2
     export PROXY_VIA_APACHE=
-    export EXPORT_MODE=localsave  # WILL EVENTAULLY BE 'upload'
+    export EXPORT_MODE=localsave
     fab -A setup
     fab -A provision
     fab -A deploy
