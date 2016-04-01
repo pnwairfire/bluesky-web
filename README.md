@@ -6,9 +6,6 @@ that can be started by simply running ```bsp-web```.
 
 ## Non-python Dependencies
 
-See the [bluesky github page](https://github.com/pnwairfire/bluesky)
-for information about it's dependencies.
-
 ## Python dependencies to install manually
 
 blueskyweb depends on the
@@ -19,6 +16,11 @@ another repo in AirFire's private bitbucket account.  Install it with the follow
     cd airfire-bluesky-scheduler
     pip install --trusted-host pypi.smoke.airfire.org -r requirements.txt
     python setup.py install
+
+### mongodb
+
+BlueSky web connects to a mongodb database to query met data availability.
+You just need to provide the url of one that is running.
 
 ## Development
 
