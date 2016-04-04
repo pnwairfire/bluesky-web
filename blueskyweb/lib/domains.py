@@ -25,7 +25,7 @@ DOMAINS = {
     # TODO: add LS (Great Lakes?) 4km with boundaries [-96.1, 41.5, -81.5, 49.5]
     'DRI2km': {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/DRI_2km/', # TODO: don't hardcode (see above)
+        'met_root_dir': '/data/ARL/DRI/2km/', # TODO: don't hardcode (see above)
         "boundary": {
             # from STI: CANV 2km - [-124.3549, 32.5479, -113.2558, 41.8884]
             "center_latitude": 37.21815, # 37.0,
@@ -41,7 +41,7 @@ DOMAINS = {
     },
     'DRI6km': {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/DRI_6km/', # TODO: don't hardcode (see above)
+        'met_root_dir': '/data/ARL/DRI/6km/', # TODO: don't hardcode (see above)
         "boundary": {
             "center_latitude": 36.5,
             "center_longitude": -119.0,
@@ -54,9 +54,24 @@ DOMAINS = {
         "index_filename_pattern": "arl12hrindex.csv",
         "time_step": 1
     },
+    'PNW4km': {
+        'queue': 'pnw', # TODO: define elsewhere ? (see above)
+        'met_root_dir': '/data/ARL/PNW/4km/', # TODO: don't hardcode (see above)
+        "boundary": {
+            "center_latitude": 45.0,
+            "center_longitude": -118.3,
+            "width_longitude": 20.0,
+            "height_latitude": 10.0,
+            "spacing_longitude": 4.0,  # TODO: is this correct?
+            "spacing_latitude": 4.0,  # TODO: is this correct?
+            "projection": "LCC"  # TODO: is this correct?
+        },
+        "index_filename_pattern": "arl12hrindex.csv",
+        "time_step": 1
+    },
     'NAM84': {
         'queue': 'nam', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/NAM84/', # TODO: don't hardcode (see above)
+        'met_root_dir': '/data/ARL/NAM/12km/', # TODO: don't hardcode (see above)
         "boundary": {
             # from STI: NAM 12km - [-131, 18, -64, 55]
             "center_latitude": 36.5, # 37.5,
