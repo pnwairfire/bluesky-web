@@ -67,13 +67,17 @@ DOMAINS = {
         'queue': 'pnw', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/PNW/4km/', # TODO: don't hardcode (see above)
         "boundary": {
-            "center_latitude": 45.0,
-            "center_longitude": -118.3,
-            "width_longitude": 20.0,
-            "height_latitude": 10.0,
-            "spacing_longitude": 4.0,  # TODO: is this correct?
-            "spacing_latitude": 4.0,  # TODO: is this correct?
-            "projection": "LCC"  # TODO: is this correct?
+            # Ran the following on haze:
+            #   $ chk_arl file /data/ARL/PNW/4km/2016040400/wrfout_d3.2016040400.f12-23_12hr01.arl |grep corner
+            #     Lower left corner:   40.0488 -128.5677
+            #    Upper right corner:   49.6821 -107.4911
+            "center_latitude": 44.86545, #45.0,
+            "center_longitude": -118.0294, #-118.3,
+            "width_longitude": 21.0766, #20.0,
+            "height_latitude": 9.6333, #10.0,
+            "spacing_longitude": 4.0,
+            "spacing_latitude": 4.0,
+            "projection": "LCC"
         },
         "index_filename_pattern": "arl12hrindex.csv",
         "time_step": 1
