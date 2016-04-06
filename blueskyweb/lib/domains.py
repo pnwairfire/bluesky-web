@@ -24,7 +24,7 @@ DOMAINS = {
     # TODO: add PNW 4km with boundaries [-128, 41, -109, 50]
     # TODO: add LS (Great Lakes?) 4km with boundaries [-96.1, 41.5, -81.5, 49.5]
     'DRI2km': {
-        'queue': 'dri', # TODO: define elsewhere ? (see above)
+        'queue': 'all-met', #'dri', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/DRI/2km/', # TODO: don't hardcode (see above)
         "boundary": {
             # STI provided the following corners:
@@ -45,7 +45,7 @@ DOMAINS = {
         "time_step": 1
     },
     'DRI6km': {
-        'queue': 'dri', # TODO: define elsewhere ? (see above)
+        'queue': 'all-met', #'dri', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/DRI/6km/', # TODO: don't hardcode (see above)
         "boundary": {
             # Ran the following on haze:
@@ -64,7 +64,7 @@ DOMAINS = {
         "time_step": 1
     },
     'PNW1.33km': {
-        'queue': 'pnw', # TODO: define elsewhere ? (see above)
+        'queue': 'all-met', #'pnw', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/PNW/1.33km/', # TODO: don't hardcode (see above)
         "boundary": {
             # Ran the following on haze:
@@ -83,7 +83,7 @@ DOMAINS = {
         "time_step": 1
     },
     'PNW4km': {
-        'queue': 'pnw', # TODO: define elsewhere ? (see above)
+        'queue': 'all-met', #'pnw', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/PNW/4km/', # TODO: don't hardcode (see above)
         "boundary": {
             # Ran the following on haze:
@@ -102,7 +102,7 @@ DOMAINS = {
         "time_step": 1
     },
     'NAM84': {
-        'queue': 'nam', # TODO: define elsewhere ? (see above)
+        'queue': 'all-met', #'nam', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/NAM/12km/', # TODO: don't hardcode (see above)
         "boundary": {
             # STI provided the following corners:
