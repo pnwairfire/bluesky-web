@@ -105,13 +105,18 @@ DOMAINS = {
         'queue': 'nam', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/NAM/12km/', # TODO: don't hardcode (see above)
         "boundary": {
-            # from STI: NAM 12km - [-131, 18, -64, 55]
-            "center_latitude": 36.5, # 37.5,
-            "center_longitude": -97.5, # -95.0,
-            "width_longitude": 67.0, # 70.0,
-            "height_latitude": 37.0, # 30.0,
-            "spacing_longitude": 0.15,  # TODO: is this correct?
-            "spacing_latitude": 0.15,  # TODO: is this correct?
+            # STI provided the following corners:
+            #   NAM 12km - [-131, 18, -64, 55]
+            # Then, ran the following on haze:
+            #   $ chk_arl file /data/ARL/NAM/12km/2016040400/nam_forecast-2016040400_00-84hr.arl |grep corner
+            #     Lower left corner:   12.1900 -133.4600
+            #    Upper right corner:   57.3290  -49.4167
+            "center_latitude": 34.7595, #36.5, # 37.5,
+            "center_longitude": -91.43835, #-97.5, # -95.0,
+            "width_longitude": 84.0433, #67.0, # 70.0,
+            "height_latitude": 45.139, #37.0, # 30.0,
+            "spacing_longitude": 0.15,
+            "spacing_latitude": 0.15,
             "projection": "LatLon"
         },
         "index_filename_pattern": "NAM84_ARL_index.csv",
