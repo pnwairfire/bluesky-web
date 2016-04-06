@@ -27,14 +27,19 @@ DOMAINS = {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/DRI/2km/', # TODO: don't hardcode (see above)
         "boundary": {
-            # from STI: CANV 2km - [-124.3549, 32.5479, -113.2558, 41.8884]
-            "center_latitude": 37.21815, # 37.0,
-            "center_longitude": -118.80535, # -119.0,
-            "width_longitude": 11.0991, # 13.0,
-            "height_latitude": 9.3405, #11.5,
-            "spacing_longitude": 2.0,  # TODO: is this correct?
-            "spacing_latitude": 2.0,  # TODO: is this correct?
-            "projection": "LCC"  # TODO: is this correct?
+            # STI provided the following corners:
+            #   CANV 2km - [-124.3549, 32.5479, -113.2558, 41.8884]
+            # Then, ran the following on haze:
+            #   $ chk_arl file /data/ARL/DRI/2km/2016040400/wrfout_d3.2016040400.f00-11_12hr01.arl |grep corner
+            #     Lower left corner:   32.5980 -124.2761
+            #    Upper right corner:   41.8444 -113.0910
+            "center_latitude": 37.2212, #37.21815, # 37.0,
+            "center_longitude": -118.68355, #-118.80535, # -119.0,
+            "width_longitude": 11.1851, #11.0991, # 13.0,
+            "height_latitude": 9.2464, #9.3405, #11.5,
+            "spacing_longitude": 2.0,
+            "spacing_latitude": 2.0,
+            "projection": "LCC"
         },
         "index_filename_pattern": "arl12hrindex.csv",
         "time_step": 1
@@ -43,13 +48,17 @@ DOMAINS = {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/DRI/6km/', # TODO: don't hardcode (see above)
         "boundary": {
-            "center_latitude": 36.5,
-            "center_longitude": -119.0,
-            "width_longitude": 25.0,
-            "height_latitude": 17.5,
-            "spacing_longitude": 6.0,  # TODO: is this correct?
-            "spacing_latitude": 6.0,  # TODO: is this correct?
-            "projection": "LCC"  # TODO: is this correct?
+            # Ran the following on haze:
+            #   $ chk_arl file /data/ARL/DRI/6km/2016040400/wrfout_d2.2016040400.f00-11_12hr01.arl |grep corner
+            #     Lower left corner:   28.7459 -128.4614
+            #    Upper right corner:   44.5953 -107.1489
+            "center_latitude": 36.6706, #36.5,
+            "center_longitude": -117.80515, #-119.0,
+            "width_longitude": 21.3125, #25.0,
+            "height_latitude": 15.8494, #17.5,
+            "spacing_longitude": 6.0,
+            "spacing_latitude": 6.0,
+            "projection": "LCC"
         },
         "index_filename_pattern": "arl12hrindex.csv",
         "time_step": 1
