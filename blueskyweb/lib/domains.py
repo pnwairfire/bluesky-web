@@ -63,6 +63,25 @@ DOMAINS = {
         "index_filename_pattern": "arl12hrindex.csv",
         "time_step": 1
     },
+    'PNW1.33km': {
+        'queue': 'pnw', # TODO: define elsewhere ? (see above)
+        'met_root_dir': '/data/ARL/PNW/1.33km/', # TODO: don't hardcode (see above)
+        "boundary": {
+            # Ran the following on haze:
+            #   $ chk_arl file /data/ARL/PNW/1.33km/2016040400/wrfout_d4.2016040400.f12-23_12hr01.arl |grep corner
+            #     Lower left corner:   44.7056 -126.2475
+            #    Upper right corner:   48.9398 -113.7484
+            "center_latitude": 46.8227,
+            "center_longitude": -119.99795,
+            "width_longitude": 12.4991,
+            "height_latitude": 4.2342,
+            "spacing_longitude": 1.33,
+            "spacing_latitude": 1.33,
+            "projection": "LCC"
+        },
+        "index_filename_pattern": "arl12hrindex.csv",
+        "time_step": 1
+    },
     'PNW4km': {
         'queue': 'pnw', # TODO: define elsewhere ? (see above)
         'met_root_dir': '/data/ARL/PNW/4km/', # TODO: don't hardcode (see above)
