@@ -273,7 +273,8 @@ class RunExecuter(RunHandlerBase):
             "met_root_dir": domains.DOMAINS[domain]['met_root_dir'],
             "arl": {
                 "index_filename_pattern":
-                    domains.DOMAINS[domain]['index_filename_pattern']
+                    domains.DOMAINS[domain]['index_filename_pattern'],
+                "fewer_arl_files": True
             }
         }
 
