@@ -62,7 +62,7 @@ deploying to, and restarting the service on a remote server.
 
 To see what tasks are available, clone the repo, cd into it, and run
 
-    git clone https://github.com/pnwairfire/bluesky.git
+    git clone git@bitbucket.org:fera/airfire-bluesky-web.git
     cd bluesky
     BLUESKYWEB_SERVERS=username@hostname fab -l
 
