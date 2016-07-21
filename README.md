@@ -584,7 +584,7 @@ and so has been optionally stripped from the following request
                     "longitude": -119.7615805,
                     "utc_offset": "-07:00"
                 },
-                "type": "natural",
+                "type": "wildfire",
                 "fuelbeds": [
                     {
                         "fccs_id": "49",
@@ -683,7 +683,7 @@ require emissions data.
                     "longitude": -119.7615805,
                     "utc_offset": "-07:00"
                 },
-                "type": "natural"
+                "type": "wildfire"
             }
         ]
     }' | python -m json.tool
@@ -739,11 +739,25 @@ and consumption data.
                     "longitude": -119.7615805,
                     "utc_offset": "-07:00"
                 },
-                "type": "natural",
+                "type": "wildfire",
                 "fuelbeds": [
                     {
                         "fccs_id": "49",
                         "pct": 50.0,
+                        "heat": {
+                            "total": [
+                                3901187352927.508
+                            ],
+                            "residual": [
+                                1312164844326.5745
+                            ],
+                            "flaming": [
+                                1395852418045.9065
+                            ],
+                            "smoldering": [
+                                1193170090555.0266
+                            ]
+                        },
                         "consumption": {
                             "smoldering": [21712.600892425173],
                             "flaming": [40988.711969791053],
@@ -855,7 +869,7 @@ consumption and emissions data.
                     "longitude": -119.7615805,
                     "utc_offset": "-07:00"
                 },
-                "type": "natural"
+                "type": "wildfire"
             }
         ]
     }' | python -m json.tool
