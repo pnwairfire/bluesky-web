@@ -343,7 +343,7 @@ class RunExecuter(RunHandlerBase):
                         "NINIT": 0,
                         "DELT": 0.0,
                         "KHMAX": 72, # number of hours after which particles are removed
-                        "MPI": True,
+                        "MPI": False,
                         "NCPUS": 4
                     })
 
