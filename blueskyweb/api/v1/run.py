@@ -334,7 +334,17 @@ class RunExecuter(RunHandlerBase):
                         "compute_grid": True,
                         "spacing_latitude": met_boundary["spacing_latitude"],
                         "spacing_longitude": met_boundary["spacing_longitude"],
-                        "projection": met_boundary["projection"]
+                        "projection": met_boundary["projection"],
+                        "NUMPAR": 1000,
+                        "MAXPAR": 10000000,
+                        "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
+                        "VERTICAL_LEVELS": [100],
+                        "INITD": 0,
+                        "NINIT": 0,
+                        "DELT": 0.0,
+                        "KHMAX": 72, # number of hours after which particles are removed
+                        "MPI": True,
+                        "NCPUS": 4
                     })
 
             logging.debug("hysplit configuration: %s", data['config']['dispersion']['hysplit'])
