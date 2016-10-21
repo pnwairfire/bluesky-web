@@ -307,11 +307,11 @@ class RunExecuter(RunHandlerBase):
                 "Bad request: dispersion 'start' and 'num_hours' must be specified")
             return
 
-        data['config']['dispersion']['dest_dir'] = os.path.join(
+        data['config']['dispersion']['output_dir'] = os.path.join(
             os.path.dirname(EXPORT_CONFIGURATION['dest_dir'].rstrip('/')),
-            'bsp-dispersion-output', data['run_id'])
-        logging.debug("Dispersion dest dir: %s",
-            data['config']['dispersion']['dest_dir'])
+            'bsp-dispersion-output', '{run_id}')
+        logging.debug("Output dir: %s",
+            data['config']['dispersion']['output_dir'])
 
         if not domain:
             data['config']['dispersion']['model'] = 'vsmoke'
