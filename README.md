@@ -371,7 +371,7 @@ a "summary" key.
 
 #### Examples
 
-An example with fire location data specified as a perimeter
+An example with fire location data specified as a geojson
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/fuelbeds/" -H 'Content-Type: application/json' -d '
     {
@@ -383,7 +383,7 @@ An example with fire location data specified as a perimeter
                 "growth": [
                     {
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -481,7 +481,7 @@ a "summary" key.
 
 #### Examples
 
-An example with fire location data specified as a perimeter
+An example with fire location data specified as geojson
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
     {
@@ -491,7 +491,7 @@ An example with fire location data specified as a perimeter
                 "event_id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA",
                 "location": {
-                    "perimeter": {
+                    "geojson": {
                         "type": "MultiPolygon",
                         "coordinates": [
                             [

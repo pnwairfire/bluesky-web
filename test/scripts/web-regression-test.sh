@@ -61,7 +61,7 @@ response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/fuelbeds/" --write-out 
                 "growth": [
                     {
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -124,7 +124,7 @@ response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" --write-out
                             }
                         ],
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
