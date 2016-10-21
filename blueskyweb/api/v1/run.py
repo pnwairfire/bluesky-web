@@ -347,7 +347,7 @@ class RunExecuter(RunHandlerBase):
                         "NINIT": 0,
                         "DELT": 0.0,
                         "KHMAX": 72, # number of hours after which particles are removed
-                        "MPI": False, # don't turn on until we switch to bluesky v2.2.*
+                        "MPI": True,
                         "NCPUS": 4
                     })
 
