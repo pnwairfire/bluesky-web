@@ -380,25 +380,29 @@ An example with fire location data specified as a perimeter
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA",
-                "location": {
-                    "perimeter": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
+                "growth": [
+                    {
+                        "location": {
+                            "perimeter": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
                                 ]
-                            ]
-                        ]
-                    },
-                    "area": 200,
-                    "ecoregion": "southern",
-                    "utc_offset": "-09:00"
-                }
+                            },
+                            "area": 200,
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00"
+                        }
+                    }
+                ]
             }
         ]
     }' | python -m json.tool
@@ -416,12 +420,16 @@ modules, and with fire location data specified as lat + lng + size.
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "location": {
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "area": 200,
-                    "utc_offset": "-09:00",
-                    "ecoregion": "southern"
+                "growth": [
+                    {
+                        "location": {
+                            "latitude": 47.4316976,
+                            "longitude": -121.3990506,
+                            "area": 200,
+                            "utc_offset": "-09:00",
+                            "ecoregion": "southern"
+                        }
+                    }
                 }
             }
         ]
@@ -524,17 +532,21 @@ modules, and with fire location data specified as lat + lng + size.
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "location": {
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "area": 200,
-                    "utc_offset": "-09:00",
-                    "ecoregion": "southern"
-                },
-                "fuelbeds": [
+                "growth": [
                     {
-                        "fccs_id": "9",
-                        "pct": 100.0
+                        "location": {
+                            "latitude": 47.4316976,
+                            "longitude": -121.3990506,
+                            "area": 200,
+                            "utc_offset": "-09:00",
+                            "ecoregion": "southern"
+                        },
+                        "fuelbeds": [
+                            {
+                                "fccs_id": "9",
+                                "pct": 100.0
+                            }
+                        ]
                     }
                 ]
             }
@@ -577,33 +589,33 @@ and so has been optionally stripped from the following request
                     "name": "Natural Fire near Yosemite, CA"
                 },
                 "id": "SF11C14225236095807750",
-                "location": {
-                    "area": 10000,
-                    "ecoregion": "western",
-                    "latitude": 37.909644,
-                    "longitude": -119.7615805,
-                    "utc_offset": "-07:00"
-                },
                 "type": "wildfire",
-                "fuelbeds": [
-                    {
-                        "fccs_id": "49",
-                        "pct": 50.0,
-                        "emissions": {
-                            "flaming": {
-                                "PM25": [3002.3815120047017005]
-                            },
-                            "residual": {
-                                "PM25": [4002.621500211796271]
-                            },
-                            "smoldering": {
-                                "PM25": [623.424985839975172]
-                            }
-                        }
-                    }
-                ],
                 "growth": [
                     {
+                        "location": {
+                            "area": 10000,
+                            "ecoregion": "western",
+                            "latitude": 37.909644,
+                            "longitude": -119.7615805,
+                            "utc_offset": "-07:00"
+                        },
+                        "fuelbeds": [
+                            {
+                                "fccs_id": "49",
+                                "pct": 50.0,
+                                "emissions": {
+                                    "flaming": {
+                                        "PM25": [3002.3815120047017005]
+                                    },
+                                    "residual": {
+                                        "PM25": [4002.621500211796271]
+                                    },
+                                    "smoldering": {
+                                        "PM25": [623.424985839975172]
+                                    }
+                                }
+                            }
+                        ],
                         "start": "2015-11-24T17:00:00",
                         "end": "2015-11-25T17:00:00",
                         "pct": 100.0
@@ -672,17 +684,17 @@ require emissions data.
                     {
                         "start": "2015-11-24T17:00:00",
                         "end": "2015-11-25T17:00:00",
-                        "pct": 100.0
+                        "pct": 100.0,
+                        "location": {
+                            "area": 10000,
+                            "ecoregion": "western",
+                            "latitude": 37.909644,
+                            "longitude": -119.7615805,
+                            "utc_offset": "-07:00"
+                        }
                     }
                 ],
                 "id": "SF11C14225236095807750",
-                "location": {
-                    "area": 10000,
-                    "ecoregion": "western",
-                    "latitude": 37.909644,
-                    "longitude": -119.7615805,
-                    "utc_offset": "-07:00"
-                },
                 "type": "wildfire"
             }
         ]
@@ -732,52 +744,52 @@ and consumption data.
                     "name": "Natural Fire near Yosemite, CA"
                 },
                 "id": "SF11C14225236095807750",
-                "location": {
-                    "area": 10000,
-                    "ecoregion": "western",
-                    "latitude": 37.909644,
-                    "longitude": -119.7615805,
-                    "utc_offset": "-07:00"
-                },
                 "type": "wildfire",
-                "fuelbeds": [
-                    {
-                        "fccs_id": "49",
-                        "pct": 50.0,
-                        "heat": {
-                            "total": [
-                                3901187352927.508
-                            ],
-                            "residual": [
-                                1312164844326.5745
-                            ],
-                            "flaming": [
-                                1395852418045.9065
-                            ],
-                            "smoldering": [
-                                1193170090555.0266
-                            ]
-                        },
-                        "consumption": {
-                            "smoldering": [21712.600892425173],
-                            "flaming": [40988.711969791053],
-                            "residual": [13823.389194227209]
-                        },
-                        "emissions": {
-                            "flaming": {
-                                "PM25": [3000.3815120047017005]
-                            },
-                            "residual": {
-                                "PM25": [4200.621500211796271]
-                            },
-                            "smoldering": {
-                                "PM25": [634.424985839975172]
-                            }
-                        }
-                    }
-                ],
                 "growth": [
                     {
+                        "location": {
+                            "area": 10000,
+                            "ecoregion": "western",
+                            "latitude": 37.909644,
+                            "longitude": -119.7615805,
+                            "utc_offset": "-07:00"
+                        },
+                        "fuelbeds": [
+                            {
+                                "fccs_id": "49",
+                                "pct": 50.0,
+                                "heat": {
+                                    "total": [
+                                        3901187352927.508
+                                    ],
+                                    "residual": [
+                                        1312164844326.5745
+                                    ],
+                                    "flaming": [
+                                        1395852418045.9065
+                                    ],
+                                    "smoldering": [
+                                        1193170090555.0266
+                                    ]
+                                },
+                                "consumption": {
+                                    "smoldering": [21712.600892425173],
+                                    "flaming": [40988.711969791053],
+                                    "residual": [13823.389194227209]
+                                },
+                                "emissions": {
+                                    "flaming": {
+                                        "PM25": [3000.3815120047017005]
+                                    },
+                                    "residual": {
+                                        "PM25": [4200.621500211796271]
+                                    },
+                                    "smoldering": {
+                                        "PM25": [634.424985839975172]
+                                    }
+                                }
+                            }
+                        ],
                         "start": "2015-11-24T17:00:00",
                         "end": "2015-11-25T17:00:00",
                         "pct": 100.0
@@ -858,17 +870,17 @@ consumption and emissions data.
                     {
                         "start": "2015-11-24T17:00:00",
                         "end": "2015-11-25T17:00:00",
-                        "pct": 100.0
+                        "pct": 100.0,
+                        "location": {
+                            "area": 10000,
+                            "ecoregion": "western",
+                            "latitude": 37.909644,
+                            "longitude": -119.7615805,
+                            "utc_offset": "-07:00"
+                        }
                     }
                 ],
                 "id": "SF11C14225236095807750",
-                "location": {
-                    "area": 10000,
-                    "ecoregion": "western",
-                    "latitude": 37.909644,
-                    "longitude": -119.7615805,
-                    "utc_offset": "-07:00"
-                },
                 "type": "wildfire"
             }
         ]

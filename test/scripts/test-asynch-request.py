@@ -149,18 +149,18 @@ REQUEST = {
             "id": "SF11C14225236095807750",
             "type": "wildfire",
             "fuel_type": "natural",
-            "location": {
-                "area": None,  # WILL BE FILLED IN
-                "ecoregion": "western",
-                "latitude": None,  # WILL BE FILLED IN
-                "longitude": None,  # WILL BE FILLED IN
-                "utc_offset": None,  # WILL BE FILLED IN
-            },
             "growth": [
                 {
                     "start": None,  # WILL BE FILLED IN
                     "end": None,  # WILL BE FILLED IN
-                    "pct": 100.0
+                    "pct": 100.0,
+                    "location": {
+                        "area": None,  # WILL BE FILLED IN
+                        "ecoregion": "western",
+                        "latitude": None,  # WILL BE FILLED IN
+                        "longitude": None,  # WILL BE FILLED IN
+                        "utc_offset": None,  # WILL BE FILLED IN
+                    }
                 }
             ]
         },
@@ -178,18 +178,18 @@ REQUEST = {
             "id": "ljo4tosghsjfdsdkf",
             "type": "rx",
             "fuel_type": "activity",
-            "location": {
-                "area": None,  # WILL BE FILLED IN
-                "ecoregion": "western",
-                "latitude": None,  # WILL BE FILLED IN
-                "longitude": None,  # WILL BE FILLED IN
-                "utc_offset": None,  # WILL BE FILLED IN
-            },
             "growth": [
                 {
                     "start": None,  # WILL BE FILLED IN
                     "end": None,  # WILL BE FILLED IN
-                    "pct": 100.0
+                    "pct": 100.0,
+                    "location": {
+                        "area": None,  # WILL BE FILLED IN
+                        "ecoregion": "western",
+                        "latitude": None,  # WILL BE FILLED IN
+                        "longitude": None,  # WILL BE FILLED IN
+                        "utc_offset": None,  # WILL BE FILLED IN
+                    }
                 }
             ]
         }
@@ -222,10 +222,10 @@ if __name__ == "__main__":
     for i in range(2):
         REQUEST['fire_information'][i]['growth'][0]['start'] = local_start_str
         REQUEST['fire_information'][i]['growth'][0]['end'] = local_end_str
-        REQUEST['fire_information'][i]['location']['area'] = args.area
-        REQUEST['fire_information'][i]['location']['latitude'] = args.latitude + ((i-0.5)/10.0)
-        REQUEST['fire_information'][i]['location']['longitude'] = args.longitude
-        REQUEST['fire_information'][i]['location']['utc_offset'] = args.utc_offset
+        REQUEST['fire_information'][i]['growth'][0]['location']['area'] = args.area
+        REQUEST['fire_information'][i]['growth'][0]['location']['latitude'] = args.latitude + ((i-0.5)/10.0)
+        REQUEST['fire_information'][i]['growth'][0]['location']['longitude'] = args.longitude
+        REQUEST['fire_information'][i]['growth'][0]['location']['utc_offset'] = args.utc_offset
 
     if args.smtp_server:
         smtp_server, smtp_port = args.smtp_server.split(':')

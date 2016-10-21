@@ -58,24 +58,28 @@ response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/fuelbeds/" --write-out 
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA",
-                "location": {
-                    "perimeter": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
+                "growth": [
+                    {
+                        "location": {
+                            "perimeter": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
                                 ]
-                            ]
-                        ]
-                    },
-                    "ecoregion": "southern",
-                    "utc_offset": "-09:00"
-                }
+                            },
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00"
+                        }
+                    }
+                ]
             }
         ],
         "config": {
@@ -111,32 +115,35 @@ response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" --write-out
                     "name": "Natural Fire near Snoqualmie Pass, WA",
                     "id": "SF11E826544"
                 },
-                "fuelbeds": [
+                "growth": [
                     {
-                        "fccs_id": "9",
-                        "pct": 100.0
-                    }
-                ],
-                "id": "SF11C14225236095807750",
-                "location": {
-                    "perimeter": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
+                        "fuelbeds": [
+                            {
+                                "fccs_id": "9",
+                                "pct": 100.0
+                            }
+                        ],
+                        "location": {
+                            "perimeter": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
                                 ]
-                            ]
-                        ]
-                    },
-                    "ecoregion": "southern",
-                    "utc_offset": "-09:00",
-                    "area": 2398.94477979842
-                }
+                            },
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00",
+                            "area": 2398.94477979842
+                        }
+                    }
+                ]
             }
         ]
     }' -o "$OUTPUT_FILE-t")
