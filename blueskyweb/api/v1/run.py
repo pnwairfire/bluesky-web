@@ -252,14 +252,16 @@ class RunExecuter(RunHandlerBase):
         # TODO: import vs call bss-scheduler?
         # TODO: dump data to json?  works fine without doing so, so this may
         #  only serve the purpose of being able to read data in scheduler ui
+        tornado.log.gen_log.debug('input: %s', data)
         BspRunScheduler().schedule(queue_name, data)
         self.write({"run_id": data['run_id']})
 
     def _run_in_process(self, data):
         try:
-            tornado.log.gen_log.debug('data: %s', data)
+            tornado.log.gen_log.debug('input: %s', data)
             stdout_data, stderr_data = _launch_bsp(data, capture_output=True)
             # TODO: make sure stdout_data is valid json?
+            tornado.log.gen_log.debug('output: %s', stdout_data)
             self.write(stdout_data)
 
         # TODO: return 404 if output has error related to bad module, etc.
