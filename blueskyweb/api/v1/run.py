@@ -310,8 +310,11 @@ class RunExecuter(RunHandlerBase):
         data['config']['dispersion']['output_dir'] = os.path.join(
             os.path.dirname(EXPORT_CONFIGURATION['dest_dir'].rstrip('/')),
             'bsp-dispersion-output', '{run_id}')
-        logging.debug("Output dir: %s",
-            data['config']['dispersion']['output_dir'])
+        data['config']['dispersion']['working_dir'] = os.path.join(
+            os.path.dirname(EXPORT_CONFIGURATION['dest_dir'].rstrip('/')),
+            'bsp-dispersion-working', '{run_id}')
+        logging.debug("Output dir: %s", data['config']['dispersion']['output_dir'])
+        logging.debug("Working dir: %s", data['config']['dispersion']['working_dir'])
 
         if not domain:
             data['config']['dispersion']['model'] = 'vsmoke'
