@@ -18,6 +18,7 @@ import socket
 import urllib2
 import uuid
 import tornado.web
+import tornado.log
 import traceback
 
 # TODO: import vs call executable?
@@ -256,6 +257,7 @@ class RunExecuter(RunHandlerBase):
 
     def _run_in_process(self, data):
         try:
+            tornado.log.gen_log.debug('data: %s', data)
             stdout_data, stderr_data = _launch_bsp(data, capture_output=True)
             # TODO: make sure stdout_data is valid json?
             self.write(stdout_data)
