@@ -173,6 +173,7 @@ class RunExecuter(RunHandlerBase):
                 self._run_asynchronously(data, domain=domain)
 
             else:
+                self._configure_emissions(data)
                 # fuelbeds or emissions request
                 if self.get_query_argument('_a', default=None) is not None:
                     self._run_asynchronously(data)
@@ -269,6 +270,11 @@ class RunExecuter(RunHandlerBase):
             logging.error('Exception: {}'.format(e))
             self.set_status(500)
 
+    def _configure_emissions(self, data):
+        logging.debug('Configuring emissions')
+        data['config'] = data.get('config', {})
+        data['config']['emissions'] = data['config'].get('emissions', {})
+        data['config']['emissions']['efs'] = "urbanski"
 
     def _configure_findmetdata(self, data, domain):
         logging.debug('Configuring findmetdata')
