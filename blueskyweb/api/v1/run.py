@@ -158,6 +158,7 @@ class RunExecuter(RunHandlerBase):
 
             # TODO: check data['modules'] specifically for 'localmet',
             # 'dispersion', 'visualization' (and 'export'?)
+            logging.debug("BSP input data: %s", json.dumps(data))
             if mode not in ('fuelbeds', 'emissions'):
                 # Hysplit or VSMOKE request
                 for m in data['modules']:
@@ -169,7 +170,6 @@ class RunExecuter(RunHandlerBase):
 
                 # TODO: configure anything else (e.g. setting domain where
                 #  appropriate)
-                #logging.debug("BSP input data: %s", json.dumps(data))
                 self._run_asynchronously(data, domain=domain)
 
             else:
