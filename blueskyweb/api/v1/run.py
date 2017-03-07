@@ -37,15 +37,17 @@ EXPORT_CONFIGURATIONS = {
             or "/bluesky/playground-output/"),  # TODO: fill in appropriate default
         "url_root_dir": (os.environ.get('BSPWEB_EXPORT_LOCALSAVE_URL_ROOT_DIR')
             or "/playground-output/"),
+        # TODO: protocol doesn't seem to be picking up ENV var (or maybe env var
+        #   being set correctly in production); figure out why
+        "protocol": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_PROTOCOL') or 'https',
         # host will be set to hostname in api request if not defined in env var
-        "protocol": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_PROTOCOL') or 'http',
         "host": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_HOST')
     },
     "upload": {
         "scp": {
             "user": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_USER') or "bluesky",
+            "protocol": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_PROTOCOL') or 'https',
             # host will be set to hostname in api request if not defined in env var
-            "protocol": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_PROTOCOL') or 'http',
             "host": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_HOST'),
             "port": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_PORT') or 22,
             "dest_dir": (os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR')
