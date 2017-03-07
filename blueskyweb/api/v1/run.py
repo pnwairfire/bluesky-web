@@ -131,16 +131,16 @@ class RunExecuter(RunHandlerBase):
 
     def post(self, mode=None, domain=None):
         if domain and domain not in domains.DOMAINS:
-            self.set_status(404, 'Bad request: Unrecognized domain')
+            self._bad_request(404, 'unrecognized domain')
             return
 
         if not self.request.body:
-            self.set_status(400, 'Bad request: empty post data')
+            self._bad_request(400, 'empty post data')
             return
 
         data = json.loads(self.request.body)
         if "fire_information" not in data:
-            self.set_status(400, "Bad request: 'fire_information' not specified")
+            self._bad_request(400, "'fire_information' not specified")
             return
 
         # TODO: should no configuration be allowed at all?  or only some? if
@@ -214,9 +214,9 @@ class RunExecuter(RunHandlerBase):
                 invalid_modules = set(data['modules']).difference(
                     default_modules)
                 if invalid_modules:
-                    self.set_status(400, "Bad request: invalid module(s) for "
-                        "emissions request: {}".format(','.join(invalid_modules)))
-                    self.finish()
+                    self._bad_request(400, "invalid module(s) for emissions "
+                        "request: {}".format(','.join(invalid_modules)))
+                    return
                 # else, leave as is
             else:
                 data['modules'] = default_modules
@@ -239,10 +239,12 @@ class RunExecuter(RunHandlerBase):
 
         logging.debug("Modules be run: {}".format(', '.join(data['modules'])))
 
-
-    # def _bad_request(self, msg):
-    #     self.set_status(400)
-    #     self.write({"error": msg})
+    def _bad_request(self, status, msg):
+        msg = "Bad request: " + msg
+        logging.warn(msg)
+        self.set_status(status, msg)
+        #self.write({"error": msg})
+        #self.finish()
 
     def _run_asynchronously(self, data, domain=None):
 
@@ -309,8 +311,7 @@ class RunExecuter(RunHandlerBase):
         if (not data.get('config', {}).get('dispersion', {}) or not
                 data['config']['dispersion'].get('start') or not
                 data['config']['dispersion'].get('num_hours')):
-            self.set_status(400,
-                "Bad request: dispersion 'start' and 'num_hours' must be specified")
+            self._bad_request(400, "dispersion 'start' and 'num_hours' must be specified")
             return
 
         data['config']['dispersion']['output_dir'] = os.path.join(
@@ -387,8 +388,9 @@ class RunExecuter(RunHandlerBase):
         # only allow email export to be specified nin request
         if 'export' in data['modules']:
             if set(data.get('config', {}).get('export', {}).get('modes', [])) - set(['email']):
-                self.set_status(400, "Bad request: only 'email' export mode allowed")
+                self._bad_request(400, "only 'email' export mode allowed")
                 return
+
             # Make sure 'export' module is executed only once, and that it
             # happens at the end
             data['modules'] = [e for e in data['modules'] if e != 'export'] + ['export']
@@ -592,7 +594,9 @@ class RunOutput(RunHandlerBase):
         """
         logging.debug('Looking for output in %s', output_location)
         if not exists_func(output_location):
-            self.set_status(404)
+            self._bad_request(404, "Output location doesn't exist: {}".format(output_location))
+            return
+
         else:
             r = {
                 # TODO: use get_output_url for form root_url
