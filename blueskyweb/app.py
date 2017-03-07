@@ -23,6 +23,7 @@ from .api.v1.run import (
     RunExecuter as RunExecuterV1,
     RunStatus as RunStatusV1,
     RunOutput as RunOutputV1,
+    EXPORT_MODE,
     EXPORT_CONFIGURATION
 )
 
@@ -70,6 +71,7 @@ def main(port, log_level_str=None, log_file=None,
     application = tornado.web.Application(routes, debug=debug)
     logging.info(' * Debug mode: {}'.format(debug))
     logging.info(' * Port: {}'.format(port))
+    logging.info(" * EXPORT_MODE: %s", EXPORT_MODE)
     logging.info(" * EXPORT_CONFIGURATION: %s", EXPORT_CONFIGURATION)
     application.listen(port)
     tornado.ioloop.IOLoop.current().start()
