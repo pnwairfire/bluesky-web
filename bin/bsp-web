@@ -44,6 +44,7 @@ Configuration
   - BSPWEB_EXPORT_MODE -- 'upload' or 'localsave'
   - BSPWEB_EXPORT_LOCALSAVE_DEST_DIR -- where to mv export, of 'localsave' mode
   - BSPWEB_EXPORT_UPLOAD_SCP_USER
+  - BSPWEB_EXPORT_UPLOAD_SCP_PROTOCOL
   - BSPWEB_EXPORT_UPLOAD_SCP_HOST
   - BSPWEB_EXPORT_UPLOAD_SCP_PORT
   - BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR
@@ -59,6 +60,7 @@ Examples
  Upload to vagrant VM (debug mode):
   $ BSPWEB_EXPORT_MODE=upload \\
     BSPWEB_EXPORT_UPLOAD_SCP_USER=vagrant \\
+    BSPWEB_EXPORT_UPLOAD_SCP_PROTOCOL=http \\
     BSPWEB_EXPORT_UPLOAD_SCP_HOST=127.0.0.1 \\
     BSPWEB_EXPORT_UPLOAD_SCP_PORT=2222 \\
     BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR=/home/vagrant/bsp-remote-exports/ \\

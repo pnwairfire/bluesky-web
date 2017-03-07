@@ -38,12 +38,14 @@ EXPORT_CONFIGURATIONS = {
         "url_root_dir": (os.environ.get('BSPWEB_EXPORT_LOCALSAVE_URL_ROOT_DIR')
             or "/playground-output/"),
         # host will be set to hostname in api request if not defined in env var
+        "protocol": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_PROTOCOL') or 'http',
         "host": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_HOST')
     },
     "upload": {
         "scp": {
             "user": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_USER') or "bluesky",
             # host will be set to hostname in api request if not defined in env var
+            "protocol": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_PROTOCOL') or 'http',
             "host": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_HOST'),
             "port": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_PORT') or 22,
             "dest_dir": (os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR')
@@ -88,7 +90,8 @@ def remote_exists(url):
     return requests.head(url).status_code != 404
 
 def get_output_url(run_id):
-    return "http://{}".format(
+    # TODO: shouldn't EXPORT_MODE be used instead of hardcoded "scp" ?
+    return "{}://{}".format(EXPORT_CONFIGURATION["scp"]["protocol"],
         os.path.join(EXPORT_CONFIGURATION["scp"]["host"],
         EXPORT_CONFIGURATION["scp"]["url_root_dir"].strip('/'),
         run_id))
