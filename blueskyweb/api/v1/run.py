@@ -603,7 +603,7 @@ class RunOutput(RunHandlerBase):
         else:
             r = {
                 # TODO: use get_output_url for form root_url
-                "root_url": "{}://{}{}".format(self.request.protocol,
+                "root_url": "{}://{}{}".format(config['protocol'] or self.request.protocol,
                     # TODO: use self.request.remote_ip instead of self.request.host
                     # TODO: call _get_host
                     config['host'] or self.request.host,
