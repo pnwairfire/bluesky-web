@@ -5,7 +5,7 @@ __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 
 import tornado.ioloop
 
-from pyairfire import scripting
+import afscripting as scripting
 
 try:
     from blueskyweb.app import main
@@ -72,8 +72,8 @@ if __name__ == "__main__":
     parser.epilog = EPILOG_STR
     parser.formatter_class = scripting.args.RawTextHelpFormatter
     scripting.args.add_arguments(parser, OPTIONAL_ARGS)
-    # Use pyairfire to add logging options to the parser object, but we'll
-    # configure logging oureselves in app.main
+    # Use afscripting to add logging options to the parser object,
+    # but we'll configure logging oureselves in app.main
     scripting.args.add_logging_options(parser)
     args = parser.parse_args()
     main(args.port, log_level_str=args.log_level, log_file=args.log_file,

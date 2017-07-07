@@ -23,6 +23,7 @@ setup(
     install_requires=requirements,
     tests_require=test_requirements,
     dependency_links=[
-        "https://pypi.smoke.airfire.org/simple/pyairfire/"
+        "https://pypi.smoke.airfire.org/simple/afscripting/",
+        "https://pypi.smoke.airfire.org/simple/met/"
     ]
 )

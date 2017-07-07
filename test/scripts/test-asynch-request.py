@@ -15,7 +15,7 @@ import sys
 import time
 import urllib.request, urllib.parse, urllib.error
 
-from pyairfire import scripting
+import afscripting as scripting
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
 EPILOG_STR = """
