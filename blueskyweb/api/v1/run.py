@@ -21,53 +21,15 @@ import tornado.web
 import tornado.log
 import traceback
 
-# TODO: import vs call executable?
-from bsslib.scheduling.schedulers.bsp.runs import BspRunScheduler
-from bsslib.jobs.bsp import _launch as _launch_bsp
-
-from blueskyweb.lib import domains
+from blueskyworker.tasks import run_bluesky, _run_bluesky
 
 # TODO: pass configuration settings into bsp-web (and on to
 #   blueskyweb.app.main) as arg options rather than as env vars ?
 
 
-EXPORT_CONFIGURATIONS = {
-    "localsave": {
-        "dest_dir": (os.environ.get('BSPWEB_EXPORT_LOCALSAVE_DEST_DIR')
-            or "/bluesky/playground-output/"),  # TODO: fill in appropriate default
-        "url_root_dir": (os.environ.get('BSPWEB_EXPORT_LOCALSAVE_URL_ROOT_DIR')
-            or "/playground-output/"),
-        # TODO: protocol doesn't seem to be picking up ENV var (or maybe env var
-        #   being set correctly in production); figure out why
-        "protocol": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_PROTOCOL') or 'https',
-        # host will be set to hostname in api request if not defined in env var
-        "host": os.environ.get('BSPWEB_EXPORT_LOCALSAVE_HOST')
-    },
-    "upload": {
-        "scp": {
-            "user": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_USER') or "bluesky",
-            "protocol": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_PROTOCOL') or 'https',
-            # host will be set to hostname in api request if not defined in env var
-            "host": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_HOST'),
-            "port": os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_PORT') or 22,
-            "dest_dir": (os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR')
-                or "/bluesky/playground-output/"),
-            "url_root_dir": (os.environ.get('BSPWEB_EXPORT_UPLOAD_SCP_URL_ROOT_DIR')
-                or "/playground-output/")
-        }
-    }
-}
-# TODO: change default export mode to 'upload' once fab tasks support setting the mode
-EXPORT_MODE = (os.environ.get('BSPWEB_EXPORT_MODE') or 'localsave').lower()
-if EXPORT_MODE not in EXPORT_CONFIGURATIONS:
-    raise ValueError("Invalid value for BSPWEB_EXPORT_MODE - {}. Must be one"
-        " of the following: {}".format(EXPORT_MODE,
-        ', '.join(list(EXPORT_CONFIGURATIONS.keys()))))
-EXPORT_CONFIGURATION = EXPORT_CONFIGURATIONS[EXPORT_MODE]
+DEST_DIR = "/bluesky/playground-output/"
+URL_ROOT_DIR = "/playground-output/"
 
-# TODO: require host to be specified if uploading?
-# if EXPORT_MODE == "upload" and not EXPORT_CONFIGURATION['scp']['host']:
-#     raise ValueError("Specify scp host for upload")
 
 
 ##
@@ -91,16 +53,17 @@ class remote_open(object):
 def remote_exists(url):
     return requests.head(url).status_code != 404
 
+def get_output_server_info(run_id):
+    output_server_info = {} # TODO: Get info from mongodb
+    return output_server_info
+
 def get_output_url(run_id):
-    # TODO: shouldn't EXPORT_MODE be used instead of hardcoded "scp" ?
-    return "{}://{}".format(EXPORT_CONFIGURATION["scp"]["protocol"],
-        os.path.join(EXPORT_CONFIGURATION["scp"]["host"],
-        EXPORT_CONFIGURATION["scp"]["url_root_dir"].strip('/'),
-        run_id))
+
+    return "{}{}".format(get_output_root_url(run_id), url_root_dir)
 
 PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
 def is_same_host(web_request_host):
-    """Checks to see if the uploaded exports are local to the web service
+    """Checks to see if the output is local to the web service
 
     If they are local, the run status and output APIS can carry out their
     checks more efficiently and quickly.
@@ -115,7 +78,9 @@ def is_same_host(web_request_host):
         web_service_host = socket.gethostbyaddr(socket.gethostname())[0]
     except:
         web_service_host = PORT_IN_HOSTNAME_MATCHER.sub('', web_request_host)
-    if EXPORT_CONFIGURATION["scp"]["host"] == web_service_host:
+
+    output_hostname = "" # TODO: Get hostname from mongodb
+    if output_hostname == web_service_host:
         return True
 
     # TODO: determine ip address of upload host and web service host and
@@ -165,7 +130,7 @@ class RunExecuter(RunHandlerBase):
             # 'dispersion', 'visualization' (and 'export'?)
             logging.debug("BSP input data: %s", json.dumps(data))
             if mode not in ('fuelbeds', 'emissions'):
-                # Hysplit or VSMOKE request
+                # plumerise or dispersion (Hysplit or VSMOKE) request
                 for m in data['modules']:
                     # 'export' module is configured in _run_asynchronously
                     if m != 'export':
@@ -253,21 +218,19 @@ class RunExecuter(RunHandlerBase):
 
     def _run_asynchronously(self, data, domain=None):
 
-        self._configure_export(data, domain is not None)
-
         queue_name = domains.DOMAINS.get(domain, {}).get('queue') or 'all-met'
 
         # TODO: import vs call bss-scheduler?
         # TODO: dump data to json?  works fine without doing so, so this may
         #  only serve the purpose of being able to read data in scheduler ui
         tornado.log.gen_log.debug('input: %s', data)
-        BspRunScheduler().schedule(queue_name, data)
+        run_bluesky.apply_async((data,), queue=queue_name)
         self.write({"run_id": data['run_id']})
 
     def _run_in_process(self, data):
         try:
             tornado.log.gen_log.debug('input: %s', data)
-            stdout_data, stderr_data = _launch_bsp(data, capture_output=True)
+            stdout_data, stderr_data = _run_bluesky(data, capture_output=True)
             # TODO: make sure stdout_data is valid json?
             tornado.log.gen_log.debug('output: %s', stdout_data)
             self.write(stdout_data)
@@ -320,13 +283,13 @@ class RunExecuter(RunHandlerBase):
             return
 
         data['config']['dispersion']['output_dir'] = os.path.join(
-            os.path.dirname(EXPORT_CONFIGURATION['dest_dir'].rstrip('/')),
-            'bsp-dispersion-output', '{run_id}')
+            DEST_DIR, '{run_id}', 'output')
         data['config']['dispersion']['working_dir'] = os.path.join(
-            os.path.dirname(EXPORT_CONFIGURATION['dest_dir'].rstrip('/')),
-            'bsp-dispersion-working', '{run_id}')
-        logging.debug("Output dir: %s", data['config']['dispersion']['output_dir'])
-        logging.debug("Working dir: %s", data['config']['dispersion']['working_dir'])
+            DEST_DIR, '{run_id}', 'working')
+        logging.debug("Output dir: %s",
+            data['config']['dispersion']['output_dir'])
+        logging.debug("Working dir: %s",
+            data['config']['dispersion']['working_dir'])
 
         if not domain:
             data['config']['dispersion']['model'] = 'vsmoke'
@@ -388,57 +351,10 @@ class RunExecuter(RunHandlerBase):
         logging.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
-    def _configure_export(self, data, include_visualization):
-        logging.debug('Configuring export')
-        # only allow email export to be specified nin request
-        if 'export' in data['modules']:
-            if set(data.get('config', {}).get('export', {}).get('modes', [])) - set(['email']):
-                self._bad_request(400, "only 'email' export mode allowed")
-                return
 
-            # Make sure 'export' module is executed only once, and that it
-            # happens at the end
-            data['modules'] = [e for e in data['modules'] if e != 'export'] + ['export']
-        else:
-            data['modules'].append('export')
 
-        # add upload export, configured to scp
-        # Note: we need to use 'upload' export, esince we don't know where bsp workers
-        #  will be run.  The bsp code should (or at least will) dynamically switch
-        #  to saving locally instead of scp'ing if the hostname of the server it's running
-        #  on is the sam
-        data['config'] = data.get('config', {})
-        data['config']['export'] = data['config'].get('export', {})
-        data['config']['export']['modes'] = data['config']['export'].get('modes', [])
-        data['config']['export']['modes'].append(EXPORT_MODE)
-        data['config']['export']['extra_exports'] = ["dispersion"]
-        if include_visualization:
-            data['config']['export']['extra_exports'].append("visualization")
-        # TODO: no real need to copy.deepcopy
-        data['config']['export'][EXPORT_MODE] = copy.deepcopy(EXPORT_CONFIGURATION)
 
-        # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
-        try:
-            image_results_version = self.get_argument('image_results_version')
-            if image_results_version:
-                logging.debug('Setting image_results_version: %s',
-                    image_results_version)
-                data['config']['export'][EXPORT_MODE]['image_results_version'] = image_results_version
-        except tornado.web.MissingArgumentError:
-            logging.debug('image_results_version not specified')
-            pass
-        # ***** END
-
-        if EXPORT_MODE == 'upload':
-            if not data['config']['export']['upload']['scp']['host']:
-                data['config']['export']['upload']['scp']['host'] = self._get_host()
-        elif EXPORT_MODE == 'localsave':
-            # TODO: set any values?
-            pass
-
-        # TODO: update bsp to allow configuring export to exclude absolute
-        #   output dir (at least for 'localsave', for 'upload' too if
-        #   necessary), and configure it to do so
+# TODO: Look in monbodb for information about the run
 
 class RunStatus(RunHandlerBase):
 
