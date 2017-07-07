@@ -18,17 +18,18 @@ except:
 
 OPTIONAL_ARGS = [
     {
+        'long': '--path-prefix',
+        'help': "Url root path prefix to apply to all routes; e.g. '/outlooks'"
+    },
+    {
         'short': '-p',
         'long': '--port',
-        'dest': 'port',
-        'help': 'run the server listening on speciied port',
-        'action': "store",
+        'help': 'run the server listening on specified port',
         'default': 8888
     },
     {
         'short': '-d',
         'long': '--debug',
-        'dest': 'debug',
         'help': 'run the server in debug mode (with auto-reloading of code, etc.)',
         'action': "store_true",
         'default': False
@@ -55,7 +56,7 @@ Examples
  Localsave (debug mode):
   $ BSPWEB_EXPORT_MODE=localsave \\
      BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=/bsp-output/bsp-local-exports/ \\
-     ./bin/bsp-web -d --log-level=DEBUG
+     ./bin/bsp-web -d --log-level=DEBUG --path-prefix=bluesky
 
  Upload to vagrant VM (debug mode):
   $ BSPWEB_EXPORT_MODE=upload \\
@@ -64,7 +65,7 @@ Examples
     BSPWEB_EXPORT_UPLOAD_SCP_HOST=127.0.0.1 \\
     BSPWEB_EXPORT_UPLOAD_SCP_PORT=2222 \\
     BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR=/home/vagrant/bsp-remote-exports/ \\
-    ./bin/bsp-web -d --log-level=DEBUG
+    ./bin/bsp-web -d --log-level=DEBUG --path-prefix=bluesky
  """
 
 if __name__ == "__main__":
@@ -76,5 +77,9 @@ if __name__ == "__main__":
     # but we'll configure logging oureselves in app.main
     scripting.args.add_logging_options(parser)
     args = parser.parse_args()
-    main(args.port, log_level_str=args.log_level, log_file=args.log_file,
-        log_format=args.log_message_format, debug=args.debug)
+
+    try:
+        main(**args.__dict__)
+    except Exception as e:
+        logging.error(e)
+        sys.exit(1)

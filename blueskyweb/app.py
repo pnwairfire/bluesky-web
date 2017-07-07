@@ -27,51 +27,58 @@ from .api.v1.run import (
     EXPORT_CONFIGURATION
 )
 
-routes = [
-    # TODO: update all patterns to allow optional trailing slash
-    (r"/api/ping/?", Ping),
-    (r"/api/v1/domains/?", DomainInfoV1),
-    (r"/api/v1/domains/([^/]+)/?", DomainInfoV1),
-    (r"/api/v1/domains/([^/]+)/available-dates/?", DomainAvailableDatesV1),
-    (r"/api/v1/available-dates/?", DomainAvailableDatesV1),
-    (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),
-    (r"/api/v1/run/(dispersion|all)/([^/]+)/?", RunExecuterV1),
-    (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
-    (r"/api/v1/run/([^/]+)/output/?", RunOutputV1)
-]
-
 DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
-def configure_logging(log_level_str, log_file, log_format):
-    log_level = getattr(logging, log_level_str)
-    logging.basicConfig(level=log_level, format=log_format)
-
-    log_file = log_file
-    if log_file:
-        fh = logging.FileHandler(log_file)
-        fh.setFormatter(logging.Formatter(log_format))
-        logging.getLogger().addHandler(fh)
-
-def main(port, log_level_str=None, log_file=None,
-        log_format=None, debug=False):
-    """Main method for starting bluesky tornado web service
-
-    args:
-     - port -- port to listen on
-
-    kwargs:
-     - log_level_str -- DEBUG, INFO, etc.
-     - log_file -- file to write logs to
-     - log_format -- format of log messages
-     - debug -- whether or not to run in debug mode (with code
-        auto-reloading etc)
-    """
-    log_level_str = log_level_str or 'WARNING'
+def configure_logging(log_level, log_file, log_format):
+    log_level = log_level or logging.WARNING
     log_format = log_format or DEFAULT_LOG_FORMAT
-    configure_logging(log_level_str, log_file, log_format)
-    application = tornado.web.Application(routes, debug=debug)
-    logging.info(' * Debug mode: {}'.format(debug))
-    logging.info(' * Port: {}'.format(port))
-    logging.info(" * EXPORT_MODE: %s", EXPORT_MODE)
-    logging.info(" * EXPORT_CONFIGURATION: %s", EXPORT_CONFIGURATION)
-    application.listen(port)
+
+    # mock the argsparse args object to pass into log config function
+    class Args(object):
+        def __init__(self, **kwargs):
+            [setattr(self, k, v) for k,v in kwargs.items()]
+
+    afscripting.args.configure_tornado_logging_from_args(
+        Args(log_message_format=log_format, log_level=log_level, log_file=log_file))
+
+DEFAULT_SETTINGS = {
+    'port': 8888
+}
+
+def get_routes(path_prefix):
+    routes = [
+        # TODO: update all patterns to allow optional trailing slash
+        (r"/api/ping/?", Ping),
+        (r"/api/v1/domains/?", DomainInfoV1),
+        (r"/api/v1/domains/([^/]+)/?", DomainInfoV1),
+        (r"/api/v1/domains/([^/]+)/available-dates/?", DomainAvailableDatesV1),
+        (r"/api/v1/available-dates/?", DomainAvailableDatesV1),
+        (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),
+        (r"/api/v1/run/(dispersion|all)/([^/]+)/?", RunExecuterV1),
+        (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
+        (r"/api/v1/run/([^/]+)/output/?", RunOutputV1)
+    ]
+    if path_prefix:
+        path_prefix = path_prefix.strip('/')
+        if path_prefix: # i.e. it wasn't just '/'
+            routes = [('/' + path_prefix + e[0], e[1]) for e in routes]
+
+    tornado.log.gen_log.debug('Routes: %s', routes)
+    return routes
+
+def main(**settings):
+    """Main method for starting bluesky tornado web service
+    """
+    configure_logging(settings['log_level'], settings['log_file'],
+        settings.get('log_format'))
+
+    settings = dict(DEFAULT_SETTINGS, **settings)
+    for k in settings:
+        tornado.log.gen_log.info(' * %s: %s', k, settings[k])
+
+    if settings.get('path_prefix'):
+        settings['path_prefix'] = '/' + settings['path_prefix'].lstrip('/')
+
+    routes = get_routes(settings.get('path_prefix'))
+    application = tornado.web.Application(routes, **settings)
+    application.listen(settings['port'])
     tornado.ioloop.IOLoop.current().start()
