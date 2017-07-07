@@ -1,0 +1,28 @@
+# Deployed code version: __CODE_VERSION__
+version: '2'
+services:
+  web:
+    restart: unless-stopped
+    container_name: bluesky-web
+    image: bluesky-web
+    ports:
+    - 8888:8888
+    environment:
+    - BSPWEB_EXPORT_MODE=localsave
+    - BSPWEB_EXPORT_LOCALSAVE_PROTOCOL=https
+    - BSPWEB_EXPORT_LOCALSAVE_HOST=www.blueskywebhost.com
+    - MONGODB_URL=mongodb://mongo/blueskyweb
+    volumes:
+    - ./docker-logs/web/:/var/log/blueskyweb/blueskyweb.log
+    links:
+    - mongo
+    command: blueskyweb -p 8888 --log-level=DEBUG --log-file=/var/log/blueskyweb/blueskyweb.log
+  mongo:
+    restart: unless-stopped
+    container_name: bluesky-web-mongo
+    image: mongo
+    ports:
+    - :
+    volumes:
+    - ./docker-logs/mongodb/:/var/log/mongodb/
+    - ./docker-data/mongodb/configdb/:/data/configdb/
