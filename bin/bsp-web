@@ -33,40 +33,24 @@ OPTIONAL_ARGS = [
         'help': 'run the server in debug mode (with auto-reloading of code, etc.)',
         'action': "store_true",
         'default': False
+    },
+    {
+        'long': '--mongodb-url',
+        'help': 'url to connect to mongodb for arl indexes and bsp job queues'
     }
 ]
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
 EPILOG_STR = """
-Configuration
-
- Some configuration is enabled via env vars.
-
-  - BSPWEB_EXPORT_MODE -- 'upload' or 'localsave'
-  - BSPWEB_EXPORT_LOCALSAVE_DEST_DIR -- where to mv export, of 'localsave' mode
-  - BSPWEB_EXPORT_UPLOAD_SCP_USER
-  - BSPWEB_EXPORT_UPLOAD_SCP_PROTOCOL
-  - BSPWEB_EXPORT_UPLOAD_SCP_HOST
-  - BSPWEB_EXPORT_UPLOAD_SCP_PORT
-  - BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR
-  - BSPWEB_EXPORT_UPLOAD_SCP_DEST_URL_ROOT
-
 Examples
 
- Localsave (debug mode):
-  $ BSPWEB_EXPORT_MODE=localsave \\
-     BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=/bsp-output/bsp-local-exports/ \\
-     ./bin/bsp-web -d --log-level=DEBUG --path-prefix=bluesky
+   $ {script_name} --log-level=DEBUG -d --path-prefix=bluesky \\
+        --mongodb-url=mongodb://localhost/blueskyweb
 
- Upload to vagrant VM (debug mode):
-  $ BSPWEB_EXPORT_MODE=upload \\
-    BSPWEB_EXPORT_UPLOAD_SCP_USER=vagrant \\
-    BSPWEB_EXPORT_UPLOAD_SCP_PROTOCOL=http \\
-    BSPWEB_EXPORT_UPLOAD_SCP_HOST=127.0.0.1 \\
-    BSPWEB_EXPORT_UPLOAD_SCP_PORT=2222 \\
-    BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR=/home/vagrant/bsp-remote-exports/ \\
-    ./bin/bsp-web -d --log-level=DEBUG --path-prefix=bluesky
- """
+Example curl Requests
+
+    $ curl "http://localhost:8888/blueskyweb/api/ping/"
+ """.format(script_name=sys.argv[0])
 
 if __name__ == "__main__":
     parser = scripting.args.ArgumentParser()

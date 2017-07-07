@@ -7,22 +7,22 @@ services:
     image: bluesky-web
     ports:
     - 8888:8888
-    environment:
-    - BSPWEB_EXPORT_MODE=localsave
-    - BSPWEB_EXPORT_LOCALSAVE_PROTOCOL=https
-    - BSPWEB_EXPORT_LOCALSAVE_HOST=www.blueskywebhost.com
-    - MONGODB_URL=mongodb://mongo/blueskyweb
     volumes:
-    - ./docker-logs/web/:/var/log/blueskyweb/blueskyweb.log
+    - ./docker-logs/web/:/var/log/blueskyweb/
     links:
     - mongo
-    command: blueskyweb -p 8888 --log-level=DEBUG --log-file=/var/log/blueskyweb/blueskyweb.log
+    # note: log should be in /var/log/blueskyweb/blueskyweb.log
+    command: blueskyweb --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8888 --log-level=DEBUG
   mongo:
     restart: unless-stopped
     container_name: bluesky-web-mongo
     image: mongo
+    environment:
+    # These are meant to be overridden
+    - MONGO_INITDB_ROOT_USERNAME=blueskyweb
+    - MONGO_INITDB_ROOT_PASSWORD=blueskywebmongopassword
     ports:
-    - :
+    - 27018:27017
     volumes:
     - ./docker-logs/mongodb/:/var/log/mongodb/
     - ./docker-data/mongodb/configdb/:/data/configdb/

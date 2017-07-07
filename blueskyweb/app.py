@@ -4,6 +4,8 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import logging
+
+import afscripting
 import tornado.ioloop
 #import tornado.log
 import tornado.web
@@ -41,7 +43,9 @@ def configure_logging(log_level, log_file, log_format):
         Args(log_message_format=log_format, log_level=log_level, log_file=log_file))
 
 DEFAULT_SETTINGS = {
-    'port': 8888
+    'port': 8888,
+    'mongodb_url': "mongodb://localhost/blueskyweb",
+    'log_file': '/var/log/blueskyweb/blueskyweb.log'
 }
 
 def get_routes(path_prefix):

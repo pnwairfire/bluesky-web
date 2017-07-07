@@ -12,7 +12,8 @@ from blueskyweb.lib import domains
 class DomainInfo(tornado.web.RequestHandler):
 
     def get(self, domain_id=None):
-        data = domains.DomainDB().find(domain_id=domain_id)
+        data = domains.DomainDB(self.settings['mongodb_url']).find(
+            domain_id=domain_id)
 
         if domain_id:
             if not data:
@@ -25,7 +26,8 @@ class DomainInfo(tornado.web.RequestHandler):
 class DomainAvailableDates(tornado.web.RequestHandler):
 
     def get(self, domain_id=None):
-        data = domains.DomainDB().find(domain_id=domain_id)
+        data = domains.DomainDB(self.settings['mongodb_url']).find(
+            domain_id=domain_id)
 
         if domain_id:
             if not data:

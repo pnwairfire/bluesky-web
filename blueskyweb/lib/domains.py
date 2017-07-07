@@ -13,8 +13,6 @@ class BlueSkyConfigurationError(ValueError):
     pass
 
 
-MONGODB_URL = os.environ.get('MONGODB_URL')
-
 # TODO: not sure where is the best place to define queues, root dirs, and
 #   boundaries...maybe they should be defined in bsslib?...or let them be
 #   defined as env vars with defaults....or they should be in mongodb!!
@@ -130,10 +128,13 @@ DOMAINS = {
 
 class DomainDB(object):
 
+    def __init__(self, mongodb_url):
+        self._mongodb_url = mongodb_url
+
     # TODO: memoize/cache find
     def find(self, domain_id=None):
         data = {}
-        for d in MetDatesCollection(MONGODB_URL).find(domain=domain_id):
+        for d in MetDatesCollection(self._mongodb_url).find(domain=domain_id):
             data[d['domain']] = {
                 "dates": d['complete_dates']
             }
