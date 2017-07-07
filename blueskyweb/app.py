@@ -82,6 +82,8 @@ def main(**settings):
     if settings.get('path_prefix'):
         settings['path_prefix'] = '/' + settings['path_prefix'].lstrip('/')
 
+    os.environ["MONGODB_URL"] = settings['mongodb_url']
+
     routes = get_routes(settings.get('path_prefix'))
     application = tornado.web.Application(routes, **settings)
     application.listen(settings['port'])
