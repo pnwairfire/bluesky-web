@@ -11,11 +11,11 @@ services:
     - ./docker-logs/web/:/var/log/blueskyweb/
     links:
     - mongo
-    # note: log should be in /var/log/blueskyweb/blueskyweb.log
+    # note: log should be in /var/log/blueskyweb/blueskyweb.log, the default
     command: blueskyweb --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8888 --log-level=DEBUG
   mongo:
     restart: unless-stopped
-    container_name: bluesky-web-mongo
+    container_name: bluesky-mongo
     image: mongo
     environment:
     # These are meant to be overridden
@@ -26,3 +26,7 @@ services:
     volumes:
     - ./docker-logs/mongodb/:/var/log/mongodb/
     - ./docker-data/mongodb/configdb/:/data/configdb/
+  # rabbitmq:
+  #   restart: unless-stopped
+  #   container_name: bluesky-web-rabbitmq
+  #   image: rabbitmq:alpine
