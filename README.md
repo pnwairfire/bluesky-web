@@ -49,15 +49,15 @@ Use the help (-h) option to see usage and available config options:
 To see list tasks:
 
     cd /path/to/airfire-bluesky-web
-    BLUESKYWEB_SERVERS=username@hostname fab -l
+    fab -l
 
 To see documentation for a specific task, use the '-d' option. E.g.:
 
-    BLUESKYWEB_SERVERS=username@hostname fab -d deploy
+    fab -d deploy
 
 #### Playground Environment
 
-    BLUESKYWEB_SERVERS=jdubowy@www.blueskywebhost.com fab -A deploy
+    BLUESKYWEB_ENV=production fab -A deploy
 
 
 

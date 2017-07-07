@@ -1,2 +1,4 @@
+-i http://pypi.smoke.airfire.org/simple/
+-f http://pypi.smoke.airfire.org/simple/
 ipython
-fabric
+affabric>=1.0.0
