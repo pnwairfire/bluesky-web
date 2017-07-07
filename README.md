@@ -26,7 +26,7 @@ You just need to provide the url of one that is running.
     cd airfire-bluesky-web
     apt-get install python-pip # if necessary
     pip install --trusted-host pypi.smoke.airfire.org -r requirements.txt
-    pip install -r requirements-dev.txt
+    pip install --trusted-host pypi.smoke.airfire.org -r requirements-dev.txt
     pip install -r requirements-test.txt
 
 ### Run
@@ -38,7 +38,11 @@ Use the help (-h) option to see usage and available config options:
 ### Run in Docker
 
     docker build -t bluesky-web .
-    docker-compose up
+
+Then run in two separate terminals (or in one, if you use the `-d` option)
+
+    docker-compose -f docker-compose.yml up -d
+    docker-compose -f docker-compose-worker.yml up
 
 
 
