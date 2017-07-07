@@ -15,7 +15,7 @@ import os
 import re
 import requests
 import socket
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import uuid
 import tornado.web
 import tornado.log
@@ -62,7 +62,7 @@ EXPORT_MODE = (os.environ.get('BSPWEB_EXPORT_MODE') or 'localsave').lower()
 if EXPORT_MODE not in EXPORT_CONFIGURATIONS:
     raise ValueError("Invalid value for BSPWEB_EXPORT_MODE - {}. Must be one"
         " of the following: {}".format(EXPORT_MODE,
-        ', '.join(EXPORT_CONFIGURATIONS.keys())))
+        ', '.join(list(EXPORT_CONFIGURATIONS.keys()))))
 EXPORT_CONFIGURATION = EXPORT_CONFIGURATIONS[EXPORT_MODE]
 
 # TODO: require host to be specified if uploading?
@@ -82,7 +82,7 @@ class remote_open(object):
         self.url = url
 
     def __enter__(self):
-        self.f = urllib2.urlopen(self.url)
+        self.f = urllib.request.urlopen(self.url)
         return self.f
 
     def __exit__(self, type, value, traceback):
@@ -185,7 +185,7 @@ class RunExecuter(RunHandlerBase):
                 else:
                     self._run_in_process(data)
 
-        except Exception, e:
+        except Exception as e:
             # IF exceptions aren't caught, the traceback is returned as
             # the response body
             logging.debug(traceback.format_exc())
@@ -273,7 +273,7 @@ class RunExecuter(RunHandlerBase):
             self.write(stdout_data)
 
         # TODO: return 404 if output has error related to bad module, etc.
-        except Exception, e:
+        except Exception as e:
             logging.error('Exception: {}'.format(e))
             self.set_status(500)
 
@@ -347,7 +347,7 @@ class RunExecuter(RunHandlerBase):
                     # just use met domain
                     data['config']['dispersion']['hysplit']["USER_DEFINED_GRID"] = True
                     data['config']['dispersion']['hysplit'].update(
-                        {k.upper(): v for k, v in met_boundary.items()})
+                        {k.upper(): v for k, v in list(met_boundary.items())})
                 else:
                     data['config']['dispersion']['hysplit'].update({
                         "compute_grid": True,
@@ -524,7 +524,7 @@ class RunOutput(RunHandlerBase):
         kmz_info = section_info.get('kmzs', {})
         if kmz_info:
             r['kmzs'] = {k: '{}/{}'.format(section_info['sub_directory'], v)
-                for k, v in kmz_info.items() if k in ('fire', 'smoke')}
+                for k, v in list(kmz_info.items()) if k in ('fire', 'smoke')}
 
     ## ******************** TO DELETE - BEGIN  <-- (once v1 is obsoleted)
     def _parse_images_v1(self, r, vis_info):

@@ -13,7 +13,7 @@ import requests
 import subprocess
 import sys
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from pyairfire import scripting
 
@@ -288,7 +288,7 @@ if __name__ == "__main__":
     query["image_results_version"] = args.image_results_version
     # ***** END
 
-    url = '?'.join([url, urllib.urlencode(query)])
+    url = '?'.join([url, urllib.parse.urlencode(query)])
 
     logging.info("Testing {} ... ".format(url))
 
