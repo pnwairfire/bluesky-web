@@ -11,8 +11,8 @@ services:
     - ./docker-logs/web/:/var/log/blueskyweb/
     links:
     - mongo
-    # note: log should be in /var/log/blueskyweb/blueskyweb.log, the default
-    command: blueskyweb --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8888 --log-level=DEBUG
+    # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
+    command: bsp-web --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8888 --log-level=DEBUG
   mongo:
     restart: unless-stopped
     image: mongo

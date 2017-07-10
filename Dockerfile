@@ -16,4 +16,4 @@ ENV PATH /usr/src/blueskyweb/bin/:$PATH
 
 RUN echo 'alias ll="ls -la --color"' >> ~/.bashrc
 
-CMD ["blueskyweb", '-h']
+CMD ["bsp-web", '-h']
