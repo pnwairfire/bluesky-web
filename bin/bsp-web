@@ -3,7 +3,10 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 
+import traceback
+
 import tornado.ioloop
+import tornado.log
 
 import afscripting as scripting
 
@@ -65,5 +68,6 @@ if __name__ == "__main__":
     try:
         main(**args.__dict__)
     except Exception as e:
-        logging.error(e)
+        tornado.log.gen_log.debug(traceback.format_exc())
+        tornado.log.gen_log.error(e)
         sys.exit(1)

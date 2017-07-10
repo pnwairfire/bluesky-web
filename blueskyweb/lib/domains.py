@@ -7,7 +7,7 @@ import logging
 import math
 import os
 
-from met.arlindexer import MetDatesCollection
+from met.arl.arlindexer import MetDatesCollection
 
 class BlueSkyConfigurationError(ValueError):
     pass

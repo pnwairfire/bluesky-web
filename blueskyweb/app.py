@@ -4,6 +4,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import logging
+import os
 
 import afscripting
 import tornado.ioloop
@@ -24,15 +25,13 @@ from .api.v1.domain import (
 from .api.v1.run import (
     RunExecuter as RunExecuterV1,
     RunStatus as RunStatusV1,
-    RunOutput as RunOutputV1,
-    EXPORT_MODE,
-    EXPORT_CONFIGURATION
+    RunOutput as RunOutputV1
 )
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
-def configure_logging(log_level, log_file, log_format):
-    log_level = log_level or logging.WARNING
-    log_format = log_format or DEFAULT_LOG_FORMAT
+def configure_logging(**settings):
+    log_level = settings.get('log_level') or logging.WARNING
+    log_format = settings.get('log_format') or DEFAULT_LOG_FORMAT
 
     # mock the argsparse args object to pass into log config function
     class Args(object):
@@ -40,7 +39,8 @@ def configure_logging(log_level, log_file, log_format):
             [setattr(self, k, v) for k,v in kwargs.items()]
 
     afscripting.args.configure_tornado_logging_from_args(
-        Args(log_message_format=log_format, log_level=log_level, log_file=log_file))
+        Args(log_message_format=log_format, log_level=log_level,
+            log_file=settings.get('log_file')))
 
 DEFAULT_SETTINGS = {
     'port': 8888,
@@ -72,8 +72,9 @@ def get_routes(path_prefix):
 def main(**settings):
     """Main method for starting bluesky tornado web service
     """
-    configure_logging(settings['log_level'], settings['log_file'],
-        settings.get('log_format'))
+    settings = {k:v for k,v in settings.items() if v}
+
+    configure_logging(**settings)
 
     settings = dict(DEFAULT_SETTINGS, **settings)
     for k in settings:
