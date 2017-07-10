@@ -8,3 +8,5 @@ logs/
 Procfile-dev-*
 db/
 .cache/
+docker-data/
+docker-logs/
