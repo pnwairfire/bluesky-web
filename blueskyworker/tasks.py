@@ -25,6 +25,8 @@ app.conf.update(
     }
 )
 
+DEFAULT_BSP_VERSION = "v2.4.3"
+
 ##
 ## Public Job Interface
 ##
