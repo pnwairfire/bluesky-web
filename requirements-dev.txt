@@ -2,3 +2,4 @@
 -f http://pypi.smoke.airfire.org/simple/
 ipython
 affabric>=1.0.0
+pyaml==16.12.2
