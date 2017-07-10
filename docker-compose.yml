@@ -3,8 +3,8 @@ version: '2'
 services:
   web:
     restart: unless-stopped
-    container_name: bluesky-web
     image: bluesky-web
+    container_name: bluesky-web
     ports:
     - 8888:8888
     volumes:
@@ -12,11 +12,11 @@ services:
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/blueskyweb.log, the default
-    command: blueskyweb --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8888 --log-level=DEBUG
+    command: blueskyweb --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8888 --log-level=DEBUG
   mongo:
     restart: unless-stopped
-    container_name: bluesky-mongo
     image: mongo
+    container_name: bluesky-web-mongo
     environment:
     # These are meant to be overridden
     - MONGO_INITDB_ROOT_USERNAME=blueskyweb
