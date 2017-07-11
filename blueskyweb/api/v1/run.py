@@ -225,7 +225,7 @@ class RunExecuter(RunHandlerBase):
         #  only serve the purpose of being able to read data in scheduler ui
         tornado.log.gen_log.debug('input: %s', data)
         args = (data, self.settings['bluesky_docker_image'])
-        run_bluesky.apply_async(args), queue=queue_name)
+        run_bluesky.apply_async(args, queue=queue_name)
         self.write({"run_id": data['run_id']})
 
     def _run_in_process(self, data):
