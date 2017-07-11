@@ -104,7 +104,7 @@ def _execute(input_data_json, bsp_docker_cmd, capture_output):
         kwargs.update(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # else, p.communicate will simply return None for stdout and stderr
     p = subprocess.Popen(bsp_docker_cmd, **kwargs)
-    return p.communicate(input=input_data_json)
+    return p.communicate(input=input_data_json.encode())
 
 ##
 ## Cleaning up
