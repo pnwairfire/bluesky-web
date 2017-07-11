@@ -128,7 +128,7 @@ class RunExecuter(RunHandlerBase):
 
             # TODO: check data['modules'] specifically for 'localmet',
             # 'dispersion', 'visualization' (and 'export'?)
-            logging.debug("BSP input data: %s", json.dumps(data))
+            tornado.log.gen_log.debug("BSP input data: %s", json.dumps(data))
             if mode not in ('fuelbeds', 'emissions'):
                 # plumerise or dispersion (Hysplit or VSMOKE) request
                 for m in data['modules']:
@@ -207,11 +207,11 @@ class RunExecuter(RunHandlerBase):
             _set(self.FUELBEDS_MODULES)
         # There are no other possibilities for mode
 
-        logging.debug("Modules be run: {}".format(', '.join(data['modules'])))
+        tornado.log.gen_log.debug("Modules be run: {}".format(', '.join(data['modules'])))
 
     def _bad_request(self, status, msg):
         msg = "Bad request: " + msg
-        logging.warn(msg)
+        tornado.log.gen_log.warn(msg)
         self.set_status(status, msg)
         #self.write({"error": msg})
         #self.finish()
@@ -242,13 +242,13 @@ class RunExecuter(RunHandlerBase):
             self.set_status(500)
 
     def _configure_emissions(self, data):
-        logging.debug('Configuring emissions')
+        tornado.log.gen_log.debug('Configuring emissions')
         data['config'] = data.get('config', {})
         data['config']['emissions'] = data['config'].get('emissions', {})
         data['config']['emissions']['efs'] = "urbanski"
 
     def _configure_findmetdata(self, data, domain):
-        logging.debug('Configuring findmetdata')
+        tornado.log.gen_log.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
         data['config']['findmetdata'] = {
             "met_root_dir": domains.DOMAINS[domain]['met_root_dir'],
@@ -260,14 +260,14 @@ class RunExecuter(RunHandlerBase):
         }
 
     def _configure_localmet(self, data, domain):
-        logging.debug('Configuring localmet')
+        tornado.log.gen_log.debug('Configuring localmet')
         data['config'] = data.get('config', {})
         data['config']['localmet'] = {
             "time_step": domains.DOMAINS[domain]['time_step']
         }
 
     def _configure_plumerising(self, data, domain):
-        logging.debug('Configuring plumerising')
+        tornado.log.gen_log.debug('Configuring plumerising')
         data['config'] = data.get('config', {})
         data['config']['plumerising'] = {
             "model": "sev"
@@ -276,7 +276,7 @@ class RunExecuter(RunHandlerBase):
     DEFAULT_HYSPLIT_GRID_LENGTH = 2000
 
     def _configure_dispersion(self, data, domain):
-        logging.debug('Configuring dispersion')
+        tornado.log.gen_log.debug('Configuring dispersion')
         if (not data.get('config', {}).get('dispersion', {}) or not
                 data['config']['dispersion'].get('start') or not
                 data['config']['dispersion'].get('num_hours')):
@@ -287,9 +287,9 @@ class RunExecuter(RunHandlerBase):
             DEST_DIR, '{run_id}', 'output')
         data['config']['dispersion']['working_dir'] = os.path.join(
             DEST_DIR, '{run_id}', 'working')
-        logging.debug("Output dir: %s",
+        tornado.log.gen_log.debug("Output dir: %s",
             data['config']['dispersion']['output_dir'])
-        logging.debug("Working dir: %s",
+        tornado.log.gen_log.debug("Working dir: %s",
             data['config']['dispersion']['working_dir'])
 
         if not domain:
@@ -330,12 +330,12 @@ class RunExecuter(RunHandlerBase):
                         "NCPUS": 4
                     })
 
-            logging.debug("hysplit configuration: %s", data['config']['dispersion']['hysplit'])
+            tornado.log.gen_log.debug("hysplit configuration: %s", data['config']['dispersion']['hysplit'])
 
         # TODO: any other model-specific configuration?
 
     def _configure_visualization(self, data, domain):
-        logging.debug('Configuring visualization')
+        tornado.log.gen_log.debug('Configuring visualization')
         # Force visualization of dispersion, and let output go into dispersion
         # output directory; in case dispersion model was hysplit, specify
         # images and data sub-directories;
@@ -349,7 +349,7 @@ class RunExecuter(RunHandlerBase):
         data['config']['visualization']["hysplit"]["images_dir"] = "images/"
         data['config']['visualization']["hysplit"]["data_dir"] = "data/"
         data['config']['visualization']["hysplit"]["create_summary_json"] = True
-        logging.debug('visualization config: %s', data['config']['visualization'])
+        tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
 
@@ -371,14 +371,14 @@ class RunStatus(RunHandlerBase):
          - open_func -- function to open output json file (local or via http)
         """
         if exists_func(output_location):
-            logging.debug('%s exists', output_location)
+            tornado.log.gen_log.debug('%s exists', output_location)
             # use join instead of os.path.join in case output_location is a remote url
             output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
-            logging.debug('checking %s', output_json_file)
+            tornado.log.gen_log.debug('checking %s', output_json_file)
             failed = True  ## TODO: REMOVE
             status = "Unknown"
             if exists_func(output_json_file):
-                logging.debug('%s exists', output_json_file)
+                tornado.log.gen_log.debug('%s exists', output_json_file)
                 with open_func(output_json_file) as f:
                     try:
                         output_json = json.loads(f.read())
@@ -399,7 +399,7 @@ class RunStatus(RunHandlerBase):
                 # TODO: include 'message'
             })
         else:
-            logging.debug('%s does *NOT* exists', output_location)
+            tornado.log.gen_log.debug('%s does *NOT* exists', output_location)
             self.write({
                 "complete": False,
                 "percent": 0.0,  # TODO: determine % from output directories
@@ -420,7 +420,7 @@ class RunStatus(RunHandlerBase):
 
     def _check_upload(self, run_id):
         if is_same_host(self.request.host):
-            logging.debug("Uploaded export is local")
+            tornado.log.gen_log.debug("Uploaded export is local")
             EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
             self._check_localsave(run_id)
         else:
@@ -514,7 +514,7 @@ class RunOutput(RunHandlerBase):
             (local or via http)
          - open_func -- function to open output json file (local or via http)
         """
-        logging.debug('Looking for output in %s', output_location)
+        tornado.log.gen_log.debug('Looking for output in %s', output_location)
         if not exists_func(output_location):
             self._bad_request(404, "Output location doesn't exist: {}".format(output_location))
             return
@@ -553,7 +553,7 @@ class RunOutput(RunHandlerBase):
 
     def _get_upload(self, run_id):
         if is_same_host(self.request.host):
-            logging.debug("Uploaded export is local")
+            tornado.log.gen_log.debug("Uploaded export is local")
             # Note: alternatively, we could do the following:
             #  > EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
             #  > EXPORT_CONFIGURATION['url_root_dir'] = EXPORT_CONFIGURATION['scp']['url_root_dir']

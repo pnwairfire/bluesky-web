@@ -7,6 +7,7 @@ import subprocess
 import uuid
 from urllib.parse import urlparse
 
+import tornado.log
 from celery import Celery
 
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://localhost:27018/blueskyweb'
@@ -34,7 +35,7 @@ DEFAULT_BSP_VERSION = "v2.4.3"
 @app.task
 def run_bluesky(data, capture_output=False,
         bsp_version=DEFAULT_BSP_VERSION):
-    logging.INFO("Running %s from queue %s", data['run_id'], queue_name)
+    tornado.log.gen_log.INFO("Running %s from queue %s", data['run_id'], queue_name)
 
     # load input_data if it's json (and 'cache' json string to dump to file
     #   in call to bsp, below)
@@ -96,8 +97,8 @@ def _run_bluesky(input_data, input_data_json=None, capture_output=False,
     return stdout_data, stderr_data
 
 def _execute(input_data_json, bsp_docker_cmd, capture_output):
-    logging.info("bsp docker command (as user %s): %s", getpass.getuser(),
-        ' '.join(bsp_docker_cmd))
+    tornado.log.gen_log.info("bsp docker command (as user %s): %s",
+        getpass.getuser(), ' '.join(bsp_docker_cmd))
     kwargs = dict(stdin=subprocess.PIPE)
     if capture_output:
         kwargs.update(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
