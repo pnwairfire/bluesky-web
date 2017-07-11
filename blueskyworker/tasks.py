@@ -26,16 +26,14 @@ app.conf.update(
     }
 )
 
-DEFAULT_BSP_VERSION = "v2.4.3"
-
 ##
 ## Public Job Interface
 ##
 
 @app.task
-def run_bluesky(data, capture_output=False,
-        bsp_version=DEFAULT_BSP_VERSION):
-    tornado.log.gen_log.INFO("Running %s from queue %s", data['run_id'], queue_name)
+def run_bluesky(data, bluesky_version, capture_output=False):
+    tornado.log.gen_log.INFO("Running %s from queue %s",
+        data['run_id'], queue_name)
 
     # load input_data if it's json (and 'cache' json string to dump to file
     #   in call to bsp, below)
@@ -52,8 +50,8 @@ def run_bluesky(data, capture_output=False,
     #       can be saved in mongodb; or have this method parse logs as bsp
     #       is running
 
-    return _run_bluesky(input_data, input_data_json=input_data_json,
-        bsp_version=bsp_version)
+    return _run_bluesky(input_data, bluesky_version,
+        input_data_json=input_data_json)
 
 
 ##
@@ -61,18 +59,14 @@ def run_bluesky(data, capture_output=False,
 ##
 
 
-def _run_bluesky(input_data, input_data_json=None, capture_output=False,
-        bsp_version=DEFAULT_BSP_VERSION):
+def _run_bluesky(input_data, bluesky_version, input_data_json=None,
+        capture_output=False):
     """
     kwargs:
-     - input_data_json -- already dumped json string, to avoid repeated dump; not
-        necessarily set by outside clients of this code
+     - input_data_json -- already dumped json string, to avoid repeated dump;
+        not necessarily set by outside clients of this code
      - capture_output -- whether or not to capture the stdout and stderr; only
         set to True by outside clients of this code
-     - bsp_version -- alternate version of bluesky package to use
-
-    Note: bsp_version is a kwarg to both `launch_bsf` and `_run_bluesky_bsf`
-      because `_run_bluesky_bsf` is called directly by blueskyweb when run in process
     """
     run_id = input_data.get('run_id') or str(uuid.uuid1()).replace('-','')
     docker_name = 'bsp-{}'.format(run_id)
@@ -83,12 +77,8 @@ def _run_bluesky(input_data, input_data_json=None, capture_output=False,
 
     _add_mount_dirs(input_data, bsp_docker_cmd)
 
-    bsp_docker_cmd.extend([
-        'pnwairfire/bluesky:{}'.format(
-            # Just in case `bsp_version` was explicitly
-            # set to `None` in call to this function
-            bsp_version or DEFAULT_BSP_VERSION), 'bsp'
-    ])
+    image_name = 'pnwairfire/bluesky:{}'.format(bluesky_version)
+    bsp_docker_cmd.extend([image_name, 'bsp'])
 
     input_data_json = input_data_json or json.dumps(input_data)
     stdout_data, stderr_data = _execute(
@@ -160,8 +150,8 @@ def _get_met_dirs(input_data):
     met_dirs = [
         _get_val(input_data, 'config', 'findmetdata', "met_root_dir"),
     ]
-    # TODO: look in input_data > met > files, in case findmetdata was bypassed
-    #   and met files were specified manually
+    # TODO: look in input_data > met > files, in case findmetdata
+    #   was bypassed and met files were specified manually
     return met_dirs
 
 def _get_output_and_working_dirs(input_data):

@@ -19,6 +19,13 @@ except:
     sys.path.insert(0, root_dir)
     from blueskyweb.app import main
 
+REQUIRED_ARGS = [
+    {
+        'long': '--bluesky-version',
+        'help': "BlueSky pipeline version"
+    }
+]
+
 OPTIONAL_ARGS = [
     {
         'long': '--path-prefix',
@@ -27,8 +34,7 @@ OPTIONAL_ARGS = [
     {
         'short': '-p',
         'long': '--port',
-        'help': 'run the server listening on specified port',
-        'default': 8888
+        'help': 'run the server listening on specified port (defaults to 8888)'
     },
     {
         'short': '-d',
@@ -47,7 +53,8 @@ OPTIONAL_ARGS = [
 EPILOG_STR = """
 Examples
 
-   $ {script_name} --log-level=DEBUG -d --path-prefix=bluesky \\
+   $ {script_name} --bluesky-version v2.4.3 \\
+        --log-level=DEBUG -d --path-prefix=bluesky \\
         --mongodb-url=mongodb://localhost:27018/blueskyweb
 
 Example curl Requests
@@ -60,6 +67,7 @@ if __name__ == "__main__":
     parser.epilog = EPILOG_STR
     parser.formatter_class = scripting.args.RawTextHelpFormatter
     scripting.args.add_arguments(parser, OPTIONAL_ARGS)
+    scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
     # Use afscripting to add logging options to the parser object,
     # but we'll configure logging oureselves in app.main
     scripting.args.add_logging_options(parser)
