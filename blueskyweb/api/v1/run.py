@@ -108,7 +108,7 @@ class RunExecuter(RunHandlerBase):
             self._bad_request(400, 'empty post data')
             return
 
-        data = json.loads(self.request.body)
+        data = json.loads(self.request.body.decode())
         if "fire_information" not in data:
             self._bad_request(400, "'fire_information' not specified")
             return
