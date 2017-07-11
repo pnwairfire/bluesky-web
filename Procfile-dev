@@ -1,4 +1,5 @@
-mongo: mongod --dbpath ./docker-data/mongodb/
+mongo: mongod --dbpath ./docker-data/mongodb/ --port 27018 --logpath ./docker-logs/mongodb/mongodb.log
 web: ./bin/bsp-web -d --log-level=DEBUG --log-file=./docker-logs/web/bluesky-web.log
-worker: celery -Q dri -c 2 -A tasks worker -l DEBUG -f ./docker-logs/worker/dri/blueskyworker.log
-worker: celery -Q nam -c 2 -A tasks worker -l DEBUG -f ./docker-logs/worker/nam/blueskyworker.log
+worker_all_met: celery -Q all-met -c 2 -A blueskyworker.tasks worker -l DEBUG -f ./docker-logs/worker/all-met/bluesky-web-worker-all-met.log
+worker_dri: celery -Q dri -c 2 -A blueskyworker.tasks worker -l DEBUG -f ./docker-logs/worker/dri/bluesky-web-worker-dri.log
+worker_nam: celery -Q nam -c 2 -A blueskyworker.tasks worker -l DEBUG -f ./docker-logs/worker/nam/bluesky-web-worker-nam.log

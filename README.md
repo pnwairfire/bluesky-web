@@ -31,24 +31,27 @@ You just need to provide the url of one that is running.
 
 ### Run
 
-Use the help (-h) option to see usage and available config options:
+    cd /path/to/airfire-bluesky-web
+    mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
+        ./docker-logs/worker/dri ./docker-logs/worker/nam \
+        ./docker-logs/worker/all-met
+    foreman start -f Procfile-dev
+    arlindexer -d DRI6km -r /DRI_6km \
+        -m mongodb://localhost:27018/blueskyweb
 
-    bsp-web -h
-
-### Run in Docker
+Or use docker by replacing `foreman start -f Procfile-dev` with:
 
     docker build -t bluesky-web .
+    docker-compose -f docker-compose.yml up
 
-Then run in two separate terminals (or in one, if you use the `-d` option)
+### Tail logs
 
-    docker-compose -f docker-compose.yml up -d
-    docker-compose -f docker-compose-worker.yml up
-
-
+    cd /path/to/airfire-bluesky-web
+    find ./docker-logs/ -name *.log -exec tail -f "$file" {} +
 
 
-### Fabric
 
+## Fabric
 
 To see list tasks:
 
@@ -59,7 +62,7 @@ To see documentation for a specific task, use the '-d' option. E.g.:
 
     fab -d deploy
 
-#### Playground Environment
+### Playground Environment
 
     BLUESKYWEB_ENV=production fab -A deploy
 
@@ -69,4 +72,3 @@ To see documentation for a specific task, use the '-d' option. E.g.:
 ## APIs
 
 See [APIs](API.md)
-
