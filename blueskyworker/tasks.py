@@ -93,7 +93,7 @@ def _run_bluesky(input_data, input_data_json=None, capture_output=False,
     input_data_json = input_data_json or json.dumps(input_data)
     stdout_data, stderr_data = _execute(
         input_data_json, bsp_docker_cmd, capture_output)
-    _clean_up(docker_name)
+    # _clean_up(docker_name)
     return stdout_data, stderr_data
 
 def _execute(input_data_json, bsp_docker_cmd, capture_output):
@@ -110,8 +110,8 @@ def _execute(input_data_json, bsp_docker_cmd, capture_output):
 ## Cleaning up
 ##
 
-def _clean_up(docker_name):
-    subprocess.call(['docker', 'stop', docker_name])
+# def _clean_up(docker_name):
+#     subprocess.call(['docker', 'stop', docker_name])
 
 ##
 ## Mounting dirs
