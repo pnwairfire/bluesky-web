@@ -153,8 +153,8 @@ class RunExecuter(RunHandlerBase):
         except Exception as e:
             # IF exceptions aren't caught, the traceback is returned as
             # the response body
-            logging.debug(traceback.format_exc())
-            logging.error('Exception: {}'.format(e))
+            tornado.log.gen_log.debug(traceback.format_exc())
+            tornado.log.gen_log.error('Exception: %s', e)
             self.set_status(500)
 
     ## Helpers
@@ -237,7 +237,8 @@ class RunExecuter(RunHandlerBase):
 
         # TODO: return 404 if output has error related to bad module, etc.
         except Exception as e:
-            logging.error('Exception: {}'.format(e))
+            tornado.log.gen_log.debug(traceback.format_exc())
+            tornado.log.gen_log.error('Exception: %s', e)
             self.set_status(500)
 
     def _configure_emissions(self, data):
