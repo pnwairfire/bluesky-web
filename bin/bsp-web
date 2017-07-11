@@ -21,8 +21,9 @@ except:
 
 REQUIRED_ARGS = [
     {
-        'long': '--bluesky-version',
-        'help': "BlueSky pipeline version"
+        'short': '-b',
+        'long': '--bluesky-docker-image',
+        'help': "BlueSky pipeline docker image name"
     }
 ]
 
@@ -53,8 +54,7 @@ OPTIONAL_ARGS = [
 EPILOG_STR = """
 Examples
 
-   $ {script_name} --bluesky-version v2.4.3 \\
-        --log-level=DEBUG -d --path-prefix=bluesky \\
+   $ {script_name} -b bluesky --log-level=DEBUG -d --path-prefix=bluesky \\
         --mongodb-url=mongodb://localhost:27018/blueskyweb
 
 Example curl Requests

@@ -31,7 +31,7 @@ app.conf.update(
 ##
 
 @app.task
-def run_bluesky(data, bluesky_version, capture_output=False):
+def run_bluesky(data, bluesky_docker_image, capture_output=False):
     tornado.log.gen_log.INFO("Running %s from queue %s",
         data['run_id'], queue_name)
 
@@ -50,7 +50,7 @@ def run_bluesky(data, bluesky_version, capture_output=False):
     #       can be saved in mongodb; or have this method parse logs as bsp
     #       is running
 
-    return _run_bluesky(input_data, bluesky_version,
+    return _run_bluesky(input_data, bluesky_docker_image,
         input_data_json=input_data_json)
 
 
@@ -59,7 +59,7 @@ def run_bluesky(data, bluesky_version, capture_output=False):
 ##
 
 
-def _run_bluesky(input_data, bluesky_version, input_data_json=None,
+def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
         capture_output=False):
     """
     kwargs:
@@ -77,8 +77,7 @@ def _run_bluesky(input_data, bluesky_version, input_data_json=None,
 
     _add_mount_dirs(input_data, bsp_docker_cmd)
 
-    image_name = 'pnwairfire/bluesky:{}'.format(bluesky_version)
-    bsp_docker_cmd.extend([image_name, 'bsp'])
+    bsp_docker_cmd.extend([bluesky_docker_image, 'bsp'])
 
     input_data_json = input_data_json or json.dumps(input_data)
     stdout_data, stderr_data = _execute(

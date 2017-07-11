@@ -12,7 +12,7 @@ services:
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    command: bsp-web --bluesky-version v2.4.3 --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8888 --log-level=DEBUG
+    command: bsp-web -b bluesky --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8888 --log-level=DEBUG
   mongo:
     restart: unless-stopped
     image: mongo
@@ -28,7 +28,7 @@ services:
     - ./docker-data/db/configdb/:/data/db/
     - ./docker-data/mongodb/configdb/:/data/configdb/
   bluesky:
-    image: pnwairfire/bluesky:v2.4.3
+    image: bluesky
   worker_all_met:
     restart: unless-stopped
     image: bluesky-web

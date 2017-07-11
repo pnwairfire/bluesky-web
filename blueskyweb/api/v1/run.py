@@ -224,7 +224,7 @@ class RunExecuter(RunHandlerBase):
         # TODO: dump data to json?  works fine without doing so, so this may
         #  only serve the purpose of being able to read data in scheduler ui
         tornado.log.gen_log.debug('input: %s', data)
-        args = (data, self.settings['bluesky_version'])
+        args = (data, self.settings['bluesky_docker_image'])
         run_bluesky.apply_async(args), queue=queue_name)
         self.write({"run_id": data['run_id']})
 
@@ -232,7 +232,7 @@ class RunExecuter(RunHandlerBase):
         try:
             tornado.log.gen_log.debug('input: %s', data)
             stdout_data, stderr_data = _run_bluesky(data,
-                self.settings['bluesky_version'], capture_output=True)
+                self.settings['bluesky_docker_image'], capture_output=True)
             # TODO: make sure stdout_data is valid json?
             tornado.log.gen_log.debug('output: %s', stdout_data)
             self.write(stdout_data)
