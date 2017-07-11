@@ -12,6 +12,7 @@ COPY blueskyweb /usr/src/blueskyweb/blueskyweb
 COPY blueskyworker /usr/src/blueskyweb/blueskyworker
 COPY bin /usr/src/blueskyweb/bin
 
+ENV PYTHONPATH /usr/src/blueskyweb/:$PYTHONPATH
 ENV PATH /usr/src/blueskyweb/bin/:$PATH
 
 RUN echo 'alias ll="ls -la --color"' >> ~/.bashrc
