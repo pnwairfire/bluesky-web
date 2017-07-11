@@ -38,6 +38,8 @@ You just need to provide the url of one that is running.
     foreman start -f Procfile-dev
     arlindexer -d DRI6km -r /DRI_6km \
         -m mongodb://localhost:27018/blueskyweb
+    arlindexer -d DRI2km -r /DRI_2km \
+        -m mongodb://localhost:27018/blueskyweb
 
 Or use docker by replacing `foreman start -f Procfile-dev` with:
 

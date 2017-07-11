@@ -48,7 +48,7 @@ EPILOG_STR = """
 Examples
 
    $ {script_name} --log-level=DEBUG -d --path-prefix=bluesky \\
-        --mongodb-url=mongodb://localhost/blueskyweb
+        --mongodb-url=mongodb://localhost:27018/blueskyweb
 
 Example curl Requests
 

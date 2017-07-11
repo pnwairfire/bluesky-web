@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 
 from celery import Celery
 
-MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://localhost/blueskyweb'
+MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://localhost:27018/blueskyweb'
 app = Celery('blueskyworker.tasks', broker=MONGODB_URL)
 
 parse_object = urlparse(MONGODB_URL)
