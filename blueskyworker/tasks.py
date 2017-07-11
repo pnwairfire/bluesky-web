@@ -95,6 +95,15 @@ def _run_bluesky(input_data, input_data_json=None, capture_output=False,
     _clean_up(docker_name)
     return stdout_data, stderr_data
 
+def _execute(input_data_json, bsp_docker_cmd, capture_output):
+    logging.info("bsp docker command (as user %s): %s", getpass.getuser(),
+        ' '.join(bsp_docker_cmd))
+    kwargs = dict(stdin=subprocess.PIPE)
+    if capture_output:
+        kwargs.update(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # else, p.communicate will simply return None for stdout and stderr
+    p = subprocess.Popen(bsp_docker_cmd, **kwargs)
+    return p.communicate(input=input_data_json)
 
 ##
 ## Cleaning up
