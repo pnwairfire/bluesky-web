@@ -3,8 +3,10 @@ import json
 import logging
 import re
 import os
-import subprocess
+import tarfile
+import time
 import uuid
+from io import BytesIO
 from urllib.parse import urlparse
 
 import tornado.log
@@ -29,6 +31,9 @@ app.conf.update(
 ##
 ## Public Job Interface
 ##
+
+class BlueSkyJobError(RuntimeError):
+    pass
 
 @app.task
 def run_bluesky(data, bluesky_docker_image, capture_output=False):
@@ -69,45 +74,79 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
         set to True by outside clients of this code
     """
     run_id = input_data.get('run_id') or str(uuid.uuid1()).replace('-','')
-    docker_name = 'bsp-{}'.format(run_id)
-    bsp_docker_cmd = [
-        'docker', 'run', '--rm', '-i', # '-i' lets us pipe input
-        '--name', docker_name
-    ]
-
-    _add_mount_dirs(input_data, bsp_docker_cmd)
-
-    bsp_docker_cmd.extend([bluesky_docker_image, 'bsp'])
-
+    input_data.get('run_id') = run_id # in case it was just generated
+    container_name = 'bsp-playground-{}'.format(run_id)
+    bsp_cmd = 'bsp -i /tmp/fires.json -o /tmp/output.json'
+    volumes_dict = _get_volumes_dict(input_data)
     input_data_json = input_data_json or json.dumps(input_data)
-    stdout_data, stderr_data = _execute(
-        input_data_json, bsp_docker_cmd, capture_output)
-    # _clean_up(docker_name)
-    return stdout_data, stderr_data
-
-def _execute(input_data_json, bsp_docker_cmd, capture_output):
     tornado.log.gen_log.info("bsp docker command (as user %s): %s",
         getpass.getuser(), ' '.join(bsp_docker_cmd))
-    kwargs = dict(stdin=subprocess.PIPE)
-    if capture_output:
-        kwargs.update(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # else, p.communicate will simply return None for stdout and stderr
-    p = subprocess.Popen(bsp_docker_cmd, **kwargs)
-    return p.communicate(input=input_data_json.encode())
 
-##
-## Cleaning up
-##
+    client = docker.from_env()
+    container = client.containers.create(bluesky_docker_image, bsp_cmd,
+        name=container_name, volumes=volumes_dict)
+    try:
+        # TODO: if not capturing output,
+        #     - write logs to file, in dispersion output dir or where
+        #       dispersioj ouput would be if dispersion run
+        #     - write to files next to log file.
+        #   else:
+        #     - write logs to dev null?
+        #     - capture and return output json
 
-# def _clean_up(docker_name):
-#     subprocess.call(['docker', 'stop', docker_name])
+        # return client.containers.run(bluesky_docker_image, bsp_cmd,
+        #     remove=True, name=container_name, volumes=volumes_dict,
+        #     tty=True)
+        _create_input_file(input_data_json, container)
+        container.start()
+        docker.APIClient().wait(container.id)
+        if capture_output:
+            return _get_output
+
+    except Exception as e:
+        raise BlueSkyJobError(str(e))
+
+    finally:
+        container.remove()
+
+def _create_input_file(input_data_json, container):
+    tar_stream = BytesIO()
+    tar_file = tarfile.TarFile(fileobj=tar_stream, mode='w')
+    tar_file_data = input_data_json.encode('utf8')
+    tar_info = tarfile.TarInfo(name='fires.json')
+    tar_info.size = len(tar_file_data)
+    tar_info.mtime = time.time()
+    #tar_info.mode = 0600
+    tar_file.addfile(tar_info, BytesIO(tar_file_data))
+    tar_file.close()
+    tar_stream.seek(0)
+    container.put_archive(path='/tmp', data=pw_tarstream)
+
+def _get_output():
+    # TODO: figure out how to extract output from tar stream,
+    #    to avoid having to write to file first
+    response = container.get_archive('/tmp/output.json')[0]
+    tarfilename = '/tmp/' + str(uuid.uuid1()) + '.tar'
+    with open(tarfilename, 'wb') as f:
+        #f.write(response.read())
+        for chunk in response.read_chunked():
+            f.write(chunk)
+
+    output = None
+    with tarfile.open(tarfilename) as t:
+        output = t.extractfile('output.json').read()
+
+    # TODO: remove tarfile
+
+    return output
+
 
 ##
 ## Mounting dirs
 ##
 
 TRAILING_RUN_ID_RE = re.compile('/{run_id}/?$')
-def _add_mount_dirs(input_data, bsp_docker_cmd):
+def _get_volumes_dict(input_data):
     """ Only mount the host os dirs that are needed
     """
     dirs_to_mount =  (
@@ -116,6 +155,7 @@ def _add_mount_dirs(input_data, bsp_docker_cmd):
         _get_output_and_working_dirs(input_data)
     )
     dirs_to_mount = list(set([m for m in dirs_to_mount if m]))
+    volumes_dict = {}
     if dirs_to_mount:
         for d in dirs_to_mount:
             # remove trailing '/{run_id}' from mount point
@@ -129,10 +169,11 @@ def _add_mount_dirs(input_data, bsp_docker_cmd):
                     # will fail, so swallow exception
                     pass
 
-            # TODO: create dir?
-            bsp_docker_cmd.extend([
-                '-v', "{d}:{d}".format(d=d)
-            ])
+            volumes_dict[d] = {
+                'bind': d,
+                'mode': 'rw'
+            }
+    return volumes_dict
 
 def _get_load_dirs(input_data):
     load_dirs = []
