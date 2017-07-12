@@ -9,6 +9,7 @@ services:
     - 8888:8888
     volumes:
     - ./docker-logs/web/:/var/log/blueskyweb/
+    - /var/run/docker.sock:/var/run/docker.sock
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
@@ -27,14 +28,13 @@ services:
     - ./docker-logs/mongodb/:/var/log/mongodb/
     - ./docker-data/db/configdb/:/data/db/
     - ./docker-data/mongodb/configdb/:/data/configdb/
-  bluesky:
-    image: bluesky
   worker_all_met:
     restart: unless-stopped
     image: bluesky-web
     container_name: bluesky-web-worker-all-met
     volumes:
     - ./docker-logs/worker/all-met/:/var/log/blueskyworker/
+    - /var/run/docker.sock:/var/run/docker.sock
     environment:
     - MONGODB_URL://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     command: celery -Q all-met -c 5 -A blueskyworker.tasks worker -l DEBUG -f /var/log/blueskyworker/bluesky-web-worker-all-met.log
@@ -44,6 +44,7 @@ services:
     container_name: bluesky-web-worker-dri
     volumes:
     - ./docker-logs/worker/dri/:/var/log/blueskyworker/
+    - /var/run/docker.sock:/var/run/docker.sock
     environment:
     - MONGODB_URL://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     command: celery -Q dri -c 5 -A blueskyworker.tasks worker -l DEBUG -f /var/log/blueskyworker/bluesky-web-worker-dri.log
@@ -53,6 +54,7 @@ services:
     container_name: bluesky-web-worker-nam
     volumes:
     - ./docker-logs/worker/nam/:/var/log/blueskyworker/
+    - /var/run/docker.sock:/var/run/docker.sock
     environment:
     - MONGODB_URL://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     command: celery -Q nam -c 5 -A blueskyworker.tasks worker -l DEBUG -f /var/log/blueskyworker/bluesky-web-worker-nam.log
