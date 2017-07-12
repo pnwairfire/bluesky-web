@@ -74,7 +74,7 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
         set to True by outside clients of this code
     """
     run_id = input_data.get('run_id') or str(uuid.uuid1()).replace('-','')
-    input_data.get('run_id') = run_id # in case it was just generated
+    input_data['run_id'] = run_id # in case it was just generated
     container_name = 'bsp-playground-{}'.format(run_id)
     bsp_cmd = 'bsp -i /tmp/fires.json -o /tmp/output.json'
     volumes_dict = _get_volumes_dict(input_data)
