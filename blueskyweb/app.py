@@ -43,7 +43,7 @@ def configure_logging(**settings):
             log_file=settings.get('log_file')))
 
 DEFAULT_SETTINGS = {
-    'port': 8888,
+    'port': 8887,
     'mongodb_url': "mongodb://localhost:27018/blueskyweb",
     'log_file': '/var/log/blueskyweb/bluesky-web.log'
 }

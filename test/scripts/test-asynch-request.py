@@ -22,18 +22,18 @@ EPILOG_STR = """
 Examples:
 
  Simple case, running only through emissions
-  $ ./test/scripts/test-asynch-request.py --simple --hostname=localhost:8888
+  $ ./test/scripts/test-asynch-request.py --simple --hostname=localhost:8887
 
  Full run (ingestiont through visualization)
-  $ ./test/scripts/test-asynch-request.py --hostname=localhost:8888 \\
+  $ ./test/scripts/test-asynch-request.py --hostname=localhost:8887 \\
         -s 2014053000/ -n 12
  """
 
 REQUIRED_ARGS = [
     {
         'long': '--hostname',
-        'help': 'hostname of web service; default localhost:8888',
-        'default': 'localhost:8888'
+        'help': 'hostname of web service; default localhost:8887',
+        'default': 'localhost:8887'
     }
 ]
 

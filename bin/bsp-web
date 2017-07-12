@@ -35,7 +35,7 @@ OPTIONAL_ARGS = [
     {
         'short': '-p',
         'long': '--port',
-        'help': 'run the server listening on specified port (defaults to 8888)'
+        'help': 'run the server listening on specified port (defaults to 8887)'
     },
     {
         'short': '-d',
@@ -59,7 +59,7 @@ Examples
 
 Example curl Requests
 
-    $ curl "http://localhost:8888/blueskyweb/api/ping/"
+    $ curl "http://localhost:8887/blueskyweb/api/ping/"
  """.format(script_name=sys.argv[0])
 
 if __name__ == "__main__":

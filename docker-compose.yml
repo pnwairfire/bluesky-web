@@ -9,7 +9,7 @@ services:
     image: bluesky-web
     container_name: bluesky-web
     ports:
-    - 8888:8888
+    - 8887:8887
     volumes:
     - ./:/usr/src/blueskyweb/
     - ./docker-logs/web/:/var/log/blueskyweb/
@@ -17,7 +17,7 @@ services:
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    command: bsp-web -d -b bluesky --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8888 --log-level=DEBUG
+    command: bsp-web -d -b bluesky --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG
   mongo:
     image: mongo
     container_name: bluesky-web-mongo

@@ -1,7 +1,7 @@
 if [ $# -lt 2 ] || [ $# -gt 3 ]
   then
     echo "Usage: $0 <hostname> <domain> [response output file]"
-    echo "Ex:  $0 localhost:8888 DRI2km /tmp/web-regression-out"
+    echo "Ex:  $0 localhost:8887 DRI2km /tmp/web-regression-out"
     echo ""
     exit 1
 fi

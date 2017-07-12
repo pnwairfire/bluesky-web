@@ -47,15 +47,15 @@ this is really conrived, since he upload scp host wouldn't eveb localhost
 
 ### status
 
-    curl -D - http://localhost:8888/api/v1/run/$RUN_ID_1/status  # success
-    curl -D - http://localhost:8888/api/v1/run/foobar1/status  # non-existent
-    curl -D - http://localhost:8888/api/v1/run/$RUN_ID_2/status  # failed
+    curl -D - http://localhost:8887/api/v1/run/$RUN_ID_1/status  # success
+    curl -D - http://localhost:8887/api/v1/run/foobar1/status  # non-existent
+    curl -D - http://localhost:8887/api/v1/run/$RUN_ID_2/status  # failed
 
 ### output:
 
-    curl -D - http://localhost:8888/api/v1/run/$RUN_ID_1/output  # success
-    curl -D - http://localhost:8888/api/v1/run/foobar1/output  # non-existent
-    curl -D - http://localhost:8888/api/v1/run/$RUN_ID_2/output  # failed
+    curl -D - http://localhost:8887/api/v1/run/$RUN_ID_1/output  # success
+    curl -D - http://localhost:8887/api/v1/run/foobar1/output  # non-existent
+    curl -D - http://localhost:8887/api/v1/run/$RUN_ID_2/output  # failed
 
 
 ## Testing end to end
