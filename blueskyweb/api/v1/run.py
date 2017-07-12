@@ -231,7 +231,7 @@ class RunExecuter(RunHandlerBase):
     def _run_in_process(self, data):
         try:
             tornado.log.gen_log.debug('input: %s', data)
-            stdout_data, stderr_data = _run_bluesky(data,
+            stdout_data = _run_bluesky(data,
                 self.settings['bluesky_docker_image'], capture_output=True)
             # TODO: make sure stdout_data is valid json?
             tornado.log.gen_log.debug('output: %s', stdout_data)

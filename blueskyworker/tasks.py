@@ -1,3 +1,4 @@
+import docker
 import getpass
 import json
 import logging
@@ -80,7 +81,7 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
     volumes_dict = _get_volumes_dict(input_data)
     input_data_json = input_data_json or json.dumps(input_data)
     tornado.log.gen_log.info("bsp docker command (as user %s): %s",
-        getpass.getuser(), ' '.join(bsp_docker_cmd))
+        getpass.getuser(), ' '.join(bsp_cmd))
 
     client = docker.from_env()
     container = client.containers.create(bluesky_docker_image, bsp_cmd,
@@ -101,7 +102,7 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
         container.start()
         docker.APIClient().wait(container.id)
         if capture_output:
-            return _get_output
+            return _get_output(container)
 
     except Exception as e:
         raise BlueSkyJobError(str(e))
@@ -120,9 +121,9 @@ def _create_input_file(input_data_json, container):
     tar_file.addfile(tar_info, BytesIO(tar_file_data))
     tar_file.close()
     tar_stream.seek(0)
-    container.put_archive(path='/tmp', data=pw_tarstream)
+    container.put_archive(path='/tmp', data=tar_stream)
 
-def _get_output():
+def _get_output(container):
     # TODO: figure out how to extract output from tar stream,
     #    to avoid having to write to file first
     response = container.get_archive('/tmp/output.json')[0]
