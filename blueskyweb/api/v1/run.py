@@ -165,14 +165,15 @@ class RunExecuter(RunHandlerBase):
     EMISSIONS_MODULES = [
         'consumption', 'emissions'
     ]
-    # Note: export module is added in _configure_export when necessary
     # TODO: for hysplit requests, instead of running findmetdata, get
     #   met data from indexed met data in mongodb;  maybe fall back on running
     #   findmetdata if indexed data isn't there or if mongodb query
     #   fails or if web service isn't configured with mongodb
+    PLUMERISE_MODULES = [
+        'findmetdata', 'localmet', 'plumerising'
+    ]
     MET_DISPERSION_MODULES = [
-        'timeprofiling', 'findmetdata', 'localmet',
-        'plumerising', 'dispersion', 'visualization'
+        'timeprofiling', 'dispersion', 'visualization'
     ]
     METLESS_DISPERSION_MODULES = [
         'timeprofiling', 'dispersion'
@@ -197,10 +198,16 @@ class RunExecuter(RunHandlerBase):
                 if domain else self.METLESS_DISPERSION_MODULES)
             if mode == 'all':
                 _set(self.FUELBEDS_MODULES + self.EMISSIONS_MODULES +
-                    dispersion_modules)
+                    self.PLUMERISE_MODULES + dispersion_modules)
+            # TODO: if mode=='dispersion', add if 'findmetdata', 'localmet',
+            #    and 'plumerising' are not in the request, run them ?
+            #    (this would only be for backwards compatibility; we
+            #    don't do that for emissions or plumerise)
 
             else:
                 _set(dispersion_modules)
+        elif mode == 'plumerise':
+            _set(self.PLUMERISE_MODULES)
         elif mode == 'emissions':
             _set(self.EMISSIONS_MODULES)
         elif mode == 'fuelbeds':
