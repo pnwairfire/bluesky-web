@@ -551,76 +551,7 @@ status and output API requests (described below).
 Since this API requires emissions data, consumption data is not required,
 and so has been optionally stripped from the following requests
 
-#### Localmet and plumerise not yet run
-
-NOTE: passing data in without plumerise and localmet data may
-not be supported. It's TBD
-
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
-    {
-        "fire_information": [
-            {
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Yosemite, CA"
-                },
-                "id": "SF11C14225236095807750",
-                "type": "wildfire",
-                "growth": [
-                    {
-                        "location": {
-                            "area": 10000,
-                            "ecoregion": "western",
-                            "latitude": 37.909644,
-                            "longitude": -119.7615805,
-                            "utc_offset": "-07:00"
-                        },
-                        "fuelbeds": [
-                            {
-                                "fccs_id": "49",
-                                "pct": 50.0,
-                                "emissions": {
-                                    "flaming": {
-                                        "PM25": [3002.3815120047017005]
-                                    },
-                                    "residual": {
-                                        "PM25": [4002.621500211796271]
-                                    },
-                                    "smoldering": {
-                                        "PM25": [623.424985839975172]
-                                    }
-                                }
-                            }
-                        ],
-                        "start": "2015-11-24T17:00:00",
-                        "end": "2015-11-25T17:00:00",
-                        "pct": 100.0
-                    }
-                ]
-            }
-        ],
-        "config": {
-            "dispersion": {
-                "start": "2015-11-25T00:00:00",
-                "num_hours": 24
-            }
-        }
-    }' | python -m json.tool
-
-The fact that the emissions data is in an array is because the
-consumption module (more specifically, the underlying 'consume'
-module) outputs arrays. The length of each array equals the
-number of fuelbeds passed into consume. Since consume is called
-on each fuelbed separately, the arrays of consumption
-and emissions data will all be of length 1.
-
-Note that the growth start and end timestamps are local time, whereas the
-dispersion start time is in UTC.
-
-#### Localmet and plumerise alrady run
-
-NOTE: passing data in without plumerise and localmet data may
-not be supported. It's TBD
+#### Localmet and plumerise already run
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
     {
@@ -691,6 +622,74 @@ not be supported. It's TBD
             ]
         },
 
+    }' | python -m json.tool
+
+The fact that the emissions data is in an array is because the
+consumption module (more specifically, the underlying 'consume'
+module) outputs arrays. The length of each array equals the
+number of fuelbeds passed into consume. Since consume is called
+on each fuelbed separately, the arrays of consumption
+and emissions data will all be of length 1.
+
+Note that the growth start and end timestamps are local time, whereas the
+dispersion start time is in UTC.
+
+
+
+#### Localmet and plumerise not yet run
+
+NOTE: passing data in without plumerise and localmet data may
+not be supported. It's TBD
+
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
+    {
+        "fire_information": [
+            {
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
+                },
+                "id": "SF11C14225236095807750",
+                "type": "wildfire",
+                "growth": [
+                    {
+                        "location": {
+                            "area": 10000,
+                            "ecoregion": "western",
+                            "latitude": 37.909644,
+                            "longitude": -119.7615805,
+                            "utc_offset": "-07:00"
+                        },
+                        "fuelbeds": [
+                            {
+                                "fccs_id": "49",
+                                "pct": 50.0,
+                                "emissions": {
+                                    "flaming": {
+                                        "PM25": [3002.3815120047017005]
+                                    },
+                                    "residual": {
+                                        "PM25": [4002.621500211796271]
+                                    },
+                                    "smoldering": {
+                                        "PM25": [623.424985839975172]
+                                    }
+                                }
+                            }
+                        ],
+                        "start": "2015-11-24T17:00:00",
+                        "end": "2015-11-25T17:00:00",
+                        "pct": 100.0
+                    }
+                ]
+            }
+        ],
+        "config": {
+            "dispersion": {
+                "start": "2015-11-25T00:00:00",
+                "num_hours": 24
+            }
+        }
     }' | python -m json.tool
 
 
@@ -981,7 +980,114 @@ This API returns the output location for a specific run
 
     ... ADD SPEC ...
 
-### Example:
+### Examples:
+
+#### Plumerise run output
+
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output"
+
+    {
+        "fire_information": [
+            {
+                "type": "wildfire",
+                "fuel_type": "natural",
+                "growth": [
+                    {
+                        "end": "2014-05-30T17:00:00",
+                        "start": "2014-05-29T17:00:00",
+                        "localmet": {
+                            ...
+                        },
+                        "plumerise": {
+                            ...
+                        },
+                        "location": {
+                            "longitude": -119.7615805,
+                            "utc_offset": "-07:00",
+                            "area": 10000,
+                            "latitude": 37.909644,
+                            "ecoregion": "western"
+                        }
+                    }
+                ],
+                "id": "SF11C14225236095807750"
+            }
+        ],
+        "met": {
+            "files": [
+                ...
+            ]
+        },
+        "today": "2017-07-13",
+        "config": {
+            "plumerising": {
+                "model": "sev"
+            },
+            "findmetdata": {
+                "time_window": {
+                    "last_hour": "...",
+                    "first_hour": "..."
+                },
+                "arl": {
+                    "index_filename_pattern": "arl12hrindex.csv"
+                },
+                "met_format": "arl",
+                "met_root_dir": "/DRI_6km/"
+            }
+        },
+        "counts": {
+            "fires": 1
+        },
+        "run_id": "7b0ad162-67f0-11e7-8754-0242ac110002",
+        "processing": [
+            {
+                "module_name": "findmetdata",
+                "module": "bluesky.modules.findmetdata",
+                "version": "0.1.0"
+            },
+            {
+                "module_name": "localmet",
+                "module": "bluesky.modules.localmet",
+                "version": "0.1.0"
+            },
+            {
+                "module_name": "plumerising",
+                "module": "bluesky.modules.plumerising",
+                "version": "0.1.1",
+                "model": "sev",
+                "plumerise_version": "1.0.0"
+            }
+        ],
+        "runtime": {
+            "total": "0.0011111111111111111h 0.06666666666666667m 4s",
+            "modules": [
+                {
+                    "module_name": "findmetdata",
+                    "total": "0.0h 0.0m 0s",
+                    "end": "2017-07-13T17:27:01Z",
+                    "start": "2017-07-13T17:27:01Z"
+                },
+                {
+                    "module_name": "localmet",
+                    "total": "0.0011111111111111111h 0.06666666666666667m 4s",
+                    "end": "2017-07-13T17:27:05Z",
+                    "start": "2017-07-13T17:27:01Z"
+                },
+                {
+                    "module_name": "plumerising",
+                    "total": "0.0h 0.0m 0s",
+                    "end": "2017-07-13T17:27:05Z",
+                    "start": "2017-07-13T17:27:05Z"
+                }
+            ],
+            "end": "2017-07-13T17:27:05Z",
+            "start": "2017-07-13T17:27:01Z"
+        }
+    }
+
+
+
+#### Dispersion run output
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output"
 
