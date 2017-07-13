@@ -1,5 +1,9 @@
 # BlueSky Web APIs
 
+In the request urls listed below, $BLUESKY_API_ROOT_URL would be
+something like 'http://localhost:8887' in development or
+'https://www.blueskywebhost.com/bluesky' in production
+
 
 
 
@@ -10,7 +14,7 @@ This API returns information about all domains with ARL data
 
 ### Request
 
- - url: http://$BLUESKY_API_HOSTNAME/api/v1/domains/
+ - url: $BLUESKY_API_ROOT_URL/api/v1/domains/
  - method: GET
 
 ### Response
@@ -26,7 +30,10 @@ This API returns information about all domains with ARL data
                     "center_latitude": <lat>,
                     "center_longitude": <lng>,
                     "width_longitude": <degrees>,
-                    "height_latitude": <degrees>
+                    "height_latitude": <degrees>,
+                    "spacing_latitude": <km>,
+                    "spacing_longitude": <km>,
+                    "projection": "..."
                 },
                 <other_domain_data?>: <data>,
                 ...
@@ -37,51 +44,62 @@ This API returns information about all domains with ARL data
 
 ### Example
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/domains/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/domains/" | python -m json.tool
     {
          "domains": {
             "DRI2km": {
                 "boundary": {
-                    "center_latitude": 37.0,
-                    "center_longitude": -119.0,
-                    "height_latitude": 11.5,
-                    "width_longitude": 13.0
+                    "center_latitude": 36.6706,
+                    "center_longitude": -117.80515,
+                    "height_latitude": 15.8494,
+                    "width_longitude": 21.3125,
+                    "spacing_latitude": 2.0,
+                    "spacing_longitude": 2.0,
+                    "projection": "LCC"
                 },
                 "dates": [
-                    "20151124",
-                    "20151123",
-                    "20151122"
+                    "2014-05-29",
+                    "2014-05-30",
+                    "2014-05-31",
+                    "2014-06-01"
                 ]
             },
             "DRI6km": {
                 "boundary": {
-                    "center_latitude": 36.5,
-                    "center_longitude": -119.0,
-                    "height_latitude": 17.5,
-                    "width_longitude": 25.0
+                    "center_latitude": 44.86545,
+                    "center_longitude": -118.0294,
+                    "width_longitude": 21.0766,
+                    "height_latitude": 9.6333,
+                    "spacing_latitude": 6.0,
+                    "spacing_longitude": 6.0,
+                    "projection": "LCC"
                 },
                 "dates": [
-                    "20151124",
-                    "20151123",
-                    "20151122"
+                    "2014-05-29",
+                    "2014-05-30",
+                    "2014-05-31",
+                    "2014-06-01"
                 ]
             },
             "NAM84": {
                 "boundary": {
-                    "center_latitude": 37.5,
-                    "center_longitude": -95.0,
-                    "height_latitude": 30.0,
-                    "width_longitude": 70.0
+                    "center_latitude": 34.7595,
+                    "center_longitude": -91.43835,
+                    "width_longitude": 84.0433,
+                    "height_latitude": 45.139,
+                    "spacing_longitude": 0.15,
+                    "spacing_latitude": 0.15,
+                    "projection": "LatLon"
                 },
                 "dates": [
-                    "20151124",
-                    "20151123",
-                    "20151122"
+                    "2014-05-29",
+                    "2014-05-30",
+                    "2014-05-31",
+                    "2014-06-01"
                 ]
             }
         }
     }
-
 
 
 
@@ -92,7 +110,7 @@ This API returns information about a specific domain with ARL data
 
 ### Request
 
- - url: http://$BLUESKY_API_HOSTNAME/api/v1/domains/<domain_id>/
+ - url: $BLUESKY_API_ROOT_URL/api/v1/domains/<domain_id>/
  - method: GET
 
 ### Response
@@ -107,7 +125,11 @@ This API returns information about a specific domain with ARL data
                 "center_latitude": <lat>,
                 "center_longitude": <lng>,
                 "width_longitude": <degrees>,
-                "height_latitude": <degrees>
+                "height_latitude": <degrees>,
+                "spacing_latitude": <km>,
+                "spacing_longitude": <km>,
+                "projection": "..."
+
             },
             <other_domain_data?>: <data>,
             ...
@@ -116,23 +138,26 @@ This API returns information about a specific domain with ARL data
 
 ### Example
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/domains/DRI6km/" | python -m json.tool
     {
-        "DRI2km": {
-            "boundary": {
-                "center_latitude": 37.0,
-                "center_longitude": -119.0,
-                "height_latitude": 11.5,
-                "width_longitude": 13.0
-            },
+        "DRI6km": {
             "dates": [
-                "20151124",
-                "20151123",
-                "20151122"
-            ]
+                "2014-05-29",
+                "2014-05-30",
+                "2014-05-31",
+                "2014-06-01"
+            ],
+            "boundary": {
+                "center_longitude": -117.80515,
+                "spacing_latitude": 6.0,
+                "projection": "LCC",
+                "height_latitude": 15.8494,
+                "center_latitude": 36.6706,
+                "spacing_longitude": 6.0,
+                "width_longitude": 21.3125
+            }
         }
     }
-
 
 
 
@@ -143,7 +168,7 @@ This API returns the dates for which a specific d has ARL data
 
 ### Request
 
- - url: http://$BLUESKY_API_HOSTNAME/api/v1/domains/<domain_id>/available-dates
+ - url: $BLUESKY_API_ROOT_URL/api/v1/domains/<domain_id>/available-dates
  - method: GET
 
 ### Response
@@ -158,13 +183,13 @@ This API returns the dates for which a specific d has ARL data
 
 ### Example
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/domains/DRI2km/available-dates" | python -m json.tool
-
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/domains/DRI6km/available-dates" | python -m json.tool
     {
         "dates": [
-            "20151124",
-            "20151123",
-            "20151122"
+            "2014-05-29",
+            "2014-05-30",
+            "2014-05-31",
+            "2014-06-01"
         ]
     }
 
@@ -179,7 +204,7 @@ This API returns the dates, by domain, for which there exist ARL data
 
 ### Request
 
- - url: http://$BLUESKY_API_HOSTNAME/api/v1/available-dates/
+ - url: $BLUESKY_API_ROOT_URL/api/v1/available-dates/
  - method: GET
 
 ### Response
@@ -197,23 +222,24 @@ This API returns the dates, by domain, for which there exist ARL data
 
 ### Example
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/available-dates" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/available-dates" | python -m json.tool
     {
         "dates": {
             "DRI2km": [
-                "20151124",
-                "20151123",
-                "20151122"
+                "2014-05-29",
+                "2014-05-30",
+                "2014-05-31",
+                "2014-06-01"
             ],
             "DRI6km": [
-                "20151124",
-                "20151123",
-                "20151122"
+                "2014-05-29",
+                "2014-05-30",
+                "2014-05-31",
+                "2014-06-01"
             ],
             "NAM84": [
-                "20151124",
-                "20151123",
-                "20151122"
+                "2014-05-31",
+                "2014-06-01"
             ]
         }
     }
@@ -235,7 +261,7 @@ specify a subset of the modules normally run by this API.
 
 ### Request
 
- - url: http://$BLUESKY_API_HOSTNAME/api/v1/run/fuelbeds/
+ - url: $BLUESKY_API_ROOT_URL/api/v1/run/fuelbeds/
  - method: POST
  - post data:
 
@@ -270,7 +296,7 @@ a "summary" key.
 
 An example with fire location data specified as a geojson
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/fuelbeds/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/fuelbeds/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -307,7 +333,7 @@ An example with fire location data specified as a geojson
 Another exmaple, this time running only the fuelbeds
 modules, and with fire location data specified as lat + lng + size.
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/fuelbeds/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/fuelbeds/" -H 'Content-Type: application/json' -d '
     {
         "modules": ["fuelbeds"],
         "fire_information": [
@@ -327,7 +353,7 @@ modules, and with fire location data specified as lat + lng + size.
                             "ecoregion": "southern"
                         }
                     }
-                }
+                ]
             }
         ]
     }' | python -m json.tool
@@ -349,7 +375,7 @@ specify a subset of the modules normally run by this API.
 
 ### Request
 
- - url: http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/
+ - url: $BLUESKY_API_ROOT_URL/api/v1/run/emissions/
  - method: POST
  - post data:
 
@@ -384,36 +410,41 @@ a "summary" key.
 
 An example with fire location data specified as geojson
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
+
     {
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA",
-                "location": {
-                    "geojson": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
-                        ]
-                    },
-                    "ecoregion": "southern",
-                    "utc_offset": "-09:00",
-                    "area": 5000
-                },
-                "fuelbeds": [
+                "growth": [
                     {
-                        "fccs_id": "9",
-                        "pct": 100.0
+                        "location": {
+                            "geojson": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "area": 200,
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00"
+                        },
+                        "fuelbeds": [
+                            {
+                                "fccs_id": "9",
+                                "pct": 100.0
+                            }
+                        ]
                     }
                 ]
             }
@@ -423,7 +454,7 @@ An example with fire location data specified as geojson
 Another exmaple, this time running only the consumption
 modules, and with fire location data specified as lat + lng + size.
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
     {
         "modules": ["consumption"],
         "fire_information": [
@@ -490,7 +521,7 @@ status and output API requests (described below).
 
 An example with fire location data specified as geojson
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/plumerise/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/DRI2km/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -553,7 +584,7 @@ and so has been optionally stripped from the following requests
 
 #### Localmet and plumerise already run
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -641,7 +672,7 @@ dispersion start time is in UTC.
 NOTE: passing data in without plumerise and localmet data may
 not be supported. It's TBD
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -705,7 +736,7 @@ require emissions data.
 
 ### Example
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/all/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/DRI2km/" -H 'Content-Type: application/json' -d '
     {
         "config": {
             "emissions": {
@@ -777,7 +808,7 @@ status and output API requests (described below).
 Unlike the hysplit request, above, this API requires both emissions
 and consumption data.
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -878,7 +909,7 @@ consumption and emissions data.
 
 ### Example
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/all/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/" -H 'Content-Type: application/json' -d '
     {
         "config": {
             "emissions": {
@@ -934,7 +965,7 @@ This API returns the status of a specific dispersion run
 
 ### Request
 
- - url: http://$BLUESKY_API_HOSTNAME/api/v1/run/<guid>/status
+ - url: $BLUESKY_API_ROOT_URL/api/v1/run/<guid>/status
  - method: GET
 
 ### Response
@@ -947,7 +978,7 @@ This API returns the status of a specific dispersion run
 
 ### Example:
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/status"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/abc123/status"
 
     {
         "complete": false,
@@ -973,7 +1004,7 @@ This API returns the output location for a specific run
 
 ### Request
 
- - url: http://$BLUESKY_API_HOSTNAME/api/v1/run/<guid>/output
+ - url: $BLUESKY_API_ROOT_URL/api/v1/run/<guid>/output
  - method: GET
 
 ### Response
@@ -984,7 +1015,7 @@ This API returns the output location for a specific run
 
 #### Plumerise run output
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/abc123/output"
 
     {
         "fire_information": [
@@ -1089,7 +1120,7 @@ This API returns the output location for a specific run
 
 #### Dispersion run output
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/abc123/output"
 
 There are currently two ways the visualization images will be specified in
 the results json object.  It depends on how you configured your run.  If you
