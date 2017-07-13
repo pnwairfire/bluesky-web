@@ -165,10 +165,10 @@ class RunExecuter(RunHandlerBase):
     EMISSIONS_MODULES = [
         'consumption', 'emissions'
     ]
-    # TODO: for hysplit requests, instead of running findmetdata, get
-    #   met data from indexed met data in mongodb;  maybe fall back on running
-    #   findmetdata if indexed data isn't there or if mongodb query
-    #   fails or if web service isn't configured with mongodb
+    # TODO: for plumerise requests, instead of running findmetdata, get
+    #   met data from indexed met data in mongodb;  maybe fall back on
+    #   running findmetdata if indexed data isn't there or if mongodb
+    #   query fails
     PLUMERISE_MODULES = [
         'findmetdata', 'localmet', 'plumerising'
     ]
@@ -199,10 +199,6 @@ class RunExecuter(RunHandlerBase):
             if mode == 'all':
                 _set(self.FUELBEDS_MODULES + self.EMISSIONS_MODULES +
                     self.PLUMERISE_MODULES + dispersion_modules)
-            # TODO: if mode=='dispersion', add if 'findmetdata', 'localmet',
-            #    and 'plumerising' are not in the request, run them ?
-            #    (this would only be for backwards compatibility; we
-            #    don't do that for emissions or plumerise)
 
             else:
                 _set(dispersion_modules)
