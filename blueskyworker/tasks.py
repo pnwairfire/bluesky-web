@@ -71,7 +71,7 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
     kwargs:
      - input_data_json -- already dumped json string, to avoid repeated dump;
         not necessarily set by outside clients of this code
-     - capture_output -- whether or not to capture the stdout and stderr; only
+     - capture_output -- whether or not to capture the stdout; only
         set to True by outside clients of this code
     """
     run_id = input_data.get('run_id') or str(uuid.uuid1()).replace('-','')
@@ -89,7 +89,7 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
     try:
         # TODO: if not capturing output,
         #     - write logs to file, in dispersion output dir or where
-        #       dispersioj ouput would be if dispersion run
+        #       dispersion ouput would be if dispersion run
         #     - write to files next to log file.
         #   else:
         #     - write logs to dev null?
@@ -100,9 +100,11 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
         #     tty=True)
         _create_input_file(input_data_json, container)
         container.start()
+        # TODO: rather than just wait, poll the logs and report status?
         docker.APIClient().wait(container.id)
         if capture_output:
             return _get_output(container)
+
 
     except Exception as e:
         raise BlueSkyJobError(str(e))

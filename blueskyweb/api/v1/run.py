@@ -233,6 +233,7 @@ class RunExecuter(RunHandlerBase):
         tornado.log.gen_log.debug('input: %s', data)
         args = (data, self.settings['bluesky_docker_image'])
         run_bluesky.apply_async(args, queue=queue_name)
+        # TODO: record that run was enqueued in mongodb
         self.write({"run_id": data['run_id']})
 
     def _run_in_process(self, data):
@@ -577,4 +578,6 @@ class RunOutput(RunHandlerBase):
     ## CRUD API
 
     def get(self, run_id):
+        # TODO: get run info from mongodb
+        # TODO: if not dispersion (i.e. plumerise), return actual output json
         getattr(self, '_get_{}'.format(EXPORT_MODE))(run_id)
