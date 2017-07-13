@@ -19,7 +19,7 @@ services:
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
     command: bsp-web -d -b bluesky --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG
   mongo:
-    image: mongo
+    image: mongo:3.4.6
     container_name: bluesky-web-mongo
     environment:
     # These are meant to be overridden
@@ -28,10 +28,10 @@ services:
     ports:
     - 27018:27017
     volumes:
-    - ./:/usr/src/blueskyweb/
     - ./docker-logs/mongodb/:/var/log/mongodb/
-    - ./docker-data/db/configdb/:/data/db/
+    - ./docker-data/mongodb/db/:/data/db/
     - ./docker-data/mongodb/configdb/:/data/configdb/
+    #command: mongod --auth
   worker_all_met:
     image: bluesky-web
     container_name: bluesky-web-worker-all-met
