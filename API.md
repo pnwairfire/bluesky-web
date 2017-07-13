@@ -751,7 +751,7 @@ require emissions data.
 ## POST /api/v1/run/dispersion/
 
 Like the met-dependent API described above, this API takes emissions
-data and runs bluesky through dispersion and
+and plumerise data and runs bluesky through dispersion and
 visualization.  This API, however, is to be used for dispersion
 models not requiring met data (e.g. vsmoke, which currently is the
 only such model supported).
