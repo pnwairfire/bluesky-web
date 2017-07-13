@@ -460,8 +460,16 @@ modules, and with fire location data specified as lat + lng + size.
 
 ## POST /api/v1/run/plumerise/<met_domain>/
 
-This API runs bluesky emissions output through plumerise.
-It requires posted JSON with three possible top level keys -
+docker run --rm \
+    -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+    -v $HOME/DRI_6km/:/DRI_6km/ bluesky bsp -i /bluesky/test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json -c /bluesky/test/config/findmetdata/findmetdata-input-DRI6km-w-timewindow.json -C plumerising.model=sev -C fuelbeds.foo=bar ingestion  findmetdata localmet plumerising|python -m json.tool |grep -A5 'plumerise":'
+
+This API runs bluesky localmet and plumerise modules.  (The bluesky
+web serives runs SEV plumerise which, unlike FEPS plumerise, requires
+localmet data.)
+
+Like the fuelbeds and emissions APIS, the plumerise API requires
+posted JSON with three possible top level keys -
 'fire_information', and 'config', and 'modules'. The
 'fire_information' key is required, and it lists the one or
 more fires to process. The 'config' key is
@@ -469,44 +477,20 @@ optional, and it specifies configuration data and other control
 parameters.  The 'modules' key is also optional, and is used to
 specify a subset of the modules normally run by this API.
 
-### Request
-
- - url: http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/
- - method: POST
- - post data:
-
-        {
-            "fire_information": [ ... ],
-            "config": { ... },
-            "modules": [ ... ]
-        }
-
-See [BlueSky Pipeline](../../README.md) for more information about required
-and optional post data
-
-### Response
-
-In handling this request, blueskyweb will run bluesky in realtime, and the
-bluesky results will be in the API response.  The response data will be the
-modified version of the request data.  It will include the
-"fire_information" key, the "config" key (if specified), a "processing"
-key that includes information from the modules that processed the data, and
-a "summary" key.
+Since plumerise requires met data that may not exist on the web
+server, bluesky will be run asynchronously, and the
+API response will include a guid to identify the run in subsequent
+status and output API requests (described below).
 
     {
-        "config": { ... },
-        "fire_information": [ ... ],
-        "modules": [ ... ],
-        "processing": [ ... ],
-        "run_id": "<RUN_ID>",
-        "summary": { ... }
+        run_id: <guid>
     }
 
 ### Examples
 
 An example with fire location data specified as geojson
 
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/plumerise/DRI2km/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -531,47 +515,7 @@ An example with fire location data specified as geojson
                     "ecoregion": "southern",
                     "utc_offset": "-09:00",
                     "area": 5000
-                },
-                "fuelbeds": [
-                    {
-                        "fccs_id": "9",
-                        "pct": 100.0
-                    }
-                ]
-            }
-        ]
-    }' | python -m json.tool
-
-Another exmaple, this time running only the consumption
-modules, and with fire location data specified as lat + lng + size.
-
-    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
-    {
-        "modules": ["consumption"],
-        "fire_information": [
-            {
-                "id": "SF11C14225236095807750",
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Snoqualmie Pass, WA"
-                },
-                "growth": [
-                    {
-                        "location": {
-                            "latitude": 47.4316976,
-                            "longitude": -121.3990506,
-                            "area": 200,
-                            "utc_offset": "-09:00",
-                            "ecoregion": "southern"
-                        },
-                        "fuelbeds": [
-                            {
-                                "fccs_id": "9",
-                                "pct": 100.0
-                            }
-                        ]
-                    }
-                ]
+                }
             }
         ]
     }' | python -m json.tool
@@ -594,7 +538,7 @@ and growth time windows for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
 and num_hours.  The 'modules' key is optional.
 
-Since dispersion is run, bluesky will be run asynchronously, and the
+Bluesky will be run asynchronously, and the
 API response will include a guid to identify the run in subsequent
 status and output API requests (described below).
 
@@ -602,10 +546,15 @@ status and output API requests (described below).
         run_id: <guid>
     }
 
-### Example
+### Examples
 
 Since this API requires emissions data, consumption data is not required,
-and so has been optionally stripped from the following request
+and so has been optionally stripped from the following requests
+
+#### Localmet and plumerise not yet run
+
+NOTE: passing data in without plumerise and localmet data may
+not be supported. It's TBD
 
     $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
     {
@@ -654,24 +603,95 @@ and so has been optionally stripped from the following request
             "dispersion": {
                 "start": "2015-11-25T00:00:00",
                 "num_hours": 24
-            },
-            "export": {
-                "extra_exports": [
-                    "dispersion",
-                    "visualization"
-                ]
             }
         }
     }' | python -m json.tool
 
-The fact that the emissions data is in an array is because the consumption
-module (more specifically, the underlying 'consume' module) outputs arrays.
-The length of each array equals the number of fuelbeds passed into consume.
-Since consume is called on each fuelbed separately, the arrays of consumption
+The fact that the emissions data is in an array is because the
+consumption module (more specifically, the underlying 'consume'
+module) outputs arrays. The length of each array equals the
+number of fuelbeds passed into consume. Since consume is called
+on each fuelbed separately, the arrays of consumption
 and emissions data will all be of length 1.
 
 Note that the growth start and end timestamps are local time, whereas the
 dispersion start time is in UTC.
+
+#### Localmet and plumerise alrady run
+
+NOTE: passing data in without plumerise and localmet data may
+not be supported. It's TBD
+
+    $ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
+    {
+        "fire_information": [
+            {
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
+                },
+                "id": "SF11C14225236095807750",
+                "type": "wildfire",
+                "growth": [
+                    {
+                        "start": "2015-11-24T17:00:00",
+                        "end": "2015-11-25T17:00:00",
+                        "location": {
+                            "area": 10000,
+                            "ecoregion": "western",
+                            "latitude": 37.909644,
+                            "longitude": -119.7615805,
+                            "utc_offset": "-07:00"
+                        },
+                        "fuelbeds": [
+                            {
+                                "fccs_id": "49",
+                                "pct": 50.0,
+                                "emissions": {
+                                    "flaming": {
+                                        "PM25": [3002.3815120047017005]
+                                    },
+                                    "residual": {
+                                        "PM25": [4002.621500211796271]
+                                    },
+                                    "smoldering": {
+                                        "PM25": [623.424985839975172]
+                                    }
+                                }
+                            }
+                        ],
+                        "localmet": {
+                            ...
+                        },
+                        "plumerise": {
+                            ...
+                        }
+                    }
+                ]
+            }
+        ],
+        "config": {
+            "dispersion": {
+                "start": "2015-11-25T00:00:00",
+                "num_hours": 24
+            }
+        }
+        "met": {
+            "files": [
+                {
+                    "file": "/DRI_2km/2015112500/wrfout_d2.2015112500.f00-11_12hr01.arl",
+                    "first_hour": "2015-11-25T00:00:00",
+                    "last_hour": "2015-11-25T11:00:00"
+                },
+                {
+                    "file": "/DRI_2km/2015112500/wrfout_d2.2015112512.f00-11_12hr01.arl",
+                    "first_hour": "2015-11-25T12:00:00",
+                    "last_hour": "2015-11-25T23:00:00"
+                }
+            ]
+        },
+
+    }' | python -m json.tool
 
 
 
@@ -697,12 +717,6 @@ require emissions data.
             "dispersion": {
                 "num_hours": 24,
                 "start": "2015-11-25T00:00:00"
-            },
-            "export": {
-                "extra_exports": [
-                    "dispersion",
-                    "visualization"
-                ]
             }
         },
         "fire_information": [
@@ -837,11 +851,6 @@ and consumption data.
                 "start": "2015-11-25T00:00:00",
                 "num_hours": 24,
                 "model": "vsmoke"
-            },
-            "export": {
-                "extra_exports": [
-                    "dispersion"
-                ]
             }
         }
     }' | python -m json.tool
@@ -857,10 +866,6 @@ level.
 
 Note that the growth start and end timestamps are local time, whereas the
 dispersion start time is in UTC.
-
-Also note that 'visualization' is not included in 'extra_exports', since
-the vsmoke dispersion model includes kml generation.
-
 
 
 
@@ -886,11 +891,6 @@ consumption and emissions data.
                 "num_hours": 24,
                 "start": "2015-11-25T00:00:00",
                 "model": "vsmoke"
-            },
-            "export": {
-                "extra_exports": [
-                    "dispersion"
-                ]
             }
         },
         "fire_information": [
