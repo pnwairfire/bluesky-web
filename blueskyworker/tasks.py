@@ -10,6 +10,7 @@ import uuid
 from io import BytesIO
 from urllib.parse import urlparse
 
+import ipify
 import tornado.log
 from celery import Celery
 
@@ -31,6 +32,8 @@ app.conf.update(
     }
 )
 
+IP_ADDRESS = ipify.get_ip()
+
 ##
 ## Public Job Interface
 ##
@@ -41,7 +44,7 @@ class BlueSkyJobError(RuntimeError):
 @app.task
 def run_bluesky(input_data, bluesky_docker_image, output_directory):
     db = BlueSkyWebDB(MONGODB_URL)
-    db.record_run(input_data['run_id'], 'dequeued')
+    db.record_run(input_data['run_id'], 'dequeued', server={"ip": IP_ADDRESS})
     tornado.log.gen_log.info("Running %s from queue %s",
         input_data['run_id'],  '/') # TODO: get queue from job process
 
