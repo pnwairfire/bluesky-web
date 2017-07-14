@@ -8,6 +8,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import copy
+import datetime
 import io
 import json
 import logging
@@ -231,7 +232,18 @@ class RunExecuter(RunHandlerBase):
         tornado.log.gen_log.debug('input: %s', data)
         args = (data, self.settings['bluesky_docker_image'])
         run_bluesky.apply_async(args, queue=queue_name)
-        # TODO: record that run was enqueued in mongodb
+        def callback(result, error):
+            if error:
+                tornado.log.gen_log.error('Error recording run: %s', error)
+            else:
+                tornado.log.gen_log.debug('Recorded run: %s', result)
+        self.settings['mongo_db'].runs.insert_one({
+          "run_id": data["run_id"],
+          "queue": queue_name,
+          "status": 'enqueued',
+          "modules": data["modules"],
+          "enqueued": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+        }, callback=callback) # TODO: call self.write in callback so we can handle failure?
         self.write({"run_id": data['run_id']})
 
     def _run_in_process(self, data):

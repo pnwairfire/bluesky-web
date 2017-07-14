@@ -134,6 +134,10 @@ class DomainDB(object):
     # TODO: memoize/cache find
     def find(self, domain_id=None):
         data = {}
+        # Note: the `met` package uses pymongo, so these db queries are executed
+        #   synchrmounsly
+        # TODO: if we have performance issues, rewrite MetDatesCollection's
+        #    functionality using motor package (either here or in the met package)
         for d in MetDatesCollection(self._mongodb_url).find(domain=domain_id):
             data[d['domain']] = {
                 "dates": d['complete_dates']

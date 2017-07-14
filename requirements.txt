@@ -2,7 +2,8 @@
 -f http://pypi.smoke.airfire.org/simple/
 afscripting>=1.1.2,<2.0.0
 met>=1.1.1,<2.0.0
-tornado==4.3.0
+tornado==4.5.1
+motor==1.1
 requests==2.18.1
 celery==4.0.2
 docker==2.4.2

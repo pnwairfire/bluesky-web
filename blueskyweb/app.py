@@ -5,8 +5,10 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import logging
 import os
+from urllib.parse import urlparse
 
 import afscripting
+import motor
 import tornado.ioloop
 #import tornado.log
 import tornado.web
@@ -84,6 +86,10 @@ def main(**settings):
         settings['path_prefix'] = '/' + settings['path_prefix'].lstrip('/')
 
     os.environ["MONGODB_URL"] = settings['mongodb_url']
+    db = (urlparse(settings['mongodb_url']).path.lstrip('/').split('/')[0]
+        or 'blueskyweb')
+    settings['mongo_db'] = motor.motor_tornado.MotorClient(
+        settings['mongodb_url'])[db]
 
     routes = get_routes(settings.get('path_prefix'))
     application = tornado.web.Application(routes, **settings)
