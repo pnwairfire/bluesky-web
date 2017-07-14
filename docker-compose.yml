@@ -31,6 +31,13 @@ services:
     - ./docker-logs/mongodb/:/var/log/mongodb/
     - ./docker-data/mongodb/db/:/data/db/
     - ./docker-data/mongodb/configdb/:/data/configdb/
+    #- ./mongo-entrypoint/:/docker-entrypoint-initdb.d/
+    # Note: '--auth' is automatically added to command if
+    #   MONGO_INITDB_ROOT_[USERNAME|PASSWORD] are set
+    # see
+    #   - https://stackoverflow.com/questions/34559557/how-to-enable-authentication-on-mongodb-through-docker
+    #   - https://github.com/docker-library/mongo/blob/27f2722bb2ebd26354321adc8c3f19f7958529e1/3.4/Dockerfile
+    #   - https://github.com/docker-library/mongo/blob/27f2722bb2ebd26354321adc8c3f19f7958529e1/3.4/docker-entrypoint.sh
     #command: mongod --auth
   worker_all_met:
     image: bluesky-web
