@@ -5,13 +5,13 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import logging
 import os
-from urllib.parse import urlparse
 
 import afscripting
-import motor
 import tornado.ioloop
 #import tornado.log
 import tornado.web
+
+from blueskymongo.client import BlueSkyWebDB
 
 # TODO: use path args for version and api module. ex:
 #  routes = [
@@ -89,10 +89,7 @@ def main(**settings):
         settings['path_prefix'] = '/' + settings['path_prefix'].lstrip('/')
 
     os.environ["MONGODB_URL"] = settings['mongodb_url']
-    db = (urlparse(settings['mongodb_url']).path.lstrip('/').split('/')[0]
-        or 'blueskyweb')
-    settings['mongo_db'] = motor.motor_tornado.MotorClient(
-        settings['mongodb_url'])[db]
+    settings['mongo_db'] = BlueSkyWebDB(settings['mongodb_url'])
 
     routes = get_routes(settings.get('path_prefix'))
     application = tornado.web.Application(routes, **settings)

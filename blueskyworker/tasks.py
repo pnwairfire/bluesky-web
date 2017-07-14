@@ -13,6 +13,8 @@ from urllib.parse import urlparse
 import tornado.log
 from celery import Celery
 
+from blueskymongo.client import BlueSkyWebDB
+
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://localhost:27018/blueskyweb'
 app = Celery('blueskyworker.tasks', broker=MONGODB_URL)
 
@@ -38,6 +40,8 @@ class BlueSkyJobError(RuntimeError):
 
 @app.task
 def run_bluesky(input_data, bluesky_docker_image, capture_output=False):
+    db = BlueSkyWebDB(MONGODB_URL)
+    db.record_run(input_data['run_id'], 'dequeued')
     tornado.log.gen_log.info("Running %s from queue %s",
         input_data['run_id'],  '/') # TODO: get queue from job process
 
@@ -57,7 +61,7 @@ def run_bluesky(input_data, bluesky_docker_image, capture_output=False):
     #       is running
 
     return _run_bluesky(input_data, bluesky_docker_image,
-        input_data_json=input_data_json)
+        input_data_json=input_data_json, db=db)
 
 
 ##
@@ -66,13 +70,14 @@ def run_bluesky(input_data, bluesky_docker_image, capture_output=False):
 
 
 def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
-        capture_output=False):
+        capture_output=False, db=None):
     """
     kwargs:
      - input_data_json -- already dumped json string, to avoid repeated dump;
         not necessarily set by outside clients of this code
      - capture_output -- whether or not to capture the stdout; only
         set to True by outside clients of this code
+     - db -- bsp web mongodb client to record run status
     """
     run_id = input_data.get('run_id') or str(uuid.uuid1()).replace('-','')
     input_data['run_id'] = run_id # in case it was just generated
@@ -100,8 +105,10 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
         #     tty=True)
         _create_input_file(input_data_json, container)
         container.start()
+        db and db.record_run(input_data['run_id'], 'running')
         # TODO: rather than just wait, poll the logs and report status?
         docker.APIClient().wait(container.id)
+        db and db.record_run(input_data['run_id'], 'completed')
         if capture_output:
             return _get_output(container)
 

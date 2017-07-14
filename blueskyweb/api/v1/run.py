@@ -8,19 +8,18 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import copy
-import datetime
 import io
 import json
-import logging
 import os
 import re
 import requests
 import socket
 import urllib.request, urllib.error, urllib.parse
 import uuid
+import traceback
+
 import tornado.web
 import tornado.log
-import traceback
 
 from blueskyworker.tasks import run_bluesky, _run_bluesky
 
@@ -232,18 +231,10 @@ class RunExecuter(RunHandlerBase):
         tornado.log.gen_log.debug('input: %s', data)
         args = (data, self.settings['bluesky_docker_image'])
         run_bluesky.apply_async(args, queue=queue_name)
-        def callback(result, error):
-            if error:
-                tornado.log.gen_log.error('Error recording run: %s', error)
-            else:
-                tornado.log.gen_log.debug('Recorded run: %s', result)
-        self.settings['mongo_db'].runs.insert_one({
-          "run_id": data["run_id"],
-          "queue": queue_name,
-          "status": 'enqueued',
-          "modules": data["modules"],
-          "enqueued": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-        }, callback=callback) # TODO: call self.write in callback so we can handle failure?
+        # TODO: call specify callback in record_run, calling
+        #    self.write in callbvack, so we can handle failure?
+        self.settings['mongo_db'].record_run(data['run_id'], 'enqueued',
+            queue=queue_name, modules=data["modules"])
         self.write({"run_id": data['run_id']})
 
     def _run_in_process(self, data):
@@ -596,22 +587,11 @@ class RunsInfo(RunHandlerBase):
 
     @tornado.web.asynchronous
     async def get(self, status=None):
-        query = {'status': status} if status else {}
         limit = int(self.get_query_argument('limit', 10))
         offset = int(self.get_query_argument('offset', 0))
-        tornado.log.gen_log.debug('query, limit, offset: %s, %s, %s',
-            query, limit, offset)
+        runs = await self.settings['mongo_db'].find_runs(status=status,
+            limit=limit, offset=offset)
 
-        cursor = self.settings['mongo_db'].runs.find(query)
-        cursor = cursor.sort('enqueued').limit(limit).skip(offset)
-
-        # runs = []
-        # async for r in cursor:
-        #     tornado.log.gen_log.debug('run: %s', r)
-        #     r.pop('_id')
-        #     runs.append(r)
-        runs = await cursor.to_list(limit)
-        for r in runs:
-            r.pop('_id')
-
+        # TODO: include total count of runs with given status, and of runs
+        #    of all statuses?
         self.write({"runs": runs})
