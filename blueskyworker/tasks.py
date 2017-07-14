@@ -37,9 +37,9 @@ class BlueSkyJobError(RuntimeError):
     pass
 
 @app.task
-def run_bluesky(data, bluesky_docker_image, capture_output=False):
-    tornado.log.gen_log.INFO("Running %s from queue %s",
-        data['run_id'], queue_name)
+def run_bluesky(input_data, bluesky_docker_image, capture_output=False):
+    tornado.log.gen_log.info("Running %s from queue %s",
+        input_data['run_id'],  '/') # TODO: get queue from job process
 
     # load input_data if it's json (and 'cache' json string to dump to file
     #   in call to bsp, below)

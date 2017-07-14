@@ -23,6 +23,8 @@ import traceback
 
 from blueskyworker.tasks import run_bluesky, _run_bluesky
 
+from blueskyweb.lib import domains
+
 # TODO: pass configuration settings into bsp-web (and on to
 #   blueskyweb.app.main) as arg options rather than as env vars ?
 
