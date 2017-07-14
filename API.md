@@ -491,10 +491,6 @@ modules, and with fire location data specified as lat + lng + size.
 
 ## POST /api/v1/run/plumerise/<met_domain>/
 
-docker run --rm \
-    -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
-    -v $HOME/DRI_6km/:/DRI_6km/ bluesky bsp -i /bluesky/test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json -c /bluesky/test/config/findmetdata/findmetdata-input-DRI6km-w-timewindow.json -C plumerising.model=sev -C fuelbeds.foo=bar ingestion  findmetdata localmet plumerising|python -m json.tool |grep -A5 'plumerise":'
-
 This API runs bluesky localmet and plumerise modules.  (The bluesky
 web serives runs SEV plumerise which, unlike FEPS plumerise, requires
 localmet data.)
@@ -521,7 +517,7 @@ status and output API requests (described below).
 
 An example with fire location data specified as geojson
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/DRI6km/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -584,7 +580,7 @@ and so has been optionally stripped from the following requests
 
 #### Localmet and plumerise already run
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI6km/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -672,7 +668,7 @@ dispersion start time is in UTC.
 NOTE: passing data in without plumerise and localmet data may
 not be supported. It's TBD
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI6km/" -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -736,7 +732,7 @@ require emissions data.
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/DRI2km/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/DRI6km/" -H 'Content-Type: application/json' -d '
     {
         "config": {
             "emissions": {
