@@ -30,6 +30,11 @@ class BlueSkyWebDB(object):
         # doing upserts
         self.db.runs.update_one(spec, doc, upsert=True, callback=_callback)
 
+    async def find_run(self, run_id):
+        run = await self.db.runs.find_one({"run_id": run_id})
+        if run:
+            run.pop('_id')
+        return run
 
     async def find_runs(self, status=None, limit=None, offset=None):
         query = {'status': status} if status else {}
