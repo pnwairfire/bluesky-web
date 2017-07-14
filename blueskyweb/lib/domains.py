@@ -25,7 +25,7 @@ DOMAINS = {
     # TODO: add LS (Great Lakes?) 4km with boundaries [-96.1, 41.5, -81.5, 49.5]
     'DRI2km': {
         'queue': 'all-met', #'dri', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/ARL/DRI/2km/', # TODO: don't hardcode (see above)
+        'met_root_dir': '/data/Met/CANSAC/2km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # STI provided the following corners:
             #   CANV 2km - [-124.3549, 32.5479, -113.2558, 41.8884]
@@ -46,7 +46,7 @@ DOMAINS = {
     },
     'DRI6km': {
         'queue': 'all-met', #'dri', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/ARL/DRI/6km/', # TODO: don't hardcode (see above)
+        'met_root_dir': '/data/Met/CANSAC/6km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # Ran the following on haze:
             #   $ chk_arl file /data/ARL/DRI/6km/2016040400/wrfout_d2.2016040400.f00-11_12hr01.arl |grep corner
@@ -65,7 +65,7 @@ DOMAINS = {
     },
     'PNW1.33km': {
         'queue': 'all-met', #'pnw', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/ARL/PNW/1.33km/', # TODO: don't hardcode (see above)
+        'met_root_dir': '/data/Met/PNW/1.33km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # Ran the following on haze:
             #   $ chk_arl file /data/ARL/PNW/1.33km/2016040400/wrfout_d4.2016040400.f12-23_12hr01.arl |grep corner
@@ -84,7 +84,7 @@ DOMAINS = {
     },
     'PNW4km': {
         'queue': 'all-met', #'pnw', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/ARL/PNW/4km/', # TODO: don't hardcode (see above)
+        'met_root_dir': '/data/Met/PNW/4km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # Ran the following on haze:
             #   $ chk_arl file /data/ARL/PNW/4km/2016040400/wrfout_d3.2016040400.f12-23_12hr01.arl |grep corner
@@ -103,7 +103,7 @@ DOMAINS = {
     },
     'NAM84': {
         'queue': 'all-met', #'nam', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/ARL/NAM/12km/', # TODO: don't hardcode (see above)
+        'met_root_dir': '/data/Met/NAM/12km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # STI provided the following corners:
             #   NAM 12km - [-131, 18, -64, 55]
