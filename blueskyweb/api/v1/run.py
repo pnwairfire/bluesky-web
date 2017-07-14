@@ -365,223 +365,159 @@ class RunExecuter(RunHandlerBase):
 
 
 
-
-# TODO: Look in monbodb for information about the run
-
 class RunStatus(RunHandlerBase):
 
-    ## Generic status check method
-
-    def _check(self, output_location, exists_func, open_func):
-        """Checks output, which may be in local dir or on remote host
-
-        args:
-         - output_location -- local pathname or url
-         - exists_func -- function to check existence of dir or file
-            (local or via http)
-         - open_func -- function to open output json file (local or via http)
-        """
-        if exists_func(output_location):
-            tornado.log.gen_log.debug('%s exists', output_location)
-            # use join instead of os.path.join in case output_location is a remote url
-            output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
-            tornado.log.gen_log.debug('checking %s', output_json_file)
-            failed = True  ## TODO: REMOVE
-            status = "Unknown"
-            if exists_func(output_json_file):
-                tornado.log.gen_log.debug('%s exists', output_json_file)
-                with open_func(output_json_file) as f:
-                    try:
-                        output_json = json.loads(f.read())
-                        if "error" in output_json: #[str(k) for k in output_json]:
-                            failed = True  ## TODO: REMOVE
-                            status = "Failure"
-                        else:
-                            failed = False  ## TODO: REMOVE
-                            status = "Success"
-                    except:
-                        # Note that status is already defaulted to "Unknown"
-                        pass
-            self.write({
-                "complete": True,
-                "percent": 100.0,
-                "failed": failed,  ## TODO: REMOVE
-                "status": status
-                # TODO: include 'message'
-            })
+    async def get(self, run_id):
+        # TODO: implement using data form mongodb
+        run = await self.settings['mongo_db'].find_run(run_id)
+        if not run:
+            self.set_status(404, "Run doesn't exist")
+            self.write({"error": "Run doesn't exist"})
         else:
-            tornado.log.gen_log.debug('%s does *NOT* exists', output_location)
-            self.write({
-                "complete": False,
-                "percent": 0.0,  # TODO: determine % from output directories
-                "status": "Unknown"
-                # TODO: include 'message'
-            })
+            self.write({"run": run})
 
-    ## Localsave
 
-    def _check_localsave(self, run_id):
-        # if bsp workers are on another machine, this will never return an
-        # accurate response. ('localsave' should only be used when running
-        # everything on one server)
-        output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
-        self._check(output_dir, os.path.exists, open)
-
-    ## Upload
-
-    def _check_upload(self, run_id):
-        if is_same_host(self.request.host):
-            tornado.log.gen_log.debug("Uploaded export is local")
-            EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
-            self._check_localsave(run_id)
-        else:
-            self._check(get_output_url(run_id), remote_exists, remote_open)
-
-    ## CRUD API
-
-    def get(self, run_id):
-        # This simply looks for the existence of output and absence of failure
-        # TODO: actually look for status
-        getattr(self, '_check_{}'.format(EXPORT_MODE))(run_id)
 
 class RunOutput(RunHandlerBase):
 
     ## Output json parsing methods
 
-    def _parse_kmzs_info(self, r, section_info):
-        kmz_info = section_info.get('kmzs', {})
-        if kmz_info:
-            r['kmzs'] = {k: '{}/{}'.format(section_info['sub_directory'], v)
-                for k, v in list(kmz_info.items()) if k in ('fire', 'smoke')}
+    # def _parse_kmzs_info(self, r, section_info):
+    #     kmz_info = section_info.get('kmzs', {})
+    #     if kmz_info:
+    #         r['kmzs'] = {k: '{}/{}'.format(section_info['sub_directory'], v)
+    #             for k, v in list(kmz_info.items()) if k in ('fire', 'smoke')}
 
-    ## ******************** TO DELETE - BEGIN  <-- (once v1 is obsoleted)
-    def _parse_images_v1(self, r, vis_info):
-        images_info = vis_info.get('images')
-        if images_info:
-            r['images'] = {
-                "hourly": ['{}/{}'.format(vis_info['sub_directory'], e)
-                    for e in images_info.get('hourly', [])],
-                "daily": {
-                    "average": ['{}/{}'.format(vis_info['sub_directory'], e)
-                        for e in images_info.get('daily', {}).get('average', [])],
-                    "maximum": ['{}/{}'.format(vis_info['sub_directory'], e)
-                        for e in images_info.get('daily', {}).get('maximum', [])],
-                }
-            }
-    ## ******************** TO DELETE - END
+    # ## ******************** TO DELETE - BEGIN  <-- (once v1 is obsoleted)
+    # def _parse_images_v1(self, r, vis_info):
+    #     images_info = vis_info.get('images')
+    #     if images_info:
+    #         r['images'] = {
+    #             "hourly": ['{}/{}'.format(vis_info['sub_directory'], e)
+    #                 for e in images_info.get('hourly', [])],
+    #             "daily": {
+    #                 "average": ['{}/{}'.format(vis_info['sub_directory'], e)
+    #                     for e in images_info.get('daily', {}).get('average', [])],
+    #                 "maximum": ['{}/{}'.format(vis_info['sub_directory'], e)
+    #                     for e in images_info.get('daily', {}).get('maximum', [])],
+    #             }
+    #         }
+    # ## ******************** TO DELETE - END
 
-    def _parse_images_v2(self, r, vis_info):
-        r["images"] = vis_info.get('images')
-        for d in r['images']:
-            for c in r['images'][d]:
-                r['images'][d][c]["directory"] = os.path.join(
-                    vis_info['sub_directory'], r['images'][d][c]["directory"])
+    # def _parse_images_v2(self, r, vis_info):
+    #     r["images"] = vis_info.get('images')
+    #     for d in r['images']:
+    #         for c in r['images'][d]:
+    #             r['images'][d][c]["directory"] = os.path.join(
+    #                 vis_info['sub_directory'], r['images'][d][c]["directory"])
 
-    def _parse_output(self, output_json):
-        export_info = output_json.get('export', {})
-        # try both export modes, in case run was initiated with other mode
-        other_em = set(EXPORT_CONFIGURATIONS.keys()).difference([EXPORT_MODE]).pop()
-        export_info = export_info.get(EXPORT_MODE) or export_info.get(other_em)
-        if not export_info:
-           return {}
+    # def _parse_output(self, output_json):
+    #     export_info = output_json.get('export', {})
+    #     # try both export modes, in case run was initiated with other mode
+    #     other_em = set(EXPORT_CONFIGURATIONS.keys()).difference([EXPORT_MODE]).pop()
+    #     export_info = export_info.get(EXPORT_MODE) or export_info.get(other_em)
+    #     if not export_info:
+    #        return {}
 
-        r = {}
-        vis_info = export_info.get('visualization')
-        if vis_info:
-            # images
-            # TODO: simplify code once v1 is obsoleted
-            image_results_version = output_json.get('config', {}).get(
-                'export',{}).get(EXPORT_MODE, {}).get('image_results_version')
-            if image_results_version == 'v2':
-                self._parse_images_v2(r, vis_info)
-            else:
-                self._parse_images_v1(r, vis_info)
+    #     r = {}
+    #     vis_info = export_info.get('visualization')
+    #     if vis_info:
+    #         # images
+    #         # TODO: simplify code once v1 is obsoleted
+    #         image_results_version = output_json.get('config', {}).get(
+    #             'export',{}).get(EXPORT_MODE, {}).get('image_results_version')
+    #         if image_results_version == 'v2':
+    #             self._parse_images_v2(r, vis_info)
+    #         else:
+    #             self._parse_images_v1(r, vis_info)
 
-            # kmzs
-            self._parse_kmzs_info(r, vis_info)
+    #         # kmzs
+    #         self._parse_kmzs_info(r, vis_info)
 
-        disp_info = export_info.get('dispersion')
-        if disp_info:
-            r.update(**{
-                k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
-                for k in ('netCDF', 'netCDFs') if k.lower() in disp_info})
+    #     disp_info = export_info.get('dispersion')
+    #     if disp_info:
+    #         r.update(**{
+    #             k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
+    #             for k in ('netCDF', 'netCDFs') if k.lower() in disp_info})
 
-            # kmzs (vsmoke dispersion produces kmzs)
-            self._parse_kmzs_info(r, disp_info)
+    #         # kmzs (vsmoke dispersion produces kmzs)
+    #         self._parse_kmzs_info(r, disp_info)
 
-        # TODO: list fire_*.csv if specified in output_json
+    #     # TODO: list fire_*.csv if specified in output_json
 
-        return r
+    #     return r
 
-    ## Generic output get methdo
+    # ## Generic output get methdo
 
-    def _get(self, output_location, exists_func, open_func, config, run_id):
-        """Gets information about the outpu output, which may be in local dir
-        or on remote host
+    # def _get(self, output_location, exists_func, open_func, config, run_id):
+    #     """Gets information about the outpu output, which may be in local dir
+    #     or on remote host
 
-        args:
-         - output_location -- local pathname or url
-         - exists_func -- function to check existence of dir or file
-            (local or via http)
-         - open_func -- function to open output json file (local or via http)
-        """
-        tornado.log.gen_log.debug('Looking for output in %s', output_location)
-        if not exists_func(output_location):
-            self._bad_request(404, "Output location doesn't exist: {}".format(output_location))
-            return
+    #     args:
+    #      - output_location -- local pathname or url
+    #      - exists_func -- function to check existence of dir or file
+    #         (local or via http)
+    #      - open_func -- function to open output json file (local or via http)
+    #     """
+    #     tornado.log.gen_log.debug('Looking for output in %s', output_location)
+    #     if not exists_func(output_location):
+    #         self._bad_request(404, "Output location doesn't exist: {}".format(output_location))
+    #         return
 
-        else:
-            r = {
-                # TODO: use get_output_url for form root_url
-                "root_url": "{}://{}{}".format(config['protocol'] or self.request.protocol,
-                    # TODO: use self.request.remote_ip instead of self.request.host
-                    # TODO: call _get_host
-                    config['host'] or self.request.host,
-                    os.path.join(config['url_root_dir'], run_id))
-            }
-            # use join instead of os.path.join in case output_location is a remote url
-            output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
-            if exists_func(output_json_file):
-                with open_func(output_json_file) as f:
-                    try:
-                        r.update(self._parse_output(json.loads(f.read())))
-                        # TODO: set fields here, using , etc.
-                    except:
-                        pass
+    #     else:
+    #         r = {
+    #             # TODO: use get_output_url for form root_url
+    #             "root_url": "{}://{}{}".format(config['protocol'] or self.request.protocol,
+    #                 # TODO: use self.request.remote_ip instead of self.request.host
+    #                 # TODO: call _get_host
+    #                 config['host'] or self.request.host,
+    #                 os.path.join(config['url_root_dir'], run_id))
+    #         }
+    #         # use join instead of os.path.join in case output_location is a remote url
+    #         output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
+    #         if exists_func(output_json_file):
+    #             with open_func(output_json_file) as f:
+    #                 try:
+    #                     r.update(self._parse_output(json.loads(f.read())))
+    #                     # TODO: set fields here, using , etc.
+    #                 except:
+    #                     pass
 
-            self.write(r)
+    #         self.write(r)
 
-    ## localsave
+    # ## localsave
 
-    def _get_localsave(self, run_id):
-        # if bsp workers are on another machine, this will never return an
-        # accurate response. ('localsave' should only be used when running
-        # everything on one server)
-        output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
-        self._get(output_dir, os.path.exists, open, EXPORT_CONFIGURATION, run_id)
+    # def _get_localsave(self, run_id):
+    #     # if bsp workers are on another machine, this will never return an
+    #     # accurate response. ('localsave' should only be used when running
+    #     # everything on one server)
+    #     output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
+    #     self._get(output_dir, os.path.exists, open, EXPORT_CONFIGURATION, run_id)
 
-    ## upload
+    # ## upload
 
-    def _get_upload(self, run_id):
-        if is_same_host(self.request.host):
-            tornado.log.gen_log.debug("Uploaded export is local")
-            # Note: alternatively, we could do the following:
-            #  > EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
-            #  > EXPORT_CONFIGURATION['url_root_dir'] = EXPORT_CONFIGURATION['scp']['url_root_dir']
-            #  > EXPORT_CONFIGURATION['host'] = EXPORT_CONFIGURATION['scp']['host']
-            #  > self._get_localsave(run_id)
-            output_dir = os.path.join(EXPORT_CONFIGURATION['scp']['dest_dir'], run_id)
-            self._get(output_dir, os.path.exists, open, EXPORT_CONFIGURATION['scp'], run_id)
-        else:
-            self._get(get_output_url(run_id), remote_exists, remote_open,
-                EXPORT_CONFIGURATION['scp'], run_id)
+    # def _get_upload(self, run_id):
+    #     if is_same_host(self.request.host):
+    #         tornado.log.gen_log.debug("Uploaded export is local")
+    #         # Note: alternatively, we could do the following:
+    #         #  > EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
+    #         #  > EXPORT_CONFIGURATION['url_root_dir'] = EXPORT_CONFIGURATION['scp']['url_root_dir']
+    #         #  > EXPORT_CONFIGURATION['host'] = EXPORT_CONFIGURATION['scp']['host']
+    #         #  > self._get_localsave(run_id)
+    #         output_dir = os.path.join(EXPORT_CONFIGURATION['scp']['dest_dir'], run_id)
+    #         self._get(output_dir, os.path.exists, open, EXPORT_CONFIGURATION['scp'], run_id)
+    #     else:
+    #         self._get(get_output_url(run_id), remote_exists, remote_open,
+    #             EXPORT_CONFIGURATION['scp'], run_id)
 
     ## CRUD API
 
     def get(self, run_id):
         # TODO: get run info from mongodb
         # TODO: if not dispersion (i.e. plumerise), return actual output json
-        getattr(self, '_get_{}'.format(EXPORT_MODE))(run_id)
+        self.set_status(501, "Not Implemented")
+
+
 
 class RunsInfo(RunHandlerBase):
 

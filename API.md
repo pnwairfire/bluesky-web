@@ -958,9 +958,7 @@ This API returns the status of a specific dispersion run
 ### Response
 
     {
-        "complete": <boolean>,
-        "percent": <double>, /* (if available) */
-        "status": <string>  /* ('Success', 'Failure', or 'Unknown') */
+        ....TODO: fill in...
     }
 
 ### Example:
@@ -968,17 +966,13 @@ This API returns the status of a specific dispersion run
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/abc123/status"
 
     {
-        "complete": false,
-        "percent": 62.3,
-        "status": "Unknown"
+        ....TODO: fill in...
     }
 
 or
 
     {
-        "complete": true,
-        "percent": 100.0,
-        "status": "Success"
+        ....TODO: fill in...
     }
 
 
