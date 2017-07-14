@@ -25,13 +25,6 @@ from blueskyworker.tasks import run_bluesky, _run_bluesky
 
 from blueskyweb.lib import domains
 
-# TODO: pass configuration settings into bsp-web (and on to
-#   blueskyweb.app.main) as arg options rather than as env vars ?
-
-
-DEST_DIR = "/bluesky/playground-output/"
-URL_ROOT_DIR = "/playground-output/"
-
 
 
 ##
@@ -229,7 +222,9 @@ class RunExecuter(RunHandlerBase):
         # TODO: dump data to json?  works fine without doing so, so this may
         #  only serve the purpose of being able to read data in scheduler ui
         tornado.log.gen_log.debug('input: %s', data)
-        args = (data, self.settings['bluesky_docker_image'])
+        output_dir = os.path.join(self.settings['output_root_dir'],
+            self.settings['output_root_url_path'], data['run_id'])
+        args = (data, self.settings['bluesky_docker_image'], output_dir)
         run_bluesky.apply_async(args, queue=queue_name)
         # TODO: call specify callback in record_run, calling
         #    self.write in callbvack, so we can handle failure?
@@ -241,7 +236,7 @@ class RunExecuter(RunHandlerBase):
         try:
             tornado.log.gen_log.debug('input: %s', data)
             stdout_data = _run_bluesky(data,
-                self.settings['bluesky_docker_image'], capture_output=True)
+                self.settings['bluesky_docker_image'])
             # TODO: make sure stdout_data is valid json?
             tornado.log.gen_log.debug('output: %s', stdout_data)
             self.write(stdout_data)
@@ -295,9 +290,13 @@ class RunExecuter(RunHandlerBase):
             return
 
         data['config']['dispersion']['output_dir'] = os.path.join(
-            DEST_DIR, '{run_id}', 'output')
+            self.settings['output_root_dir'],
+            self.settings['output_root_url_path'],
+            '{run_id}', 'output')
         data['config']['dispersion']['working_dir'] = os.path.join(
-            DEST_DIR, '{run_id}', 'working')
+            self.settings['output_root_dir'],
+            self.settings['output_root_url_path'],
+            '{run_id}', 'working')
         tornado.log.gen_log.debug("Output dir: %s",
             data['config']['dispersion']['output_dir'])
         tornado.log.gen_log.debug("Working dir: %s",

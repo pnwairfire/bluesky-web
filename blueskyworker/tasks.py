@@ -39,7 +39,7 @@ class BlueSkyJobError(RuntimeError):
     pass
 
 @app.task
-def run_bluesky(input_data, bluesky_docker_image, capture_output=False):
+def run_bluesky(input_data, bluesky_docker_image, output_directory):
     db = BlueSkyWebDB(MONGODB_URL)
     db.record_run(input_data['run_id'], 'dequeued')
     tornado.log.gen_log.info("Running %s from queue %s",
@@ -61,7 +61,8 @@ def run_bluesky(input_data, bluesky_docker_image, capture_output=False):
     #       is running
 
     return _run_bluesky(input_data, bluesky_docker_image,
-        input_data_json=input_data_json, db=db)
+        input_data_json=input_data_json,
+        output_directory=output_directory, db=db)
 
 
 ##
@@ -70,13 +71,16 @@ def run_bluesky(input_data, bluesky_docker_image, capture_output=False):
 
 
 def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
-        capture_output=False, db=None):
+        output_directory=None, db=None):
     """
+    args:
+     - input_data -- bsp input data
+     - bluesky_docker_image -- name of bluesky docker image, with version
     kwargs:
      - input_data_json -- already dumped json string, to avoid repeated dump;
         not necessarily set by outside clients of this code
-     - capture_output -- whether or not to capture the stdout; only
-        set to True by outside clients of this code
+     - output_directory -- were to write output; if not defined, then
+        output returned without writing to disk
      - db -- bsp web mongodb client to record run status
     """
     run_id = input_data.get('run_id') or str(uuid.uuid1()).replace('-','')
@@ -109,12 +113,31 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
         # TODO: rather than just wait, poll the logs and report status?
         docker.APIClient().wait(container.id)
         db and db.record_run(input_data['run_id'], 'completed')
-        if capture_output:
-            return _get_output(container)
+        output = _get_output(container)
+        if db:
+            try:
+                error = json.loads(output.decode()).get('error')
+                if error:
+                    db.record_run(input_data['run_id'], 'failed', error=error)
 
+            except Exception as e:
+                tornado.log.gen_log.error('failed to parse error : %s', e)
+                pass
+
+        # TODO: check output for error, and if so record status 'failed' with error message
+        if output_directory:
+            os.makedirs(output_directory, exist_ok=True)
+            with open(os.path.join(output_directory, 'output.json'), 'wb') as f:
+                f.write(output)
+            db.record_run(input_data['run_id'], 'output_written',
+                output_url="https://{}{}")
+
+        else:
+            return output
 
     except Exception as e:
-        db and db.record_run(input_data['run_id'], 'failed')
+        db and db.record_run(input_data['run_id'], 'failed',
+            error={"message": str(e)})
         raise BlueSkyJobError(str(e))
 
     finally:

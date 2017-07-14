@@ -24,6 +24,11 @@ REQUIRED_ARGS = [
         'short': '-b',
         'long': '--bluesky-docker-image',
         'help': "BlueSky pipeline docker image name"
+    },
+    {
+        'short': '-o',
+        'long': '--output-root-dir',
+        'help': "root directory of output"
     }
 ]
 

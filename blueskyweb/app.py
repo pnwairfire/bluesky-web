@@ -48,7 +48,8 @@ def configure_logging(**settings):
 DEFAULT_SETTINGS = {
     'port': 8887,
     'mongodb_url': "mongodb://localhost:27018/blueskyweb",
-    'log_file': '/var/log/blueskyweb/bluesky-web.log'
+    'log_file': '/var/log/blueskyweb/bluesky-web.log',
+    'output_root_url_path': 'pgv3'
 }
 
 def get_routes(path_prefix):
