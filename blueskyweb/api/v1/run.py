@@ -591,3 +591,27 @@ class RunOutput(RunHandlerBase):
         # TODO: get run info from mongodb
         # TODO: if not dispersion (i.e. plumerise), return actual output json
         getattr(self, '_get_{}'.format(EXPORT_MODE))(run_id)
+
+class RunsInfo(RunHandlerBase):
+
+    @tornado.web.asynchronous
+    async def get(self, status=None):
+        query = {'status': status} if status else {}
+        limit = int(self.get_query_argument('limit', 10))
+        offset = int(self.get_query_argument('offset', 0))
+        tornado.log.gen_log.debug('query, limit, offset: %s, %s, %s',
+            query, limit, offset)
+
+        cursor = self.settings['mongo_db'].runs.find(query)
+        cursor = cursor.sort('enqueued').limit(limit).skip(offset)
+
+        # runs = []
+        # async for r in cursor:
+        #     tornado.log.gen_log.debug('run: %s', r)
+        #     r.pop('_id')
+        #     runs.append(r)
+        runs = await cursor.to_list(limit)
+        for r in runs:
+            r.pop('_id')
+
+        self.write({"runs": runs})

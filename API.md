@@ -1195,3 +1195,72 @@ you'll get something like the following:
         "netCDF": "dispersion-visualization/hysplit_conc.nc",
         "root_url": "http://localhost:8888/playground-output/812ee94a-cb78-11e5-9d7c-0242ac110003-image-format-v1"
     }
+
+
+
+
+## GET /api/v1/runs/[<status>/]
+
+This API returns meta information about runs
+
+### Request
+
+ - url: $BLUESKY_API_ROOT_URL/api/v1/runs/[<status>/]
+ - optional query args: limit, offset
+ - method: GET
+
+### Response
+
+
+    {
+        "runs": [
+            {
+                "enqueued": "<ts>",
+                "modules": [
+                    ...
+                ],
+                "status": "<status>",
+                "queue": "<queue>",
+                "run_id": "<run_id>",
+                "server": "<hostname>",
+                "dequeued": "<ts>",
+                "started": "<ts>",
+                "completed": "<ts>",
+                ....
+            },
+            ...
+        ]
+    }
+
+
+### Example
+
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/enqueued/?limit=2&offset=1" |python -m json.tool
+
+    {
+        "runs": [
+            {
+                "enqueued": "2017-07-14T19:17:17Z",
+                "modules": [
+                    "findmetdata",
+                    "localmet",
+                    "plumerising"
+                ],
+                "status": "enqueued",
+                "queue": "dri",
+                "run_id": "0d39dd48-68c9-11e7-9295-3c15c2c6639e"
+            },
+            {
+                "enqueued": "2017-07-14T19:18:59Z",
+                "modules": [
+                    "findmetdata",
+                    "localmet",
+                    "plumerising"
+                ],
+                "status": "enqueued",
+                "queue": "dri",
+                "run_id": "49e42864-68c9-11e7-9f5f-3c15c2c6639e"
+            }
+        ]
+    }

@@ -27,7 +27,8 @@ from .api.v1.domain import (
 from .api.v1.run import (
     RunExecuter as RunExecuterV1,
     RunStatus as RunStatusV1,
-    RunOutput as RunOutputV1
+    RunOutput as RunOutputV1,
+    RunsInfo as RunsInfoV1
 )
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
@@ -61,7 +62,9 @@ def get_routes(path_prefix):
         (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),
         (r"/api/v1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuterV1),
         (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
-        (r"/api/v1/run/([^/]+)/output/?", RunOutputV1)
+        (r"/api/v1/run/([^/]+)/output/?", RunOutputV1),
+        (r"/api/v1/runs/?", RunsInfoV1),
+        (r"/api/v1/runs/(enqueued|dequeued|started|completed|failed)/?", RunsInfoV1)
     ]
     if path_prefix:
         path_prefix = path_prefix.strip('/')
