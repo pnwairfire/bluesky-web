@@ -521,28 +521,19 @@ An example with fire location data specified as geojson
     {
         "fire_information": [
             {
-                "id": "SF11C14225236095807750",
-                "event_id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA",
-                "location": {
-                    "geojson": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
-                        ]
-                    },
-                    "ecoregion": "southern",
-                    "utc_offset": "-09:00",
-                    "area": 5000
-                }
+                "growth": [
+                    {
+                        "start": "2015-11-24T17:00:00",
+                        "end": "2015-11-25T17:00:00",
+                        "location": {
+                            "area": 10000,
+                            "ecoregion": "western",
+                            "latitude": 37.909644,
+                            "longitude": -119.7615805,
+                            "utc_offset": "-07:00"
+                        }
+                    }
+                ]
             }
         ]
     }' | python -m json.tool
