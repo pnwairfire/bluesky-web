@@ -114,6 +114,7 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
 
 
     except Exception as e:
+        db and db.record_run(input_data['run_id'], 'failed')
         raise BlueSkyJobError(str(e))
 
     finally:
