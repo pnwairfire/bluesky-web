@@ -43,6 +43,15 @@ OPTIONAL_ARGS = [
         'help': 'run the server listening on specified port (defaults to 8887)'
     },
     {
+        'long': '--output-path-prefix',
+        'help': ("Url root path prefix to access output on worker servers; "
+            "defaults to /pgv3-output")
+    },
+    {
+        'long': '--output-port',
+        'help': "Port that output web server will listen on (defaults to 8886)"
+    },
+    {
         'short': '-d',
         'long': '--debug',
         'help': 'run the server in debug mode (with auto-reloading of code, etc.)',

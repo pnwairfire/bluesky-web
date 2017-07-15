@@ -42,7 +42,7 @@ class BlueSkyJobError(RuntimeError):
     pass
 
 @app.task
-def run_bluesky(input_data, bluesky_docker_image, output_directory):
+def run_bluesky(input_data, bluesky_docker_image, output_directory, **settings):
     db = BlueSkyWebDB(MONGODB_URL)
     db.record_run(input_data['run_id'], 'dequeued', server={"ip": IP_ADDRESS})
     tornado.log.gen_log.info("Running %s from queue %s",
@@ -65,7 +65,7 @@ def run_bluesky(input_data, bluesky_docker_image, output_directory):
 
     return _run_bluesky(input_data, bluesky_docker_image,
         input_data_json=input_data_json,
-        output_directory=output_directory, db=db)
+        output_directory=output_directory, db=db, **settings)
 
 
 ##
@@ -74,7 +74,7 @@ def run_bluesky(input_data, bluesky_docker_image, output_directory):
 
 
 def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
-        output_directory=None, db=None):
+        output_directory=None, db=None, **settings):
     """
     args:
      - input_data -- bsp input data
@@ -130,10 +130,14 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
         # TODO: check output for error, and if so record status 'failed' with error message
         if output_directory:
             os.makedirs(output_directory, exist_ok=True)
-            with open(os.path.join(output_directory, 'output.json'), 'wb') as f:
+            output_filename = os.path.join(output_directory, 'output.json')
+            with open(output_filename, 'wb') as f:
                 f.write(output)
             db.record_run(input_data['run_id'], 'output_written',
-                output_url="https://{}{}")
+                output_url="https://{}:{}/{}/{}".format(IP_ADDRESS,
+                    settings.get('port', 8886),
+                    settings.get('path_prefix', 'pgv3-output').strip('/'),
+                    input_data["run_id"]))
 
         else:
             return output

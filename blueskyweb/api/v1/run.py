@@ -223,7 +223,7 @@ class RunExecuter(RunHandlerBase):
         #  only serve the purpose of being able to read data in scheduler ui
         tornado.log.gen_log.debug('input: %s', data)
         output_dir = os.path.join(self.settings['output_root_dir'],
-            self.settings['output_root_url_path'], data['run_id'])
+            self.settings['output_path_prefix'], data['run_id'])
         args = (data, self.settings['bluesky_docker_image'], output_dir)
         run_bluesky.apply_async(args, queue=queue_name)
         # TODO: call specify callback in record_run, calling
@@ -291,11 +291,11 @@ class RunExecuter(RunHandlerBase):
 
         data['config']['dispersion']['output_dir'] = os.path.join(
             self.settings['output_root_dir'],
-            self.settings['output_root_url_path'],
+            self.settings['output_path_prefix'],
             '{run_id}', 'output')
         data['config']['dispersion']['working_dir'] = os.path.join(
             self.settings['output_root_dir'],
-            self.settings['output_root_url_path'],
+            self.settings['output_path_prefix'],
             '{run_id}', 'working')
         tornado.log.gen_log.debug("Output dir: %s",
             data['config']['dispersion']['output_dir'])
