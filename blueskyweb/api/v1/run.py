@@ -94,7 +94,8 @@ class RunHandlerBase(tornado.web.RequestHandler):
 
 class RunExecuter(RunHandlerBase):
 
-    def post(self, mode=None, domain=None):
+    @tornado.web.asynchronous
+    async def post(self, mode=None, domain=None):
         if domain and domain not in domains.DOMAINS:
             self._bad_request(404, 'unrecognized domain')
             return
@@ -143,7 +144,7 @@ class RunExecuter(RunHandlerBase):
                 if self.get_query_argument('_a', default=None) is not None:
                     self._run_asynchronously(data)
                 else:
-                    self._run_in_process(data)
+                    await self._run_in_process(data)
 
         except Exception as e:
             # IF exceptions aren't caught, the traceback is returned as
@@ -215,25 +216,25 @@ class RunExecuter(RunHandlerBase):
         #self.finish()
 
     def _run_asynchronously(self, data, domain=None):
-
         queue_name = domains.DOMAINS.get(domain, {}).get('queue') or 'all-met'
 
-        # TODO: import vs call bss-scheduler?
-        # TODO: dump data to json?  works fine without doing so, so this may
-        #  only serve the purpose of being able to read data in scheduler ui
         tornado.log.gen_log.debug('input: %s', data)
         args = (data, ) # has to be a tuple
+
+        # TODO: figure out how to enqueue without blocking
         run_bluesky.apply_async(args=args, kwargs=self.settings,
             queue=queue_name)
         # TODO: call specify callback in record_run, calling
-        #    self.write in callbvack, so we can handle failure?
+        #    self.write in callback, so we can handle failure?
         self.settings['mongo_db'].record_run(data['run_id'], 'enqueued',
             queue=queue_name, modules=data["modules"])
         self.write({"run_id": data['run_id']})
 
-    def _run_in_process(self, data):
+    async def _run_in_process(self, data):
         try:
             tornado.log.gen_log.debug('input: %s', data)
+            # TODO: refactor task module so that bluesky can be
+            #    run without blocking, and use `await` here
             stdout_data = _run_bluesky(data, **self.settings)
             # TODO: make sure stdout_data is valid json?
             tornado.log.gen_log.debug('output: %s', stdout_data)

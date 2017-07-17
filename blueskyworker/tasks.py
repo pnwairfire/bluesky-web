@@ -87,7 +87,6 @@ def run_bluesky(input_data, **settings):
 ## Launching process
 ##
 
-
 def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
     """
     args:
@@ -144,7 +143,6 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
             except Exception as e:
                 tornado.log.gen_log.error('failed to parse error : %s', e)
                 pass
-
 
         if db:
             # TODO: check output for error, and if so record status 'failed' with error message
