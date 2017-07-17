@@ -36,7 +36,7 @@ app.conf.update(
 #    ip address? or maybe use ipify as a backup
 IP_ADDRESS = ipify.get_ip()
 
-def form_output_url(run_id):
+def form_output_url(run_id, **settings):
     scheme = settings.get('output_url_scheme') or 'https'
     port_str = (':' + settings['output_url_port']
         if settings.get('output_url_port') else '')
@@ -71,14 +71,9 @@ def run_bluesky(input_data, **settings):
         input_data_json = input_data
         input_data = json.loads(input_data)
 
-    # TODO:
-    #   - store server info in mongodb (under run_id key)
-    #   - stores status (start, finish, anything else) in mongodb (also under
-    #      run_id key)
-    #      (maybe run each module separately, so that more granular status
+    # TODO: (maybe run each module separately, so that more granular status
     #       can be saved in mongodb; or have this method parse logs as bsp
     #       is running
-
     return _run_bluesky(input_data, input_data_json=input_data_json, db=db,
         **settings)
 
@@ -146,15 +141,15 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
 
         if db:
             # TODO: check output for error, and if so record status 'failed' with error message
-            output_dir = os.path.join(settings['output_root_dir'],
-                settings['output_url_path_prefix'], data['run_id'])
+            output_directory = os.path.join(settings['output_root_dir'],
+                settings['output_url_path_prefix'], input_data['run_id'])
             os.makedirs(output_directory, exist_ok=True)
             output_filename = os.path.join(output_directory, 'output.json')
             with open(output_filename, 'wb') as f:
                 f.write(output)
+            output_url = form_output_url(input_data['run_id'], **settings)
             db.record_run(input_data['run_id'], 'output_written',
-                # TODO: use urllib.parse.urlunparse
-                output_url=form_output_url(input_data['run_id'], **settings))
+                output_url=output_url)
 
         else:
             return output

@@ -222,8 +222,8 @@ class RunExecuter(RunHandlerBase):
         args = (data, ) # has to be a tuple
 
         # TODO: figure out how to enqueue without blocking
-        run_bluesky.apply_async(args=args, kwargs=self.settings,
-            queue=queue_name)
+        settings = {k:v for k, v in self.settings.items() if k != 'mongo_db'}
+        run_bluesky.apply_async(args=args, kwargs=settings, queue=queue_name)
         # TODO: call specify callback in record_run, calling
         #    self.write in callback, so we can handle failure?
         self.settings['mongo_db'].record_run(data['run_id'], 'enqueued',
