@@ -946,13 +946,13 @@ consumption and emissions data.
 
 
 
-## GET /api/v1/run/<guid>/status
+## GET /api/v1/runs/<guid>
 
 This API returns the status of a specific dispersion run
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/run/<guid>/status
+ - url: $BLUESKY_API_ROOT_URL/api/v1/runs/<guid> (/api/v1/run/<guid>/status is also supported for backwards compatibility)
  - method: GET
 
 ### Response
@@ -963,7 +963,7 @@ This API returns the status of a specific dispersion run
 
 ### Example:
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/abc123/status"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123"
 
     {
         ....TODO: fill in...
@@ -979,13 +979,13 @@ or
 
 
 
-## GET /api/v1/run/<guid>/output
+## GET /api/v1/runs/<guid>/output
 
 This API returns the output location for a specific run
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/run/<guid>/output
+ - url: $BLUESKY_API_ROOT_URL/api/v1/runs/<guid>/output (/api/v1/run/<guid>/output is also supported for backwards compatibility)
  - method: GET
 
 ### Response
@@ -996,7 +996,7 @@ This API returns the output location for a specific run
 
 #### Plumerise run output
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/abc123/output"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123/output"
 
     {
         "fire_information": [
@@ -1101,7 +1101,7 @@ This API returns the output location for a specific run
 
 #### Dispersion run output
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/abc123/output"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123/output"
 
 There are currently two ways the visualization images will be specified in
 the results json object.  It depends on how you configured your run.  If you

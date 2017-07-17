@@ -57,16 +57,25 @@ DEFAULT_SETTINGS = {
 
 def get_routes(path_prefix):
     routes = [
-        # TODO: update all patterns to allow optional trailing slash
         (r"/api/ping/?", Ping),
+        # Getting information about met data
         (r"/api/v1/domains/?", DomainInfoV1),
         (r"/api/v1/domains/([^/]+)/?", DomainInfoV1),
         (r"/api/v1/domains/([^/]+)/available-dates/?", DomainAvailableDatesV1),
         (r"/api/v1/available-dates/?", DomainAvailableDatesV1),
+        # Initiating runs
         (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),
         (r"/api/v1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuterV1),
+        # Getting information about runs
+        # Note: The following paths are supported for backwards compatibility:
+        #       - /api/v1/run/<guid>/status/
+        #       - /api/v1/run/<guid>/output/
+        #     the current paths are:
+        #       - /api/v1/runs/<guid>/
+        #       - /api/v1/runs/<guid>/output/
+        (r"/api/v1/runs/([^/]+)/?", RunStatusV1),
         (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
-        (r"/api/v1/run/([^/]+)/output/?", RunOutputV1),
+        (r"/api/v1/runs?/([^/]+)/output/?", RunOutputV1),
         (r"/api/v1/runs/?", RunsInfoV1),
         (r"/api/v1/runs/(enqueued|dequeued|started|completed|failed)/?", RunsInfoV1)
     ]
