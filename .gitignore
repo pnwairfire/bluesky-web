@@ -10,3 +10,4 @@ db/
 .cache/
 docker-data/
 docker-logs/
+dev/data/*.json

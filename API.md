@@ -454,8 +454,7 @@ An example with fire location data specified as geojson
 Another exmaple, this time running only the consumption
 modules, and with fire location data specified as lat + lng + size.
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
-    {
+    $ echo '{
         "modules": ["consumption"],
         "fire_information": [
             {
@@ -483,7 +482,10 @@ modules, and with fire location data specified as lat + lng + size.
                 ]
             }
         ]
-    }' | python -m json.tool
+    }' > dev/data/emissions-input.json
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" \
+        -H 'Content-Type: application/json' \
+        -d @dev/data/emissions-input.json' | python -m json.tool
 
 
 
@@ -517,8 +519,7 @@ status and output API requests (described below).
 
 An example with fire location data specified as geojson
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/DRI6km/" -H 'Content-Type: application/json' -d '
-    {
+    $ echo '{
         "fire_information": [
             {
                 "growth": [
@@ -536,7 +537,11 @@ An example with fire location data specified as geojson
                 ]
             }
         ]
-    }' | python -m json.tool
+    }' > dev/data/plumerise-input.json
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/DRI6km/"
+        -H 'Content-Type: application/json' \
+        -d @dev/data/plumerise-input.json' | python -m json.tool
 
 
 
