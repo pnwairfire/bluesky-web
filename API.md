@@ -410,9 +410,7 @@ a "summary" key.
 
 An example with fire location data specified as geojson
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" -H 'Content-Type: application/json' -d '
-
-    {
+    $ echo '{
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
@@ -449,7 +447,12 @@ An example with fire location data specified as geojson
                 ]
             }
         ]
-    }' | python -m json.tool
+    }' > dev/data/emissions-input.json
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" \
+        -H 'Content-Type: application/json' \
+        -d @dev/data/emissions-input.json | python -m json.tool | less
+
 
 Another exmaple, this time running only the consumption
 modules, and with fire location data specified as lat + lng + size.
@@ -482,11 +485,11 @@ modules, and with fire location data specified as lat + lng + size.
                 ]
             }
         ]
-    }' > dev/data/emissions-input.json
+    }' > dev/data/consumption-input.json
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" \
         -H 'Content-Type: application/json' \
-        -d @dev/data/emissions-input.json | python -m json.tool | less
+        -d @dev/data/consumption-input.json | python -m json.tool | less
 
 
 
