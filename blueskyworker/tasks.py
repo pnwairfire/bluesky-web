@@ -41,7 +41,6 @@ def form_output_url(run_id):
     port_str = (':' + settings['output_url_port']
         if settings.get('output_url_port') else '')
     prefix = (settings.get('output_url_path_prefix') or '').strip('/')
-
     return "{}://{}{}/{}/{}".format(
         scheme, IP_ADDRESS, port_str, prefix, run_id)
 
@@ -115,8 +114,8 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
         getpass.getuser(), ' '.join(bsp_cmd))
 
     client = docker.from_env()
-    container = client.containers.create(bluesky_docker_image, bsp_cmd,
-        name=container_name, volumes=volumes_dict)
+    container = client.containers.create(settings['bluesky_docker_image'],
+        bsp_cmd, name=container_name, volumes=volumes_dict)
     try:
         # TODO: if not capturing output,
         #     - write logs to file, in dispersion output dir or where
