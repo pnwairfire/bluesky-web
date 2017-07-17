@@ -11,13 +11,13 @@ services:
     ports:
     - 8887:8887
     volumes:
-    - ./:/usr/src/blueskyweb/
-    - ./docker-logs/web/:/var/log/blueskyweb/
+    - $PWD/:/usr/src/blueskyweb/
+    - $PWD/docker-logs/web/:/var/log/blueskyweb/
     - /var/run/docker.sock:/var/run/docker.sock
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    command: bsp-web -d -b bluesky --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix=
+    command: bsp-web -d -b bluesky -o /data/blueskyweb/dev/output/ --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
   mongo:
     image: mongo:3.4.6
     container_name: bluesky-web-mongo
@@ -28,10 +28,10 @@ services:
     ports:
     - 27018:27017
     volumes:
-    - ./docker-logs/mongodb/:/var/log/mongodb/
-    - ./docker-data/mongodb/db/:/data/db/
-    - ./docker-data/mongodb/configdb/:/data/configdb/
-    #- ./mongo-entrypoint/:/docker-entrypoint-initdb.d/
+    - $PWD/docker-logs/mongodb/:/var/log/mongodb/
+    - $PWD/docker-data/mongodb/db/:/data/db/
+    - $PWD/docker-data/mongodb/configdb/:/data/configdb/
+    #- $PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/
     # Note: '--auth' is automatically added to command if
     #   MONGO_INITDB_ROOT_[USERNAME|PASSWORD] are set
     # see
@@ -43,15 +43,16 @@ services:
     image: python:3.5-alpine
     container_name: bluesky-web-output
     volumes:
-    - ./docker-data/output/:/data/output/
+    - $PWD/docker-data/output/:/data/output/
     working_dir: /data/output/
     command: python -m http.server 8886
   worker_all_met:
     image: bluesky-web
     container_name: bluesky-web-worker-all-met
     volumes:
-    - ./:/usr/src/blueskyweb/
-    - ./docker-logs/worker/all-met/:/var/log/blueskyworker/
+    - $PWD/:/usr/src/blueskyweb/
+    - $PWD/docker-logs/worker/all-met/:/var/log/blueskyworker/
+    - $PWD/docker-data/output/:/data/blueskyweb/dev/output/
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
@@ -60,8 +61,9 @@ services:
     image: bluesky-web
     container_name: bluesky-web-worker-dri
     volumes:
-    - ./:/usr/src/blueskyweb/
-    - ./docker-logs/worker/dri/:/var/log/blueskyworker/
+    - $PWD/:/usr/src/blueskyweb/
+    - $PWD/docker-logs/worker/dri/:/var/log/blueskyworker/
+    - $PWD/docker-data/output/:/data/blueskyweb/dev/output/
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
@@ -70,8 +72,9 @@ services:
     image: bluesky-web
     container_name: bluesky-web-worker-nam
     volumes:
-    - ./:/usr/src/blueskyweb/
-    - ./docker-logs/worker/nam/:/var/log/blueskyworker/
+    - $PWD/:/usr/src/blueskyweb/
+    - $PWD/docker-logs/worker/nam/:/var/log/blueskyworker/
+    - $PWD/docker-data/output/:/data/blueskyweb/dev/output/
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
