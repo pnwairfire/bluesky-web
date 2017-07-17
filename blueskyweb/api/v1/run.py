@@ -222,10 +222,9 @@ class RunExecuter(RunHandlerBase):
         # TODO: dump data to json?  works fine without doing so, so this may
         #  only serve the purpose of being able to read data in scheduler ui
         tornado.log.gen_log.debug('input: %s', data)
-        output_dir = os.path.join(self.settings['output_root_dir'],
-            self.settings['output_url_path_prefix'], data['run_id'])
-        args = (data, self.settings['bluesky_docker_image'], output_dir)
-        run_bluesky.apply_async(args, queue=queue_name)
+        args = (data, ) # has to be a tuple
+        run_bluesky.apply_async(args=args, kwargs=self.settings,
+            queue=queue_name)
         # TODO: call specify callback in record_run, calling
         #    self.write in callbvack, so we can handle failure?
         self.settings['mongo_db'].record_run(data['run_id'], 'enqueued',
@@ -235,8 +234,7 @@ class RunExecuter(RunHandlerBase):
     def _run_in_process(self, data):
         try:
             tornado.log.gen_log.debug('input: %s', data)
-            stdout_data = _run_bluesky(data,
-                self.settings['bluesky_docker_image'])
+            stdout_data = _run_bluesky(data, **self.settings)
             # TODO: make sure stdout_data is valid json?
             tornado.log.gen_log.debug('output: %s', stdout_data)
             self.write(stdout_data)

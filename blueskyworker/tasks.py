@@ -32,7 +32,18 @@ app.conf.update(
     }
 )
 
+# TODO: pass hostname in via env var rather than use ipify to get
+#    ip address? or maybe use ipify as a backup
 IP_ADDRESS = ipify.get_ip()
+
+def form_output_url(run_id):
+    scheme = settings.get('output_url_scheme') or 'https'
+    port_str = (':' + settings['output_url_port']
+        if settings.get('output_url_port') else '')
+    prefix = (settings.get('output_url_path_prefix') or '').strip('/')
+
+    return "{}://{}{}/{}/{}".format(
+        scheme, IP_ADDRESS, port_str, prefix, run_id)
 
 ##
 ## Public Job Interface
@@ -42,7 +53,13 @@ class BlueSkyJobError(RuntimeError):
     pass
 
 @app.task
-def run_bluesky(input_data, bluesky_docker_image, output_directory, **settings):
+def run_bluesky(input_data, **settings):
+    """
+    args:
+     - input_data -- bsp input data
+    Settings:
+     See `_run_bluesky` helpstring for required settings
+    """
     db = BlueSkyWebDB(MONGODB_URL)
     db.record_run(input_data['run_id'], 'dequeued', server={"ip": IP_ADDRESS})
     tornado.log.gen_log.info("Running %s from queue %s",
@@ -63,9 +80,8 @@ def run_bluesky(input_data, bluesky_docker_image, output_directory, **settings):
     #       can be saved in mongodb; or have this method parse logs as bsp
     #       is running
 
-    return _run_bluesky(input_data, bluesky_docker_image,
-        input_data_json=input_data_json,
-        output_directory=output_directory, db=db, **settings)
+    return _run_bluesky(input_data, input_data_json=input_data_json, db=db,
+        **settings)
 
 
 ##
@@ -73,18 +89,21 @@ def run_bluesky(input_data, bluesky_docker_image, output_directory, **settings):
 ##
 
 
-def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
-        output_directory=None, db=None, **settings):
+def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
     """
     args:
      - input_data -- bsp input data
-     - bluesky_docker_image -- name of bluesky docker image, with version
     kwargs:
      - input_data_json -- already dumped json string, to avoid repeated dump;
         not necessarily set by outside clients of this code
-     - output_directory -- were to write output; if not defined, then
-        output returned without writing to disk
      - db -- bsp web mongodb client to record run status
+    Settings:
+     Always required:
+      - bluesky_docker_image -- name of bluesky docker image, with version
+     Required if writing to db (i.e. if `db` is defined):
+      - output_url_scheme
+      - output_url_port
+      - output_url_path_prefix
     """
     run_id = input_data.get('run_id') or str(uuid.uuid1()).replace('-','')
     input_data['run_id'] = run_id # in case it was just generated
@@ -127,17 +146,18 @@ def _run_bluesky(input_data, bluesky_docker_image, input_data_json=None,
                 tornado.log.gen_log.error('failed to parse error : %s', e)
                 pass
 
-        # TODO: check output for error, and if so record status 'failed' with error message
-        if output_directory:
+
+        if db:
+            # TODO: check output for error, and if so record status 'failed' with error message
+            output_dir = os.path.join(settings['output_root_dir'],
+                settings['output_url_path_prefix'], data['run_id'])
             os.makedirs(output_directory, exist_ok=True)
             output_filename = os.path.join(output_directory, 'output.json')
             with open(output_filename, 'wb') as f:
                 f.write(output)
             db.record_run(input_data['run_id'], 'output_written',
-                output_url="https://{}:{}/{}/{}".format(IP_ADDRESS,
-                    settings.get('port', 8886),
-                    settings.get('path_prefix', 'pgv3-output').strip('/'),
-                    input_data["run_id"]))
+                # TODO: use urllib.parse.urlunparse
+                output_url=form_output_url(input_data['run_id'], **settings))
 
         else:
             return output
