@@ -364,6 +364,7 @@ class RunExecuter(RunHandlerBase):
 
 class RunStatus(RunHandlerBase):
 
+    @tornado.web.asynchronous
     async def get(self, run_id):
         # TODO: implement using data form mongodb
         run = await self.settings['mongo_db'].find_run(run_id)
@@ -376,6 +377,16 @@ class RunStatus(RunHandlerBase):
 
 
 class RunOutput(RunHandlerBase):
+
+    @tornado.web.asynchronous
+    async def get(self, run_id):
+        # TODO: implement using data form mongodb
+        run = await self.settings['mongo_db'].find_run(run_id)
+        if not run:
+            self.set_status(404, "Run doesn't exist")
+            self.write({"error": "Run doesn't exist"})
+        else:
+            self._get(run)
 
     ## Output json parsing methods
 
@@ -507,12 +518,6 @@ class RunOutput(RunHandlerBase):
     #         self._get(get_output_url(run_id), remote_exists, remote_open,
     #             EXPORT_CONFIGURATION['scp'], run_id)
 
-    ## CRUD API
-
-    def get(self, run_id):
-        # TODO: get run info from mongodb
-        # TODO: if not dispersion (i.e. plumerise), return actual output json
-        self.set_status(501, "Not Implemented")
 
 
 
