@@ -52,7 +52,8 @@ DEFAULT_SETTINGS = {
     # Output url - to access output from the outside world
     'output_url_scheme': 'https',
     'output_url_port': None, # 80
-    'output_url_path_prefix': 'pgv3-output'
+    'output_url_path_prefix': 'pgv3-output',
+    'bluesky_log_level': logging.INFO
 }
 
 def get_routes(path_prefix):

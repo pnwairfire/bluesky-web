@@ -97,12 +97,28 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
       - output_url_scheme
       - output_url_port
       - output_url_path_prefix
+
+    If this is an asynchronous run (i.e. `db` is defined), then we'll
+    mount the output directory to the host machine's output directory;
+    otherwise, we'll mount to host machines /tmp/, since we'll just
+    read it here and then forget about it.
     """
     run_id = input_data.get('run_id') or str(uuid.uuid1()).replace('-','')
     input_data['run_id'] = run_id # in case it was just generated
     container_name = 'bsp-playground-{}'.format(run_id)
-    bsp_cmd = 'bsp -i /tmp/fires.json -o /tmp/output.json'
+    output_dir = os.path.abspath(os.path.join(settings['output_root_dir'],
+        settings['output_url_path_prefix'], input_data['run_id']))
+    output_json_filename = os.path.join(output_dir, 'output.json')
+    output_log_filename = os.path.join(output_dir, 'output.log')
+    bsp_cmd = ('bsp -i /tmp/fires.json -o {} '
+        '--log-file={} --log-level={}'.format(
+        output_json_filename, output_log_filename,
+        settings['bluesky_log_level']))
     volumes_dict = _get_volumes_dict(input_data)
+    host_output_dir = output_dir if db else '/tmp'
+    os.makedirs(host_output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
+    volumes_dict[host_output_dir] = {'bind': output_dir, 'mode': 'rw'}
+
     input_data_json = input_data_json or json.dumps(input_data)
     tornado.log.gen_log.info("bsp docker command (as user %s): %s",
         getpass.getuser(), ' '.join(bsp_cmd))
@@ -128,9 +144,13 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
         # TODO: rather than just wait, poll the logs and report status?
         docker.APIClient().wait(container.id)
         db and db.record_run(input_data['run_id'], 'completed')
-        output = _get_output(container)
+        with open(os.path.join(host_output_dir, 'output.json'), 'r') as f:
+            output = f.read()
+
         if db:
             try:
+                # check output for error, and if so record status
+                # 'failed' with error message
                 error = json.loads(output.decode()).get('error')
                 if error:
                     db.record_run(input_data['run_id'], 'failed', error=error)
@@ -139,14 +159,6 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
                 tornado.log.gen_log.error('failed to parse error : %s', e)
                 pass
 
-        if db:
-            # TODO: check output for error, and if so record status 'failed' with error message
-            output_directory = os.path.join(settings['output_root_dir'],
-                settings['output_url_path_prefix'], input_data['run_id'])
-            os.makedirs(output_directory, exist_ok=True)
-            output_filename = os.path.join(output_directory, 'output.json')
-            with open(output_filename, 'wb') as f:
-                f.write(output)
             output_url = form_output_url(input_data['run_id'], **settings)
             db.record_run(input_data['run_id'], 'output_written',
                 output_url=output_url)
@@ -155,6 +167,7 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
             return output
 
     except Exception as e:
+        #tornado.log.gen_log.debug(traceback.format_exc())
         db and db.record_run(input_data['run_id'], 'failed',
             error={"message": str(e)})
         raise BlueSkyJobError(str(e))
@@ -175,10 +188,10 @@ def _create_input_file(input_data_json, container):
     tar_stream.seek(0)
     container.put_archive(path='/tmp', data=tar_stream)
 
-def _get_output(container):
+def _read_file_from_sibling_docker_container(container, file_pathname):
     # TODO: figure out how to extract output from tar stream,
     #    to avoid having to write to file first
-    response = container.get_archive('/tmp/output.json')[0]
+    response = container.get_archive(file_pathname)[0]
     tarfilename = '/tmp/' + str(uuid.uuid1()) + '.tar'
     with open(tarfilename, 'wb') as f:
         #f.write(response.read())
@@ -187,7 +200,7 @@ def _get_output(container):
 
     output = None
     with tarfile.open(tarfilename) as t:
-        output = t.extractfile('output.json').read()
+        output = t.extractfile(os.path.basename(file_pathname)).read()
 
     # TODO: remove tarfile
 

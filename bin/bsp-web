@@ -28,7 +28,7 @@ REQUIRED_ARGS = [
     {
         'short': '-o',
         'long': '--output-root-dir',
-        'help': "root directory of output"
+        'help': "root directory of output on worker machines"
     }
 ]
 
@@ -56,6 +56,11 @@ OPTIONAL_ARGS = [
         'long': '--output-url-scheme',
         'help': "http vs https (defaults to {})".format(
             DEFAULT_SETTINGS['output_url_scheme'])
+    },
+    {
+        'long': '--bluesky-log-level',
+        'help': "Log level of bluesky pipeline run".format(
+            DEFAULT_SETTINGS['bluesky_log_level'])
     },
     {
         'short': '-d',
