@@ -49,8 +49,10 @@ DEFAULT_SETTINGS = {
     'port': 8887,
     'mongodb_url': "mongodb://localhost:27018/blueskyweb",
     'log_file': '/var/log/blueskyweb/bluesky-web.log',
-    'output_path_prefix': 'pgv3-output',
-    'output_port': 8886
+    # Output url - to access output from the outside world
+    'output_url_scheme': 'https',
+    'output_url_port': None, # 80
+    'output_url_path_prefix': 'pgv3-output'
 }
 
 def get_routes(path_prefix):

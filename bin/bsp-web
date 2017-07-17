@@ -12,12 +12,12 @@ import tornado.log
 import afscripting as scripting
 
 try:
-    from blueskyweb.app import main
+    from blueskyweb.app import main, DEFAULT_SETTINGS
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from blueskyweb.app import main
+    from blueskyweb.app import main, DEFAULT_SETTINGS
 
 REQUIRED_ARGS = [
     {
@@ -43,13 +43,19 @@ OPTIONAL_ARGS = [
         'help': 'run the server listening on specified port (defaults to 8887)'
     },
     {
-        'long': '--output-path-prefix',
-        'help': ("Url root path prefix to access output on worker servers; "
-            "defaults to /pgv3-output")
+        'long': '--output-url-path-prefix',
+        'help': ("Url root path prefix to access output on worker servers "
+            "(defaults to {})".format(DEFAULT_SETTINGS['output_url_path_prefix']))
     },
     {
-        'long': '--output-port',
-        'help': "Port that output web server will listen on (defaults to 8886)"
+        'long': '--output-url-port',
+        'help': ("Port that output web server will listen on "
+            "(defaults to {})".format(DEFAULT_SETTINGS['output_url_port']))
+    },
+    {
+        'long': '--output-url-scheme',
+        'help': "http vs https (defaults to {})".format(
+            DEFAULT_SETTINGS['output_url_scheme'])
     },
     {
         'short': '-d',

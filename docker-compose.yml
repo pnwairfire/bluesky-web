@@ -17,7 +17,7 @@ services:
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    command: bsp-web -d -b bluesky --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG
+    command: bsp-web -d -b bluesky --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix=
   mongo:
     image: mongo:3.4.6
     container_name: bluesky-web-mongo
