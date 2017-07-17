@@ -108,20 +108,22 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
     container_name = 'bsp-playground-{}'.format(run_id)
     output_dir = os.path.abspath(os.path.join(settings['output_root_dir'],
         settings['output_url_path_prefix'], input_data['run_id']))
+    tornado.log.gen_log.debug('Output dir: %s', output_dir)
     output_json_filename = os.path.join(output_dir, 'output.json')
     output_log_filename = os.path.join(output_dir, 'output.log')
     bsp_cmd = ('bsp -i /tmp/fires.json -o {} '
         '--log-file={} --log-level={}'.format(
         output_json_filename, output_log_filename,
         settings['bluesky_log_level']))
+    tornado.log.gen_log.debug('bsp command: %s', bsp_cmd)
     volumes_dict = _get_volumes_dict(input_data)
-    host_output_dir = output_dir if db else '/tmp'
-    os.makedirs(host_output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
-    volumes_dict[host_output_dir] = {'bind': output_dir, 'mode': 'rw'}
+    os.makedirs(output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
+    volumes_dict[output_dir] = {'bind': output_dir, 'mode': 'rw'}
+    tornado.log.gen_log.debug('volumes dict: %s', volumes_dict)
 
     input_data_json = input_data_json or json.dumps(input_data)
     tornado.log.gen_log.info("bsp docker command (as user %s): %s",
-        getpass.getuser(), ' '.join(bsp_cmd))
+        getpass.getuser(), bsp_cmd)
 
     client = docker.from_env()
     container = client.containers.create(settings['bluesky_docker_image'],
@@ -144,7 +146,7 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
         # TODO: rather than just wait, poll the logs and report status?
         docker.APIClient().wait(container.id)
         db and db.record_run(input_data['run_id'], 'completed')
-        with open(os.path.join(host_output_dir, 'output.json'), 'r') as f:
+        with open(output_json_filename, 'r') as f:
             output = f.read()
 
         if db:

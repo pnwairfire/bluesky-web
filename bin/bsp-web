@@ -43,9 +43,9 @@ OPTIONAL_ARGS = [
         'help': 'run the server listening on specified port (defaults to 8887)'
     },
     {
-        'long': '--output-url-path-prefix',
-        'help': ("Url root path prefix to access output on worker servers "
-            "(defaults to {})".format(DEFAULT_SETTINGS['output_url_path_prefix']))
+        'long': '--output-url-scheme',
+        'help': "http vs https (defaults to {})".format(
+            DEFAULT_SETTINGS['output_url_scheme'])
     },
     {
         'long': '--output-url-port',
@@ -53,9 +53,9 @@ OPTIONAL_ARGS = [
             "(defaults to {})".format(DEFAULT_SETTINGS['output_url_port']))
     },
     {
-        'long': '--output-url-scheme',
-        'help': "http vs https (defaults to {})".format(
-            DEFAULT_SETTINGS['output_url_scheme'])
+        'long': '--output-url-path-prefix',
+        'help': ("Url root path prefix to access output on worker servers "
+            "(defaults to {})".format(DEFAULT_SETTINGS['output_url_path_prefix']))
     },
     {
         'long': '--bluesky-log-level',
