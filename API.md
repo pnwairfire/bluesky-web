@@ -483,9 +483,10 @@ modules, and with fire location data specified as lat + lng + size.
             }
         ]
     }' > dev/data/emissions-input.json
+
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" \
         -H 'Content-Type: application/json' \
-        -d @dev/data/emissions-input.json' | python -m json.tool
+        -d @dev/data/emissions-input.json | python -m json.tool | less
 
 
 
@@ -539,9 +540,9 @@ An example with fire location data specified as geojson
         ]
     }' > dev/data/plumerise-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/DRI6km/"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/DRI6km/" \
         -H 'Content-Type: application/json' \
-        -d @dev/data/plumerise-input.json' | python -m json.tool
+        -d @dev/data/plumerise-input.json | python -m json.tool | less
 
 
 
