@@ -414,7 +414,9 @@ class RunOutput(RunHandlerBase):
     ##
 
     def _get_plumerise(self, run, output):
-        pass
+        output = {k:v for k,v in output.items()
+            if k in ('run_id', 'fire_information')}
+        self.write(output)
 
     ##
     ## Dispersion
