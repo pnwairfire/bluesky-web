@@ -1164,14 +1164,13 @@ This API returns the output location for a specific run
     }
 
 
-
 #### Dispersion run output
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123/output"
 
-There are currently two ways the visualization images will be specified in
-the results json object.  It depends on how you configured your run.  If you
-set 'image_results_version=v2' in the original post request, you'll get
+There are currently two ways the visualization images will be
+specified in the results json object.  If you specify
+'image_results_version=v2' in the output request, you'll get
 something like the following:
 
     {
