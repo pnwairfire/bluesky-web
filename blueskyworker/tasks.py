@@ -257,8 +257,9 @@ def _get_met_dirs(input_data):
     met_dirs = [
         _get_val(input_data, 'config', 'findmetdata', "met_root_dir"),
     ]
-    # TODO: look in input_data > met > files, in case findmetdata
-    #   was bypassed and met files were specified manually
+    met_files = [e['file'] for e in input_data.get('met', {}).get('files', [])]
+    met_dirs.extend(list(set([os.path.dirname(f) for f in met_files])))
+
     return met_dirs
 
 def _get_output_and_working_dirs(input_data):
