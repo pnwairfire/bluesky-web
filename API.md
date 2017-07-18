@@ -553,15 +553,16 @@ An example with fire location data specified as geojson
 
 ## POST /api/v1/run/dispersion/<met_domain>/
 
-This API takes emissions data and runs bluesky through dispersion and
-visualization.  It's the dispersion API to be used for met-dependent
-dispersion models (e.g. hysplit, which currently the only such model
-supported).
+This API takes consumption, emissions, and plumerise data and runs
+bluesky through dispersion and visualization.  It's the dispersion
+API to be used for met-dependent dispersion models (e.g. hysplit,
+which is currently the only such model supported).
 
 Like with the emissions API, This API requires posted JSON with three
 possible top level keys - 'fire_information', 'config', and 'modules.
-The 'fire_information' key is required, and must contain emissions data
-and growth time windows for each fire. The 'config' key is also
+The 'fire_information' key is required, and must contain
+growth time windows with consumption, emissions, and plumerise data
+for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
 and num_hours.  The 'modules' key is optional.
 
@@ -575,10 +576,8 @@ status and output API requests (described below).
 
 ### Examples
 
-Since this API requires emissions data, consumption data is not required,
-and so has been optionally stripped from the following requests
-
-#### Localmet and plumerise already run
+The following is a simple example that runs dispersion for only
+one hour.
 
     $  echo '{
         "fire_information": [
@@ -600,6 +599,27 @@ and so has been optionally stripped from the following requests
                             "longitude": -119.7615805,
                             "utc_offset": "-07:00"
                         },
+                        "heat": {
+                            "total": [
+                                3901187352927.508
+                            ],
+                            "residual": [
+                                1312164844326.5745
+                            ],
+                            "flaming": [
+                                1395852418045.9065
+                            ],
+                            "smoldering": [
+                                1193170090555.0266
+                            ]
+                        },
+                        "consumption": {
+                            "summary": {
+                                "smoldering": [21712.600892425173],
+                                "flaming": [40988.711969791053],
+                                "residual": [13823.389194227209]
+                            }
+                        },
                         "fuelbeds": [
                             {
                                 "fccs_id": "49",
@@ -617,40 +637,6 @@ and so has been optionally stripped from the following requests
                                 }
                             }
                         ],
-                        "localmet": {
-                            "2014-05-29T17:00:00": {
-                                "TEMP": [18.9,18.0,17.1,15.9,14.4,12.8,11.0,9.4,7.1,4.0,0.34,-5.0,-11.8,-18.0,-23.8,-29.5,-35.1,-41.3,-48.0,-53.6,-57.0,-57.6,-57.0,-57.1,-58.5,-60.2,-61.2,-61.7,-61.8,-61.8,-61.2],
-                                "RELH": [20.118608669639134,20.455560242267424,20.707708096204268,22.03241602522676,22.999619573138613,24.06106447989768,24.41728102957821,16.03683400197446,11.099793025043102,9.236240428993268,8.886336621064157,11.372462088617617,21.152632300624326,31.24327262763656,40.14354990264358,52.37954255073795,55.305642491056254,51.56344891488525,38.385086906506345,24.129373559853594,14.93578385517181,13.3344176585832,5.162987011664329,4.19664135432114,3.945912123639419,3.744828827069603,1.264857160782035,0.4795238439421066,0.16176666191454495,0.08897166405299972,0.09034694005585964],
-                                "sunrise_hour": 6.0,
-                                "SHGT": 1472.0,
-                                "HPBL": 100.0,
-                                "PBLH": 770.0,
-                                "HGTS": [1359.3566495827665,1426.9898045331631,1524.4027918914464,1642.5578286940072,1802.2954601443178,1995.3622802185055,2234.2041165813416,2565.534551837579,2987.574123779814,3416.915748023283,3878.781296757666,4549.6073666928905,5432.7746075781115,6328.970662440699,7234.854726013943,8145.368040180117,9075.405854211265,10022.305476071488,10981.449306410641,11945.31079168034,12975.402503889687,14044.394573313946,15101.72267790848,16292.89241561934,17458.301486042972,18712.940611562906,20077.39600222122,21581.33380820919,23270.279977561968,25534.516727442915,28825.25346629527],
-                                "PRSS": 852.0,
-                                "TPP6": null,
-                                "VWND": [1.1,1.4,1.5,1.7,2.2,2.7,3.6,5.4,5.4,4.7,4.3,5.9,8.8,11.8,13.6,14.3,15.1,17.1,19.3,19.5,17.9,16.0,14.7,13.2,11.7,9.8,9.7,10.4,9.8,8.0,5.7],
-                                "WWND": [-57.0,-44.0,-17.3,8.8,8.2,0.0,-15.5,-28.9,-28.6,-14.4,-14.6,-15.8,-17.1,0.0,0.0,11.3,11.5,18.9,17.6,10.6,0.0,-5.5,-7.1,-5.5,-4.0,-1.6,0.24,-0.13,-0.93,-1.7,278.0],
-                                "U10M": 3.9,
-                                "pressure_at_surface": 0.0,
-                                "dew_point": [-4.701260686930368,-5.238182820022018,-5.836130169464127,-6.026178810980127,-6.736434548425223,-7.514023090387241,-8.875396496680423,-15.603041893258137,-21.950586393736444,-26.559533401537493,-29.890467901995123,-31.448765921634873,-30.306448434913193,-31.46608789877405,-34.0154309054422,-36.49860426269589,-41.237377381247285,-47.79534678598489,-56.75535831782929,-65.74952140451904,-72.47745437920801,-73.84363597922572,-80.19557390774395,-81.71103522123744,-83.22872422606838,-84.90896912833261,-92.58411425355243,-96.70406899255195,-96.77368668652971,-96.77368668652971,-96.35614420062694],
-                                "WDIR": [253.4,250.4,249.9,247.8,240.9,226.1,198.3,177.1,164.1,155.4,155.7,182.2,208.2,212.9,216.8,223.9,228.4,227.5,222.0,217.4,219.0,226.1,231.6,230.7,227.0,223.4,211.0,196.6,183.5,167.9,142.0],
-                                "TPP3": null,
-                                "WSPD": [3.8,4.2,4.4,4.4,4.4,3.9,3.8,5.4,5.7,5.2,4.8,5.9,9.9,13.9,16.9,19.6,22.5,25.1,25.8,24.4,22.9,22.8,23.3,20.6,17.0,13.3,11.2,10.8,9.8,8.2,7.3],
-                                "pressure": [849.0,842.0,832.0,820.0,804.0,785.0,762.0,731.0,693.0,656.0,618.0,566.0,503.0,445.0,392.0,344.0,300.0,260.0,224.0,192.0,162.0,135.0,112.0,90.0,72.0,56.0,42.0,30.0,20.0,11.0,4.0],
-                                "lng": -119.7615805,
-                                "T02M": 19.9,
-                                "TO2M": null,
-                                "sunset_hour": -4.0,
-                                "TPOT": [306.1,305.9,305.8,305.9,306.0,306.2,306.6,308.4,310.2,311.4,312.1,313.1,314.7,317.2,319.8,323.1,326.3,328.8,330.8,334.2,341.4,353.5,368.6,383.2,396.0,408.4,422.5,437.8,454.3,471.4,490.1],
-                                "V10M": 2.4,
-                                "UWND": [3.6,3.9,4.1,4.0,3.8,2.8,1.2,-0.33,-1.6,-2.2,-2.0,0.16,4.6,7.4,10.0,13.5,16.7,18.3,17.0,14.6,14.2,16.2,18.1,15.8,12.3,9.0,5.7,3.0,0.5,-1.8,-4.5],
-                                "TPPA": 0.0,
-                                "lat": 37.909644,
-                                "SPHU": [3.2,3.1,3.0,3.0,2.9,2.8,2.6,1.6,1.0,0.71,0.56,0.53,0.66,0.67,0.6,0.54,0.39,0.23,0.1,0.04,0.02,0.02,0.01,0.01,0.01,0.01,0.004,0.002,0.001,0.001,0.003],
-                                "PRES": [849.0,842.0,833.0,821.0,805.0,787.0,766.0,737.0,702.0,666.0,630.0,582.0,522.0,468.0,419.0,373.0,332.0,295.0,261.0,230.0,202.0,177.0,155.0,135.0,118.0,103.0,89.6,78.4,68.8,60.5,53.3],
-                                "RH2M": null
-                            }
-                        },
                         "plumerise": {
                             "2014-05-29T17:00:00": {
                                 "percentile_015": 204.81921283270026,
@@ -686,20 +672,6 @@ and so has been optionally stripped from the following requests
                 "start": "2014-05-30T00:00:00",
                 "num_hours": 1
             }
-        },
-        "met": {
-            "files": [
-                {
-                    "file": "/data/Met/CANSAC/6km/ARL/wrfout_d2.20140530.f00-11_12hr01.arl",
-                    "first_hour": "2014-05-30T00:00:00",
-                    "last_hour": "2014-05-30T11:00:00"
-                },
-                {
-                    "file": "/data/Met/CANSAC/6km/ARL/wrfout_d2.20140530.f00-11_12hr01.arl",
-                    "first_hour": "2014-05-30T12:00:00",
-                    "last_hour": "2014-05-30T23:00:00"
-                }
-            ]
         }
     }' > dev/data/dispersion-hysplit-input.json
 
@@ -717,65 +689,6 @@ and emissions data will all be of length 1.
 
 Note that the growth start and end timestamps are local time, whereas the
 dispersion start time is in UTC.
-
-
-
-#### Localmet and plumerise not yet run
-
-NOTE: passing data in without plumerise and localmet data may
-not be supported. It's TBD
-
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI6km/" -H 'Content-Type: application/json' -d '
-    {
-        "fire_information": [
-            {
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Yosemite, CA"
-                },
-                "id": "SF11C14225236095807750",
-                "type": "wildfire",
-                "growth": [
-                    {
-                        "location": {
-                            "area": 10000,
-                            "ecoregion": "western",
-                            "latitude": 37.909644,
-                            "longitude": -119.7615805,
-                            "utc_offset": "-07:00"
-                        },
-                        "fuelbeds": [
-                            {
-                                "fccs_id": "49",
-                                "pct": 50.0,
-                                "emissions": {
-                                    "flaming": {
-                                        "PM25": [3002.3815120047017005]
-                                    },
-                                    "residual": {
-                                        "PM25": [4002.621500211796271]
-                                    },
-                                    "smoldering": {
-                                        "PM25": [623.424985839975172]
-                                    }
-                                }
-                            }
-                        ],
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        "pct": 100.0
-                    }
-                ]
-            }
-        ],
-        "config": {
-            "dispersion": {
-                "start": "2014-05-30T00:00:00",
-                "num_hours": 24
-            }
-        }
-    }' | python -m json.tool
-
 
 
 
