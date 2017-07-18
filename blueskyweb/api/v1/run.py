@@ -405,12 +405,16 @@ class RunOutput(RunHandlerBase):
                 self.write({'error': "Getting {} output not "
                     "implemented.".format(run['modules'][-1])})
 
+    ##
     ## Plumerise
+    ##
 
     def _get_plumerise(self, run, output):
         pass
 
+    ##
     ## Dispersion
+    ##
 
     def _get_dispersion(self, run, output):
         r = {}
@@ -437,7 +441,7 @@ class RunOutput(RunHandlerBase):
             # kmzs (vsmoke dispersion produces kmzs)
             self._parse_kmzs_info(r, disp_info)
 
-        # TODO: list fire_*.csv if specified in output_json
+        # TODO: list fire_*.csv if specified in output
 
         return r
 
@@ -472,86 +476,49 @@ class RunOutput(RunHandlerBase):
 
 
 
-    ## Commont methods
+    ##
+    ## Common methods
+    ##
 
     def _load_output(self, run):
+        # TODO: Maybe first try local no matter what, since is_same_host might
+        #   give false negative and checking local shouldn't give false postive
+        #   (only do this if is_same_host returns false negative in production)
         if is_same_host(run):
-            self._load_local_output(run)
+            tornado.log.gen_log.debug('Loading local output')
+            return self._get(run['output_dir'], os.path.exists, open)
         else:
-            self._load_remote_output(run)
+            tornado.log.gen_log.debug('Loading remote output')
+            return self._get(run['output_url'], remote_exists, remote_open)
 
-    def _load_local_output(self, run):
-        pass
+    def _get(self, output_location, exists_func, open_func):
+        """Gets information about the outpu output, which may be in local dir
+        or on remote host
 
-    def _load_remote_output(self, run):
-        pass
+        args:
+         - output_location -- local pathname or url
+         - exists_func -- function to check existence of dir or file
+            (local or via http)
+         - open_func -- function to open output json file (local or via http)
+        """
+        tornado.log.gen_log.debug('Looking for output in %s', output_location)
+        if not exists_func(output_location):
+            msg = "Output location doesn't exist: {}".format(output_location)
+            raise tornado.web.HTTPError(status_code=404, log_message=msg)
 
+        # use join instead of os.path.join in case output_location is a remote url
+        output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
+        if not exists_func(output_json_file):
+            msg = "Output file doesn't exist: {}".format(output_json_file)
+            raise tornado.web.HTTPError(status_code=404, log_message=msg)
 
-
-
-    # ## Generic output get methdo
-
-    # def _get(self, output_location, exists_func, open_func, config, run_id):
-    #     """Gets information about the outpu output, which may be in local dir
-    #     or on remote host
-
-    #     args:
-    #      - output_location -- local pathname or url
-    #      - exists_func -- function to check existence of dir or file
-    #         (local or via http)
-    #      - open_func -- function to open output json file (local or via http)
-    #     """
-    #     tornado.log.gen_log.debug('Looking for output in %s', output_location)
-    #     if not exists_func(output_location):
-    #         self._bad_request(404, "Output location doesn't exist: {}".format(output_location))
-    #         return
-
-    #     else:
-    #         r = {
-    #             # TODO: use get_output_url for form root_url
-    #             "root_url": "{}://{}{}".format(config['protocol'] or self.request.protocol,
-    #                 # TODO: use self.request.remote_ip instead of self.request.host
-    #                 # TODO: call _get_host
-    #                 config['host'] or self.request.host,
-    #                 os.path.join(config['url_root_dir'], run_id))
-    #         }
-    #         # use join instead of os.path.join in case output_location is a remote url
-    #         output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
-    #         if exists_func(output_json_file):
-    #             with open_func(output_json_file) as f:
-    #                 try:
-    #                     r.update(self._parse_output(json.loads(f.read())))
-    #                     # TODO: set fields here, using , etc.
-    #                 except:
-    #                     pass
-
-    #         self.write(r)
-
-    # ## localsave
-
-    # def _get_localsave(self, run_id):
-    #     # if bsp workers are on another machine, this will never return an
-    #     # accurate response. ('localsave' should only be used when running
-    #     # everything on one server)
-    #     output_dir = os.path.join(EXPORT_CONFIGURATION['dest_dir'], run_id)
-    #     self._get(output_dir, os.path.exists, open, EXPORT_CONFIGURATION, run_id)
-
-    # ## upload
-
-    # def _get_upload(self, run_id):
-    #     if is_same_host(self.request.host):
-    #         tornado.log.gen_log.debug("Uploaded export is local")
-    #         # Note: alternatively, we could do the following:
-    #         #  > EXPORT_CONFIGURATION['dest_dir'] = EXPORT_CONFIGURATION['scp']['dest_dir']
-    #         #  > EXPORT_CONFIGURATION['url_root_dir'] = EXPORT_CONFIGURATION['scp']['url_root_dir']
-    #         #  > EXPORT_CONFIGURATION['host'] = EXPORT_CONFIGURATION['scp']['host']
-    #         #  > self._get_localsave(run_id)
-    #         output_dir = os.path.join(EXPORT_CONFIGURATION['scp']['dest_dir'], run_id)
-    #         self._get(output_dir, os.path.exists, open, EXPORT_CONFIGURATION['scp'], run_id)
-    #     else:
-    #         self._get(get_output_url(run_id), remote_exists, remote_open,
-    #             EXPORT_CONFIGURATION['scp'], run_id)
-
+        with open_func(output_json_file) as f:
+            try:
+                return json.loads(f.read())
+                # TODO: set fields here, using , etc.
+            except:
+                msg = "Failed to open output file: {}".format(output_json_file)
+                raise tornado.web.HTTPError(status_code=500, log_message=msg)
 
 
 class RunsInfo(RunHandlerBase):
