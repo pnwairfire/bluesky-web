@@ -102,27 +102,26 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
     otherwise, we'll mount to host machines /tmp/, since we'll just
     read it here and then forget about it.
     """
-    run_id = input_data.get('run_id') or str(uuid.uuid1()).replace('-','')
-    input_data['run_id'] = run_id # in case it was just generated
-    container_name = 'bsp-playground-{}'.format(run_id)
-    output_dir = os.path.abspath(os.path.join(settings['output_root_dir'],
-        settings['output_url_path_prefix'], input_data['run_id']))
-    os.makedirs(output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
-    tornado.log.gen_log.debug('Output dir: %s', output_dir)
+    input_data['run_id'] = (input_data.get('run_id')
+        or str(uuid.uuid1()).replace('-',''))
+
+    output_dir = _get_output_dir(input_data, **settings)
     output_json_filename = os.path.join(output_dir, 'output.json')
     output_log_filename = os.path.join(output_dir, 'output.log')
+
     bsp_cmd = ('bsp -i /tmp/fires.json -o {} '
         '--log-file={} --log-level={}'.format(
         output_json_filename, output_log_filename,
         settings['bluesky_log_level']))
     tornado.log.gen_log.debug('bsp command: %s', bsp_cmd)
-    volumes_dict = _get_volumes_dict(output_dir, input_data)
 
     input_data_json = input_data_json or json.dumps(input_data)
     tornado.log.gen_log.info("bsp docker command (as user %s): %s",
         getpass.getuser(), bsp_cmd)
 
     client = docker.from_env()
+    container_name = 'bsp-playground-{}'.format(input_data['run_id'])
+    volumes_dict = _get_volumes_dict(output_dir, input_data)
     container = client.containers.create(settings['bluesky_docker_image'],
         bsp_cmd, name=container_name, volumes=volumes_dict)
     try:
@@ -172,7 +171,15 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
         raise BlueSkyJobError(str(e))
 
     finally:
+        container.stop()
         container.remove()
+
+def _get_output_dir(input_data, **settings):
+    output_dir = os.path.abspath(os.path.join(settings['output_root_dir'],
+        settings['output_url_path_prefix'], input_data['run_id']))
+    os.makedirs(output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
+    tornado.log.gen_log.debug('Output dir: %s', output_dir)
+    return output_dir
 
 def _create_input_file(input_data_json, container):
     tar_stream = BytesIO()
