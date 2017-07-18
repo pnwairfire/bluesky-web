@@ -416,6 +416,11 @@ class RunOutput(RunHandlerBase):
     def _get_plumerise(self, run, output):
         output = {k:v for k,v in output.items()
             if k in ('run_id', 'fire_information')}
+        for f in output['fire_information']:
+            for i in range(len(f['growth'])):
+                f['growth'][i] = {k:v for k,v in f['growth'][i].items()
+                    if k in ('start', 'end', 'location', 'plumerise')}
+
         self.write(output)
 
     ##
