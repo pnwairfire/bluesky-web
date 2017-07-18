@@ -179,8 +179,7 @@ class BlueSkyRunner(object):
                     # 'failed' with error message
                     error = json.loads(output).get('error')
                     if error:
-                        self._record_run('failed',
-                            error=error)
+                        self._record_run('failed', error=error)
 
                 except Exception as e:
                     tornado.log.gen_log.error('failed to parse error : %s', e)

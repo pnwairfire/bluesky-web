@@ -22,9 +22,10 @@ class BlueSkyWebDB(object):
 
         spec = {"run_id": run_id}
         # include run_id in doc in case it's an insert
-        doc = {"$set": dict(status=status, **data) }
         ts = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-        doc["$set"][status] = ts
+        doc = {"$push": {"status":[status, ts]}}
+        if data:
+            doc["$set"] = data
 
         # There should never be multiple entries, since we're always
         # doing upserts
@@ -42,7 +43,7 @@ class BlueSkyWebDB(object):
             query, limit, offset)
 
         cursor = self.db.runs.find(query)
-        cursor = cursor.sort([('enqueued', -1)]).limit(limit).skip(offset)
+        cursor = cursor.sort([('ts', -1)]).limit(limit).skip(offset)
 
         # runs = []
         # async for r in cursor:

@@ -8,6 +8,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import copy
+import datetime
 import io
 import json
 import os
@@ -233,7 +234,8 @@ class RunExecuter(RunHandlerBase):
         # TODO: call specify callback in record_run, calling
         #    self.write in callback, so we can handle failure?
         self.settings['mongo_db'].record_run(data['run_id'], 'enqueued',
-            queue=queue_name, modules=data["modules"])
+            queue=queue_name, modules=data["modules"],
+            ts=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
         self.write({"run_id": data['run_id']})
 
     async def _run_in_process(self, data):
