@@ -22,7 +22,7 @@ import ipify
 import tornado.web
 import tornado.log
 
-from blueskyworker.tasks import run_bluesky, _run_bluesky
+from blueskyworker.tasks import run_bluesky, BlueSkyRunner
 from blueskyweb.lib import domains
 
 
@@ -241,7 +241,7 @@ class RunExecuter(RunHandlerBase):
             tornado.log.gen_log.debug('input: %s', data)
             # TODO: refactor task module so that bluesky can be
             #    run without blocking, and use `await` here
-            stdout_data = _run_bluesky(data, **self.settings)
+            stdout_data = BlueSkyRunner(data, **self.settings).run()
             # TODO: make sure stdout_data is valid json?
             tornado.log.gen_log.debug('output: %s', stdout_data)
             self.write(stdout_data)
