@@ -679,10 +679,9 @@ one hour.
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-hysplit-input.json | python -m json.tool
 
-
-The fact that the emissions data is in an array is because the
-consumption module (more specifically, the underlying 'consume'
-module) outputs arrays. The length of each array equals the
+The fact that the consumption and emissions data are in arrays is
+because the consumption module (more specifically, the underlying
+'consume' module) outputs arrays. The length of each array equals the
 number of fuelbeds passed into consume. Since consume is called
 on each fuelbed separately, the arrays of consumption
 and emissions data will all be of length 1.
