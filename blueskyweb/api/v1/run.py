@@ -199,9 +199,11 @@ class RunExecuter(RunHandlerBase):
             if mode == 'all':
                 _set(self.FUELBEDS_MODULES + self.EMISSIONS_MODULES +
                     self.PLUMERISE_MODULES + dispersion_modules)
-
             else:
-                _set(dispersion_modules)
+                if 'met' not in data:
+                    _set(['findmetdata'] + dispersion_modules)
+                else:
+                    _set(dispersion_modules)
         elif mode == 'plumerise':
             _set(self.PLUMERISE_MODULES)
         elif mode == 'emissions':
