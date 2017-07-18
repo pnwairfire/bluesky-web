@@ -422,9 +422,9 @@ class RunOutput(RunHandlerBase):
         if vis_info:
             # images
             # TODO: simplify code once v1 is obsoleted
-            image_results_version = output_json.get('config', {}).get(
-                'export',{}).get(EXPORT_MODE, {}).get('image_results_version')
-            if image_results_version == 'v2':
+            # TODO: make sure both v1 and v2 work
+            i_ver = int(self.get_query_argument('image_results_version') or 1)
+            if i_ver == 'v2':
                 self._parse_images_v2(r, vis_info)
             else:
                 self._parse_images_v1(r, vis_info)
