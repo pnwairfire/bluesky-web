@@ -107,6 +107,7 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
     container_name = 'bsp-playground-{}'.format(run_id)
     output_dir = os.path.abspath(os.path.join(settings['output_root_dir'],
         settings['output_url_path_prefix'], input_data['run_id']))
+    os.makedirs(output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
     tornado.log.gen_log.debug('Output dir: %s', output_dir)
     output_json_filename = os.path.join(output_dir, 'output.json')
     output_log_filename = os.path.join(output_dir, 'output.log')
@@ -115,10 +116,7 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
         output_json_filename, output_log_filename,
         settings['bluesky_log_level']))
     tornado.log.gen_log.debug('bsp command: %s', bsp_cmd)
-    volumes_dict = _get_volumes_dict(input_data)
-    os.makedirs(output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
-    volumes_dict[output_dir] = {'bind': output_dir, 'mode': 'rw'}
-    tornado.log.gen_log.debug('volumes dict: %s', volumes_dict)
+    volumes_dict = _get_volumes_dict(output_dir, input_data)
 
     input_data_json = input_data_json or json.dumps(input_data)
     tornado.log.gen_log.info("bsp docker command (as user %s): %s",
@@ -213,13 +211,12 @@ def _read_file_from_sibling_docker_container(container, file_pathname):
 ##
 
 TRAILING_RUN_ID_RE = re.compile('/{run_id}/?$')
-def _get_volumes_dict(input_data):
+def _get_volumes_dict(output_dir, input_data):
     """ Only mount the host os dirs that are needed
     """
     dirs_to_mount =  (
         _get_load_dirs(input_data) +
-        _get_met_dirs(input_data) +
-        _get_output_and_working_dirs(input_data)
+        _get_met_dirs(input_data)
     )
     dirs_to_mount = list(set([m for m in dirs_to_mount if m]))
     volumes_dict = {}
@@ -240,6 +237,10 @@ def _get_volumes_dict(input_data):
                 'bind': d,
                 'mode': 'rw'
             }
+
+    volumes_dict[output_dir] = {'bind': output_dir, 'mode': 'rw'}
+
+    tornado.log.gen_log.debug('volumes dict: %s', volumes_dict)
     return volumes_dict
 
 def _get_load_dirs(input_data):
@@ -261,16 +262,6 @@ def _get_met_dirs(input_data):
     met_dirs.extend(list(set([os.path.dirname(f) for f in met_files])))
 
     return met_dirs
-
-def _get_output_and_working_dirs(input_data):
-    # distination dirs
-    dest_dirs = [
-        _get_val(input_data, "config", "dispersion", "output_dir"),
-        _get_val(input_data, "config", "dispersion", "working_dir"),
-        _get_val(input_data, 'config', 'visualization',  'hysplit', 'output_dir'),
-        _get_val(input_data, "config", "export", "localsave", "dest_dir")
-    ]
-    return dest_dirs
 
 def _get_val(input_data, *args):
     if isinstance(input_data, dict):
