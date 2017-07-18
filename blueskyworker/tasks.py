@@ -152,7 +152,7 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
             try:
                 # check output for error, and if so record status
                 # 'failed' with error message
-                error = json.loads(output.decode()).get('error')
+                error = json.loads(output).get('error')
                 if error:
                     db.record_run(input_data['run_id'], 'failed', error=error)
 
