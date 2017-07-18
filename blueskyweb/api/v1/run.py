@@ -259,8 +259,9 @@ class RunExecuter(RunHandlerBase):
     def _configure_findmetdata(self, data, domain):
         tornado.log.gen_log.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
+        domains_db = domains.DomainDB(self.settings['mongodb_url'])
         data['config']['findmetdata'] = {
-            "met_root_dir": domains.DOMAINS[domain]['met_root_dir'],
+            "met_root_dir": domains_db.get_root_dir(domain),
             "arl": {
                 "index_filename_pattern":
                     domains.DOMAINS[domain]['index_filename_pattern'],

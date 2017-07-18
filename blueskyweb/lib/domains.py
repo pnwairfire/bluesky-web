@@ -7,13 +7,13 @@ import logging
 import math
 import os
 
-from met.arl.arlindexer import MetDatesCollection
+from met.arl.arlindexer import MetDatesCollection, MetFilesCollection
 
 class BlueSkyConfigurationError(ValueError):
     pass
 
 
-# TODO: not sure where is the best place to define queues, root dirs, and
+# TODO: not sure where is the best place to define queues and
 #   boundaries...maybe they should be defined in bsslib?...or let them be
 #   defined as env vars with defaults....or they should be in mongodb!!
 #   if going with mongodb, then don't hard code DOMAINS here, but instead
@@ -23,7 +23,6 @@ DOMAINS = {
     # TODO: add LS (Great Lakes?) 4km with boundaries [-96.1, 41.5, -81.5, 49.5]
     'DRI2km': {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/Met/CANSAC/2km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # STI provided the following corners:
             #   CANV 2km - [-124.3549, 32.5479, -113.2558, 41.8884]
@@ -44,7 +43,6 @@ DOMAINS = {
     },
     'DRI6km': {
         'queue': 'dri', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/Met/CANSAC/6km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # Ran the following on haze:
             #   $ chk_arl file /data/ARL/DRI/6km/2016040400/wrfout_d2.2016040400.f00-11_12hr01.arl |grep corner
@@ -63,7 +61,6 @@ DOMAINS = {
     },
     'PNW1.33km': {
         'queue': 'pnw', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/Met/PNW/1.33km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # Ran the following on haze:
             #   $ chk_arl file /data/ARL/PNW/1.33km/2016040400/wrfout_d4.2016040400.f12-23_12hr01.arl |grep corner
@@ -82,7 +79,6 @@ DOMAINS = {
     },
     'PNW4km': {
         'queue': 'pnw', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/Met/PNW/4km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # Ran the following on haze:
             #   $ chk_arl file /data/ARL/PNW/4km/2016040400/wrfout_d3.2016040400.f12-23_12hr01.arl |grep corner
@@ -101,7 +97,6 @@ DOMAINS = {
     },
     'NAM84': {
         'queue': 'nam', # TODO: define elsewhere ? (see above)
-        'met_root_dir': '/data/Met/NAM/12km/ARL/', # TODO: don't hardcode (see above)
         "boundary": {
             # STI provided the following corners:
             #   NAM 12km - [-131, 18, -64, 55]
@@ -131,7 +126,7 @@ class DomainDB(object):
     def __init__(self, mongodb_url):
         self._mongodb_url = mongodb_url
 
-    # TODO: memoize/cache find
+    # TODO: memoize/cache
     def find(self, domain_id=None):
         data = {}
         # Note: the `met` package uses pymongo, so these db queries are executed
@@ -145,6 +140,18 @@ class DomainDB(object):
             if d['domain'] in DOMAINS:
                 data[d['domain']]['boundary'] = DOMAINS[d['domain']]['boundary']
         return data
+
+    # TODO: memoize/cache
+    def get_root_dir(self, domain_id):
+        # Use met_files collection object directly so that we can
+        # specify reading only the root_dir field
+        db = MetFilesCollection(self._mongodb_url)
+        d = db.met_files.find_one({'domain': domain_id}, {'root_dir': 1})
+        if not d:
+            raise BlueSkyConfigurationError(
+                "Unsupported met domain {}".format(domain))
+
+        return d['root_dir']
 
 ##
 ## Utility methods
