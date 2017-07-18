@@ -34,7 +34,7 @@ app.conf.update(
 
 # TODO: pass hostname in via env var rather than use ipify to get
 #    ip address? or maybe use ipify as a backup
-IP_ADDRESS = ipify.get_ip()
+IP_ADDRESS = os.environ.get('PUBLIC_HOSTNAME') or ipify.get_ip()
 
 def form_output_url(run_id, **settings):
     scheme = settings.get('output_url_scheme') or 'https'

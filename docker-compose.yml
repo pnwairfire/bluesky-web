@@ -56,6 +56,7 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    - PUBLIC_HOSTNAME=localhost
     command: celery -Q all-met -c 5 -A blueskyworker.tasks worker -l DEBUG -f /var/log/blueskyworker/bluesky-web-worker-all-met.log
   worker_dri:
     image: bluesky-web
@@ -67,6 +68,7 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    - PUBLIC_HOSTNAME=localhost
     command: celery -Q dri -c 5 -A blueskyworker.tasks worker -l DEBUG -f /var/log/blueskyworker/bluesky-web-worker-dri.log
   worker_nam:
     image: bluesky-web
@@ -78,4 +80,5 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    - PUBLIC_HOSTNAME=localhost
     command: celery -Q nam -c 5 -A blueskyworker.tasks worker -l DEBUG -f /var/log/blueskyworker/bluesky-web-worker-nam.log
