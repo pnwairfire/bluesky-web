@@ -18,14 +18,15 @@ import urllib.request, urllib.error, urllib.parse
 import uuid
 import traceback
 
+import ipify
 import tornado.web
 import tornado.log
 
 from blueskyworker.tasks import run_bluesky, _run_bluesky
-
 from blueskyweb.lib import domains
 
 
+IP_ADDRESS = ipify.get_ip()
 
 ##
 ## Utilities for working with remote output
@@ -56,32 +57,35 @@ def get_output_url(run_id):
 
     return "{}{}".format(get_output_root_url(run_id), url_root_dir)
 
-PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
-def is_same_host(web_request_host):
-    """Checks to see if the output is local to the web service
+# PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
+# def is_same_host(web_request_host):
+#     """Checks to see if the output is local to the web service
+#
+#     If they are local, the run status and output APIS can carry out their
+#     checks more efficiently and quickly.
+#
+#     This function is a complete hack, but it works, at least some of the time.
+#     (And when it fails, it should only result in false negatives, which
+#     don't affect the correctness of the calling APIs - it just means they
+#     don't take advantage of working with local files.)
+#     """
+#     # first check if same hostname
+#     try:
+#         web_service_host = socket.gethostbyaddr(socket.gethostname())[0]
+#     except:
+#         web_service_host = PORT_IN_HOSTNAME_MATCHER.sub('', web_request_host)
+#
+#     output_hostname = "" # TODO: Get hostname from mongodb
+#     if output_hostname == web_service_host:
+#         return True
+#
+#     # TODO: determine ip address of upload host and web service host and
+#     #   check if ip addresses match
+#
+#     return False
 
-    If they are local, the run status and output APIS can carry out their
-    checks more efficiently and quickly.
-
-    This function is a complete hack, but it works, at least some of the time.
-    (And when it fails, it should only result in false negatives, which
-    don't affect the correctness of the calling APIs - it just means they
-    don't take advantage of working with local files.)
-    """
-    # first check if same hostname
-    try:
-        web_service_host = socket.gethostbyaddr(socket.gethostname())[0]
-    except:
-        web_service_host = PORT_IN_HOSTNAME_MATCHER.sub('', web_request_host)
-
-    output_hostname = "" # TODO: Get hostname from mongodb
-    if output_hostname == web_service_host:
-        return True
-
-    # TODO: determine ip address of upload host and web service host and
-    #   check if ip addresses match
-
-    return False
+def is_same_host(run):
+    return run['server']['ip'] == IP_ADDRESS
 
 ###
 ### API Handlers
@@ -386,75 +390,103 @@ class RunOutput(RunHandlerBase):
         if not run:
             self.set_status(404, "Run doesn't exist")
             self.write({"error": "Run doesn't exist"})
+        elif not run['output_url']:
+            self.set_status(404, "Run output doesn't exist")
+            self.write({"error": "Run output doesn't exist"})
         else:
-            self._get(run)
+            output = self._load_output(run)
+            if run['modules'][-1] == 'dispersion':
+                self._get_disperion(run, output)
+            elif run['modules'][-1] == 'plumerising':
+                self._get_plumerise(run, output)
+            else:
+                self.set_status(501, 'Not implemented')
+                self.write({'error': "Getting {} output not "
+                    "implemented.".format(run['modules'][-1])})
 
-    ## Output json parsing methods
+    ## Plumerise
 
-    # def _parse_kmzs_info(self, r, section_info):
-    #     kmz_info = section_info.get('kmzs', {})
-    #     if kmz_info:
-    #         r['kmzs'] = {k: '{}/{}'.format(section_info['sub_directory'], v)
-    #             for k, v in list(kmz_info.items()) if k in ('fire', 'smoke')}
+    def _get_plumerise(self, run, output):
+        pass
 
-    # ## ******************** TO DELETE - BEGIN  <-- (once v1 is obsoleted)
-    # def _parse_images_v1(self, r, vis_info):
-    #     images_info = vis_info.get('images')
-    #     if images_info:
-    #         r['images'] = {
-    #             "hourly": ['{}/{}'.format(vis_info['sub_directory'], e)
-    #                 for e in images_info.get('hourly', [])],
-    #             "daily": {
-    #                 "average": ['{}/{}'.format(vis_info['sub_directory'], e)
-    #                     for e in images_info.get('daily', {}).get('average', [])],
-    #                 "maximum": ['{}/{}'.format(vis_info['sub_directory'], e)
-    #                     for e in images_info.get('daily', {}).get('maximum', [])],
-    #             }
-    #         }
-    # ## ******************** TO DELETE - END
+    ## Dispersion
 
-    # def _parse_images_v2(self, r, vis_info):
-    #     r["images"] = vis_info.get('images')
-    #     for d in r['images']:
-    #         for c in r['images'][d]:
-    #             r['images'][d][c]["directory"] = os.path.join(
-    #                 vis_info['sub_directory'], r['images'][d][c]["directory"])
+    def _get_dispersion(self, run, output):
+        r = {}
+        vis_info = export_info.get('visualization')
+        if vis_info:
+            # images
+            # TODO: simplify code once v1 is obsoleted
+            image_results_version = output_json.get('config', {}).get(
+                'export',{}).get(EXPORT_MODE, {}).get('image_results_version')
+            if image_results_version == 'v2':
+                self._parse_images_v2(r, vis_info)
+            else:
+                self._parse_images_v1(r, vis_info)
 
-    # def _parse_output(self, output_json):
-    #     export_info = output_json.get('export', {})
-    #     # try both export modes, in case run was initiated with other mode
-    #     other_em = set(EXPORT_CONFIGURATIONS.keys()).difference([EXPORT_MODE]).pop()
-    #     export_info = export_info.get(EXPORT_MODE) or export_info.get(other_em)
-    #     if not export_info:
-    #        return {}
+            # kmzs
+            self._parse_kmzs_info(r, vis_info)
 
-    #     r = {}
-    #     vis_info = export_info.get('visualization')
-    #     if vis_info:
-    #         # images
-    #         # TODO: simplify code once v1 is obsoleted
-    #         image_results_version = output_json.get('config', {}).get(
-    #             'export',{}).get(EXPORT_MODE, {}).get('image_results_version')
-    #         if image_results_version == 'v2':
-    #             self._parse_images_v2(r, vis_info)
-    #         else:
-    #             self._parse_images_v1(r, vis_info)
+        disp_info = export_info.get('dispersion')
+        if disp_info:
+            r.update(**{
+                k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
+                for k in ('netCDF', 'netCDFs') if k.lower() in disp_info})
 
-    #         # kmzs
-    #         self._parse_kmzs_info(r, vis_info)
+            # kmzs (vsmoke dispersion produces kmzs)
+            self._parse_kmzs_info(r, disp_info)
 
-    #     disp_info = export_info.get('dispersion')
-    #     if disp_info:
-    #         r.update(**{
-    #             k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
-    #             for k in ('netCDF', 'netCDFs') if k.lower() in disp_info})
+        # TODO: list fire_*.csv if specified in output_json
 
-    #         # kmzs (vsmoke dispersion produces kmzs)
-    #         self._parse_kmzs_info(r, disp_info)
+        return r
 
-    #     # TODO: list fire_*.csv if specified in output_json
+    def _parse_kmzs_info(self, r, section_info):
+        kmz_info = section_info.get('kmzs', {})
+        if kmz_info:
+            r['kmzs'] = {k: '{}/{}'.format(section_info['sub_directory'], v)
+                for k, v in list(kmz_info.items()) if k in ('fire', 'smoke')}
 
-    #     return r
+    ## ******************** TO DELETE - BEGIN  <-- (once v1 is obsoleted)
+    def _parse_images_v1(self, r, vis_info):
+        images_info = vis_info.get('images')
+        if images_info:
+            r['images'] = {
+                "hourly": ['{}/{}'.format(vis_info['sub_directory'], e)
+                    for e in images_info.get('hourly', [])],
+                "daily": {
+                    "average": ['{}/{}'.format(vis_info['sub_directory'], e)
+                        for e in images_info.get('daily', {}).get('average', [])],
+                    "maximum": ['{}/{}'.format(vis_info['sub_directory'], e)
+                        for e in images_info.get('daily', {}).get('maximum', [])],
+                }
+            }
+    ## ******************** TO DELETE - END
+
+    def _parse_images_v2(self, r, vis_info):
+        r["images"] = vis_info.get('images')
+        for d in r['images']:
+            for c in r['images'][d]:
+                r['images'][d][c]["directory"] = os.path.join(
+                    vis_info['sub_directory'], r['images'][d][c]["directory"])
+
+
+
+    ## Commont methods
+
+    def _load_output(self, run):
+        if is_same_host(run):
+            self._load_local_output(run)
+        else:
+            self._load_remote_output(run)
+
+    def _load_local_output(self, run):
+        pass
+
+    def _load_remote_output(self, run):
+        pass
+
+
+
 
     # ## Generic output get methdo
 
@@ -518,7 +550,6 @@ class RunOutput(RunHandlerBase):
     #     else:
     #         self._get(get_output_url(run_id), remote_exists, remote_open,
     #             EXPORT_CONFIGURATION['scp'], run_id)
-
 
 
 
