@@ -162,7 +162,7 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
 
             output_url = form_output_url(input_data['run_id'], **settings)
             db.record_run(input_data['run_id'], 'output_written',
-                output_url=output_url)
+                output_url=output_url, output_dir=output_dir)
 
         else:
             return output
