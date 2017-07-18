@@ -119,6 +119,11 @@ def _run_bluesky(input_data, input_data_json=None, db=None, **settings):
     tornado.log.gen_log.info("bsp docker command (as user %s): %s",
         getpass.getuser(), bsp_cmd)
 
+    return _run_docker(input_data, input_data_json, bsp_cmd, output_dir,
+        output_json_filename, db, **settings)
+
+def _run_docker(input_data, input_data_json, bsp_cmd, output_dir,
+        output_json_filename, db, **settings):
     client = docker.from_env()
     container_name = 'bsp-playground-{}'.format(input_data['run_id'])
     volumes_dict = _get_volumes_dict(output_dir, input_data)
