@@ -54,6 +54,8 @@ services:
     - $PWD/docker-logs/worker/all-met/:/var/log/blueskyworker/
     - $PWD/docker-data/output/:/data/blueskyweb/dev/output/
     - /var/run/docker.sock:/var/run/docker.sock
+    # - $HOME/DRI_6km/:/data/Met/CANSAC/6km/ARL/
+    # - $HOME/NAM84/:/data/Met/NAM/12km/ARL/
     environment:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - PUBLIC_HOSTNAME=localhost
@@ -66,6 +68,7 @@ services:
     - $PWD/docker-logs/worker/dri/:/var/log/blueskyworker/
     - $PWD/docker-data/output/:/data/blueskyweb/dev/output/
     - /var/run/docker.sock:/var/run/docker.sock
+    # - $HOME/DRI_6km/:/data/Met/CANSAC/6km/ARL/
     environment:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - PUBLIC_HOSTNAME=localhost
@@ -78,6 +81,7 @@ services:
     - $PWD/docker-logs/worker/nam/:/var/log/blueskyworker/
     - $PWD/docker-data/output/:/data/blueskyweb/dev/output/
     - /var/run/docker.sock:/var/run/docker.sock
+    # - $HOME/NAM84/:/data/Met/NAM/12km/ARL/
     environment:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - PUBLIC_HOSTNAME=localhost
