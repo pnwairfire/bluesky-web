@@ -977,102 +977,78 @@ This API returns the output location for a specific run
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123/output"
 
     {
-        "fire_information": [
+      "run_id": "9617845e-6c10-11e7-ace3-3c15c2c6639e",
+      "fire_information": [
+        {
+          "id": "96de73a2",
+          "growth": [
             {
-                "type": "wildfire",
-                "fuel_type": "natural",
-                "growth": [
-                    {
-                        "end": "2014-05-30T17:00:00",
-                        "start": "2014-05-29T17:00:00",
-                        "localmet": {
-                            ...
-                        },
-                        "plumerise": {
-                            ...
-                        },
-                        "location": {
-                            "longitude": -119.7615805,
-                            "utc_offset": "-07:00",
-                            "area": 10000,
-                            "latitude": 37.909644,
-                            "ecoregion": "western"
-                        }
-                    }
-                ],
-                "id": "SF11C14225236095807750"
-            }
-        ],
-        "met": {
-            "files": [
+              "start": "2014-05-29T17:00:00",
+              "plumerise": {
+                "2014-05-29T17:00:00": {
+                  "percentile_015": 204.81921283270026,
+                  "percentile_070": 302.77622766573086,
+                  "percentile_000": 178.10366333278284,
+                  "percentile_050": 267.15549499917427,
+                  "percentile_060": 284.96586133245256,
+                  "percentile_075": 311.68141083237,
+                  "percentile_005": 187.008846499422,
+                  "percentile_055": 276.06067816581344,
+                  "percentile_085": 329.4917771656483,
+                  "percentile_080": 320.5865939990091,
+                  "percentile_020": 213.7243959993394,
+                  "percentile_065": 293.8710444990917,
+                  "percentile_010": 195.91402966606114,
+                  "percentile_030": 231.5347623326177,
+                  "percentile_025": 222.62957916597856,
+                  "percentile_100": 356.2073266655657,
+                  "percentile_090": 338.3969603322874,
+                  "smolder_fraction": 0,
+                  "percentile_045": 258.2503118325351,
+                  "percentile_095": 347.3021434989265,
+                  "percentile_040": 249.34512866589597,
+                  "percentile_035": 240.43994549925685
+                },
                 ...
-            ]
-        },
-        "today": "2017-07-13",
-        "config": {
-            "plumerising": {
-                "model": "sev"
-            },
-            "findmetdata": {
-                "time_window": {
-                    "last_hour": "...",
-                    "first_hour": "..."
-                },
-                "arl": {
-                    "index_filename_pattern": "arl12hrindex.csv"
-                },
-                "met_format": "arl",
-                "met_root_dir": "/DRI_6km/"
-            }
-        },
-        "counts": {
-            "fires": 1
-        },
-        "run_id": "7b0ad162-67f0-11e7-8754-0242ac110002",
-        "processing": [
-            {
-                "module_name": "findmetdata",
-                "module": "bluesky.modules.findmetdata",
-                "version": "0.1.0"
-            },
-            {
-                "module_name": "localmet",
-                "module": "bluesky.modules.localmet",
-                "version": "0.1.0"
-            },
-            {
-                "module_name": "plumerising",
-                "module": "bluesky.modules.plumerising",
-                "version": "0.1.1",
-                "model": "sev",
-                "plumerise_version": "1.0.0"
-            }
-        ],
-        "runtime": {
-            "total": "0.0011111111111111111h 0.06666666666666667m 4s",
-            "modules": [
-                {
-                    "module_name": "findmetdata",
-                    "total": "0.0h 0.0m 0s",
-                    "end": "2017-07-13T17:27:01Z",
-                    "start": "2017-07-13T17:27:01Z"
-                },
-                {
-                    "module_name": "localmet",
-                    "total": "0.0011111111111111111h 0.06666666666666667m 4s",
-                    "end": "2017-07-13T17:27:05Z",
-                    "start": "2017-07-13T17:27:01Z"
-                },
-                {
-                    "module_name": "plumerising",
-                    "total": "0.0h 0.0m 0s",
-                    "end": "2017-07-13T17:27:05Z",
-                    "start": "2017-07-13T17:27:05Z"
+                "2014-05-30T16:00:00": {
+                  "percentile_015": 538.6485338077127,
+                  "percentile_070": 796.2630499766187,
+                  "percentile_000": 468.39002939801105,
+                  "percentile_050": 702.5850440970166,
+                  "percentile_060": 749.4240470368177,
+                  "percentile_075": 819.6825514465194,
+                  "percentile_005": 491.8095308679116,
+                  "percentile_055": 726.0045455669172,
+                  "percentile_085": 866.5215543863205,
+                  "percentile_080": 843.1020529164199,
+                  "percentile_020": 562.0680352776133,
+                  "percentile_065": 772.8435485067182,
+                  "percentile_010": 515.2290323378122,
+                  "percentile_030": 608.9070382174143,
+                  "percentile_025": 585.4875367475138,
+                  "percentile_100": 936.7800587960221,
+                  "percentile_090": 889.941055856221,
+                  "smolder_fraction": 0,
+                  "percentile_045": 679.1655426271161,
+                  "percentile_095": 913.3605573261216,
+                  "percentile_040": 655.7460411572155,
+                  "percentile_035": 632.326539687315
                 }
-            ],
-            "end": "2017-07-13T17:27:05Z",
-            "start": "2017-07-13T17:27:01Z"
+              },
+              "location": {
+                "longitude": -119.7615805,
+                "utc_offset": "-07:00",
+                "area": 10000,
+                "latitude": 37.909644,
+                "ecoregion": "western"
+              },
+              "end": "2014-05-30T17:00:00"
+            }
+          ],
+          "fuel_type": "natural",
+          "type": "wildfire"
         }
+      ]
     }
 
 
