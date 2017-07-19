@@ -525,7 +525,10 @@ class RunOutput(RunHandlerBase):
 
         with open_func(output_json_file) as f:
             try:
-                return json.loads(f.read())
+                j = f.read()
+                if hasattr(j, 'decode'):
+                    j = j.decode()
+                return json.loads(j)
                 # TODO: set fields here, using , etc.
             except:
                 msg = "Failed to open output file: {}".format(output_json_file)

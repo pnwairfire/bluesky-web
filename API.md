@@ -1116,8 +1116,8 @@ something like the following:
         "root_url": "http://localhost:8888/playground-output/abc123"
     }
 
-Otherwise, if you set 'image_results_version=v1' or if you didn't set it at all,
-you'll get something like the following:
+Otherwise, if you set 'image_results_version=v1' or if you don't
+set it at all, you'll get something like the following:
 
     {
         "images": {
