@@ -566,6 +566,13 @@ for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
 and num_hours.  The 'modules' key is optional.
 
+There are currently two ways the visualization images can be
+listed in the output to be retrieved later (see output API spec
+below), but you need to specify which way when initializing
+the dispersion run. Set 'image_results_version' to 'v1' or 'v2', or
+don't set it at all to get 'v1'. The output API spec, below,
+lists the two output formats.
+
 Bluesky will be run asynchronously, and the
 API response will include a guid to identify the run in subsequent
 status and output API requests (described below).
@@ -1087,10 +1094,10 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123/output"
 
-There are currently two ways the visualization images will be
-specified in the results json object.  If you specify
-'image_results_version=v2' in the output request, you'll get
-something like the following:
+As mentioned above, there are currently two ways the visualization
+images may be specified in the results json object.  If you specified
+'image_results_version=v2' in the request to initiate the dispersion
+run, you'll get something like the following:
 
     {
         "images": {
@@ -1147,7 +1154,7 @@ something like the following:
         "root_url": "http://localhost:8888/playground-output/abc123"
     }
 
-Otherwise, if you set 'image_results_version=v1' or if you don't
+Otherwise, if you set 'image_results_version=v1' or if you didn't
 set it at all, you'll get something like the following:
 
     {
