@@ -421,8 +421,9 @@ class RunOutput(tornado.web.RequestHandler):
             self.write({"error": "Run output doesn't exist"})
         else:
             output = self._load_output(run)
-            if run['modules'][-1] == 'dispersion':
-                self._get_disperion(run, output)
+            if 'dispersion' in run['modules']:
+                #if output['config']['dispersion'].get('model') != 'vsmoke'):
+                self._get_dispersion(run, output)
             elif run['modules'][-1] == 'plumerising':
                 self._get_plumerise(run, output)
             else:
@@ -449,14 +450,16 @@ class RunOutput(tornado.web.RequestHandler):
     ##
 
     def _get_dispersion(self, run, output):
-        r = {}
-        vis_info = export_info.get('visualization')
+        r = {
+            "root_url": run['output_url']
+        }
+        vis_info = output['export']['localsave'].get('visualization')
         if vis_info:
             # images
             # TODO: simplify code once v1 is obsoleted
             # TODO: make sure both v1 and v2 work
-            i_ver = int(self.get_query_argument('image_results_version') or 1)
-            if i_ver == 'v2':
+            if output['config']['export']['localsave'].get(
+                    'image_results_version') == 'v2':
                 self._parse_images_v2(r, vis_info)
             else:
                 self._parse_images_v1(r, vis_info)
@@ -464,7 +467,7 @@ class RunOutput(tornado.web.RequestHandler):
             # kmzs
             self._parse_kmzs_info(r, vis_info)
 
-        disp_info = export_info.get('dispersion')
+        disp_info = output['export']['localsave'].get('dispersion')
         if disp_info:
             r.update(**{
                 k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
@@ -475,7 +478,7 @@ class RunOutput(tornado.web.RequestHandler):
 
         # TODO: list fire_*.csv if specified in output
 
-        return r
+        self.write(r)
 
     def _parse_kmzs_info(self, r, section_info):
         kmz_info = section_info.get('kmzs', {})
