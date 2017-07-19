@@ -92,12 +92,7 @@ def is_same_host(run):
 ### API Handlers
 ###
 
-class RunHandlerBase(tornado.web.RequestHandler):
-
-    def _get_host(self):
-        return self.request.host
-
-class RunExecuter(RunHandlerBase):
+class RunExecuter(tornado.web.RequestHandler):
 
     @tornado.web.asynchronous
     async def post(self, mode=None, domain=None):
@@ -371,8 +366,7 @@ class RunExecuter(RunHandlerBase):
         # TODO: set anything else?
 
 
-
-class RunStatus(RunHandlerBase):
+class RunStatus(tornado.web.RequestHandler):
 
     @tornado.web.asynchronous
     async def get(self, run_id):
@@ -386,7 +380,7 @@ class RunStatus(RunHandlerBase):
 
 
 
-class RunOutput(RunHandlerBase):
+class RunOutput(tornado.web.RequestHandler):
 
     @tornado.web.asynchronous
     async def get(self, run_id):
@@ -535,7 +529,7 @@ class RunOutput(RunHandlerBase):
                 raise tornado.web.HTTPError(status_code=500, log_message=msg)
 
 
-class RunsInfo(RunHandlerBase):
+class RunsInfo(tornado.web.RequestHandler):
 
     @tornado.web.asynchronous
     async def get(self, status=None):
