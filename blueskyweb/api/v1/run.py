@@ -128,11 +128,9 @@ class RunExecuter(tornado.web.RequestHandler):
             if mode not in ('fuelbeds', 'emissions'):
                 # plumerise or dispersion (Hysplit or VSMOKE) request
                 for m in data['modules']:
-                    # 'export' module is configured in _run_asynchronously
-                    if m != 'export':
-                        f = getattr(self, '_configure_{}'.format(m), None)
-                        if f:
-                            f(data, domain)
+                    f = getattr(self, '_configure_{}'.format(m), None)
+                    if f:
+                        f(data, domain)
 
                 # TODO: configure anything else (e.g. setting domain where
                 #  appropriate)
@@ -169,10 +167,10 @@ class RunExecuter(tornado.web.RequestHandler):
         'findmetdata', 'localmet', 'plumerising'
     ]
     MET_DISPERSION_MODULES = [
-        'timeprofiling', 'dispersion', 'visualization'
+        'timeprofiling', 'dispersion', 'visualization', 'export'
     ]
     METLESS_DISPERSION_MODULES = [
-        'timeprofiling', 'dispersion'
+        'timeprofiling', 'dispersion', 'export'
     ]
 
     def _set_modules(self, domain, mode, data):
@@ -365,6 +363,35 @@ class RunExecuter(tornado.web.RequestHandler):
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
+    def _configure_export(self, data, domain):
+        # we just run export to get image and file information
+        tornado.log.gen_log.debug('Configuring export')
+        # dest_dir = data['config']['dispersion']['output_dir'].replace(
+        #     'output', 'export')
+        # Run id will be
+        dest_dir = os.path.join(
+            self.settings['output_root_dir'],
+            self.settings['output_url_path_prefix'])
+
+        extras = ["dispersion", "visualization"] if domain else ["dispersion"]
+        data['config']['export'] = {
+            "modes": ["localsave"],
+            "extra_exports": extras,
+            "localsave": {
+                "handle_existing": "write_in_place",
+                "dest_dir": dest_dir
+            }
+        }
+        # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
+        try:
+            image_results_version = self.get_argument('image_results_version')
+            if image_results_version:
+                tornado.log.gen_log.debug('Setting image_results_version: %s',
+                    image_results_version)
+                data['config']['export']['localsave']['image_results_version'] = image_results_version
+        except tornado.web.MissingArgumentError:
+            tornado.log.gen_log.debug('image_results_version not specified')
+        # ***** END
 
 class RunStatus(tornado.web.RequestHandler):
 
