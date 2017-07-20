@@ -25,7 +25,8 @@ services:
     #   - https://stackoverflow.com/questions/34559557/how-to-enable-authentication-on-mongodb-through-docker
     #   - https://github.com/docker-library/mongo/blob/27f2722bb2ebd26354321adc8c3f19f7958529e1/3.4/Dockerfile
     #   - https://github.com/docker-library/mongo/blob/27f2722bb2ebd26354321adc8c3f19f7958529e1/3.4/docker-entrypoint.sh
-    #command: mongod --auth
+    #command: mongod --auth --logpath /var/log/mongodb/mongodb.log
+    command: mongod --logpath /var/log/mongodb/mongodb.log
   web:
     image: bluesky-web
     container_name: bluesky-web
@@ -42,7 +43,7 @@ services:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
     #command: bsp-web -d -b bluesky -o $PWD/docker-data/output --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
-    command: bsp-web -d -b bluesky -o $PWD/docker-data/output --path-prefix=bluesky --mongodb-url=mongodb://mongo/blueskyweb -p 8887 --log-level=DEBUG --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
+    command: bsp-web -d -b bluesky -o $PWD/docker-data/output --path-prefix=bluesky --mongodb-url=mongodb://mongo/blueskyweb -p 8887 --log-level=DEBUG --log-file=/var/log/blueskyweb/bluesky-web.log  --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
   output_web:
     image: python:3.5-alpine
     container_name: bluesky-web-output
