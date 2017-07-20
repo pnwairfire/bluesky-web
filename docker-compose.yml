@@ -5,26 +5,13 @@
 #   or with foreman
 version: '2'
 services:
-  web:
-    image: bluesky-web
-    container_name: bluesky-web
-    ports:
-    - 8887:8887
-    volumes:
-    - $PWD/:/usr/src/blueskyweb/
-    - $PWD/docker-logs/web/:/var/log/blueskyweb/
-    - /var/run/docker.sock:/var/run/docker.sock
-    links:
-    - mongo
-    # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    command: bsp-web -d -b bluesky -o /data/blueskyweb/dev/output/ --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
   mongo:
     image: mongo:3.4.6
     container_name: bluesky-web-mongo
-    environment:
-    # These are meant to be overridden
-    - MONGO_INITDB_ROOT_USERNAME=blueskyweb
-    - MONGO_INITDB_ROOT_PASSWORD=blueskywebmongopassword
+    # environment:
+    # # These are meant to be overridden
+    # - MONGO_INITDB_ROOT_USERNAME=blueskyweb
+    # - MONGO_INITDB_ROOT_PASSWORD=blueskywebmongopassword
     ports:
     - 27018:27017
     volumes:
@@ -39,12 +26,31 @@ services:
     #   - https://github.com/docker-library/mongo/blob/27f2722bb2ebd26354321adc8c3f19f7958529e1/3.4/Dockerfile
     #   - https://github.com/docker-library/mongo/blob/27f2722bb2ebd26354321adc8c3f19f7958529e1/3.4/docker-entrypoint.sh
     #command: mongod --auth
+  web:
+    image: bluesky-web
+    container_name: bluesky-web
+    ports:
+    - 8887:8887
+    volumes:
+    - $PWD/:/usr/src/blueskyweb/
+    - $PWD/docker-logs/web/:/var/log/blueskyweb/
+    - /var/run/docker.sock:/var/run/docker.sock
+    # Note: output root dir has to be the same on host and in container,
+    #   since bsp container will have the same mount
+    - $PWD/docker-data/output/:$PWD/docker-data/output/
+    links:
+    - mongo
+    # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
+    #command: bsp-web -d -b bluesky -o $PWD/docker-data/output --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
+    command: bsp-web -d -b bluesky -o $PWD/docker-data/output --path-prefix=bluesky --mongodb-url=mongodb://mongo/blueskyweb -p 8887 --log-level=DEBUG --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
   output_web:
     image: python:3.5-alpine
     container_name: bluesky-web-output
+    ports:
+    - 8886:8886
     volumes:
-    - $PWD/docker-data/output/:/data/output/
-    working_dir: /data/output/
+    - $PWD/docker-data/output/:$PWD/docker-data/output/
+    working_dir: $PWD/docker-data/output/
     command: python -m http.server 8886
   worker_all_met:
     image: bluesky-web
@@ -52,37 +58,46 @@ services:
     volumes:
     - $PWD/:/usr/src/blueskyweb/
     - $PWD/docker-logs/worker/all-met/:/var/log/blueskyworker/
-    - $PWD/docker-data/output/:/data/blueskyweb/dev/output/
+    - $PWD/docker-data/output/:$PWD/docker-data/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # - $HOME/DRI_6km/:/data/Met/CANSAC/6km/ARL/
     # - $HOME/NAM84/:/data/Met/NAM/12km/ARL/
+    links:
+    - mongo
     environment:
-    - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    - MONGODB_URL=mongodb://mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q all-met -c 5 -A blueskyworker.tasks worker -l DEBUG -f /var/log/blueskyworker/bluesky-web-worker-all-met.log
+    command: celery -Q all-met -c 5 -A blueskyworker.tasks worker -l INFO -f /var/log/blueskyworker/bluesky-web-worker-all-met.log
   worker_dri:
     image: bluesky-web
     container_name: bluesky-web-worker-dri
     volumes:
     - $PWD/:/usr/src/blueskyweb/
     - $PWD/docker-logs/worker/dri/:/var/log/blueskyworker/
-    - $PWD/docker-data/output/:/data/blueskyweb/dev/output/
+    - $PWD/docker-data/output/:$PWD/docker-data/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # - $HOME/DRI_6km/:/data/Met/CANSAC/6km/ARL/
+    links:
+    - mongo
     environment:
-    - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    - MONGODB_URL=mongodb://mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q dri -c 5 -A blueskyworker.tasks worker -l DEBUG -f /var/log/blueskyworker/bluesky-web-worker-dri.log
+    command: celery -Q dri -c 5 -A blueskyworker.tasks worker -l INFO -f /var/log/blueskyworker/bluesky-web-worker-dri.log
   worker_nam:
     image: bluesky-web
     container_name: bluesky-web-worker-nam
     volumes:
     - $PWD/:/usr/src/blueskyweb/
     - $PWD/docker-logs/worker/nam/:/var/log/blueskyworker/
-    - $PWD/docker-data/output/:/data/blueskyweb/dev/output/
+    - $PWD/docker-data/output/:$PWD/docker-data/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # - $HOME/NAM84/:/data/Met/NAM/12km/ARL/
+    links:
+    - mongo
     environment:
-    - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    - MONGODB_URL=mongodb://mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q nam -c 5 -A blueskyworker.tasks worker -l DEBUG -f /var/log/blueskyworker/bluesky-web-worker-nam.log
+    command: celery -Q nam -c 5 -A blueskyworker.tasks worker -l INFO -f /var/log/blueskyworker/bluesky-web-worker-nam.log
