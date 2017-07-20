@@ -121,16 +121,18 @@ class BlueSkyRunner(object):
             self.input_data['run_id']))
         os.makedirs(self.output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
         tornado.log.gen_log.debug('Output dir: %s', self.output_dir)
+        self.input_json_filename = os.path.join(
+            self.output_dir, 'fires.json')
         self.output_json_filename = os.path.join(
             self.output_dir, 'output.json')
         self.output_log_filename = os.path.join(
             self.output_dir, 'output.log')
 
     def _set_bsp_cmd(self):
-        self.bsp_cmd = ('bsp -i /tmp/fires.json -o {} '
+        self.bsp_cmd = ('bsp -i {} -o {} '
             '--log-file={} --log-level={}'.format(
-            self.output_json_filename, self.output_log_filename,
-            self.settings['bluesky_log_level']))
+            self.input_json_filename, self.output_json_filename,
+            self.output_log_filename, self.settings['bluesky_log_level']))
         tornado.log.gen_log.info("bsp docker command (as user %s): %s",
             getpass.getuser(), self.bsp_cmd)
 
@@ -224,7 +226,7 @@ class BlueSkyRunner(object):
         tar_file.addfile(tar_info, BytesIO(tar_file_data))
         tar_file.close()
         tar_stream.seek(0)
-        container.put_archive(path='/tmp', data=tar_stream)
+        container.put_archive(path=self.output_dir, data=tar_stream)
 
     def _read_file_from_sibling_docker_container(self, container, file_pathname):
         # TODO: figure out how to extract output from tar stream,
