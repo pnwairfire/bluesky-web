@@ -42,8 +42,20 @@ services:
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    #command: bsp-web -d -b bluesky -o $PWD/docker-data/output --path-prefix=bluesky --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb -p 8887 --log-level=DEBUG --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
-    command: bsp-web -d -b bluesky -o $PWD/docker-data/output --path-prefix=bluesky --mongodb-url=mongodb://mongo/blueskyweb -p 8887 --log-level=DEBUG --log-file=/var/log/blueskyweb/bluesky-web.log  --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
+    #command: bsp-web -d -b bluesky -o $PWD/docker-data/output
+    #  --path-prefix=bluesky -p 8887
+    #  --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
+    #  --log-level=DEBUG
+    #  --log-file=/var/log/blueskyweb/bluesky-web.log
+    #  --output-url-scheme=http --output-url-port=8886
+    #  --output-url-path-prefix= --bluesky-log-level=DEBUG
+    command: bsp-web -d -b bluesky -o $PWD/docker-data/output
+      --path-prefix=bluesky -p 8887
+      --mongodb-url=mongodb://mongo/blueskyweb
+      --log-level=DEBUG
+      --log-file=/var/log/blueskyweb/bluesky-web.log
+      --output-url-scheme=http --output-url-port=8886
+      --output-url-path-prefix= --bluesky-log-level=DEBUG
   output_web:
     image: python:3.5-alpine
     container_name: bluesky-web-output
@@ -69,7 +81,8 @@ services:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q all-met -c 5 -A blueskyworker.tasks worker -l INFO -f /var/log/blueskyworker/bluesky-web-worker-all-met.log
+    command: celery -Q all-met -c 5 -A blueskyworker.tasks worker
+      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-all-met.log
   worker_dri:
     image: bluesky-web
     container_name: bluesky-web-worker-dri
@@ -85,7 +98,8 @@ services:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q dri -c 5 -A blueskyworker.tasks worker -l INFO -f /var/log/blueskyworker/bluesky-web-worker-dri.log
+    command: celery -Q dri -c 5 -A blueskyworker.tasks worker
+      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-dri.log
   worker_nam:
     image: bluesky-web
     container_name: bluesky-web-worker-nam
@@ -101,4 +115,5 @@ services:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q nam -c 5 -A blueskyworker.tasks worker -l INFO -f /var/log/blueskyworker/bluesky-web-worker-nam.log
+    command: celery -Q nam -c 5 -A blueskyworker.tasks worker
+      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-nam.log
