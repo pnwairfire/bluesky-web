@@ -7,6 +7,7 @@ that can be started by simply running ```bsp-web```.
 
 
 
+
 ## External Dependencies
 
 ### mongodb
@@ -14,6 +15,7 @@ that can be started by simply running ```bsp-web```.
 BlueSky web connects to a mongodb database to query met data availability
 and to enqueue background plumerise and dispersion runs.
 You just need to provide the url of one that is running.
+
 
 
 
@@ -54,6 +56,8 @@ Or use docker by replacing `foreman start -f Procfile-dev` with:
 
 
 
+
+
 ## Fabric
 
 To see list tasks:
@@ -67,7 +71,6 @@ To see documentation for a specific task, use the '-d' option. E.g.:
 
 ### Playground Environment
 
-
 First time:
 
     BLUESKY_WEB_ENV=production fab -A deploy
@@ -79,6 +82,22 @@ Subsequent deployments:
 
     BLUESKY_WEB_ENV=production fab -A deploy
     BLUESKY_WEB_ENV=production fab -A restart
+
+### Test Environment
+
+First time:
+
+    BLUESKY_WEB_ENV=test fab -A deploy
+    BLUESKY_WEB_ENV=test fab -A start
+    BLUESKY_WEB_ENV=test fab -A configure_web_apache_proxy
+    BLUESKY_WEB_ENV=test fab -A configure_worker_apache_proxy
+
+Subsequent deployments:
+
+    BLUESKY_WEB_ENV=test fab -A deploy
+    BLUESKY_WEB_ENV=test fab -A restart
+
+
 
 
 
