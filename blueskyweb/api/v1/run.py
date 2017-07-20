@@ -124,7 +124,7 @@ class RunExecuter(tornado.web.RequestHandler):
 
             # TODO: check data['modules'] specifically for 'localmet',
             # 'dispersion', 'visualization' (and 'export'?)
-            tornado.log.gen_log.debug("BSP input data: %s", json.dumps(data))
+            #tornado.log.gen_log.debug("BSP input data: %s", json.dumps(data))
             if mode not in ('fuelbeds', 'emissions'):
                 # plumerise or dispersion (Hysplit or VSMOKE) request
                 for m in data['modules']:
@@ -218,7 +218,7 @@ class RunExecuter(tornado.web.RequestHandler):
     def _run_asynchronously(self, data, domain=None):
         queue_name = domains.DOMAINS.get(domain, {}).get('queue') or 'all-met'
 
-        tornado.log.gen_log.debug('input: %s', data)
+        #tornado.log.gen_log.debug('input: %s', data)
         args = (data, ) # has to be a tuple
 
         # TODO: figure out how to enqueue without blocking
@@ -233,12 +233,12 @@ class RunExecuter(tornado.web.RequestHandler):
 
     async def _run_in_process(self, data):
         try:
-            tornado.log.gen_log.debug('input: %s', data)
+            #tornado.log.gen_log.debug('input: %s', data)
             # TODO: refactor task module so that bluesky can be
             #    run without blocking, and use `await` here
             stdout_data = BlueSkyRunner(data, **self.settings).run()
             # TODO: make sure stdout_data is valid json?
-            tornado.log.gen_log.debug('output: %s', stdout_data)
+            #tornado.log.gen_log.debug('output: %s', stdout_data)
             self.write(stdout_data)
 
         # TODO: return 404 if output has error related to bad module, etc.
