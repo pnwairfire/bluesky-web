@@ -37,6 +37,11 @@ You just need to provide the url of one that is running.
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
         ./docker-logs/worker/dri ./docker-logs/worker/nam \
         ./docker-logs/worker/no-met
+
+#### foreman
+
+One option is to use foreman
+
     foreman start -f Procfile-dev
     arlindexer -d DRI6km -r $HOME/DRI_6km \
         -m mongodb://localhost:27018/blueskyweb
@@ -44,10 +49,22 @@ You just need to provide the url of one that is running.
         -m mongodb://localhost:27018/blueskyweb
     ....
 
-Or use docker by replacing `foreman start -f Procfile-dev` with:
+#### Docker:
 
     docker build -t bluesky-web .
     docker-compose -f docker-compose.yml up
+
+When using docker, arlindex will automatically be updated every
+15 minutes using the mcuadros/ofelia docker image.
+If you don't want to wait for it to run, manually run it with:
+
+    docker exec bluesky-web-worker-dri \
+        arlindexer -d DRI6km -r $HOME/DRI_6km \
+        -m mongodb://mongo/blueskywe
+    docker exec bluesky-web-worker-nam \
+        arlindexer -d NAM84 -r $HOME/NAM84 \
+        -p NAM84_ARL_index.csv \
+        -m mongodb://localhost:27018/blueskyweb
 
 ### Tail logs
 

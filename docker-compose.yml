@@ -91,7 +91,10 @@ services:
     - $PWD/docker-logs/worker/dri/:/var/log/blueskyworker/
     - $PWD/docker-data/output/:$PWD/docker-data/output/
     - /var/run/docker.sock:/var/run/docker.sock
-    # - $HOME/DRI_6km/:/data/Met/CANSAC/6km/ARL/
+    # mount met for ofelia
+    # Note: met root dir has to be the same on host and in this container,
+    #   since bsp container will have the same mount
+    - $HOME/DRI_6km/:$HOME/DRI_6km/
     links:
     - mongo
     environment:
@@ -108,7 +111,8 @@ services:
     - $PWD/docker-logs/worker/nam/:/var/log/blueskyworker/
     - $PWD/docker-data/output/:$PWD/docker-data/output/
     - /var/run/docker.sock:/var/run/docker.sock
-    # - $HOME/NAM84/:/data/Met/NAM/12km/ARL/
+    # mount met for ofelia
+    - $HOME/NAM84/:$HOME/NAM84/
     links:
     - mongo
     environment:
@@ -117,3 +121,10 @@ services:
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q nam -c 5 -A blueskyworker.tasks worker
       -l INFO -f /var/log/blueskyworker/bluesky-web-worker-nam.log
+  ofelia:
+    image: mcuadros/ofelia
+    container_name: bluesky-web-arlindexer
+    volumes:
+    - $PWD/ofelia.ini:/etc/ofelia/config.ini
+    - /var/run/docker.sock:/var/run/docker.sock
+    #command: ofelia daemon --config /etc/ofelia/config.ini
