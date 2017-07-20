@@ -58,6 +58,8 @@ OPTIONAL_ARGS = [
             "(defaults to {})".format(DEFAULT_SETTINGS['output_url_path_prefix']))
     },
     {
+        # this is supposed to be a string, since it's passed into
+        # the bsp docker command
         'long': '--bluesky-log-level',
         'help': "Log level of bluesky pipeline run".format(
             DEFAULT_SETTINGS['bluesky_log_level'])

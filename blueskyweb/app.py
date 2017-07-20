@@ -47,7 +47,9 @@ DEFAULT_SETTINGS = {
     'output_url_scheme': 'https',
     'output_url_port': None, # 80
     'output_url_path_prefix': 'pgv3-output',
-    'bluesky_log_level': logging.INFO
+    # this is supposed to be a string, since it's passed into
+    # the bsp docker command
+    'bluesky_log_level': "INFO"
 }
 
 def get_routes(path_prefix):
