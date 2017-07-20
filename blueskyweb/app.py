@@ -24,12 +24,6 @@ from .api.v1.domain import (
     DomainInfo as DomainInfoV1,
     DomainAvailableDates as DomainAvailableDatesV1
 )
-from .api.v1.run import (
-    RunExecuter as RunExecuterV1,
-    RunStatus as RunStatusV1,
-    RunOutput as RunOutputV1,
-    RunsInfo as RunsInfoV1
-)
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
 def configure_logging(**settings):
@@ -57,6 +51,15 @@ DEFAULT_SETTINGS = {
 }
 
 def get_routes(path_prefix):
+    # We need to import inline so that MONGDB_URL env var is set
+    #    os.environ["MONGODB_URL"] = settings['mongodb_url']
+    # before blueskyworker.tasks is imported in .api.v1.run
+    from .api.v1.run import (
+        RunExecuter as RunExecuterV1,
+        RunStatus as RunStatusV1,
+        RunOutput as RunOutputV1,
+        RunsInfo as RunsInfoV1
+    )
     routes = [
         (r"/api/ping/?", Ping),
         # Getting information about met data
