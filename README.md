@@ -36,7 +36,7 @@ You just need to provide the url of one that is running.
     cd /path/to/airfire-bluesky-web
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
         ./docker-logs/worker/dri ./docker-logs/worker/nam \
-        ./docker-logs/worker/all-met
+        ./docker-logs/worker/no-met
     foreman start -f Procfile-dev
     arlindexer -d DRI6km -r $HOME/DRI_6km \
         -m mongodb://localhost:27018/blueskyweb

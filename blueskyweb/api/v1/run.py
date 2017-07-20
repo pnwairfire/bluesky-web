@@ -215,8 +215,18 @@ class RunExecuter(tornado.web.RequestHandler):
         #self.write({"error": msg})
         #self.finish()
 
+    def _get_queue_name(self, domain):
+        if domain:
+            if domain not in domains.DOMAINS:
+                msg = "Invalid domain: {}".format(domain)
+                raise tornado.web.HTTPError(status_code=404, log_message=msg)
+            return domains.DOMAINS[domain]['queue']
+        else:
+            return 'no-met'
+
+
     def _run_asynchronously(self, data, domain=None):
-        queue_name = domains.DOMAINS.get(domain, {}).get('queue') or 'all-met'
+        queue_name = self._get_queue_name(domain)
 
         #tornado.log.gen_log.debug('input: %s', data)
         args = (data, ) # has to be a tuple

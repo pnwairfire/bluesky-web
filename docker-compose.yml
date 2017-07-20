@@ -65,12 +65,12 @@ services:
     - $PWD/docker-data/output/:$PWD/docker-data/output/
     working_dir: $PWD/docker-data/output/
     command: python -m http.server 8886
-  worker_all_met:
+  worker_no_met:
     image: bluesky-web
-    container_name: bluesky-web-worker-all-met
+    container_name: bluesky-web-worker-no-met
     volumes:
     - $PWD/:/usr/src/blueskyweb/
-    - $PWD/docker-logs/worker/all-met/:/var/log/blueskyworker/
+    - $PWD/docker-logs/worker/no-met/:/var/log/blueskyworker/
     - $PWD/docker-data/output/:$PWD/docker-data/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # - $HOME/DRI_6km/:/data/Met/CANSAC/6km/ARL/
@@ -81,8 +81,8 @@ services:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q all-met -c 5 -A blueskyworker.tasks worker
-      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-all-met.log
+    command: celery -Q no-met -c 5 -A blueskyworker.tasks worker
+      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-no-met.log
   worker_dri:
     image: bluesky-web
     container_name: bluesky-web-worker-dri
