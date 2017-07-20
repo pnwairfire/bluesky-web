@@ -73,29 +73,29 @@ To see documentation for a specific task, use the '-d' option. E.g.:
 
 First time:
 
-    BLUESKY_WEB_ENV=production fab -A deploy
-    BLUESKY_WEB_ENV=production fab -A start
-    BLUESKY_WEB_ENV=production fab -A configure_web_apache_proxy
-    BLUESKY_WEB_ENV=production fab -A configure_worker_apache_proxy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A deploy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A start
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A configure_web_apache_proxy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A configure_output_web_apache_proxy
 
 Subsequent deployments:
 
-    BLUESKY_WEB_ENV=production fab -A deploy
-    BLUESKY_WEB_ENV=production fab -A restart
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A deploy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A restart
 
 ### Test Environment
 
 First time:
 
-    BLUESKY_WEB_ENV=test fab -A deploy
-    BLUESKY_WEB_ENV=test fab -A start
-    BLUESKY_WEB_ENV=test fab -A configure_web_apache_proxy
-    BLUESKY_WEB_ENV=test fab -A configure_worker_apache_proxy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A deploy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A start
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A configure_web_apache_proxy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A configure_output_web_apache_proxy
 
 Subsequent deployments:
 
-    BLUESKY_WEB_ENV=test fab -A deploy
-    BLUESKY_WEB_ENV=test fab -A restart
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A deploy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A restart
 
 
 
