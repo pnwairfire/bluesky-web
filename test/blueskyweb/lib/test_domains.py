@@ -14,14 +14,14 @@ from blueskyweb.lib import domains
 class TestGetMetBoundary(object):
 
     def test_invalid(self):
-        with raises(domains.BlueSkyConfigurationError) as e_info:
+        with raises(domains.InvalidDomainError) as e_info:
             domains.get_met_boundary('dfsdf')
-        assert e_info.value.message == "Unsupported met domain dfsdf"
+        assert e_info.value.args[0] == "dfsdf"
 
         domains.DOMAINS['sdf'] = {}
-        with raises(domains.BlueSkyConfigurationError) as e_info:
+        with raises(domains.BoundaryNotDefinedError) as e_info:
             domains.get_met_boundary('sdf')
-        assert e_info.value.message == "Boundary not defined for met domain sdf"
+        assert e_info.value.args[0] == "sdf"
 
     def test_valid(self):
         assert domains.DOMAINS['DRI2km']['boundary'] == domains.get_met_boundary('DRI2km')

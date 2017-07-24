@@ -3,13 +3,19 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import datetime
 import logging
 import math
 import os
+from urllib.parse import urlparse
 
-from met.arl.arlindexer import MetDatesCollection, MetFilesCollection
+import motor
+import tornado.log
 
-class BlueSkyConfigurationError(ValueError):
+class BoundaryNotDefinedError(ValueError):
+    pass
+
+class InvalidDomainError(ValueError):
     pass
 
 
@@ -124,32 +130,30 @@ DOMAINS = {
 class DomainDB(object):
 
     def __init__(self, mongodb_url):
-        self._mongodb_url = mongodb_url
+        db_name = (urlparse(mongodb_url).path.lstrip('/').split('/')[0]
+            or 'blueskyweb')
+        tornado.log.gen_log.debug('Using %s for domain data', mongodb_url)
+        self.db = motor.motor_tornado.MotorClient(mongodb_url)[db_name]
 
     # TODO: memoize/cache
-    def find(self, domain_id=None):
+    async def find(self, domain_id=None):
+        query = {"domain": domain_id} if domain_id else {}
         data = {}
-        # Note: the `met` package uses pymongo, so these db queries are executed
-        #   synchrmounsly
-        # TODO: if we have performance issues, rewrite MetDatesCollection's
-        #    functionality using motor package (either here or in the met package)
-        for d in MetDatesCollection(self._mongodb_url).find(domain=domain_id):
+        async for d in self.db.dates.find(query):
             data[d['domain']] = {
-                "dates": d['complete_dates']
+                "dates": sorted(list(set(d['complete_dates'])))
             }
             if d['domain'] in DOMAINS:
                 data[d['domain']]['boundary'] = DOMAINS[d['domain']]['boundary']
         return data
 
     # TODO: memoize/cache
-    def get_root_dir(self, domain_id):
+    async def get_root_dir(self, domain_id):
         # Use met_files collection object directly so that we can
         # specify reading only the root_dir field
-        db = MetFilesCollection(self._mongodb_url)
-        d = db.met_files.find_one({'domain': domain_id}, {'root_dir': 1})
+        d = self.db.met_files.find_one({'domain': domain_id}, {'root_dir': 1})
         if not d:
-            raise BlueSkyConfigurationError(
-                "Unsupported met domain {}".format(domain))
+            raise InvalidDomainError(domain_id)
 
         return d['root_dir']
 
@@ -159,11 +163,9 @@ class DomainDB(object):
 
 def get_met_boundary(domain):
     if domain not in DOMAINS:
-        raise BlueSkyConfigurationError(
-            "Unsupported met domain {}".format(domain))
+        raise InvalidDomainError(domain_id)
 
     if not DOMAINS[domain].get('boundary'):
-        raise BlueSkyConfigurationError(
-            "Boundary not defined for met domain {}".format(domain))
+        raise BoundaryNotDefinedError(domain)
 
     return DOMAINS[domain]['boundary']

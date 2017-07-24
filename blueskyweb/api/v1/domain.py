@@ -5,15 +5,21 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import datetime
 import json
+
 import tornado.web
 
 from blueskyweb.lib import domains
 
-class DomainInfo(tornado.web.RequestHandler):
+class DomainBaseHander(tornado.web.RequestHandler):
 
-    def get(self, domain_id=None):
-        data = domains.DomainDB(self.settings['mongodb_url']).find(
-            domain_id=domain_id)
+    def __init__(self, *args, **kwargs):
+        super(DomainBaseHander, self).__init__(*args, **kwargs)
+        self.domains_db = domains.DomainDB(self.settings['mongodb_url'])
+
+class DomainInfo(DomainBaseHander):
+
+    async def get(self, domain_id=None):
+        data = await self.domains_db.find(domain_id=domain_id)
 
         if domain_id:
             if not data:
@@ -23,11 +29,10 @@ class DomainInfo(tornado.web.RequestHandler):
         else:
             self.write({"domains": data})
 
-class DomainAvailableDates(tornado.web.RequestHandler):
+class DomainAvailableDates(DomainBaseHander):
 
-    def get(self, domain_id=None):
-        data = domains.DomainDB(self.settings['mongodb_url']).find(
-            domain_id=domain_id)
+    async def get(self, domain_id=None):
+        data = await self.domains_db.find(domain_id=domain_id)
 
         if domain_id:
             if not data:

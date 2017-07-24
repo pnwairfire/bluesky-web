@@ -154,7 +154,7 @@ This API returns information about a specific domain with ARL data
 
 ## GET /api/v1/domains/<domain_id>/available-dates/
 
-This API returns the dates for which a specific d has ARL data
+This API returns the dates for which a specific domain has ARL data
 
 ### Request
 
