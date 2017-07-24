@@ -123,7 +123,7 @@ services:
       -l INFO -f /var/log/blueskyworker/bluesky-web-worker-nam.log
   ofelia:
     image: mcuadros/ofelia
-    container_name: bluesky-web-arlindexer
+    container_name: bluesky-web-ofelia
     volumes:
     - $PWD/ofelia.ini:/etc/ofelia/config.ini
     - /var/run/docker.sock:/var/run/docker.sock
