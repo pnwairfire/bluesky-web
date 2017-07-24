@@ -5,6 +5,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import datetime
 import json
+import re
 
 import tornado.web
 
@@ -43,3 +44,24 @@ class DomainAvailableDates(DomainBaseHander):
             self.write({
                 "dates": {d: data[d]['dates'] for d in data}
             })
+
+class DomainAvailableDate(DomainBaseHander):
+
+    DATE_MATCHER = re.compile(
+        '^(?P<year>[0-9]{4})-?(?P<month>[0-9]{2})-?(?P<day>[0-9]{2})$')
+
+    async def get(self, domain_id=None, date_str=None):
+        # domain_id and date will always be defined
+        m = self.DATE_MATCHER.match(date_str)
+        if not m:
+            raise tornado.web.HTTPError(status_code=400,
+                log_message="Invalid date: {}".format(date_str))
+        date_obj = datetime.date(int(m.group('year')), int(m.group('month')),
+            int(m.group('day')))
+
+        try:
+            data = await self.domains_db.get_availability(domain_id, date_obj)
+            self.write(data)
+        except domains.InvalidDomainError:
+            raise tornado.web.HTTPError(status_code=404,
+                log_message="Domain does not exist")

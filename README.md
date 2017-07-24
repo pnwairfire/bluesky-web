@@ -121,4 +121,4 @@ Subsequent deployments:
 
 ## APIs
 
-See [APIs](API.md)
+See [APIs](doc/API.md)

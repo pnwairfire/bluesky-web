@@ -123,6 +123,8 @@ DOMAINS = {
     }
 }
 
+ONE_DAY = datetime.timedelta(days=1)
+
 ##
 ## Domain database
 ##
@@ -156,6 +158,28 @@ class DomainDB(object):
             raise InvalidDomainError(domain_id)
 
         return d['root_dir']
+
+    # TODO: memoize/cache
+    async def get_availability(self, domain_id, target_date, date_range=3):
+        data = await self.find(domain_id=domain_id)
+        if not data:
+            raise InvalidDomainError(domain_id)
+
+        date_range *= ONE_DAY
+
+        begin_date_str = (target_date - date_range).strftime('%Y-%m-%d')
+        target_date_str = target_date.strftime('%Y-%m-%d')
+        end_date_str = (target_date + date_range).strftime('%Y-%m-%d')
+
+        available = target_date_str in data[domain_id]["dates"]
+        alternatives = [d for d in data[domain_id]["dates"]
+            if d >= begin_date_str and d <= end_date_str and
+            d != target_date_str]
+
+        return {
+            "available": available,
+            "alternatives": alternatives
+        }
 
 ##
 ## Utility methods

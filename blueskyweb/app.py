@@ -22,7 +22,8 @@ from blueskymongo.client import BlueSkyWebDB
 from .api.ping import Ping
 from .api.v1.domain import (
     DomainInfo as DomainInfoV1,
-    DomainAvailableDates as DomainAvailableDatesV1
+    DomainAvailableDates as DomainAvailableDatesV1,
+    DomainAvailableDate as DomainAvailableDateV1
 )
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
@@ -68,6 +69,7 @@ def get_routes(path_prefix):
         (r"/api/v1/domains/?", DomainInfoV1),
         (r"/api/v1/domains/([^/]+)/?", DomainInfoV1),
         (r"/api/v1/domains/([^/]+)/available-dates/?", DomainAvailableDatesV1),
+        (r"/api/v1/domains/([^/]+)/available-dates/([0-9-]+)/?", DomainAvailableDateV1),
         (r"/api/v1/available-dates/?", DomainAvailableDatesV1),
         # Initiating runs
         (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),

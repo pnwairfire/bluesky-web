@@ -35,6 +35,7 @@ GET_URLS=(
     http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN/
     http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN/available-dates
     http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN/available-dates/
+    # TODO: test date verification API
     http://$BLUESKY_API_HOSTNAME/api/v1/available-dates
     http://$BLUESKY_API_HOSTNAME/api/v1/available-dates/
 )

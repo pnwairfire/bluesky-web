@@ -170,7 +170,6 @@ This API returns the dates for which a specific domain has ARL data
         ]
     }
 
-
 ### Example
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/domains/DRI6km/available-dates" | python -m json.tool
@@ -182,6 +181,64 @@ This API returns the dates for which a specific domain has ARL data
             "2014-06-01"
         ]
     }
+
+
+
+## GET /api/v1/domains/<domain_id>/available-dates/<date>/
+
+This API checks availability of a given date for a specific domain.
+If not available, it returns alternative dates, if there are any.
+(For altertermatives, it considers any dates within 3 days of
+requested Date.)
+
+### Request
+
+ - url: $BLUESKY_API_ROOT_URL/api/v1/domains/<domain_id>/available-dates/<date>/
+ - method: GET
+
+### Response
+
+    {
+        "available": <boolean>,
+        "alternatives": [
+           <date>,
+           ...
+        ]
+    }
+
+### Examples
+
+#### Date available
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/domains/DRI6km/available-dates/2014-05-30/" | python -m json.tool
+    {
+        "alternatives": [
+            "2014-05-29",
+            "2014-05-31",
+            "2014-06-01"
+        ],
+        "available": true
+    }
+
+#### Date not available, with alternatives
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/domains/DRI6km/available-dates/2014-05-27/" | python -m json.tool
+    {
+        "alternatives": [
+            "2014-05-29",
+            "2014-05-30"
+        ],
+        "available": false
+    }
+
+#### Date not available, no alternatives
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/domains/DRI6km/available-dates/2014-05-24/" | python -m json.tool
+    {
+        "alternatives": [],
+        "available": false
+    }
+
 
 
 
