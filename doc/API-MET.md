@@ -188,13 +188,15 @@ This API returns the dates for which a specific domain has ARL data
 
 This API checks availability of a given date for a specific domain.
 If not available, it returns alternative dates, if there are any.
-(For altertermatives, it considers any dates within 3 days of
-requested Date.)
+For altertermatives, it considers any dates within 3 days of
+requested Date.  Use query param 'date_range' to specify a different
+date range
 
 ### Request
 
  - url: $BLUESKY_API_ROOT_URL/api/v1/domains/<domain_id>/available-dates/<date>/
  - method: GET
+ - optional query args: 'date_range'
 
 ### Response
 
@@ -216,6 +218,15 @@ requested Date.)
             "2014-05-29",
             "2014-05-31",
             "2014-06-01"
+        ],
+        "available": true
+    }
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/domains/DRI6km/available-dates/2014-05-30/?date_range=1" | python -m json.tool
+    {
+        "alternatives": [
+            "2014-05-29",
+            "2014-05-31"
         ],
         "available": true
     }

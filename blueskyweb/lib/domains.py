@@ -160,7 +160,7 @@ class DomainDB(object):
         return d['root_dir']
 
     # TODO: memoize/cache
-    async def get_availability(self, domain_id, target_date, date_range=3):
+    async def get_availability(self, domain_id, target_date, date_range):
         data = await self.find(domain_id=domain_id)
         if not data:
             raise InvalidDomainError(domain_id)

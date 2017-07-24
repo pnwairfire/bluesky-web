@@ -59,9 +59,28 @@ class DomainAvailableDate(DomainBaseHander):
         date_obj = datetime.date(int(m.group('year')), int(m.group('month')),
             int(m.group('day')))
 
+
         try:
-            data = await self.domains_db.get_availability(domain_id, date_obj)
+            data = await self.domains_db.get_availability(
+                domain_id, date_obj, self.get_date_range())
             self.write(data)
         except domains.InvalidDomainError:
             raise tornado.web.HTTPError(status_code=404,
                 log_message="Domain does not exist")
+
+    DEFAUL_DATE_RANGE = 3
+
+    def get_date_range(self):
+        try:
+            date_range = self.get_argument('date_range',
+                self.DEFAUL_DATE_RANGE)
+            date_range = int(date_range)
+        except ValueError as e:
+            msg = "Invalid value for date_range: '{}'".format(date_range)
+            raise tornado.web.HTTPError(status_code=400, log_message=msg)
+
+        if date_range < 1:
+            msg = "date_range must be greater than or equal to 1"
+            raise tornado.web.HTTPError(status_code=400, log_message=msg)
+
+        return date_range
