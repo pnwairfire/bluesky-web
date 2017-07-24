@@ -78,7 +78,7 @@ An example with fire location data specified as a geojson
                 ]
             }
         ]
-    }' | python -m json.tool
+    }' | python -m json.tool | less
 
 Another exmaple, this time running only the fuelbeds
 modules, and with fire location data specified as lat + lng + size.
@@ -106,7 +106,7 @@ modules, and with fire location data specified as lat + lng + size.
                 ]
             }
         ]
-    }' | python -m json.tool
+    }' | python -m json.tool | less
 
 
 

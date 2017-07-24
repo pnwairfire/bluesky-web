@@ -153,7 +153,7 @@ class DomainDB(object):
     async def get_root_dir(self, domain_id):
         # Use met_files collection object directly so that we can
         # specify reading only the root_dir field
-        d = self.db.met_files.find_one({'domain': domain_id}, {'root_dir': 1})
+        d = await self.db.met_files.find_one({'domain': domain_id}, {'root_dir': 1})
         if not d:
             raise InvalidDomainError(domain_id)
 

@@ -130,14 +130,14 @@ class RunExecuter(tornado.web.RequestHandler):
                 for m in data['modules']:
                     f = getattr(self, '_configure_{}'.format(m), None)
                     if f:
-                        f(data, domain)
+                        await f(data, domain)
 
                 # TODO: configure anything else (e.g. setting domain where
                 #  appropriate)
                 self._run_asynchronously(data, domain=domain)
 
             else:
-                self._configure_emissions(data)
+                await self._configure_emissions(data)
                 # fuelbeds or emissions request
                 if self.get_query_argument('_a', default=None) is not None:
                     self._run_asynchronously(data)
@@ -257,18 +257,19 @@ class RunExecuter(tornado.web.RequestHandler):
             tornado.log.gen_log.error('Exception: %s', e)
             self.set_status(500)
 
-    def _configure_emissions(self, data):
+    async def _configure_emissions(self, data):
         tornado.log.gen_log.debug('Configuring emissions')
         data['config'] = data.get('config', {})
         data['config']['emissions'] = data['config'].get('emissions', {})
         data['config']['emissions']['efs'] = "urbanski"
 
-    def _configure_findmetdata(self, data, domain):
+    async def _configure_findmetdata(self, data, domain):
         tornado.log.gen_log.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
         domains_db = domains.DomainDB(self.settings['mongodb_url'])
+        met_root_dir = await domains_db.get_root_dir(domain)
         data['config']['findmetdata'] = {
-            "met_root_dir": domains_db.get_root_dir(domain),
+            "met_root_dir": met_root_dir,
             "arl": {
                 "index_filename_pattern":
                     domains.DOMAINS[domain]['index_filename_pattern'],
@@ -276,14 +277,14 @@ class RunExecuter(tornado.web.RequestHandler):
             }
         }
 
-    def _configure_localmet(self, data, domain):
+    async def _configure_localmet(self, data, domain):
         tornado.log.gen_log.debug('Configuring localmet')
         data['config'] = data.get('config', {})
         data['config']['localmet'] = {
             "time_step": domains.DOMAINS[domain]['time_step']
         }
 
-    def _configure_plumerising(self, data, domain):
+    async def _configure_plumerising(self, data, domain):
         tornado.log.gen_log.debug('Configuring plumerising')
         data['config'] = data.get('config', {})
         data['config']['plumerising'] = {
@@ -292,7 +293,7 @@ class RunExecuter(tornado.web.RequestHandler):
 
     DEFAULT_HYSPLIT_GRID_LENGTH = 2000
 
-    def _configure_dispersion(self, data, domain):
+    async def _configure_dispersion(self, data, domain):
         tornado.log.gen_log.debug('Configuring dispersion')
         if (not data.get('config', {}).get('dispersion', {}) or not
                 data['config']['dispersion'].get('start') or not
@@ -355,7 +356,7 @@ class RunExecuter(tornado.web.RequestHandler):
 
         # TODO: any other model-specific configuration?
 
-    def _configure_visualization(self, data, domain):
+    async def _configure_visualization(self, data, domain):
         tornado.log.gen_log.debug('Configuring visualization')
         # Force visualization of dispersion, and let output go into dispersion
         # output directory; in case dispersion model was hysplit, specify
@@ -373,7 +374,7 @@ class RunExecuter(tornado.web.RequestHandler):
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
-    def _configure_export(self, data, domain):
+    async def _configure_export(self, data, domain):
         # we just run export to get image and file information
         tornado.log.gen_log.debug('Configuring export')
         # dest_dir = data['config']['dispersion']['output_dir'].replace(
