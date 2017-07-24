@@ -414,7 +414,8 @@ class RunStatus(tornado.web.RequestHandler):
             self.set_status(404, "Run doesn't exist")
             self.write({"error": "Run doesn't exist"})
         else:
-            self.write({"run": run})
+            run['complete'] = 'output_url' in run
+            self.write(run)
 
 
 

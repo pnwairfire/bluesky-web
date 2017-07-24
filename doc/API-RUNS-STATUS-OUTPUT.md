@@ -11,55 +11,50 @@ This API returns the status of a specific dispersion run
 ### Response
 
     {
-        "run": {
-            "server": {
-                "ip": "<ip address>"
-            },
-            "modules": [...list of modules...],
-            "output_url": "<root output url>",
-            "ts": "2017-07-19T22:13:01Z",
-            "queue": "dri",
-            "run_id": "6e035f30-6ccf-11e7-b85c-3c15c2c6639e",
-            "output_dir": "<root output dir>",
-            "status": [
-                ["<step>", "<ts>"],
-                ...
-            ]
-        }
+        "complete": <boolean>,
+        "server": {
+            "ip": "<ip address>"
+        },
+        "modules": [...list of modules...],
+        "output_url": "<root output url>",
+        "ts": "2017-07-19T22:13:01Z",
+        "queue": "dri",
+        "run_id": "6e035f30-6ccf-11e7-b85c-3c15c2c6639e",
+        "output_dir": "<root output dir>",
+        "status": [
+            ["<step>", "<ts>"],
+            ...
+        ]
     }
-
 
 ### Example:
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123"
 
 
-    {
-        "run": {
-            "server": {
-                "ip": "63.142.207.34"
-            },
-            "modules": [
-                "findmetdata",
-                "timeprofiling",
-                "dispersion",
-                "visualization",
-                "export"
-            ],
-            "output_url": "http://localhost:8886/pgv3-output/6e035f30-6ccf-11e7-b85c-3c15c2c6639e",
-            "ts": "2017-07-19T22:13:01Z",
-            "queue": "dri",
-            "run_id": "6e035f30-6ccf-11e7-b85c-3c15c2c6639e",
-            "output_dir": "/Users/jdubowy/code/airfire-bluesky-web/docker-data/output/pgv3-output/6e035f30-6ccf-11e7-b85c-3c15c2c6639e",
-            "status": [
-                ["enqueued", "2017-07-19T22:13:01Z"],
-                ["dequeued","2017-07-19T22:13:02Z"],
-                ["running","2017-07-19T22:13:03Z"],
-                ["completed","2017-07-19T22:13:07Z"],
-                ["output_written","2017-07-19T22:13:07Z"]
-            ]
-        }
+    {                                                                      "queue": "dri",
+        "complete": true,
+        "ts": "2017-07-24T22:33:02Z",
+        "run_id": "0d97a6c2-70c0-11e7-acdc-3c15c2c6639e",
+        "output_url": "http://localhost:8886/pgv3-output/0d97a6c2-70c0-11e7-acdc-3c15c2c6639e",
+        "status": [
+            [ "enqueued", "2017-07-24T22:33:02Z"],
+            [ "dequeued", "2017-07-24T22:33:02Z"],
+            ["running", "2017-07-24T22:33:03Z"],
+            ["completed", "2017-07-24T22:33:12Z"],
+            ["output_written", "2017-07-24T22:33:12Z"]
+        ],
+        "server": {
+            "ip": "63.142.207.34"
+        },
+        "modules": [
+            "findmetdata",
+            "localmet",
+            "plumerising"
+        ],
+        "output_dir": "/Users/jdubowy/code/airfire-bluesky-web/docker-data/output/pgv3-output/0d97a6c2-70c0-11e7-acdc-3c15c2c6639e"
     }
+
 
 
 
