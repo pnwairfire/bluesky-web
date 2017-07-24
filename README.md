@@ -36,7 +36,8 @@ You just need to provide the url of one that is running.
     cd /path/to/airfire-bluesky-web
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
         ./docker-logs/worker/dri ./docker-logs/worker/nam \
-        ./docker-logs/worker/no-met
+        ./docker-logs/worker/no-met ./docker-data/mongodb/db \
+        ./docker-data/output
 
 #### foreman
 
