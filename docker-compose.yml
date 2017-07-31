@@ -8,25 +8,21 @@ services:
   mongo:
     image: mongo:3.4.6
     container_name: bluesky-web-mongo
-    # environment:
-    # # These are meant to be overridden
-    # - MONGO_INITDB_ROOT_USERNAME=blueskyweb
-    # - MONGO_INITDB_ROOT_PASSWORD=blueskywebmongopassword
+    environment:
+    # These are meant to be overridden
+    - MONGO_INITDB_ROOT_USERNAME=blueskywebadmin
+    - MONGO_INITDB_ROOT_PASSWORD=blueskywebmongopasswordadmin
     ports:
     - 27018:27017
     volumes:
     - $PWD/docker-logs/mongodb/:/var/log/mongodb/
     - $PWD/docker-data/mongodb/db/:/data/db/
     - $PWD/docker-data/mongodb/configdb/:/data/configdb/
-    #- $PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/
+    - $PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/
     # Note: '--auth' is automatically added to command if
-    #   MONGO_INITDB_ROOT_[USERNAME|PASSWORD] are set
-    # see
-    #   - https://stackoverflow.com/questions/34559557/how-to-enable-authentication-on-mongodb-through-docker
-    #   - https://github.com/docker-library/mongo/blob/27f2722bb2ebd26354321adc8c3f19f7958529e1/3.4/Dockerfile
-    #   - https://github.com/docker-library/mongo/blob/27f2722bb2ebd26354321adc8c3f19f7958529e1/3.4/docker-entrypoint.sh
-    #command: mongod --auth --logpath /var/log/mongodb/mongodb.log
-    command: mongod --logpath /var/log/mongodb/mongodb.log
+    #   MONGO_INITDB_ROOT_[USERNAME|PASSWORD] are set, but we need to
+    #   set `command` in order to specify `--logpath`
+    command: mongod --auth --logpath /var/log/mongodb/mongodb.log
   web:
     image: bluesky-web
     container_name: bluesky-web
@@ -42,16 +38,9 @@ services:
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    #command: bsp-web -d -b bluesky -o $PWD/docker-data/output
-    #  --path-prefix=bluesky -p 8887
-    #  --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
-    #  --log-level=DEBUG
-    #  --log-file=/var/log/blueskyweb/bluesky-web.log
-    #  --output-url-scheme=http --output-url-port=8886
-    #  --output-url-path-prefix= --bluesky-log-level=DEBUG
     command: bsp-web -d -b bluesky -o $PWD/docker-data/output
       --path-prefix=bluesky-web -p 8887
-      --mongodb-url=mongodb://mongo/blueskyweb
+      --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
       --log-level=DEBUG
       --log-file=/var/log/blueskyweb/bluesky-web.log
       --output-url-scheme=http --output-url-port=8886
@@ -79,7 +68,7 @@ services:
     - mongo
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
-    - MONGODB_URL=mongodb://mongo/blueskyweb
+    - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q no-met -c 5 -A blueskyworker.tasks worker
       -l INFO -f /var/log/blueskyworker/bluesky-web-worker-no-met.log
@@ -99,7 +88,7 @@ services:
     - mongo
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
-    - MONGODB_URL=mongodb://mongo/blueskyweb
+    - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q dri -c 5 -A blueskyworker.tasks worker
       -l INFO -f /var/log/blueskyworker/bluesky-web-worker-dri.log
@@ -117,7 +106,7 @@ services:
     - mongo
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
-    - MONGODB_URL=mongodb://mongo/blueskyweb
+    - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q nam -c 5 -A blueskyworker.tasks worker
       -l INFO -f /var/log/blueskyworker/bluesky-web-worker-nam.log
