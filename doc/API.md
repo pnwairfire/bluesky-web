@@ -9,7 +9,7 @@ The API docs are divided into four categories:
 
 In each of the docs linked to above, API urls contain the env
 var `$BLUESKY_API_ROOT_URL`. `$BLUESKY_API_ROOT_URL` would be
-something like 'http://localhost:8887' in development or
+something like 'http://localhost:8887/bluesky-web' in development or
 'https://www.blueskywebhost.com/bluesky-web' in production.  In bash,
 you can set it in a terminal session with:
 
