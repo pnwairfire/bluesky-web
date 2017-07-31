@@ -110,24 +110,18 @@ one hour.
                             "utc_offset": "-07:00"
                         },
                         "heat": {
-                            "total": [
-                                3901187352927.508
-                            ],
-                            "residual": [
-                                1312164844326.5745
-                            ],
-                            "flaming": [
-                                1395852418045.9065
-                            ],
-                            "smoldering": [
-                                1193170090555.0266
-                            ]
+                            "summary": {
+                                "total": 3901187352927.508,
+                                "residual": 1312164844326.5745,
+                                "flaming": 1395852418045.9065,
+                                "smoldering": 1193170090555.0266
+                            }
                         },
                         "consumption": {
                             "summary": {
-                                "smoldering": [21712.600892425173],
-                                "flaming": [40988.711969791053],
-                                "residual": [13823.389194227209]
+                                "smoldering": 21712.600892425173,
+                                "flaming": 40988.711969791053,
+                                "residual": 13823.389194227209
                             }
                         },
                         "fuelbeds": [
@@ -283,8 +277,7 @@ status and output API requests (described below).
 Unlike the hysplit request, above, this API requires both emissions
 and consumption data.
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/" -H 'Content-Type: application/json' -d '
-    {
+    $ echo '{
         "fire_information": [
             {
                 "meta": {
@@ -293,14 +286,11 @@ and consumption data.
                         "ws": 12
                     }
                 },
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Yosemite, CA"
-                },
-                "id": "SF11C14225236095807750",
                 "type": "wildfire",
                 "growth": [
                     {
+                        "start": "2014-05-29T17:00:00",
+                        "end": "2014-05-30T17:00:00",
                         "location": {
                             "area": 10000,
                             "ecoregion": "western",
@@ -308,29 +298,25 @@ and consumption data.
                             "longitude": -119.7615805,
                             "utc_offset": "-07:00"
                         },
+                        "heat": {
+                            "summary": {
+                                "total": 3901187352927.508,
+                                "residual": 1312164844326.5745,
+                                "flaming": 1395852418045.9065,
+                                "smoldering": 1193170090555.0266
+                            }
+                        },
+                        "consumption": {
+                            "summary": {
+                                "smoldering": 21712.600892425173,
+                                "flaming": 40988.711969791053,
+                                "residual": 13823.389194227209
+                            }
+                        },
                         "fuelbeds": [
                             {
                                 "fccs_id": "49",
                                 "pct": 50.0,
-                                "heat": {
-                                    "total": [
-                                        3901187352927.508
-                                    ],
-                                    "residual": [
-                                        1312164844326.5745
-                                    ],
-                                    "flaming": [
-                                        1395852418045.9065
-                                    ],
-                                    "smoldering": [
-                                        1193170090555.0266
-                                    ]
-                                },
-                                "consumption": {
-                                    "smoldering": [21712.600892425173],
-                                    "flaming": [40988.711969791053],
-                                    "residual": [13823.389194227209]
-                                },
                                 "emissions": {
                                     "flaming": {
                                         "PM25": [3000.3815120047017005]
@@ -343,10 +329,7 @@ and consumption data.
                                     }
                                 }
                             }
-                        ],
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        "pct": 100.0
+                        ]
                     }
                 ]
             }
@@ -358,7 +341,11 @@ and consumption data.
                 "model": "vsmoke"
             }
         }
-    }' | python -m json.tool
+    }'  > dev/data/dispersion-vsmoke-input.json
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/" \
+        -H 'Content-Type: application/json' \
+        -d @dev/data/dispersion-vsmoke-input.json | python -m json.tool
 
 As mentioned earlier, the fact that the emissions data is in an array
 is because the consumption module (more specifically, the underlying
