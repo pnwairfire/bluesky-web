@@ -191,10 +191,17 @@ class RunExecuter(tornado.web.RequestHandler):
             dispersion_modules = (self.MET_DISPERSION_MODULES
                 if domain else self.METLESS_DISPERSION_MODULES)
             if mode == 'all':
-                _set(self.FUELBEDS_MODULES + self.EMISSIONS_MODULES +
-                    self.PLUMERISE_MODULES + dispersion_modules)
+                if domain:
+                    _set(self.FUELBEDS_MODULES +
+                        self.EMISSIONS_MODULES +
+                        self.PLUMERISE_MODULES +
+                        dispersion_modules)
+                else:
+                    _set(self.FUELBEDS_MODULES +
+                        self.EMISSIONS_MODULES +
+                        dispersion_modules)
             else:
-                if 'met' not in data:
+                if domain and ('met' not in data):
                     _set(['findmetdata'] + dispersion_modules)
                 else:
                     _set(dispersion_modules)
