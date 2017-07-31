@@ -91,10 +91,10 @@ To see documentation for a specific task, use the '-d' option. E.g.:
 
 First time:
 
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A deploy
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A start
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A configure_web_apache_proxy
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A configure_output_web_apache_proxy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=playground fab -A deploy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=playground fab -A start
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=playground fab -A configure_web_apache_proxy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=playground fab -A configure_output_web_apache_proxy
 
 Subsequent deployments:
 
