@@ -51,7 +51,7 @@ class BlueSkyWebDB(object):
         return run
 
     async def find_runs(self, status=None, limit=None, offset=None):
-        query = {'status': status} if status else {}
+        query = {'history.0.status': status} if status else {}
         tornado.log.gen_log.debug('query, limit, offset: %s, %s, %s',
             query, limit, offset)
 
