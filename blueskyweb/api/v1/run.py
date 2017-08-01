@@ -423,6 +423,8 @@ class RunExecuter(tornado.web.RequestHandler):
 
 class RunStatus(tornado.web.RequestHandler):
 
+    VERBOSE_FIELDS = ('output_dir', 'queue', 'modules', 'server')
+
     @tornado.web.asynchronous
     async def get(self, run_id):
         # TODO: implement using data form mongodb
@@ -432,6 +434,10 @@ class RunStatus(tornado.web.RequestHandler):
             self.write({"error": "Run doesn't exist"})
         else:
             run['complete'] = 'output_url' in run
+            if self.get_query_argument('verbose', None) is None:
+                run['status'] = run['status'][-1] if run.get('status') else None
+                for k in self.VERBOSE_FIELDS:
+                    run.pop(k, None)
             self.write(run)
 
 
