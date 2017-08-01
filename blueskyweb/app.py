@@ -81,11 +81,11 @@ def get_routes(path_prefix):
         #     the current paths are:
         #       - /api/v1/runs/<guid>/
         #       - /api/v1/runs/<guid>/output/
+        (r"/api/v1/runs/?", RunsInfoV1),
+        (r"/api/v1/runs/(enqueued|dequeued|running|processing_output|completed|failed)/?", RunsInfoV1),
         (r"/api/v1/runs/([^/]+)/?", RunStatusV1),
         (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
-        (r"/api/v1/runs?/([^/]+)/output/?", RunOutputV1),
-        (r"/api/v1/runs/?", RunsInfoV1),
-        (r"/api/v1/runs/(enqueued|dequeued|started|completed|failed)/?", RunsInfoV1)
+        (r"/api/v1/runs?/([^/]+)/output/?", RunOutputV1)
     ]
     if path_prefix:
         path_prefix = path_prefix.strip('/')

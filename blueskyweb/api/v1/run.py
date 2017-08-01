@@ -431,20 +431,29 @@ class RunExecuter(tornado.web.RequestHandler):
             tornado.log.gen_log.debug('image_results_version not specified')
         # ***** END
 
+
 class RunStatusBase(RunBase):
 
     VERBOSE_FIELDS = ('output_dir', 'queue', 'modules', 'server')
 
-    def prune(self, run):
-        if not self.get_boolean_argument('verbose'):
-            run['status'] = run['status'][-1] if run.get('status') else None
+    def process(self, run):
+        if not self.get_boolean_argument('raw'):
+            # add
+            run['complete'] = 'output_url' in run
+            # TODO: figure out how to estimate percentage from
+            #   log and stdout information
+            run['percent'] = None
+            # history is in reverse chronological order
+            run['status'] = run['history'][0] if run.get('history') else None
+
+            # prune
             for k in self.VERBOSE_FIELDS:
                 run.pop(k, None)
+
         return run
 
 
 class RunStatus(RunStatusBase):
-
 
     @tornado.web.asynchronous
     async def get(self, run_id):
@@ -454,10 +463,23 @@ class RunStatus(RunStatusBase):
             self.set_status(404, "Run doesn't exist")
             self.write({"error": "Run doesn't exist"})
         else:
-            run['complete'] = 'output_url' in run
-            self.prune(run)
+            self.process(run)
             self.write(run)
 
+
+class RunsInfo(RunStatusBase):
+
+    @tornado.web.asynchronous
+    async def get(self, status=None):
+        limit = int(self.get_query_argument('limit', 10))
+        offset = int(self.get_query_argument('offset', 0))
+        runs = await self.settings['mongo_db'].find_runs(status=status,
+            limit=limit, offset=offset)
+        runs = [self.process(run) for run in runs]
+
+        # TODO: include total count of runs with given status, and of runs
+        #    of all statuses?
+        self.write({"runs": runs})
 
 
 class RunOutput(tornado.web.RequestHandler):
@@ -611,17 +633,3 @@ class RunOutput(tornado.web.RequestHandler):
                 msg = "Failed to open output file: {}".format(output_json_file)
                 raise tornado.web.HTTPError(status_code=500, log_message=msg)
 
-
-class RunsInfo(RunStatusBase):
-
-    @tornado.web.asynchronous
-    async def get(self, status=None):
-        limit = int(self.get_query_argument('limit', 10))
-        offset = int(self.get_query_argument('offset', 0))
-        runs = await self.settings['mongo_db'].find_runs(status=status,
-            limit=limit, offset=offset)
-        runs = [self.prune(run) for run in runs]
-
-        # TODO: include total count of runs with given status, and of runs
-        #    of all statuses?
-        self.write({"runs": runs})
