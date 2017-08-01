@@ -169,8 +169,8 @@ class BlueSkyRunner(object):
             self._create_input_file(container)
             container.start()
             self._record_run('running')
-            # TODO: rather than just wait, poll the logs and report status?
-            docker.APIClient().wait(container.id)
+
+            self._wait(container)
             self._record_run('completed')
             with open(self.output_json_filename, 'r') as f:
                 output = f.read()
@@ -203,13 +203,42 @@ class BlueSkyRunner(object):
             container.stop()
             container.remove()
 
+    def _wait(self, container):
+        #docker.APIClient().wait(container.id)
+
+        # TODO: figure out more elegant way of polling for completion than
+        #   calling top until it raises an APIError
+        api_client = docker.APIClient()
+        while True:
+            try:
+                api_client.top(container.id)
+            except docker.errors.APIError as e:
+                # TODO: somehow confirm not failure, e.g. by checking
+                #    for presence of output file.  If failure, raise exception
+                #    (though, I guess if there's not output file, the)
+                return
+
+            try:
+                e = api_client.exec_create(container.id,
+                    'tail -1 {}'.format(self.output_log_filename))
+                r = api_client.exec_start(e['Id'])
+                self._record_run('progress_check', log=r.decode())
+            except Exception as e:
+                print(e)
+                pass
+
+            time.sleep(1)
+
+
+
     ##
     ## DB
     ##
 
-    def _record_run(self, status, **data):
+    def _record_run(self, status, log=None, **data):
         if self.db:
-            self.db.record_run(self.input_data['run_id'], status, **data)
+            self.db.record_run(self.input_data['run_id'], status, log=log,
+                **data)
 
     ##
     ## I/O
