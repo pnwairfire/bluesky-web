@@ -264,7 +264,7 @@ class RunExecuter(tornado.web.RequestHandler):
             tornado.log.gen_log.error('Exception: %s', e)
             self.set_status(500)
 
-    async def _configure_emissions(self, data):
+    async def _configure_emissions(self, data, domain=None):
         tornado.log.gen_log.debug('Configuring emissions')
         data['config'] = data.get('config', {})
         data['config']['emissions'] = data['config'].get('emissions', {})
