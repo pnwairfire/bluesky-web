@@ -11,7 +11,8 @@ class BlueSkyWebDB(object):
             or 'blueskyweb')
         self.db = motor.motor_tornado.MotorClient(mongodb_url)[db_name]
 
-    def record_run(self, run_id, status, log=None, callback=None, **data):
+    def record_run(self, run_id, status, log=None, stdout=None, callback=None,
+            **data):
         def _callback(result, error):
             if error:
                 tornado.log.gen_log.error('Error recording run: %s', error)
@@ -26,6 +27,8 @@ class BlueSkyWebDB(object):
         doc = {"$push": {"status":{'status': status, 'ts': ts}}}
         if log:
             doc["$push"]["status"]["log"] = log
+        if stdout:
+            doc["$push"]["status"]["stdout"] = stdout
         if data:
             doc["$set"] = data
 

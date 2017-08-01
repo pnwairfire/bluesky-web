@@ -219,10 +219,14 @@ class BlueSkyRunner(object):
                 return
 
             try:
+                # last entry in log
                 e = api_client.exec_create(container.id,
                     'tail -1 {}'.format(self.output_log_filename))
                 r = api_client.exec_start(e['Id'])
-                self._record_run('progress_check', log=r.decode())
+                # last line in stdout
+                s = api_client.logs(container.id, tail=1)
+                self._record_run('progress_check', log=r.decode(),
+                    stdout=s.decode())
             except Exception as e:
                 print(e)
                 pass
@@ -233,10 +237,10 @@ class BlueSkyRunner(object):
     ## DB
     ##
 
-    def _record_run(self, status, log=None, **data):
+    def _record_run(self, status, log=None, stdout=None, **data):
         if self.db:
             self.db.record_run(self.input_data['run_id'], status, log=log,
-                **data)
+                stdout=stdout, **data)
 
     ##
     ## I/O
