@@ -227,9 +227,7 @@ class BlueSkyRunner(object):
                 print(e)
                 pass
 
-            time.sleep(1)
-
-
+            time.sleep(5)
 
     ##
     ## DB
