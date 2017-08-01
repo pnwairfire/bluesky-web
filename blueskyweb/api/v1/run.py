@@ -144,6 +144,11 @@ class RunExecuter(tornado.web.RequestHandler):
                 else:
                     await self._run_in_process(data)
 
+        except tornado.web.HTTPError as e:
+            # this was intentionally raised; re-raise it
+            self.write({'error': str(e)})
+            raise
+
         except Exception as e:
             # IF exceptions aren't caught, the traceback is returned as
             # the response body
@@ -274,7 +279,12 @@ class RunExecuter(tornado.web.RequestHandler):
         tornado.log.gen_log.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
         domains_db = domains.DomainDB(self.settings['mongodb_url'])
-        met_root_dir = await domains_db.get_root_dir(domain)
+        try:
+            met_root_dir = await domains_db.get_root_dir(domain)
+        except domains.InvalidDomainError as e:
+            msg = "Invalid domain: {}".format(domain)
+            raise tornado.web.HTTPError(status_code=404, log_message=msg)
+
         data['config']['findmetdata'] = {
             "met_root_dir": met_root_dir,
             "arl": {
