@@ -92,6 +92,16 @@ def is_same_host(run):
 ### API Handlers
 ###
 
+class RunBase(tornado.web.RequestHandler):
+
+    BOOLEAN_VALUES = ('false', '0')
+
+    def get_boolean_argument(self, key):
+        # false if not specified or if '0' or 'false', 'False', 'FALSE', etc.
+        v = self.get_query_argument(key, None)
+        return v is not None and v.lower() not in self.BOOLEAN_VALUES
+
+
 class RunExecuter(tornado.web.RequestHandler):
 
     @tornado.web.asynchronous
@@ -421,12 +431,12 @@ class RunExecuter(tornado.web.RequestHandler):
             tornado.log.gen_log.debug('image_results_version not specified')
         # ***** END
 
-class RunStatusBase(tornado.web.RequestHandler):
+class RunStatusBase(RunBase):
 
     VERBOSE_FIELDS = ('output_dir', 'queue', 'modules', 'server')
 
     def prune(self, run):
-        if self.get_query_argument('verbose', None) is None:
+        if not self.get_boolean_argument('verbose'):
             run['status'] = run['status'][-1] if run.get('status') else None
             for k in self.VERBOSE_FIELDS:
                 run.pop(k, None)
