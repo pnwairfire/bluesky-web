@@ -27,7 +27,13 @@ from blueskyworker.tasks import run_bluesky, BlueSkyRunner
 from blueskyweb.lib import domains
 
 
-IP_ADDRESS = ipify.get_ip()
+try:
+    IP_ADDRESS = ipify.get_ip()
+except:
+    # IP_ADDRESS is only used to see if worker is running on
+    # same machine as web server.  If ipify fails, we'll just
+    # resort to loading all output as if from remote server
+    pass
 
 ##
 ## Utilities for working with remote output

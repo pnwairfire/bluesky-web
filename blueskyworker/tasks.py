@@ -32,7 +32,11 @@ app.conf.update(
     }
 )
 
-IP_ADDRESS = ipify.get_ip()
+try:
+    IP_ADDRESS = ipify.get_ip()
+except:
+    # this should only happen in dev, if working without internet connection
+    IP_ADDRESS = 'localhost'
 HOSTNAME = os.environ.get('PUBLIC_HOSTNAME') or IP_ADDRESS
 
 ##
