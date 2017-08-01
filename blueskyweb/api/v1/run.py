@@ -260,7 +260,7 @@ class RunExecuter(tornado.web.RequestHandler):
         #    self.write in callback, so we can handle failure?
         self.settings['mongo_db'].record_run(data['run_id'], 'enqueued',
             queue=queue_name, modules=data["modules"],
-            ts=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
+            initiated_at=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
         self.write({"run_id": data['run_id']})
 
     async def _run_in_process(self, data):

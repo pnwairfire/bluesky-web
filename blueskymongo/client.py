@@ -56,7 +56,7 @@ class BlueSkyWebDB(object):
             query, limit, offset)
 
         cursor = self.db.runs.find(query)
-        cursor = cursor.sort([('ts', -1)]).limit(limit).skip(offset)
+        cursor = cursor.sort([('initiated_at', -1)]).limit(limit).skip(offset)
 
         # runs = []
         # async for r in cursor:
