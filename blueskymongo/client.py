@@ -4,6 +4,29 @@ from urllib.parse import urlparse
 import motor
 import tornado.log
 
+
+class RunStatusesType(type):
+    STATUSES = {
+        "Enqueued": "enqueued",
+        "Dequeued": "dequeued",
+        "Running": "running",
+        "ProcessingOutput": "processing_output",
+        "Completed": "completed",
+        "Failed": "failed"
+    }
+
+    def __getattr__(self, key):
+        if key in self.STATUSES:
+            return self.STATUSES[key]
+        elif key == 'statuses':
+            return list(self.STATUSES.values())
+        #return super(RunStatus, self).__getattr__(key)
+        raise AttributeError(key)
+
+class RunStatuses(metaclass=RunStatusesType):
+    pass
+
+
 class BlueSkyWebDB(object):
 
     def __init__(self, mongodb_url):

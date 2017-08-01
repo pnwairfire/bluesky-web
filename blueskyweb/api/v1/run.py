@@ -23,6 +23,7 @@ import ipify
 import tornado.web
 import tornado.log
 
+from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import run_bluesky, BlueSkyRunner
 from blueskyweb.lib import domains
 
@@ -262,10 +263,10 @@ class RunExecuter(tornado.web.RequestHandler):
         # TODO: figure out how to enqueue without blocking
         settings = {k:v for k, v in self.settings.items() if k != 'mongo_db'}
         run_bluesky.apply_async(args=args, kwargs=settings, queue=queue_name)
-        # TODO: call specify callback in record_run, calling
+        # TODO: specify callback in record_run, calling
         #    self.write in callback, so we can handle failure?
-        self.settings['mongo_db'].record_run(data['run_id'], 'enqueued',
-            queue=queue_name, modules=data["modules"],
+        self.settings['mongo_db'].record_run(data['run_id'],
+            RunStatuses.Enqueued, queue=queue_name, modules=data["modules"],
             initiated_at=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
         self.write({"run_id": data['run_id']})
 

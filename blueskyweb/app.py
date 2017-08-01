@@ -11,7 +11,7 @@ import tornado.ioloop
 #import tornado.log
 import tornado.web
 
-from blueskymongo.client import BlueSkyWebDB
+from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
 # TODO: use path args for version and api module. ex:
 #  routes = [
@@ -69,7 +69,8 @@ def get_routes(path_prefix):
         (r"/api/v1/domains/?", DomainInfoV1),
         (r"/api/v1/domains/([^/]+)/?", DomainInfoV1),
         (r"/api/v1/domains/([^/]+)/available-dates/?", DomainAvailableDatesV1),
-        (r"/api/v1/domains/([^/]+)/available-dates/([0-9-]+)/?", DomainAvailableDateV1),
+        (r"/api/v1/domains/([^/]+)/available-dates/([0-9-]+)/?",
+            DomainAvailableDateV1),
         (r"/api/v1/available-dates/?", DomainAvailableDatesV1),
         # Initiating runs
         (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),
@@ -82,7 +83,8 @@ def get_routes(path_prefix):
         #       - /api/v1/runs/<guid>/
         #       - /api/v1/runs/<guid>/output/
         (r"/api/v1/runs/?", RunsInfoV1),
-        (r"/api/v1/runs/(enqueued|dequeued|running|processing_output|completed|failed)/?", RunsInfoV1),
+        (r"/api/v1/runs/({})/?".format('|'.join(RunStatuses.statuses)),
+            RunsInfoV1),
         (r"/api/v1/runs/([^/]+)/?", RunStatusV1),
         (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
         (r"/api/v1/runs?/([^/]+)/output/?", RunOutputV1)

@@ -14,7 +14,7 @@ import ipify
 import tornado.log
 from celery import Celery
 
-from blueskymongo.client import BlueSkyWebDB
+from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://localhost:27018/blueskyweb'
 app = Celery('blueskyworker.tasks', broker=MONGODB_URL)
@@ -55,7 +55,8 @@ def run_bluesky(input_data, **settings):
      See `_run_bluesky` helpstring for required settings
     """
     db = BlueSkyWebDB(MONGODB_URL)
-    db.record_run(input_data['run_id'], 'dequeued', server={"ip": IP_ADDRESS})
+    db.record_run(input_data['run_id'], RunStatuses.Dequeued,
+        server={"ip": IP_ADDRESS})
     tornado.log.gen_log.info("Running %s from queue %s",
         input_data['run_id'],  '/') # TODO: get queue from job process
 
@@ -172,9 +173,9 @@ class BlueSkyRunner(object):
             #     tty=True)
             self._create_input_file(container)
             container.start()
-            self._record_run('running')
+            self._record_run(RunStatuses.Running)
             self._wait(container)
-            self._record_run('processing_output')
+            self._record_run(RunStatuses.ProcessingOutput)
             with open(self.output_json_filename, 'r') as f:
                 output = f.read()
 
@@ -194,7 +195,8 @@ class BlueSkyRunner(object):
                     tornado.log.gen_log.error('failed to parse error : %s', e)
                     pass
 
-                status = 'failed' if 'error' in data else 'completed'
+                status = (RunStatuses.Failed if 'error' in data
+                    else RunStatuses.Completed)
                 self._record_run(status, **data)
 
             else:
@@ -202,7 +204,7 @@ class BlueSkyRunner(object):
 
         except Exception as e:
             #tornado.log.gen_log.debug(traceback.format_exc())
-            self._record_run('failed',
+            self._record_run(RunStatuses.Failed,
                 error={"message": str(e)})
             raise BlueSkyJobError(str(e))
 
@@ -232,7 +234,7 @@ class BlueSkyRunner(object):
                 r = api_client.exec_start(e['Id'])
                 # last line in stdout
                 s = api_client.logs(container.id, tail=1)
-                self._record_run('running', log=r.decode(),
+                self._record_run(RunStatuses.Running, log=r.decode(),
                     stdout=s.decode())
             except Exception as e:
                 print(e)
