@@ -169,26 +169,29 @@ class BlueSkyRunner(object):
             self._create_input_file(container)
             container.start()
             self._record_run('running')
-
             self._wait(container)
-            self._record_run('completed')
+            self._record_run('processing_output')
             with open(self.output_json_filename, 'r') as f:
                 output = f.read()
 
             if self.db:
+                data = {
+                    'output_url': self.output_url,
+                    'output_dir': self.output_dir
+                }
                 try:
                     # check output for error, and if so record status
                     # 'failed' with error message
                     error = json.loads(output).get('error')
                     if error:
-                        self._record_run('failed', error=error)
+                        data['error'] = error
 
                 except Exception as e:
                     tornado.log.gen_log.error('failed to parse error : %s', e)
                     pass
 
-                self._record_run('output_written',
-                    output_url=self.output_url, output_dir=self.output_dir)
+                status = 'failed' if 'error' in data else 'completed'
+                self._record_run(status, **data)
 
             else:
                 return output
@@ -225,7 +228,7 @@ class BlueSkyRunner(object):
                 r = api_client.exec_start(e['Id'])
                 # last line in stdout
                 s = api_client.logs(container.id, tail=1)
-                self._record_run('progress_check', log=r.decode(),
+                self._record_run('running', log=r.decode(),
                     stdout=s.decode())
             except Exception as e:
                 print(e)
