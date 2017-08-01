@@ -446,11 +446,15 @@ class RunStatusBase(RunBase):
         if not self.get_boolean_argument('raw'):
             # add
             run['complete'] = 'output_url' in run
+
             # TODO: figure out how to estimate percentage from
             #   log and stdout information
             run['percent'] = None
+
             # history is in reverse chronological order
-            run['status'] = run['history'][0] if run.get('history') else None
+            # Note: history will always be defined; a run is never
+            #  recorded in the db without adding to the history
+            run['status'] = run.pop('history')[0] # if run.get('history') else None
 
             # prune
             for k in self.VERBOSE_FIELDS:
