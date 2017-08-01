@@ -205,8 +205,7 @@ require emissions data.
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/DRI6km/" -H 'Content-Type: application/json' -d '
-    {
+    $ echo '{
         "config": {
             "emissions": {
                 "species": [
@@ -242,7 +241,11 @@ require emissions data.
                 "type": "wildfire"
             }
         ]
-    }' | python -m json.tool
+    }' > dev/data/all-input.json
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/DRI6km/" \
+        -H 'Content-Type: application/json' \
+        -d @dev/data/all-input.json | python -m json.tool
 
 
 
