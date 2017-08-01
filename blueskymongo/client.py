@@ -24,11 +24,19 @@ class BlueSkyWebDB(object):
         spec = {"run_id": run_id}
         # include run_id in doc in case it's an insert
         ts = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-        doc = {"$push": {"status":{'status': status, 'ts': ts}}}
+        doc = {
+            "$push": {
+                "history": {
+                    # instert at position  in reverse chronological order
+                    '$each': [{'status': status, 'ts': ts}],
+                    '$position': 0
+                }
+            }
+        }
         if log:
-            doc["$push"]["status"]["log"] = log
+            doc["$push"]["history"]['$each'][0]["log"] = log
         if stdout:
-            doc["$push"]["status"]["stdout"] = stdout
+            doc["$push"]["history"]['$each'][0]["stdout"] = stdout
         if data:
             doc["$set"] = data
 
