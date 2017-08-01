@@ -421,9 +421,20 @@ class RunExecuter(tornado.web.RequestHandler):
             tornado.log.gen_log.debug('image_results_version not specified')
         # ***** END
 
-class RunStatus(tornado.web.RequestHandler):
+class RunStatusBase(tornado.web.RequestHandler):
 
     VERBOSE_FIELDS = ('output_dir', 'queue', 'modules', 'server')
+
+    def prune(self, run):
+        if self.get_query_argument('verbose', None) is None:
+            run['status'] = run['status'][-1] if run.get('status') else None
+            for k in self.VERBOSE_FIELDS:
+                run.pop(k, None)
+        return run
+
+
+class RunStatus(RunStatusBase):
+
 
     @tornado.web.asynchronous
     async def get(self, run_id):
@@ -434,10 +445,7 @@ class RunStatus(tornado.web.RequestHandler):
             self.write({"error": "Run doesn't exist"})
         else:
             run['complete'] = 'output_url' in run
-            if self.get_query_argument('verbose', None) is None:
-                run['status'] = run['status'][-1] if run.get('status') else None
-                for k in self.VERBOSE_FIELDS:
-                    run.pop(k, None)
+            self.prune(run)
             self.write(run)
 
 
@@ -594,7 +602,7 @@ class RunOutput(tornado.web.RequestHandler):
                 raise tornado.web.HTTPError(status_code=500, log_message=msg)
 
 
-class RunsInfo(tornado.web.RequestHandler):
+class RunsInfo(RunStatusBase):
 
     @tornado.web.asynchronous
     async def get(self, status=None):
@@ -602,6 +610,7 @@ class RunsInfo(tornado.web.RequestHandler):
         offset = int(self.get_query_argument('offset', 0))
         runs = await self.settings['mongo_db'].find_runs(status=status,
             limit=limit, offset=offset)
+        runs = [self.prune(run) for run in runs]
 
         # TODO: include total count of runs with given status, and of runs
         #    of all statuses?
