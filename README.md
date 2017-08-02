@@ -107,8 +107,8 @@ First time:
 
 Subsequent deployments:
 
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A deploy
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A restart
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=playground fab -A deploy
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=playground fab -A restart
 
 ### Test Environment
 
