@@ -1,21 +1,28 @@
-if [ $# -lt 2 ] || [ $# -gt 3 ]
+if [ $# -lt 2 ] || [ $# -gt 4 ]
   then
-    echo "Usage: $0 <hostname> <domain> [response output file]"
-    echo "Ex:  $0 localhost:8887 DRI2km /tmp/web-regression-out"
+    echo "Usage: $0 <root_url> <domain> <date> [response output file]"
+    echo "Examples:"
+    echo "  $0 http://localhost:8887/bluesky-web/ DRI6km 2014-05-29 ./tmp/web-regression-out-dev.log"
+    echo "  $0 https://www.blueskywebhost.com/bluesky-web-test/ DRI2km \`date "+%Y-%m-%d"\` ./tmp/web-regression-out-test.log"
+    echo "  $0 https://www.blueskywebhost.com/bluesky-web/ DRI2km \`date "+%Y-%m-%d"\` ./tmp/web-regression-out-prod.log"
     echo ""
     exit 1
 fi
 
-BLUESKY_API_HOSTNAME=$1
+# trim trailing slash from root url
+ROOT_URL=$(echo $1 | sed 's:/*$::')
 DOMAIN=$2
-if [ $# -eq 3 ]
+DATE=$3
+if [ $# -eq 4 ]
   then
-    OUTPUT_FILE=$3
+    OUTPUT_FILE=$4
 else
     OUTPUT_FILE=/dev/null
 fi
 
-echo "Testing $BLUESKY_API_HOSTNAME"
+echo "Testing $ROOT_URL"
+echo "Domain: $DOMAIN"
+echo "Date: $DATE"
 echo "Outputing to $OUTPUT_FILE"
 
 echo -n "" > $OUTPUT_FILE
@@ -27,17 +34,19 @@ echo -n "" > $OUTPUT_FILE
 #   - /api/v1/run/RUN_ID/output/
 
 GET_URLS=(
-    http://$BLUESKY_API_HOSTNAME/api/ping
-    http://$BLUESKY_API_HOSTNAME/api/ping/
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN/
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN/available-dates
-    http://$BLUESKY_API_HOSTNAME/api/v1/domains/$DOMAIN/available-dates/
+    $ROOT_URL/api/ping
+    $ROOT_URL/api/ping/
+    $ROOT_URL/api/v1/domains
+    $ROOT_URL/api/v1/domains/
+    $ROOT_URL/api/v1/domains/$DOMAIN
+    $ROOT_URL/api/v1/domains/$DOMAIN/
+    $ROOT_URL/api/v1/domains/$DOMAIN/available-dates
+    $ROOT_URL/api/v1/domains/$DOMAIN/available-dates/
+    $ROOT_URL/api/v1/domains/$DOMAIN/available-dates/$DATE
+    $ROOT_URL/api/v1/domains/$DOMAIN/available-dates/$DATE/
     # TODO: test date verification API
-    http://$BLUESKY_API_HOSTNAME/api/v1/available-dates
-    http://$BLUESKY_API_HOSTNAME/api/v1/available-dates/
+    $ROOT_URL/api/v1/available-dates
+    $ROOT_URL/api/v1/available-dates/
 )
 WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 for i in "${GET_URLS[@]}"
@@ -51,9 +60,9 @@ for i in "${GET_URLS[@]}"
     rm $OUTPUT_FILE-t
 done
 
-echo -n "Testing http://$BLUESKY_API_HOSTNAME/api/v1/run/fuelbeds/ ... "
-echo -n "http://$BLUESKY_API_HOSTNAME/api/v1/run/fuelbeds/ - " >> $OUTPUT_FILE
-response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/fuelbeds/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
+echo -n "Testing $ROOT_URL/api/v1/run/fuelbeds/ ... "
+echo -n "$ROOT_URL/api/v1/run/fuelbeds/ - " >> $OUTPUT_FILE
+response=$(curl "$ROOT_URL/api/v1/run/fuelbeds/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
@@ -98,12 +107,12 @@ echo $response
 rm $OUTPUT_FILE-t
 
 
-echo -n "Testing http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/ ... "
-echo -n "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/ - " >> $OUTPUT_FILE
+echo -n "Testing $ROOT_URL/api/v1/run/emissions/ ... "
+echo -n "$ROOT_URL/api/v1/run/emissions/ - " >> $OUTPUT_FILE
 # TODO: figure out how to feed next_response back tino
-#cmd='curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '"'"'$next_request'"'"' -o "$OUTPUT_FILE-t"'
+#cmd='curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '"'"'$next_request'"'"' -o "$OUTPUT_FILE-t"'
 #response=$(eval "$cmd")
-response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
+response=$(curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
         "config": {
             "emissions": {
                 "efs": "feps",
@@ -156,6 +165,6 @@ rm $OUTPUT_FILE-t
 
 
 # to post data in a file
-# curl -D - "http://$BLUESKY_API_HOSTNAME/api/v1/run/" \
+# curl -D - "$ROOT_URL/api/v1/run/" \
 #     -H "Content-Type: application/json" \
 #     -X POST -d @/path/to/fires.json
