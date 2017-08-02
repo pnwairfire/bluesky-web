@@ -22,18 +22,20 @@ EPILOG_STR = """
 Examples:
 
  Simple case, running only through emissions
-  $ ./test/scripts/test-asynch-request.py --simple --hostname=localhost:8887
+  $ {script_name} --simple -r http://localhost:8887/bluesky-web/ \\
+        --log-level=DEBUG
 
  Full run (ingestiont through visualization)
-  $ ./test/scripts/test-asynch-request.py --hostname=localhost:8887 \\
-        -s 2014053000/ -n 12
- """
+  $ {script_name} -r http://localhost:8887/bluesky-web/ \\
+        --log-level=DEBUG -s 2014053000/ -n 12
+ """.format(script_name=sys.argv[0])
 
 REQUIRED_ARGS = [
     {
-        'long': '--hostname',
-        'help': 'hostname of web service; default localhost:8887',
-        'default': 'localhost:8887'
+        'short': '-r',
+        'long': '--root-url',
+        'help': 'api root url ; default http://localhost:8887/bluesky-web/',
+        'default': 'http://localhost:8887/bluesky-web/'
     }
 ]
 
@@ -252,6 +254,8 @@ if __name__ == "__main__":
             }
         }
 
+    args.root_url = args.root_url.rstrip('/')
+
     logging.info("UTC start: {}".format(start_str))
     logging.info("Num hours: {}".format(args.num_hours))
     logging.info("Local start: {}".format(local_start_str))
@@ -267,7 +271,7 @@ if __name__ == "__main__":
     data = json.dumps(REQUEST)
     logging.info("Request JSON: {}".format(data))
 
-    url = "http://{}/api/v1/run/".format(args.hostname)
+    url = "{}/api/v1/run/".format(args.root_url)
     query = {}
     if args.simple:
         #first get fuelbeds
@@ -299,29 +303,29 @@ if __name__ == "__main__":
         logging.error("Failed initiate run")
         sys.exit(1)
 
-    run_id = json.loads(response.content)['run_id']
+    run_id = json.loads(response.content.decode())['run_id']
     logging.info("Run id: {}".format(run_id))
     while True:
         time.sleep(5)
         logging.info("Checking status...")
-        url = "http://{}/api/v1/run/{}/status/".format(args.hostname, run_id)
+        url = "{}/api/v1/run/{}/status/".format(args.root_url, run_id)
         response = requests.get(url, HEADERS)
         if response.status_code == 200:
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode())
             if data['complete']:
                 logging.info("Complete")
                 break
             else:
                 logging.info("{} Complete".format(data['percent']))
 
-    url =  "http://{}/api/v1/run/{}/output/".format(args.hostname, run_id)
+    url =  "{}/api/v1/run/{}/output/".format(args.root_url, run_id)
     response = requests.get(url, HEADERS)
     if response.status_code != 200:
         # TODO: add retry logic, since the run did succeed and complete
         logging.error("Failed to get output")
         sys.exit(1)
 
-    data = json.loads(response.content)
+    data = json.loads(response.content.decode())
     # TODO: log individual bits of information
     logging.info("Reponse: {}".format(data))
 
