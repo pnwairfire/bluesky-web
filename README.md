@@ -81,18 +81,26 @@ If you don't want to wait for it to run, manually run it with:
 
 ## Tests
 
+### Unit tests
+
     py.test
+
+### Ad Hoc tests
 
 See the helpstrings for the following two scripts for examples
 
     ./test/scripts/web-regression-test.sh
     ./test/scripts/test-asynch-request.py -h
 
-### Test Env
+#### Test Env
 
     ./test/scripts/web-regression-test.sh https://www.blueskywebhost.com/bluesky-web-test/ DRI2km `date +%Y-%m-%d` ./tmp/web-regression-out-test.log
     ./test/scripts/test-asynch-request.py --log-level=DEBUG --simple -r https://www.blueskywebhost.com/bluesky-web-test/
-    ./test/scripts/test-asynch-request.py -r http://localhost:8887/bluesky-web/ --log-level=DEBUG -s 2014-05-30T00:00:00 -n 12
+    ./test/scripts/test-asynch-request.py -r https://www.blueskywebhost.com/bluesky-web-test/ --log-level=DEBUG -s `date +%Y-%m-%dT00:00:00` -n 12
+
+#### Production
+
+    ...
 
 
 
