@@ -308,7 +308,7 @@ if __name__ == "__main__":
     while True:
         time.sleep(5)
         logging.info("Checking status...")
-        url = "{}/api/v1/run/{}/status/".format(args.root_url, run_id)
+        url = "{}/api/v1/runs/{}/".format(args.root_url, run_id)
         response = requests.get(url, HEADERS)
         if response.status_code == 200:
             data = json.loads(response.content.decode())
@@ -318,7 +318,7 @@ if __name__ == "__main__":
             else:
                 logging.info("{} Complete".format(data['percent']))
 
-    url =  "{}/api/v1/run/{}/output/".format(args.root_url, run_id)
+    url =  "{}/api/v1/runs/{}/output/".format(args.root_url, run_id)
     response = requests.get(url, HEADERS)
     if response.status_code != 200:
         # TODO: add retry logic, since the run did succeed and complete
