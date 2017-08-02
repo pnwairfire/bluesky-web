@@ -91,7 +91,8 @@ See the helpstrings for the following two scripts for examples
 ### Test Env
 
     ./test/scripts/web-regression-test.sh https://www.blueskywebhost.com/bluesky-web-test/ DRI2km `date +%Y-%m-%d` ./tmp/web-regression-out-test.log
-    ...
+    ./test/scripts/test-asynch-request.py --log-level=DEBUG --simple -r https://www.blueskywebhost.com/bluesky-web-test/
+    ./test/scripts/test-asynch-request.py -r http://localhost:8887/bluesky-web/ --log-level=DEBUG -s 2014-05-30T00:00:00 -n 12
 
 
 

@@ -27,7 +27,7 @@ Examples:
 
  Full run (ingestiont through visualization)
   $ {script_name} -r http://localhost:8887/bluesky-web/ \\
-        --log-level=DEBUG -s 2014053000/ -n 12
+        --log-level=DEBUG -s 2014-05-30T00:00:00 -n 12
  """.format(script_name=sys.argv[0])
 
 REQUIRED_ARGS = [
@@ -91,8 +91,8 @@ OPTIONAL_ARGS = [
     },
     {
         'long': "--met-domain",
-        'help': "met domain; default 'DRI2km'",
-        'default': 'DRI2km'
+        'help': "met domain; default 'DRI6km'",
+        'default': 'DRI6km'
     },
     {
         'short': '-m',
