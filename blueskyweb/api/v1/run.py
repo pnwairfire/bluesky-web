@@ -441,9 +441,9 @@ class RunExecuter(tornado.web.RequestHandler):
 
 class RunStatusBase(RunBase):
 
-    VERBOSE_FIELDS = ('output_dir', 'queue', 'modules', 'server')
+    VERBOSE_FIELDS = ('output_dir', 'modules', 'server')
 
-    def process(self, run):
+    async def process(self, run):
         if not self.get_boolean_argument('raw'):
             # add
             run['complete'] = 'output_url' in run
@@ -451,6 +451,17 @@ class RunStatusBase(RunBase):
             # TODO: figure out how to estimate percentage from
             #   log and stdout information
             run['percent'] = None
+            # need to call get_queue_position before converting
+            # run['status'] from array to scalar object
+            position = await self.settings['mongo_db'].get_queue_position(run)
+            if position is not None:
+                run['queue'] = {
+                    'name': run['queue'],
+                    'position': position
+                }
+            else:
+                tornado.log.gen_log.debug(run)
+                run.pop('queue', None)
 
             # history is in reverse chronological order
             # Note: history will always be defined; a run is never
@@ -474,7 +485,7 @@ class RunStatus(RunStatusBase):
             self.set_status(404, "Run doesn't exist")
             self.write({"error": "Run doesn't exist"})
         else:
-            self.process(run)
+            await self.process(run)
             self.write(run)
 
 
@@ -486,7 +497,8 @@ class RunsInfo(RunStatusBase):
         offset = int(self.get_query_argument('offset', 0))
         runs = await self.settings['mongo_db'].find_runs(status=status,
             limit=limit, offset=offset)
-        runs = [self.process(run) for run in runs]
+        for run in runs:
+            await self.process(run)
 
         # TODO: include total count of runs with given status, and of runs
         #    of all statuses?
