@@ -8,6 +8,7 @@ that can be started by simply running ```bsp-web```.
 
 
 
+
 ## External Dependencies
 
 ### mongodb
@@ -15,6 +16,7 @@ that can be started by simply running ```bsp-web```.
 BlueSky web connects to a mongodb database to query met data availability
 and to enqueue background plumerise and dispersion runs.
 You just need to provide the url of one that is running.
+
 
 
 
@@ -75,6 +77,8 @@ If you don't want to wait for it to run, manually run it with:
 
 
 
+
+
 ## Tests
 
     py.test
@@ -83,6 +87,15 @@ See the helpstrings for the following two scripts for examples
 
     ./test/scripts/web-regression-test.sh
     ./test/scripts/test-asynch-request.py -h
+
+### Test Env
+
+    ./test/scripts/web-regression-test.sh https://www.blueskywebhost.com/bluesky-web-test/ DRI2km `date +%Y-%m-%d` ./tmp/web-regression-out-test.log
+    ...
+
+
+
+
 
 
 ## Fabric
@@ -123,6 +136,7 @@ Subsequent deployments:
 
     FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A deploy
     FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A restart
+
 
 
 
