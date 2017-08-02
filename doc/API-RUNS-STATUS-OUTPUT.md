@@ -11,48 +11,73 @@ This API returns the status of a specific dispersion run
 ### Response
 
     {
-        "complete": <boolean>,
-        "server": {
-            "ip": "<ip address>"
+        "percent": <float>,
+        "queue": {
+            "name": "<queue_name>",
+            "position": <int>
         },
-        "modules": [...list of modules...],
-        "output_url": "<root output url>",
-        "ts": "2017-07-19T22:13:01Z",
-        "queue": "dri",
-        "run_id": "6e035f30-6ccf-11e7-b85c-3c15c2c6639e",
-        "output_dir": "<root output dir>",
-        "status": [
-            ["<step>", "<ts>"],
-            ...
-        ]
+        "initiated_at": "<ts>",
+        "complete": <boolean>,
+        "status": {
+            "ts": "<ts>",
+            "status": "<str>",
+            "stdout": "<last_line_in_stdout>",
+            "log": "<last_line_in_log_file>"
+        },
+        "run_id": "<run_id>"
     }
+
+Note:
+ - the 'queue' field will only be in the response if the run is currently enqueued
+ - the 'stdout' and 'log' fields, under 'status', will only be in the response if they're available
 
 ### Example:
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123"
 
+An enqueued run:
 
-    {                                                                      "queue": "dri",
-        "complete": true,
-        "ts": "2017-07-24T22:33:02Z",
-        "run_id": "0d97a6c2-70c0-11e7-acdc-3c15c2c6639e",
-        "output_url": "http://localhost:8886/pgv3-output/0d97a6c2-70c0-11e7-acdc-3c15c2c6639e",
-        "status": [
-            [ "enqueued", "2017-07-24T22:33:02Z"],
-            [ "dequeued", "2017-07-24T22:33:02Z"],
-            ["running", "2017-07-24T22:33:03Z"],
-            ["completed", "2017-07-24T22:33:12Z"],
-            ["output_written", "2017-07-24T22:33:12Z"]
-        ],
-        "server": {
-            "ip": "63.142.207.34"
+    {
+        "percent": 0,
+        "queue": {
+            "name": "dri",
+            "position": 2
         },
-        "modules": [
-            "findmetdata",
-            "localmet",
-            "plumerising"
-        ],
-        "output_dir": "/Users/jdubowy/code/airfire-bluesky-web/docker-data/output/pgv3-output/0d97a6c2-70c0-11e7-acdc-3c15c2c6639e"
+        "initiated_at": "2017-08-02T18:09:27Z",
+        "complete": false,
+        "status": {
+            "ts": "2017-08-02T18:09:27Z",
+            "status": "enqueued"
+        },
+        "run_id": "e239a018-77ac-11e7-92f9-3c15c2c6639e"
+    }
+
+A run in progress:
+
+    {
+        "percent": 50,
+        "initiated_at": "2017-08-02T18:05:22Z",
+        "complete": false,
+        "status": {
+            "ts": "2017-08-02T18:05:45Z",
+            "stdout": "Warning 1: No UNIDATA NC_GLOBAL:Conventions attribute\n",
+            "status": "running",
+            "log": "2017-08-02 18:05:44,923 DEBUG: Creating three hour (RedColorBar) concentration plot 23 of 24 \n"
+        },
+        "run_id": "271b36a6-77ad-11e7-807e-3c15c2c6639e"
+    }
+
+A completed run:
+    {
+        "percent": 100,
+        "initiated_at": "2017-08-02T16:57:04Z",
+        "status": {
+            "ts": "2017-08-02T16:57:46Z",
+            "status": "completed"
+        },
+        "run_id": "9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
+        "output_url": "http://localhost:8886/pgv3-output/9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
+        "complete": true
     }
 
 
@@ -249,36 +274,42 @@ set it at all, you'll get something like the following:
 
 ## GET /api/v1/runs/[<status>/]
 
-This API returns meta information about runs
+This API returns status information about runs
 
 ### Request
 
  - url: $BLUESKY_API_ROOT_URL/api/v1/runs/[<status>/]
- - optional query args: limit, offset
+ - optional query args:
+  - limit (int)
+  - offset (int)
+  - raw (bool) -- return raw data from db
  - method: GET
 
 ### Response
 
-
     {
         "runs": [
             {
-                "enqueued": "<ts>",
-                "modules": [
-                    ...
-                ],
-                "status": "<status>",
-                "queue": "<queue>",
-                "run_id": "<run_id>",
-                "server": "<hostname>",
-                "dequeued": "<ts>",
-                "started": "<ts>",
-                "completed": "<ts>",
-                ....
+                "percent": <float>,
+                "queue": {
+                    "name": "<queue_name>",
+                    "position": <int>
+                },
+                "initiated_at": "<ts>",
+                "complete": <boolean>,
+                "status": {
+                    "ts": "<ts>",
+                    "status": "<str>",
+                    "stdout": "<last_line_in_stdout>",
+                    "log": "<last_line_in_log_file>"
+                },
+                "run_id": "<run_id>"
             },
             ...
         ]
     }
+
+See notes under status API response, above
 
 
 ### Example
@@ -289,26 +320,41 @@ This API returns meta information about runs
     {
         "runs": [
             {
-                "enqueued": "2017-07-14T19:17:17Z",
-                "modules": [
-                    "findmetdata",
-                    "localmet",
-                    "plumerising"
-                ],
-                "status": "enqueued",
-                "queue": "dri",
-                "run_id": "0d39dd48-68c9-11e7-9295-3c15c2c6639e"
+                "percent": 0,
+                "queue": {
+                    "name": "dri",
+                    "position": 2
+                },
+                "initiated_at": "2017-08-02T18:09:27Z",
+                "complete": false,
+                "status": {
+                    "ts": "2017-08-02T18:09:27Z",
+                    "status": "enqueued"
+                },
+                "run_id": "e239a018-77ac-11e7-92f9-3c15c2c6639e"
             },
             {
-                "enqueued": "2017-07-14T19:18:59Z",
-                "modules": [
-                    "findmetdata",
-                    "localmet",
-                    "plumerising"
-                ],
-                "status": "enqueued",
-                "queue": "dri",
-                "run_id": "49e42864-68c9-11e7-9f5f-3c15c2c6639e"
+                "percent": 50,
+                "initiated_at": "2017-08-02T18:05:22Z",
+                "complete": false,
+                "status": {
+                    "ts": "2017-08-02T18:05:45Z",
+                    "stdout": "Warning 1: No UNIDATA NC_GLOBAL:Conventions attribute\n",
+                    "status": "running",
+                    "log": "2017-08-02 18:05:44,923 DEBUG: Creating three hour (RedColorBar) concentration plot 23 of 24 \n"
+                },
+                "run_id": "271b36a6-77ad-11e7-807e-3c15c2c6639e"
+            },
+            {
+                "percent": 100,
+                "initiated_at": "2017-08-02T16:57:04Z",
+                "status": {
+                    "ts": "2017-08-02T16:57:46Z",
+                    "status": "completed"
+                },
+                "run_id": "9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
+                "output_url": "http://localhost:8886/pgv3-output/9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
+                "complete": true
             }
         ]
     }
