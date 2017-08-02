@@ -445,12 +445,6 @@ class RunStatusBase(RunBase):
 
     async def process(self, run):
         if not self.get_boolean_argument('raw'):
-            # add
-            run['complete'] = 'output_url' in run
-
-            # TODO: figure out how to estimate percentage from
-            #   log and stdout information
-            run['percent'] = None
             # need to call get_queue_position before converting
             # run['status'] from array to scalar object
             position = await self.settings['mongo_db'].get_queue_position(run)
@@ -467,6 +461,23 @@ class RunStatusBase(RunBase):
             # Note: history will always be defined; a run is never
             #  recorded in the db without adding to the history
             run['status'] = run.pop('history')[0] # if run.get('history') else None
+
+            #run['complete'] = 'output_url' in run
+            run['complete'] = (run['status']['status']
+                in (RunStatuses.Completed, RunStatuses.Failed))
+
+            if (run['status']['status'] in
+                    (RunStatuses.Enqueued, RunStatuses.Dequeued)):
+                run['percent'] = 0
+            elif (run['status']['status'] in
+                    (RunStatuses.Completed, RunStatuses.Failed)):
+                run['percent'] = 100
+            elif run['status']['status'] == RunStatuses.ProcessingOutput:
+                run['percent'] = 99  # HACK
+            else: # RunStatuses.Running
+                # TODO: figure out how to estimate percentage from
+                #   log and stdout information
+                run['percent'] = 50  # HACK
 
             # prune
             for k in self.VERBOSE_FIELDS:
