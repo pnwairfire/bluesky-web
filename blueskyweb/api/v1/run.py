@@ -536,9 +536,8 @@ class RunOutput(tornado.web.RequestHandler):
             elif run['modules'][-1] == 'plumerising':
                 self._get_plumerise(run, output)
             else:
-                self.set_status(501, 'Not implemented')
-                self.write({'error': "Getting {} output not "
-                    "implemented.".format(run['modules'][-1])})
+                # TODO: is returning raw input not ok?
+                self.write(output)
 
     ##
     ## Plumerise
