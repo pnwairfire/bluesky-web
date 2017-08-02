@@ -92,3 +92,24 @@ class BlueSkyWebDB(object):
             r.pop('_id')
 
         return runs
+
+    async def get_queue_position(self, run):
+        """
+
+        args:
+         - run -- either run dict or run_id string
+        """
+        # TODO: do this more efficiently - not querying run first
+        if hasattr(run, 'lower'):
+            # it's a run id; query run
+            run = await self.find_run(run)
+
+        if run['history'][0]['status'] == RunStatuses.Enqueued:
+            query = {
+                'history.0.status': RunStatuses.Enqueued,
+                'initiated_at': {'$lte': run['initiated_at']},
+                'queue': run['queue']
+            }
+            return await self.db.runs.find(query).count()
+
+        # else, returns None -> i.e. not in queue
