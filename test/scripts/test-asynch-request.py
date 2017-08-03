@@ -155,7 +155,6 @@ REQUEST = {
                 {
                     "start": None,  # WILL BE FILLED IN
                     "end": None,  # WILL BE FILLED IN
-                    "pct": 100.0,
                     "location": {
                         "area": None,  # WILL BE FILLED IN
                         "ecoregion": "western",
@@ -184,7 +183,6 @@ REQUEST = {
                 {
                     "start": None,  # WILL BE FILLED IN
                     "end": None,  # WILL BE FILLED IN
-                    "pct": 100.0,
                     "location": {
                         "area": None,  # WILL BE FILLED IN
                         "ecoregion": "western",

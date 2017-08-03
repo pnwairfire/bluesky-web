@@ -227,7 +227,6 @@ require emissions data.
                     {
                         "start": "2014-05-29T17:00:00",
                         "end": "2014-05-30T17:00:00",
-                        "pct": 100.0,
                         "location": {
                             "area": 10000,
                             "ecoregion": "western",
