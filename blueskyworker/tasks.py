@@ -155,7 +155,7 @@ class BlueSkyRunner(object):
 
     def _run_docker(self):
         client = docker.from_env()
-        container_name = 'bsp-playground-{}'.format(self.input_data['run_id'])
+        container_name = 'bluesky-web-bsp-{}'.format(self.input_data['run_id'])
         volumes_dict = self._get_volumes_dict()
         container = client.containers.create(self.settings['bluesky_docker_image'],
             self.bsp_cmd, name=container_name, volumes=volumes_dict)
