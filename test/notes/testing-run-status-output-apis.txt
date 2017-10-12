@@ -2,19 +2,19 @@
 
 ## setup
 
-Using the following runs, each in http://www.blueskywebhost.com/playground-output/,
+Using the following runs, each in http://www.blueskywebhost.com/bluesky-web-output/,
  - Success: $RUN_ID_1
  - Non-existent: foobar1
  - Failed: $RUN_ID_2
 
 First, grab input
 
-    mkdir -p /bsp-output/from-playground/
-    mkdir /bsp-output/from-playground/$RUN_ID_1/
-    mkdir /bsp-output/from-playground/$RUN_ID_2
+    mkdir -p /bsp-output/from-production/
+    mkdir /bsp-output/from-production/$RUN_ID_1/
+    mkdir /bsp-output/from-production/$RUN_ID_2
 
-    cd /bsp-output/from-playground/$RUN_ID_1/ && wget http://www.blueskywebhost.com/playground-output/$RUN_ID_1/output.json
-    cd /bsp-output/from-playground/$RUN_ID_2 && wget http://www.blueskywebhost.com/playground-output/$RUN_ID_2/output.json
+    cd /bsp-output/from-production/$RUN_ID_1/ && wget http://www.blueskywebhost.com/bluesky-web-output/$RUN_ID_1/output.json
+    cd /bsp-output/from-production/$RUN_ID_2 && wget http://www.blueskywebhost.com/bluesky-web-output/$RUN_ID_2/output.json
 
 ## start server
 
@@ -29,7 +29,7 @@ First, grab input
 ### localsave
 
     BSPWEB_EXPORT_MODE=localsave \
-        BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=/bsp-output/from-playground/ \
+        BSPWEB_EXPORT_LOCALSAVE_DEST_DIR=/bsp-output/from-production/ \
         ./bin/bsp-web -d --log-level=DEBUG
 
 ### upload where upload server is the same as request server
@@ -37,7 +37,7 @@ First, grab input
 this is really conrived, since he upload scp host wouldn't eveb localhost
 
     BSPWEB_EXPORT_MODE=upload \
-        BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR=/bsp-output/from-playground/ \
+        BSPWEB_EXPORT_UPLOAD_SCP_DEST_DIR=/bsp-output/from-production/ \
         BSPWEB_EXPORT_UPLOAD_SCP_USER=jdubowy \
         BSPWEB_EXPORT_UPLOAD_SCP_PROTOCOL=http \
         BSPWEB_EXPORT_UPLOAD_SCP_HOST=localhost \

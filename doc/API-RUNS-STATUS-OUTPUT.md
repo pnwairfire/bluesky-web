@@ -76,7 +76,7 @@ A completed run:
             "status": "completed"
         },
         "run_id": "9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
-        "output_url": "http://localhost:8886/pgv3-output/9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
+        "output_url": "http://localhost:8886/bluesky-web-output/9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
         "complete": true
     }
 
@@ -165,7 +165,7 @@ All statuses, with limit and offset
                     "status": "completed"
                 },
                 "run_id": "9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
-                "output_url": "http://localhost:8886/pgv3-output/9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
+                "output_url": "http://localhost:8886/bluesky-web-output/9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
                 "complete": true
             }
         ]
@@ -355,7 +355,7 @@ run, you'll get something like the following:
             "smoke": "dispersion-visualization/smoke_dispersion.kmz"
         },
         "netCDF": "dispersion-visualization/hysplit_conc.nc",
-        "root_url": "http://localhost:8888/playground-output/abc123"
+        "root_url": "http://localhost:8888/bluesky-web-output/abc123"
     }
 
 Otherwise, if you set 'image_results_version=v1' or if you didn't
@@ -382,5 +382,5 @@ set it at all, you'll get something like the following:
             "smoke": "dispersion-visualization/smoke_dispersion.kmz"
         },
         "netCDF": "dispersion-visualization/hysplit_conc.nc",
-        "root_url": "http://localhost:8888/playground-output/812ee94a-cb78-11e5-9d7c-0242ac110003-image-format-v1"
+        "root_url": "http://localhost:8888/bluesky-web-output/812ee94a-cb78-11e5-9d7c-0242ac110003-image-format-v1"
     }

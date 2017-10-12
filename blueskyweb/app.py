@@ -47,7 +47,7 @@ DEFAULT_SETTINGS = {
     # Output url - to access output from the outside world
     'output_url_scheme': 'https',
     'output_url_port': None, # 80
-    'output_url_path_prefix': 'pgv3-output',
+    'output_url_path_prefix': 'bluesky-web-output',
     # this is supposed to be a string, since it's passed into
     # the bsp docker command
     'bluesky_log_level': "INFO"
