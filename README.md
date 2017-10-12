@@ -132,6 +132,10 @@ Subsequent deployments:
     FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A deploy
     FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A restart
 
+Check status
+
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A check_status
+
 ### Test Environment
 
 First time:
@@ -146,6 +150,9 @@ Subsequent deployments:
     FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A deploy
     FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A restart
 
+Check status
+
+    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A check_status
 
 
 
