@@ -75,13 +75,13 @@ OPTIONAL_ARGS = [
     {
         'long': "--latitude",
         'help': 'latitude of fire location; default: 37.909644',
-        'default':  37.909644,
+        'default': 48.6832397,
         'type': float
     },
     {
         'long': "--longitude",
         'help': 'longitude of fire location; default: -119.7615805',
-        'default': -119.7615805,
+        'default': -120.3104511,
         'type': float
     },
     {
