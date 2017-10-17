@@ -91,8 +91,8 @@ OPTIONAL_ARGS = [
     },
     {
         'long': "--met-domain",
-        'help': "met domain; default 'DRI6km'",
-        'default': 'DRI6km'
+        'help': "met domain; default 'NAM84'",
+        'default': 'NAM84'
     },
     {
         'short': '-m',
