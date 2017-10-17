@@ -209,7 +209,7 @@ require emissions data.
         "config": {
             "emissions": {
                 "species": [
-                    "PM25"
+                    "PM2.5"
                 ]
             },
             "dispersion": {
@@ -378,7 +378,7 @@ consumption and emissions data.
         "config": {
             "emissions": {
                 "species": [
-                    "PM25"
+                    "PM2.5"
                 ]
             },
             "dispersion": {

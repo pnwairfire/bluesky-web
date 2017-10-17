@@ -126,7 +126,7 @@ OPTIONAL_ARGS = [
 REQUEST = {
     "config": {
         "emissions": {
-            "species": ["PM25"]
+            "species": ["PM2.5"]
         },
         "dispersion": {
             "start": None,  # WILL BE FILLED IN

@@ -3,7 +3,7 @@ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/all/DRI2km/" -H 'Content-Type: app
         "config": {
             "emissions": {
                 "species": [
-                    "PM25"
+                    "PM2.5"
                 ]
             },
             "dispersion": {
@@ -52,7 +52,7 @@ curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/all/DRI2km/" -H 'Content-Type: app
         "config": {
             "emissions": {
                 "species": [
-                    "PM25"
+                    "PM2.5"
                 ]
             },
             "dispersion": {

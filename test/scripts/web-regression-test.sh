@@ -95,7 +95,7 @@ response=$(curl "$ROOT_URL/api/v1/run/fuelbeds/" --write-out "$WRITE_OUT_PATTERN
         "config": {
             "emissions":{
                 "efs": "feps",
-                "species": ["PM25"]
+                "species": ["PM2.5"]
             }
         }
     }' -o "$OUTPUT_FILE-t")
@@ -116,7 +116,7 @@ response=$(curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTER
         "config": {
             "emissions": {
                 "efs": "feps",
-                "species": ["PM25"]
+                "species": ["PM2.5"]
             }
         },
         "fire_information": [
