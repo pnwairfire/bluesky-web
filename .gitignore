@@ -5,7 +5,6 @@ build/
 dist/
 blueskyweb.egg-info/
 logs/
-dev/Procfile-dev-*
 db/
 .cache/
 docker-data/

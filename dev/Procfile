@@ -1,6 +1,0 @@
-mongo: mongod --dbpath $PWD/docker-data/mongodb/db/ --port 27018 --logpath $PWD/docker-logs/mongodb/mongodb.log
-web: ./bin/bsp-web -d -b bluesky -o $PWD/docker-data/output/ --path-prefix=bluesky-web -p 8887 --log-level=DEBUG --log-file=$PWD/docker-logs/web/bluesky-web.log --output-url-scheme=http --output-url-port=8886 --output-url-path-prefix= --bluesky-log-level=DEBUG
-output_web: bash -c 'pkill -f "python -m http.server 8886"; true;' && cd $PWD/docker-data/output/ && python -m http.server 8886
-worker_no_met: PUBLIC_HOSTNAME=localhost celery -Q no-met -c 2 -A blueskyworker.tasks worker -l INFO -f $PWD/docker-logs/worker/no-met/bluesky-web-worker-no-met.log
-worker_dri: PUBLIC_HOSTNAME=localhost celery -Q dri -c 2 -A blueskyworker.tasks worker -l INFO -f $PWD/docker-logs/worker/dri/bluesky-web-worker-dri.log
-worker_nam: PUBLIC_HOSTNAME=localhost celery -Q nam -c 2 -A blueskyworker.tasks worker -l INFO -f $PWD/docker-logs/worker/nam/bluesky-web-worker-nam.log

@@ -35,24 +35,15 @@ You just need to provide the url of one that is running.
 
 ### Run
 
+Create log and data dirs
+
     cd /path/to/airfire-bluesky-web
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
         ./docker-logs/worker/dri ./docker-logs/worker/nam \
         ./docker-logs/worker/no-met ./docker-data/mongodb/db \
         ./docker-data/output
 
-#### foreman
-
-One option is to use foreman
-
-    foreman start -f ./dev/Procfile
-    arlindexer -d DRI6km -r $HOME/DRI_6km \
-        -m mongodb://localhost:27018/blueskyweb
-    arlindexer -d NAM84 -r $HOME/NAM84 -p NAM84_ARL_index.csv \
-        -m mongodb://localhost:27018/blueskyweb
-    ....
-
-#### Docker:
+Run in docker
 
     docker build -t bluesky-web .
     docker-compose -f dev/docker-compose.yml up
