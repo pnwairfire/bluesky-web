@@ -322,7 +322,7 @@ class RunExecuter(tornado.web.RequestHandler):
         tornado.log.gen_log.debug('Configuring plumerising')
         data['config'] = data.get('config', {})
         data['config']['plumerising'] = {
-            "model": "sev"
+            "model": "feps"
         }
 
     DEFAULT_HYSPLIT_GRID_LENGTH = 2000
