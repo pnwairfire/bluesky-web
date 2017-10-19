@@ -181,18 +181,18 @@ class RunExecuter(tornado.web.RequestHandler):
     EMISSIONS_MODULES = [
         'consumption', 'emissions'
     ]
-    # TODO: for plumerise requests, instead of running findmetdata, get
+    PLUMERISE_MODULES = [
+        'timeprofiling', 'plumerising'
+    ]
+    # TODO: for dispersion requests, instead of running findmetdata, get
     #   met data from indexed met data in mongodb;  maybe fall back on
     #   running findmetdata if indexed data isn't there or if mongodb
     #   query fails
-    PLUMERISE_MODULES = [
-        'findmetdata', 'localmet', 'plumerising'
-    ]
     MET_DISPERSION_MODULES = [
-        'timeprofiling', 'dispersion', 'visualization', 'export'
+        'findmetdata', 'dispersion', 'visualization', 'export'
     ]
     METLESS_DISPERSION_MODULES = [
-        'timeprofiling', 'dispersion', 'export'
+        'findmetdata', 'dispersion', 'export'
     ]
 
     def _set_modules(self, domain, mode, data):
