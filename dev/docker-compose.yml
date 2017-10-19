@@ -18,7 +18,7 @@ services:
     - $PWD/docker-logs/mongodb/:/var/log/mongodb/
     - $PWD/docker-data/mongodb/db/:/data/db/
     - $PWD/docker-data/mongodb/configdb/:/data/configdb/
-    - $PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/
+    - $PWD/dev/mongo-entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
     # Note: '--auth' is automatically added to command if
     #   MONGO_INITDB_ROOT_[USERNAME|PASSWORD] are set, but we need to
     #   set `command` in order to specify `--logpath`
@@ -114,6 +114,6 @@ services:
     image: mcuadros/ofelia
     container_name: bluesky-web-ofelia
     volumes:
-    - $PWD/ofelia.ini:/etc/ofelia/config.ini
+    - $PWD/dev/ofelia.ini:/etc/ofelia/config.ini
     - /var/run/docker.sock:/var/run/docker.sock
     #command: ofelia daemon --config /etc/ofelia/config.ini

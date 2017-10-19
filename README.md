@@ -45,7 +45,7 @@ You just need to provide the url of one that is running.
 
 One option is to use foreman
 
-    foreman start -f Procfile-dev
+    foreman start -f ./dev/Procfile
     arlindexer -d DRI6km -r $HOME/DRI_6km \
         -m mongodb://localhost:27018/blueskyweb
     arlindexer -d NAM84 -r $HOME/NAM84 -p NAM84_ARL_index.csv \
@@ -55,7 +55,7 @@ One option is to use foreman
 #### Docker:
 
     docker build -t bluesky-web .
-    docker-compose -f docker-compose.yml up
+    docker-compose -f dev/docker-compose.yml up
 
 When using docker, arlindex will automatically be updated every
 15 minutes using the mcuadros/ofelia docker image.
