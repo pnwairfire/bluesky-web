@@ -202,6 +202,55 @@ Note that the growth start and end timestamps are local time, whereas the
 dispersion start time is in UTC.
 
 
+### Extra hysplit parameters
+
+If you don't specify any dispersion configuration beyond 'start'
+and 'num_hours', hysplit will be configured with a set of default
+parameters, and will be run over the entire met domain.  You may,
+however, override any of these.  For example:
+
+
+    $  echo '{
+        "fire_information": [
+            .... same as previous example ....
+        ],
+        "config": {
+            "dispersion": {
+                "start": "2014-05-30T00:00:00",
+                "num_hours": 1,
+                "hysplit": {
+                    "grid": {
+                        "spacing": 6.0,
+                        "boundary": {
+                            "ne": {
+                                "lat": 40.0,
+                                "lng": -115.0
+                            },
+                            "sw": {
+                                "lat": 35.00,
+                                "lng": -125.0
+                            }
+                        }
+                    },
+                    "NUMPAR": 3000,
+                    "MAXPAR": 1000000000,
+                    "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 10,
+                    "VERTICAL_LEVELS": [100],
+                    "INITD": 0,
+                    "NINIT": 0,
+                    "DELT": 0.0,
+                    "KHMAX": 72
+                }
+            }
+        }
+    }' > dev/data/dispersion-hysplit-input.json
+
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI6km/" \
+        -H 'Content-Type: application/json' \
+        -d @dev/data/dispersion-hysplit-input.json | python -m json.tool
+
+
+
 
 
 ## POST /api/v1/run/all/<met_domain>/
