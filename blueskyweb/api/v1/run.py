@@ -26,6 +26,7 @@ import tornado.log
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import run_bluesky, BlueSkyRunner
 from blueskyweb.lib import domains
+import blueskyconfig
 
 
 try:
@@ -354,39 +355,42 @@ class RunExecuter(tornado.web.RequestHandler):
         # TODO: if data['config']['dispersion']['hysplit']['grid'] is not defined
         #   *and* if grid isn't defined in hardcoded data, then raise exception
         if data['config']['dispersion'].get('model') in ('hysplit', None):
-            if not data['config']['dispersion'].get('hysplit'):
-                data['config']['dispersion']['hysplit'] = {}
+            await self._configure_hysplit(data, domain)
 
-            # configure grid spacing if it's not already set in request
-            if not any([
-                    data['config']['dispersion']['hysplit'].get(k) or
-                    data['config']['dispersion']['hysplit'].get(k.lower())
-                    for k in ('GRID', 'USER_DEFINED_GRID', 'COMPUTE_GRID')]):
-                met_boundary = domains.get_met_boundary(domain)
-                if len(data['fire_information']) != 1:
-                    # just use met domain
-                    data['config']['dispersion']['hysplit']["USER_DEFINED_GRID"] = True
-                    data['config']['dispersion']['hysplit'].update(
-                        {k.upper(): v for k, v in list(met_boundary.items())})
-                else:
-                    data['config']['dispersion']['hysplit'].update({
-                        "compute_grid": True,
-                        "spacing_latitude": met_boundary["spacing_latitude"],
-                        "spacing_longitude": met_boundary["spacing_longitude"],
-                        "projection": met_boundary["projection"],
-                        "NUMPAR": 1000,
-                        "MAXPAR": 10000000,
-                        "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
-                        "VERTICAL_LEVELS": [100],
-                        "INITD": 0,
-                        "NINIT": 0,
-                        "DELT": 0.0,
-                        "KHMAX": 72, # number of hours after which particles are removed
-                        "MPI": True,
-                        "NCPUS": 4
-                    })
+    async def _configure_hysplit(self, data, domain):
+        # initialize config dict
+        if not data['config']['dispersion'].get('hysplit'):
+            data['config']['dispersion']['hysplit'] = {}
 
-            tornado.log.gen_log.debug("hysplit configuration: %s", data['config']['dispersion']['hysplit'])
+        # set hysplit params
+        hysplit_defaults = blueskyconfig.get('hysplit')
+        for k in hysplit_defaults.keys():
+            if k not in data['config']['dispersion']['hysplit']:
+                data['config']['dispersion']['hysplit']['NUMPAR'] = (
+                    hysplit_defaults[k]))
+
+        # set grid
+        grid_config = blueskyconfig.get('domain', domain, 'grid')
+        if data['config']['dispersion']['hysplit'].get('grid'):
+            # TODO: fill in any missing info from grid_config
+            pass
+        elif data['config']['dispersion']['hysplit'].get('USER_DEFINED_GRID'):
+            # TODO: fill in any missing values for the following
+            #   using what's in grid_config
+            #    "USER_DEFINED_GRID", "CENTER_LATITUDE", "CENTER_LONGITUDE",
+            #    "WIDTH_LONGITUDE", "HEIGHT_LATITUDE", "SPACING_LONGITUDE", "SPACING_LATITUDE",
+            pass
+        elif data['config']['dispersion']['hysplit'].get('compute_grid'):
+            # TODO: fill in values for the following using what's
+            #   in grid_config
+            #    "spacing_longitude", "spacing_latitude",
+            #    "grid_length", "projection" (?)
+            pass
+        else:
+            data['config']['dispersion']['hysplit']['grid'] = grid_config
+
+
+        tornado.log.gen_log.debug("hysplit configuration: %s", data['config']['dispersion']['hysplit'])
 
         # TODO: any other model-specific configuration?
 
