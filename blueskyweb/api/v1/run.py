@@ -366,11 +366,11 @@ class RunExecuter(tornado.web.RequestHandler):
         hysplit_defaults = blueskyconfig.get('hysplit')
         for k in hysplit_defaults.keys():
             if k not in data['config']['dispersion']['hysplit']:
-                data['config']['dispersion']['hysplit']['NUMPAR'] = (
+                data['config']['dispersion']['hysplit'][k] = (
                     hysplit_defaults[k])
 
         # set grid
-        grid_config = blueskyconfig.get('domain', domain, 'grid')
+        grid_config = blueskyconfig.get('domains', domain, 'grid')
         if data['config']['dispersion']['hysplit'].get('grid'):
             # TODO: fill in any missing info from grid_config
             pass
