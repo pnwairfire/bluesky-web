@@ -31,6 +31,7 @@ services:
     volumes:
     - $PWD/:/usr/src/blueskyweb/
     - $PWD/docker-logs/web/:/var/log/blueskyweb/
+    - $PWD/dev/config.json:/etc/bluesky-web/config.json
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
@@ -45,6 +46,7 @@ services:
       --log-file=/var/log/blueskyweb/bluesky-web.log
       --output-url-scheme=http --output-url-port=8886
       --output-url-path-prefix= --bluesky-log-level=DEBUG
+      -c /etc/bluesky-web/config.json
   output_web:
     image: python:3.5-alpine
     container_name: bluesky-web-output
