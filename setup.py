@@ -24,7 +24,6 @@ setup(
     tests_require=test_requirements,
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/afscripting/",
-        "https://pypi.smoke.airfire.org/simple/met/",
-        "https://pypi.smoke.airfire.org/simple/afconfig/"
+        "https://pypi.smoke.airfire.org/simple/met/"
     ]
 )
