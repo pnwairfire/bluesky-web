@@ -1,8 +1,8 @@
 ## POST /api/v1/run/plumerise/<met_domain>/
 
-This API runs bluesky localmet and plumerise modules.  (The bluesky
-web serives runs SEV plumerise which, unlike FEPS plumerise, requires
-localmet data.)
+This API runs bluesky timeprofiling and plumerise modules.  (The
+bluesky web service runs FEPS plumerise which, unlike SEV plumerise,
+requires timeprofiling data.)
 
 Like the fuelbeds and emissions APIS, the plumerise API requires
 posted JSON with three possible top level keys -
