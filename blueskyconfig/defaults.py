@@ -91,5 +91,17 @@ DEFAULTS = {
             "index_filename_pattern": "NAM84_ARL_index.csv",
             "time_step": 3
         }
+    },
+    'hysplit': {
+        "NUMPAR": 2000,
+        "MAXPAR": 1000000000, # don't want to ever hit MAXPAR
+        "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
+        "VERTICAL_LEVELS": [100],
+        "INITD": 0,
+        "NINIT": 0,
+        "DELT": 0.0,
+        "KHMAX": 72, # number of hours after which particles are removed
+        "MPI": True,
+        "NCPUS": 4
     }
 }
