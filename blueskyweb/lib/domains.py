@@ -54,7 +54,7 @@ class DomainDB(object):
                 "dates": sorted(list(set(d['complete_dates'])))
             }
             if d['domain'] in DOMAINS:
-                data[d['domain']]['boundary'] = DOMAINS[d['domain']]['boundary']
+                data[d['domain']]['grid'] = DOMAINS[d['domain']]['grid']
         return data
 
     # TODO: memoize/cache
@@ -97,7 +97,7 @@ def get_met_boundary(domain):
     if domain not in DOMAINS:
         raise InvalidDomainError(domain_id)
 
-    if not DOMAINS[domain].get('boundary'):
+    if not DOMAINS[domain].get('grid', {}).get('boundary'):
         raise BoundaryNotDefinedError(domain)
 
-    return DOMAINS[domain]['boundary']
+    return DOMAINS[domain]['grid']['boundary']
