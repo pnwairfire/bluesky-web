@@ -13,7 +13,7 @@ import motor
 import tornado.log
 import blueskyconfig
 
-DOMAINS = blueskyconfig.config['domains']
+DOMAINS = blueskyconfig.get('domains')
 
 class BoundaryNotDefinedError(ValueError):
     pass
