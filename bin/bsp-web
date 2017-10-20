@@ -13,11 +13,13 @@ import afscripting as scripting
 
 try:
     from blueskyweb.app import main, DEFAULT_SETTINGS
+    from blueskyconfig import apply_overrides
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
     from blueskyweb.app import main, DEFAULT_SETTINGS
+    from blueskyconfig import apply_overrides
 
 REQUIRED_ARGS = [
     {
@@ -95,10 +97,13 @@ if __name__ == "__main__":
     parser.formatter_class = scripting.args.RawTextHelpFormatter
     scripting.args.add_arguments(parser, OPTIONAL_ARGS)
     scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
+    scripting.args.add_configuration_options(parser, support_short_names=True)
     # Use afscripting to add logging options to the parser object,
     # but we'll configure logging oureselves in app.main
     scripting.args.add_logging_options(parser)
     args = parser.parse_args()
+    apply_overrides(args.config_file_options)
+    apply_overrides(args.config_options)
 
     try:
         main(**args.__dict__)
