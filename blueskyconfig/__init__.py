@@ -3,8 +3,8 @@ import os
 
 from .defaults import DEFAULTS as config
 
+# Note: afconfig is installed via afscripting
 import afconfig
-
 
 def apply_overrides(overrides):
     if overrides:
