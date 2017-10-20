@@ -4,93 +4,88 @@ DEFAULTS = {
         # TODO: add LS (Great Lakes?) 4km with boundaries [-96.1, 41.5, -81.5, 49.5]
         'DRI2km': {
             'queue': 'dri', # TODO: define elsewhere ? (see above)
-            "boundary": {
-                # STI provided the following corners:
-                #   CANV 2km - [-124.3549, 32.5479, -113.2558, 41.8884]
-                # Then, ran the following on haze:
-                #   $ chk_arl file /data/ARL/DRI/2km/2016040400/wrfout_d3.2016040400.f00-11_12hr01.arl |grep corner
-                #     Lower left corner:   32.5980 -124.2761
-                #    Upper right corner:   41.8444 -113.0910
-                "center_latitude": 37.2212, #37.21815, # 37.0,
-                "center_longitude": -118.68355, #-118.80535, # -119.0,
-                "width_longitude": 11.1851, #11.0991, # 13.0,
-                "height_latitude": 9.2464, #9.3405, #11.5,
-                "spacing_longitude": 2.0,
-                "spacing_latitude": 2.0,
-                "projection": "LCC"
+            "grid": {
+                "spacing": 2,
+                "boundary": {
+                    # STI provided the following corners:
+                    #   CANV 2km - [-124.3549, 32.5479, -113.2558, 41.8884]
+                    # Then, ran the following on haze:
+                    #   $ chk_arl file /data/ARL/DRI/2km/2016040400/wrfout_d3.2016040400.f00-11_12hr01.arl |grep corner
+                    #     Lower left corner:   32.5980 -124.2761
+                    #    Upper right corner:   41.8444 -113.0910
+                    "ne": {"lat": 41.8444, "lng": -113.0910},
+                    "sw": {"lat": 32.5980, "lng": -124.2761}
+                },
+                "projection": "LLC"
             },
             "index_filename_pattern": "arl12hrindex.csv",
             "time_step": 1
         },
         'DRI6km': {
             'queue': 'dri', # TODO: define elsewhere ? (see above)
-            "boundary": {
-                # Ran the following on haze:
-                #   $ chk_arl file /data/ARL/DRI/6km/2016040400/wrfout_d2.2016040400.f00-11_12hr01.arl |grep corner
-                #     Lower left corner:   28.7459 -128.4614
-                #    Upper right corner:   44.5953 -107.1489
-                "center_latitude": 36.6706, #36.5,
-                "center_longitude": -117.80515, #-119.0,
-                "width_longitude": 21.3125, #25.0,
-                "height_latitude": 15.8494, #17.5,
-                "spacing_longitude": 6.0,
-                "spacing_latitude": 6.0,
-                "projection": "LCC"
+            "grid": {
+                "spacing": 6,
+                "boundary": {
+                    # Ran the following on haze:
+                    #   $ chk_arl file /data/ARL/DRI/6km/2016040400/wrfout_d2.2016040400.f00-11_12hr01.arl |grep corner
+                    #     Lower left corner:   28.7459 -128.4614
+                    #    Upper right corner:   44.5953 -107.1489
+                    "ne": {"lat": 44.5953, "lng": -107.1489},
+                    "sw": {"lat": 28.7459, "lng": -128.4614}
+                },
+                "projection": "LLC"
             },
             "index_filename_pattern": "arl12hrindex.csv",
             "time_step": 1
         },
         'PNW1.33km': {
             'queue': 'pnw', # TODO: define elsewhere ? (see above)
-            "boundary": {
-                # Ran the following on haze:
-                #   $ chk_arl file /data/ARL/PNW/1.33km/2016040400/wrfout_d4.2016040400.f12-23_12hr01.arl |grep corner
-                #     Lower left corner:   44.7056 -126.2475
-                #    Upper right corner:   48.9398 -113.7484
-                "center_latitude": 46.8227,
-                "center_longitude": -119.99795,
-                "width_longitude": 12.4991,
-                "height_latitude": 4.2342,
-                "spacing_longitude": 1.33,
-                "spacing_latitude": 1.33,
-                "projection": "LCC"
+            "grid": {
+                "spacing": 1.33,
+                "boundary": {
+                    # Ran the following on haze:
+                    #   $ chk_arl file /data/ARL/PNW/1.33km/2016040400/wrfout_d4.2016040400.f12-23_12hr01.arl |grep corner
+                    #     Lower left corner:   44.7056 -126.2475
+                    #    Upper right corner:   48.9398 -113.7484
+                    "ne": {"lat": 48.9398, "lng": -113.7484},
+                    "sw": {"lat": 44.7056, "lng": -126.2475}
+                },
+                "projection": "LLC"
             },
             "index_filename_pattern": "arl12hrindex.csv",
             "time_step": 1
         },
         'PNW4km': {
             'queue': 'pnw', # TODO: define elsewhere ? (see above)
-            "boundary": {
-                # Ran the following on haze:
-                #   $ chk_arl file /data/ARL/PNW/4km/2016040400/wrfout_d3.2016040400.f12-23_12hr01.arl |grep corner
-                #     Lower left corner:   40.0488 -128.5677
-                #    Upper right corner:   49.6821 -107.4911
-                "center_latitude": 44.86545, #45.0,
-                "center_longitude": -118.0294, #-118.3,
-                "width_longitude": 21.0766, #20.0,
-                "height_latitude": 9.6333, #10.0,
-                "spacing_longitude": 4.0,
-                "spacing_latitude": 4.0,
-                "projection": "LCC"
+            # Ran the following on haze:
+            #   $ chk_arl file /data/ARL/PNW/4km/2016040400/wrfout_d3.2016040400.f12-23_12hr01.arl |grep corner
+            #     Lower left corner:   40.0488 -128.5677
+            #    Upper right corner:   49.6821 -107.4911
+            "grid": {
+                "spacing": 4.0,
+                "boundary": {
+                    "ne": {"lat": 49.6821, "lng": -107.4911},
+                    "sw": {"lat": 40.0488, "lng": -128.5677}
+                },
+                "projection": "LLC"
             },
             "index_filename_pattern": "arl12hrindex.csv",
             "time_step": 1
         },
         'NAM84': {
             'queue': 'nam', # TODO: define elsewhere ? (see above)
-            "boundary": {
-                # STI provided the following corners:
-                #   NAM 12km - [-131, 18, -64, 55]
-                # Then, ran the following on haze:
-                #   $ chk_arl file /data/ARL/NAM/12km/2016040400/nam_forecast-2016040400_00-84hr.arl |grep corner
-                #     Lower left corner:   12.1900 -133.4600
-                #    Upper right corner:   57.3290  -49.4167
-                "center_latitude": 34.7595, #36.5, # 37.5,
-                "center_longitude": -91.43835, #-97.5, # -95.0,
-                "width_longitude": 84.0433, #67.0, # 70.0,
-                "height_latitude": 45.139, #37.0, # 30.0,
-                "spacing_longitude": 0.15,
-                "spacing_latitude": 0.15,
+            "grid": {
+                "spacing": 0.15,
+                "boundary": {
+                    # STI provided the following corners:
+                    #   NAM 12km - [-131, 18, -64, 55]
+                    # Then, ran the following on haze:
+                    #   $ chk_arl file /data/ARL/NAM/12km/2016040400/nam_forecast-2016040400_00-84hr.arl |grep corner
+                    #     Lower left corner:   12.1900 -133.4600
+                    #    Upper right corner:   57.3290  -49.4167
+                    "ne": {"lat": 57.3290, "lng": -49.4167},
+                    "sw": {"lat": 12.1900, "lng": -133.4600}
+                },
                 "projection": "LatLon"
             },
             "index_filename_pattern": "NAM84_ARL_index.csv",
