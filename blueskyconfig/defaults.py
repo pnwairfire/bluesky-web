@@ -101,6 +101,7 @@ DEFAULTS = {
         "NINIT": 0,
         "DELT": 0.0,
         "KHMAX": 72, # number of hours after which particles are removed
+        # Note: MPI and NCPUS are not allowed to be overridden
         "MPI": True,
         "NCPUS": 4
     }

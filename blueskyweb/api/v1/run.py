@@ -352,8 +352,6 @@ class RunExecuter(tornado.web.RequestHandler):
         if not domain:
             data['config']['dispersion']['model'] = 'vsmoke'
 
-        # TODO: if data['config']['dispersion']['hysplit']['grid'] is not defined
-        #   *and* if grid isn't defined in hardcoded data, then raise exception
         if data['config']['dispersion'].get('model') in ('hysplit', None):
             await self._configure_hysplit(data, domain)
 
@@ -361,36 +359,37 @@ class RunExecuter(tornado.web.RequestHandler):
         # initialize config dict
         if not data['config']['dispersion'].get('hysplit'):
             data['config']['dispersion']['hysplit'] = {}
+        hysplit_config = data['config']['dispersion']['hysplit']
 
         # set hysplit params
         hysplit_defaults = blueskyconfig.get('hysplit')
         for k in hysplit_defaults.keys():
-            if k not in data['config']['dispersion']['hysplit']:
-                data['config']['dispersion']['hysplit'][k] = (
-                    hysplit_defaults[k])
+            # use MPI and NCPUS defaults even if request specifies them
+            if k in ('MPI', 'NCPUS') or k not in hysplit_config:
+                hysplit_config[k] = hysplit_defaults[k]
 
         # set grid
         grid_config = blueskyconfig.get('domains', domain, 'grid')
-        if data['config']['dispersion']['hysplit'].get('grid'):
+        if hysplit_config.get('grid'):
             # TODO: fill in any missing info from grid_config
             pass
-        elif data['config']['dispersion']['hysplit'].get('USER_DEFINED_GRID'):
+        elif hysplit_config.get('USER_DEFINED_GRID'):
             # TODO: fill in any missing values for the following
             #   using what's in grid_config
             #    "USER_DEFINED_GRID", "CENTER_LATITUDE", "CENTER_LONGITUDE",
             #    "WIDTH_LONGITUDE", "HEIGHT_LATITUDE", "SPACING_LONGITUDE", "SPACING_LATITUDE",
             pass
-        elif data['config']['dispersion']['hysplit'].get('compute_grid'):
+        elif hysplit_config.get('compute_grid'):
             # TODO: fill in values for the following using what's
             #   in grid_config
             #    "spacing_longitude", "spacing_latitude",
             #    "grid_length", "projection" (?)
             pass
         else:
-            data['config']['dispersion']['hysplit']['grid'] = grid_config
+            hysplit_config['grid'] = grid_config
 
 
-        tornado.log.gen_log.debug("hysplit configuration: %s", data['config']['dispersion']['hysplit'])
+        tornado.log.gen_log.debug("hysplit configuration: %s", hysplit_config)
 
         # TODO: any other model-specific configuration?
 
