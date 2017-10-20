@@ -12,4 +12,4 @@ def apply_overrides(overrides):
         afconfig.merge_configs(config, overrides)
 
 def get(*args):
-    return afconfig(config, *args)
+    return afconfig.get_config_value(config, *args)
