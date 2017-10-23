@@ -386,7 +386,11 @@ class RunExecuter(tornado.web.RequestHandler):
             #    "grid_length", "projection" (?)
             pass
         else:
-            hysplit_config['grid'] = grid_config
+            hysplit_config['grid'] = {
+                'spacing': grid_config['grid']['resolution_km'],
+                'boundary': grid_config['grid']['boundary'],
+                'projection': 'LCC'
+            }
 
 
         tornado.log.gen_log.debug("hysplit configuration: %s", hysplit_config)
