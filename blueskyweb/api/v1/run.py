@@ -386,12 +386,9 @@ class RunExecuter(tornado.web.RequestHandler):
             #    "grid_length", "projection" (?)
             pass
         else:
-            hysplit_config['grid'] = {
-                'spacing': grid_config['grid']['resolution_km'],
-                'boundary': grid_config['grid']['boundary'],
-                'projection': 'LCC'
-            }
-
+            # TODO: check for grid size reduction factor and
+            #  compute smaller grid (using Robert's calculations?)
+            hysplit_config['grid'] = grid_config['grid']
 
         tornado.log.gen_log.debug("hysplit configuration: %s", hysplit_config)
 
