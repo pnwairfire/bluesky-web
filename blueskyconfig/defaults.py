@@ -5,7 +5,7 @@ DEFAULTS = {
     #   $ chk_arl file /data/ARL/DRI/2km/2016040400/wrfout_d3.2016040400.f00-11_12hr01.arl |grep corner
     #     Lower left corner:   32.5980 -124.2761
     #    Upper right corner:   41.8444 -113.0910
-    'domains': {
+    "domains": {
         "NAM84": {
             "grid": {
                 "spacing": 12,
@@ -127,12 +127,17 @@ DEFAULTS = {
             }
         }
     },
-    'archives': {
-        'standard': {
+    "archives": {
+        "standard": {
             "national_12-km": {
                 "type": "standard",
                 "title": "National 12-km",
                 "domain_id": "NAM84"
+            },
+            "national_3-km": {
+                "type": "standard",
+                "title": "National 3-km",
+                "domain_id": "NAM3km"
             },
             "pacific_northwest_1.33-km": {
                 "type": "standard",
@@ -159,11 +164,6 @@ DEFAULTS = {
                 "title": "AZ/NM 1.8-km",
                 "domain_id": "UofA1.8km"
             },
-            "national_3-km": {
-                "type": "standard",
-                "title": "National 3-km",
-                "domain_id": "NAM3km"
-            },
             "lakestates_4-km": {
                 "type": "standard",
                 "title": "Lake States 4-km",
@@ -175,22 +175,22 @@ DEFAULTS = {
                 "domain_id": "Alaska12km"
             }
         },
-        'special': {
+        "special": {
             "CA-OR-2018-1km06Z": {
                 "type": "special",
                 "title": "NWS 1km 06Z CA/OR",
-                "domain_id": "NWS-06Z-1km-2018-CA-NV"
+                "domain_id": "NWS-06Z-1km-2018-CA-NV",
             },
             "MT-2018-1km00Z": {
                 "type": "special",
                 "title": "NWS 1km 00Z Montana",
-                "domain_id": "NWS-00Z-1km-2018-MT"
+                "domain_id": "NWS-00Z-1km-2018-MT",
             }
         }
     }
-    'hysplit': {
+    "hysplit": {
         "NUMPAR": 2000,
-        "MAXPAR": 1000000000, # don't want to ever hit MAXPAR
+        "MAXPAR": 1000000000, # don"t want to ever hit MAXPAR
         "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
         "VERTICAL_LEVELS": [100],
         "INITD": 0,
