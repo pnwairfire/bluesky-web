@@ -26,7 +26,7 @@ DEFAULTS = {
                     "sw": {"lng": -126,"lat": 41.5},
                     "ne" : {"lng": -113.5, "lat": 49.5}
                 }
-            }
+            },
             "index_filename_pattern": "arl12hrindex.csv",
             "time_step": 1
         },
@@ -38,7 +38,7 @@ DEFAULTS = {
                     "sw": {"lng": -128.6,"lat": 40},
                     "ne" : {"lng": -107, "lat": 49.7}
                 }
-            }
+            },
             "index_filename_pattern": "arl12hrindex.csv",
             "time_step": 1
         },
@@ -50,7 +50,7 @@ DEFAULTS = {
                     "sw": {"lng": -124.3,"lat": 32.5},
                     "ne" : {"lng": -113.0, "lat": 41.8}
                 }
-            }
+            },
             "index_filename_pattern": "arl12hrindex.csv",
             "time_step": 1
         },
@@ -62,7 +62,7 @@ DEFAULTS = {
                     "sw": {"lng": -128.5,"lat": 28.7},
                     "ne" : {"lng": -107.0, "lat": 44.6}
                 }
-            }
+            },
             "index_filename_pattern": "arl12hrindex.csv",
             "time_step": 1
         },
@@ -130,64 +130,53 @@ DEFAULTS = {
     "archives": {
         "standard": {
             "national_12-km": {
-                "type": "standard",
                 "title": "National 12-km",
                 "domain_id": "NAM84"
             },
             "national_3-km": {
-                "type": "standard",
                 "title": "National 3-km",
                 "domain_id": "NAM3km"
             },
             "pacific_northwest_1.33-km": {
-                "type": "standard",
                 "title": "Pacific Northwest 1.33-km",
                 "domain_id": "PNW1.33km"
             },
             "pacific_northwest_4-km": {
-                "type": "standard",
                 "title": "Pacific Northwest 4-km",
                 "domain_id": "PNW4km"
             },
             "ca-nv_2-km": {
-                "type": "standard",
                 "title": "CA/NV 2-km",
                 "domain_id": "DRI2km"
             },
             "ca-nv_6-km": {
-                "type": "standard",
                 "title": "CA/NV 6-km",
                 "domain_id": "DRI6km"
             },
             "AZ-NM_1.8-km": {
-                "type": "standard",
                 "title": "AZ/NM 1.8-km",
                 "domain_id": "UofA1.8km"
             },
             "lakestates_4-km": {
-                "type": "standard",
                 "title": "Lake States 4-km",
                 "domain_id": "LakeStates4km"
             },
             "alaska_12-km": {
-                "type": "standard",
                 "title": "Alaska 12-km",
                 "domain_id": "Alaska12km"
             }
         },
         "special": {
             "CA-OR-2018-1km06Z": {
-                "type": "special",
                 "title": "NWS 1km 06Z CA/OR",
                 "domain_id": "NWS-06Z-1km-2018-CA-NV",
             },
             "MT-2018-1km00Z": {
-                "type": "special",
                 "title": "NWS 1km 00Z Montana",
                 "domain_id": "NWS-00Z-1km-2018-MT",
             }
         }
-    }
+    },
     "hysplit": {
         "NUMPAR": 2000,
         "MAXPAR": 1000000000, # don"t want to ever hit MAXPAR
