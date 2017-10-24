@@ -19,6 +19,13 @@ import motor
 import tornado.log
 import blueskyconfig
 
+__all__ = [
+    "DOMAINS",
+    "BoundaryNotDefinedError",
+    "InvalidDomainError",
+    "MetArchiveDB"
+]
+
 DOMAINS = blueskyconfig.get('domains')
 
 class BoundaryNotDefinedError(ValueError):
@@ -34,7 +41,7 @@ ONE_DAY = datetime.timedelta(days=1)
 ## Domain database
 ##
 
-class DomainDB(object):
+class MetArchiveDB(object):
 
     def __init__(self, mongodb_url):
         db_name = (urlparse(mongodb_url).path.lstrip('/').split('/')[0]

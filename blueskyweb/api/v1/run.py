@@ -1,7 +1,7 @@
 """blueskyweb.api.v1.run"""
 
 # TODO: replace each reference to domains.DOMAINS with call
-#   to some method (to be implemented) in domains.DomainDB or to
+#   to some method (to be implemented) in domains.MetArchiveDB or to
 #   a module level function in domains wrapping the hardcoded data
 
 __author__      = "Joel Dubowy"
@@ -296,9 +296,9 @@ class RunExecuter(tornado.web.RequestHandler):
     async def _configure_findmetdata(self, data, domain):
         tornado.log.gen_log.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
-        domains_db = domains.DomainDB(self.settings['mongodb_url'])
+        met_archives_db = domains.MetArchiveDB(self.settings['mongodb_url'])
         try:
-            met_root_dir = await domains_db.get_root_dir(domain)
+            met_root_dir = await met_archives_db.get_root_dir(domain)
         except domains.InvalidDomainError as e:
             msg = "Invalid domain: {}".format(domain)
             raise tornado.web.HTTPError(status_code=404, log_message=msg)

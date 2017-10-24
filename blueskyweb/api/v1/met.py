@@ -56,7 +56,7 @@ class ArchiveBaseHander(tornado.web.RequestHandler):
 
     def __init__(self, *args, **kwargs):
         super(ArchiveBaseHander, self).__init__(*args, **kwargs)
-        self.domains_db = domains.DomainDB(self.settings['mongodb_url'])
+        self.met_archives_db = domains.MetArchiveDB(self.settings['mongodb_url'])
 
 class ArchivesInfo(ArchiveBaseHander):
 
@@ -70,7 +70,7 @@ class ArchivesInfo(ArchiveBaseHander):
 class DomainAvailableDates(ArchiveBaseHander):
 
     async def get(self, domain_id=None):
-        data = await self.domains_db.find(domain_id=domain_id)
+        data = await self.met_archives_db.find(domain_id=domain_id)
 
         if domain_id:
             if not data:
@@ -98,7 +98,7 @@ class DomainAvailableDate(ArchiveBaseHander):
 
 
         try:
-            data = await self.domains_db.get_availability(
+            data = await self.met_archives_db.get_availability(
                 domain_id, date_obj, self.get_date_range())
             self.write(data)
         except domains.InvalidDomainError:
