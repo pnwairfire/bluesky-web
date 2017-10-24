@@ -10,7 +10,7 @@ import re
 import tornado.web
 
 import blueskyconfig
-from blueskyweb.lib import domains
+from blueskyweb.lib import met
 
 ##
 ## Domains
@@ -21,7 +21,7 @@ KM_PER_DEG_LAT = 111
 class DomainInfo(tornado.web.RequestHandler):
 
     def _marshall(self, domain_id):
-        grid_config = domains.DOMAINS[domain_id]['grid']
+        grid_config = met.DOMAINS[domain_id]['grid']
         r = {
             id: domain_id,
             boundary: grid_config['boundary']
@@ -34,14 +34,14 @@ class DomainInfo(tornado.web.RequestHandler):
 
     def get(self, domain_id=None):
         if domain_id:
-            if domains_id not in domains.DOMAINS:
+            if domains_id not in met.DOMAINS:
                 self.set_status(404, "Domain does not exist")
             else:
                 self.write({"domain_id": self._marshall(domain_id)})
         else:
             self.write({
                 "domains": {
-                    d: self._marshall(d) for d in domains.DOMAINS
+                    d: self._marshall(d) for d in met.DOMAINS
                 }
             })
 
@@ -55,8 +55,8 @@ ARCHIVES = blueskyconfig.get('archives')
 class MetArchiveBaseHander(tornado.web.RequestHandler):
 
     def __init__(self, *args, **kwargs):
-        super(ArchiveBaseHander, self).__init__(*args, **kwargs)
-        self.met_archives_db = domains.MetArchiveDB(self.settings['mongodb_url'])
+        super(MetArchiveBaseHander, self).__init__(*args, **kwargs)
+        self.met_archives_db = met.MetArchiveDB(self.settings['mongodb_url'])
 
 class MetArchivesInfo(MetArchiveBaseHander):
 
@@ -90,7 +90,7 @@ class MetArchivesInfo(MetArchiveBaseHander):
                 self.set_status(404, "Archive does not exist")
 
 
-class MetArchiveAvailability(ArchiveBaseHander):
+class MetArchiveAvailability(MetArchiveBaseHander):
 
     DATE_MATCHER = re.compile(
         '^(?P<year>[0-9]{4})-?(?P<month>[0-9]{2})-?(?P<day>[0-9]{2})$')
@@ -109,7 +109,7 @@ class MetArchiveAvailability(ArchiveBaseHander):
             data = await self.met_archives_db.check_availability(
                 domain_id, date_obj, self.get_date_range())
             self.write(data)
-        except domains.InvalidDomainError:
+        except met.InvalidDomainError:
             raise tornado.web.HTTPError(status_code=404,
                 log_message="Domain does not exist")
 

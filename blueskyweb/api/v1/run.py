@@ -1,7 +1,7 @@
 """blueskyweb.api.v1.run"""
 
-# TODO: replace each reference to domains.DOMAINS with call
-#   to some method (to be implemented) in domains.MetArchiveDB or to
+# TODO: replace each reference to met.DOMAINS with call
+#   to some method (to be implemented) in met.MetArchiveDB or to
 #   a module level function in domains wrapping the hardcoded data
 
 __author__      = "Joel Dubowy"
@@ -25,7 +25,7 @@ import tornado.log
 
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import run_bluesky, BlueSkyRunner
-from blueskyweb.lib import domains
+from blueskyweb.lib import met
 import blueskyconfig
 
 
@@ -114,7 +114,7 @@ class RunExecuter(tornado.web.RequestHandler):
 
     @tornado.web.asynchronous
     async def post(self, mode=None, domain=None):
-        if domain and domain not in domains.DOMAINS:
+        if domain and domain not in met.DOMAINS:
             self._bad_request(404, 'unrecognized domain')
             return
 
@@ -247,10 +247,10 @@ class RunExecuter(tornado.web.RequestHandler):
 
     def _get_queue_name(self, domain):
         if domain:
-            if domain not in domains.DOMAINS:
+            if domain not in met.DOMAINS:
                 msg = "Invalid domain: {}".format(domain)
                 raise tornado.web.HTTPError(status_code=404, log_message=msg)
-            return domains.DOMAINS[domain]['queue']
+            return met.DOMAINS[domain]['queue']
         else:
             return 'no-met'
 
@@ -296,10 +296,10 @@ class RunExecuter(tornado.web.RequestHandler):
     async def _configure_findmetdata(self, data, domain):
         tornado.log.gen_log.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
-        met_archives_db = domains.MetArchiveDB(self.settings['mongodb_url'])
+        met_archives_db = met.MetArchiveDB(self.settings['mongodb_url'])
         try:
             met_root_dir = await met_archives_db.get_root_dir(domain)
-        except domains.InvalidDomainError as e:
+        except met.InvalidDomainError as e:
             msg = "Invalid domain: {}".format(domain)
             raise tornado.web.HTTPError(status_code=404, log_message=msg)
 
@@ -307,7 +307,7 @@ class RunExecuter(tornado.web.RequestHandler):
             "met_root_dir": met_root_dir,
             "arl": {
                 "index_filename_pattern":
-                    domains.DOMAINS[domain]['index_filename_pattern'],
+                    met.DOMAINS[domain]['index_filename_pattern'],
                 "fewer_arl_files": True
             }
         }
@@ -316,7 +316,7 @@ class RunExecuter(tornado.web.RequestHandler):
         tornado.log.gen_log.debug('Configuring localmet')
         data['config'] = data.get('config', {})
         data['config']['localmet'] = {
-            "time_step": domains.DOMAINS[domain]['time_step']
+            "time_step": met.DOMAINS[domain]['time_step']
         }
 
     async def _configure_plumerising(self, data, domain):
