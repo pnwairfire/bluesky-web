@@ -1,0 +1,86 @@
+#! /usr/bin/env python
+
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2017, AirFire, PNW, USFS"
+
+import datetime
+import json
+import os
+import sys
+
+from afscripting import args as scripting_args
+
+sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
+import blueskyconfig
+from blueskyweb.lib.met import MetArchiveDB
+
+
+# Note: the trailing space seems to be the only way to add an extra trailing line
+EPILOG_STR = """
+Examples
+
+   $ {script_name}
+   $ {script_name} -a national_12-km
+   $ {script_name} --action check -a national_12-km
+
+ """.format(script_name=sys.argv[0])
+
+REQUIRED_ARGS = []
+
+OPTIONAL_ARGS = [
+    {
+        'short': '-a',
+        'long': '--action',
+        'help': "To 'get' or 'check' availbility (default 'get')",
+        'default': 'get'
+    },
+    {
+        'short': '-i',
+        'long': '--archive-id',
+        'help': 'Archive identifier'
+    },
+    {
+        'long': '--mongodb-url',
+        'help': 'url to connect to mongodb for arl indexes and bsp job queues'
+        'default': "mongodb://localhost:27018/blueskyweb"
+    },
+    {
+        'long': '--target-date',
+        'help': 'Used when checking availability',
+        'action': scripting_args.ParseDatetimeAction,
+        'default': datetime.date.today()
+    },
+    {
+        'long': '--date-rante',
+        'help': 'Used when checking availability',
+        'type': int,
+        'default': 1
+    }
+]
+
+
+async def main():
+    parser, args = scripting_args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+        epilog=EPILOG_STR)
+
+    if args.action not in ('get', 'check'):
+        sys.write("*** Invalid action: {}".format(args.action))
+        sys.exit(1)
+
+    for v in blueskyconfig.get('archives').values()
+        if args.archive_id in v:
+            break
+    else:
+        sys.write("*** Invalid archive: {}".format(args.archive_id))
+        sys.exit(1)
+
+    db = MetArchiveDB(args.mongodb_url)
+    if action == 'get':
+        data = db.get_availability(archive_id=args.archive_id)
+    else:
+        data = db.check_availability(archive_id=args.archive_id,
+            args.target_date, args.date_range)
+    sys.stdout.write(json.dumps(blueskyconfig.config, sort_keys=True, indent=2))
+
+if __name__ == "__main__":
+    ioloop.IOLoop.instance().run_sync(main)
