@@ -42,6 +42,10 @@ ONE_DAY = datetime.timedelta(days=1)
 ##
 
 class MetArchiveDB(object):
+    """Wraps interaction with met archive index mongodb
+
+    TODO: memoize / cache the three main methods
+    """
 
     def __init__(self, mongodb_url):
         db_name = (urlparse(mongodb_url).path.lstrip('/').split('/')[0]
@@ -49,19 +53,6 @@ class MetArchiveDB(object):
         tornado.log.gen_log.debug('Using %s for domain data', mongodb_url)
         self.db = motor.motor_tornado.MotorClient(mongodb_url)[db_name]
 
-    # TODO: memoize/cache
-    async def find(self, archive_id=None):
-        query = {"domain": archive_id} if archive_id else {}
-        data = {}
-        async for d in self.db.dates.find(query):
-            data[d['domain']] = {
-                "dates": sorted(list(set(d['complete_dates'])))
-            }
-            if d['domain'] in DOMAINS:
-                data[d['domain']]['grid'] = DOMAINS[d['domain']]['grid']
-        return data
-
-    # TODO: memoize/cache
     async def get_root_dir(self, archive_id):
         # Use met_files collection object directly so that we can
         # specify reading only the root_dir field
@@ -71,8 +62,28 @@ class MetArchiveDB(object):
 
         return d['root_dir']
 
-    # TODO: memoize/cache
-    async def get_availability(self, archive_id, target_date, date_range):
+    async def get_availability(self, archive_id=None):
+        pipeline = []
+        if archive_id:
+            pipeline.append({"$match": { "domain": archive_id }})
+        pipeline.extend([
+            {
+                "$project": {
+                    "archive_id": "$archive_id",
+                    "begin": { "$min": "$dates" },
+                    "end": { "$max": "$dates" }
+                }
+            },
+            {
+                "$limit": 1
+            }
+        ])
+        r = await self.db.dates.aggregate(pipeline)
+
+        # TODO: modify r?
+        return r
+
+    async def check_availability(self, archive_id, target_date, date_range):
         data = await self.find(archive_id=archive_id)
         if not data:
             raise InvalidDomainError(archive_id)
@@ -92,4 +103,3 @@ class MetArchiveDB(object):
             "available": available,
             "alternatives": alternatives
         }
-

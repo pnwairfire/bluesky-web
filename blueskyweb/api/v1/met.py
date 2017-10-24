@@ -13,14 +13,10 @@ import blueskyconfig
 from blueskyweb.lib import domains
 
 ##
-## Static Domain data
+## Domains
 ##
 
 KM_PER_DEG_LAT = 111
-DEG_LAT_PER_KM = 1.0 / KM_PER_DEG_LAT
-RADIANS_PER_DEG = math.pi / 180.0
-KM_PER_DEG_LNG_AT_EQUATOR = 111.32
-
 
 class DomainInfo(tornado.web.RequestHandler):
 
@@ -32,8 +28,9 @@ class DomainInfo(tornado.web.RequestHandler):
         }
         r['resolution_km'] = grid_config['spacing']
         if grid_config['projection'] == 'LatLon':
-            r['resolution_km'] *=
-
+            # This uses N/S resolution, which will be different E/W resolution
+            # TODO: Is this appropriate
+            r['resolution_km'] *= KM_PER_DEG_LAT
 
     def get(self, domain_id=None):
         if domain_id:
@@ -48,9 +45,12 @@ class DomainInfo(tornado.web.RequestHandler):
                 }
             })
 
+
 ##
-## DB-based Domain data
+## Archives
 ##
+
+ARCHIVES = blueskyconfig.get('archives')
 
 class MetArchiveBaseHander(tornado.web.RequestHandler):
 
@@ -60,13 +60,37 @@ class MetArchiveBaseHander(tornado.web.RequestHandler):
 
 class MetArchivesInfo(MetArchiveBaseHander):
 
-    async def get(self, identifier):
-        if identifier in blueskyconfig.get('archives'):
-            pass
-        else:
-            pass
+    async def _marshall(self, archive_group, archive_id):
+        r = dict(ARCHIVES[archive_group][archive_id], id=archive_id,
+            group=archive_group)
+        availability = await self.met_archives_db.get_availability(archive_id)
+        r.update(availability)
+        return r
 
-class DomainAvailableDate(ArchiveBaseHander):
+    async def get(self, identifier):
+        if not identifier:
+            self.write([
+                self._marshall(archive_group, archive_id)
+                    for archive_group in ARCHIVES
+                    for archive_id in ARCHIVES[archive_group]
+            ])
+
+        elif identifier in ARCHIVES:
+            self.write([
+                self._marshall(identifier, archive_id)
+                    for archive_id in ARCHIVES[identifier]
+            ])
+
+        else:
+            for archive_group in archives:
+                if archive_id in archives[archive_group]:
+                    self.write(self._marshall(archive_group, archive_id))
+                    break
+            else:
+                self.set_status(404, "Archive does not exist")
+
+
+class MetArchiveAvailability(ArchiveBaseHander):
 
     DATE_MATCHER = re.compile(
         '^(?P<year>[0-9]{4})-?(?P<month>[0-9]{2})-?(?P<day>[0-9]{2})$')
@@ -82,7 +106,7 @@ class DomainAvailableDate(ArchiveBaseHander):
 
 
         try:
-            data = await self.met_archives_db.get_availability(
+            data = await self.met_archives_db.check_availability(
                 domain_id, date_obj, self.get_date_range())
             self.write(data)
         except domains.InvalidDomainError:
