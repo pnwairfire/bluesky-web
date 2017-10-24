@@ -69,22 +69,21 @@ class MetArchiveDB(object):
         pipeline.extend([
             {
                 "$project": {
-                    "archive_id": "$archive_id",
-                    "begin": { "$min": "$dates" },
-                    "end": { "$max": "$dates" }
+                    "archive_id": "$domain",
+                    "begin": { "$min": "$complete_dates" },
+                    "end": { "$max": "$complete_dates" }
                 }
-            },
-            {
-                "$limit": 1
             }
         ])
-        r = await self.db.dates.aggregate(pipeline)
+        r = []
+        async for e in self.db.dates.aggregate(pipeline):
+            r.append(dict(archive_id=e['archive_id'], begin=e['begin'], end=e['end']))
 
         # TODO: modify r?
         return r
 
     async def check_availability(self, archive_id, target_date, date_range):
-        data = await self.find(archive_id=archive_id)
+        data = await self.find(domain=archive_id)
         if not data:
             raise InvalidDomainError(archive_id)
 
