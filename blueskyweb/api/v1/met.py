@@ -52,43 +52,27 @@ class DomainInfo(tornado.web.RequestHandler):
 ## DB-based Domain data
 ##
 
-class ArchiveBaseHander(tornado.web.RequestHandler):
+class MetArchiveBaseHander(tornado.web.RequestHandler):
 
     def __init__(self, *args, **kwargs):
         super(ArchiveBaseHander, self).__init__(*args, **kwargs)
         self.met_archives_db = domains.MetArchiveDB(self.settings['mongodb_url'])
 
-class ArchivesInfo(ArchiveBaseHander):
-
-    async def
+class MetArchivesInfo(MetArchiveBaseHander):
 
     async def get(self, identifier):
         if identifier in blueskyconfig.get('archives'):
-            for
-
-
-class DomainAvailableDates(ArchiveBaseHander):
-
-    async def get(self, domain_id=None):
-        data = await self.met_archives_db.find(domain_id=domain_id)
-
-        if domain_id:
-            if not data:
-                self.set_status(404, "Domain does not exist")
-            else:
-                self.write({"dates":data[domain_id]["dates"]})
+            pass
         else:
-            self.write({
-                "dates": {d: data[d]['dates'] for d in data}
-            })
+            pass
 
 class DomainAvailableDate(ArchiveBaseHander):
 
     DATE_MATCHER = re.compile(
         '^(?P<year>[0-9]{4})-?(?P<month>[0-9]{2})-?(?P<day>[0-9]{2})$')
 
-    async def get(self, domain_id=None, date_str=None):
-        # domain_id and date will always be defined
+    async def get(self, archive_id=None, date_str=None):
+        # archive_id and date will always be defined
         m = self.DATE_MATCHER.match(date_str)
         if not m:
             raise tornado.web.HTTPError(status_code=400,

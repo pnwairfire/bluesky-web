@@ -50,8 +50,8 @@ class MetArchiveDB(object):
         self.db = motor.motor_tornado.MotorClient(mongodb_url)[db_name]
 
     # TODO: memoize/cache
-    async def find(self, domain_id=None):
-        query = {"domain": domain_id} if domain_id else {}
+    async def find(self, archive_id=None):
+        query = {"domain": archive_id} if archive_id else {}
         data = {}
         async for d in self.db.dates.find(query):
             data[d['domain']] = {
@@ -62,20 +62,20 @@ class MetArchiveDB(object):
         return data
 
     # TODO: memoize/cache
-    async def get_root_dir(self, domain_id):
+    async def get_root_dir(self, archive_id):
         # Use met_files collection object directly so that we can
         # specify reading only the root_dir field
-        d = await self.db.met_files.find_one({'domain': domain_id}, {'root_dir': 1})
+        d = await self.db.met_files.find_one({'domain': archive_id}, {'root_dir': 1})
         if not d:
-            raise InvalidDomainError(domain_id)
+            raise InvalidDomainError(archive_id)
 
         return d['root_dir']
 
     # TODO: memoize/cache
-    async def get_availability(self, domain_id, target_date, date_range):
-        data = await self.find(domain_id=domain_id)
+    async def get_availability(self, archive_id, target_date, date_range):
+        data = await self.find(archive_id=archive_id)
         if not data:
-            raise InvalidDomainError(domain_id)
+            raise InvalidDomainError(archive_id)
 
         date_range *= ONE_DAY
 
@@ -83,8 +83,8 @@ class MetArchiveDB(object):
         target_date_str = target_date.strftime('%Y-%m-%d')
         end_date_str = (target_date + date_range).strftime('%Y-%m-%d')
 
-        available = target_date_str in data[domain_id]["dates"]
-        alternatives = [d for d in data[domain_id]["dates"]
+        available = target_date_str in data[archive_id]["dates"]
+        alternatives = [d for d in data[archive_id]["dates"]
             if d >= begin_date_str and d <= end_date_str and
             d != target_date_str]
 

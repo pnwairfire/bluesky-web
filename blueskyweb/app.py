@@ -20,10 +20,9 @@ from blueskymongo.client import BlueSkyWebDB, RunStatuses
 # and have dispatcher try to dynamically import and run the
 # appropriate hander, returning 404 if not implemented
 from .api.ping import Ping
-from .api.v1.domain import (
-    DomainInfo as DomainInfoV1,
-    DomainAvailableDates as DomainAvailableDatesV1,
-    DomainAvailableDate as DomainAvailableDateV1
+from .api.v1.met import (
+    MetArchivesInfo as MetArchivesInfoV1,
+    MetArchiveAvailability as MetArchiveAvailabilityV1
 )
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
@@ -70,12 +69,12 @@ def get_routes(path_prefix):
         (r"/api/v1/met/domains/([^/]+)/?", DomainInfoV1),
 
         # Getting information about all met data archives
-        (r"/api/v1/met/archives/?", ArchivesInfoV1),
+        (r"/api/v1/met/archives/?", MetArchivesInfoV1),
         # Getting information about specific met archive or
         # collection ('standard', 'special', etc.)
-        (r"/api/v1/met/archives/([^/]+)/?", ArchiveInfoV1),
+        (r"/api/v1/met/archives/([^/]+)/?", MetArchiveInfoV1),
         # Checking specific date avaialbility
-        (r"/api/v1/met/archives/([^/]+)/([0-9-]+)/?", ArchiveAvailabilityV1),
+        (r"/api/v1/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailabilityV1),
 
         # Initiating runs
         (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),
