@@ -1,4 +1,10 @@
-"""blueskyweb.lib.domain"""
+"""blueskyweb.lib.domain
+
+Notes:
+ - the arlindexer works in terms of 'domains', but bluesky web
+   uses works with met 'archives'.  The indexes are per archive,
+   but are labeled as 'domain' in the database
+"""
 
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
@@ -20,15 +26,6 @@ class BoundaryNotDefinedError(ValueError):
 
 class InvalidDomainError(ValueError):
     pass
-
-
-# TODO: Put domain settings in bsp-web config file
-
-# TODO: not sure where is the best place to define queues and
-#   boundaries...maybe they should be defined in bsslib?...or let them be
-#   defined as env vars with defaults....or they should be in mongodb!!
-#   if going with mongodb, then don't hard code DOMAINS here, but instead
-#   wrap with methods in DomainDB and memoize
 
 
 ONE_DAY = datetime.timedelta(days=1)

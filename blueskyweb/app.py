@@ -65,13 +65,18 @@ def get_routes(path_prefix):
     )
     routes = [
         (r"/api/ping/?", Ping),
-        # Getting information about met data
-        (r"/api/v1/domains/?", DomainInfoV1),
-        (r"/api/v1/domains/([^/]+)/?", DomainInfoV1),
-        (r"/api/v1/domains/([^/]+)/available-dates/?", DomainAvailableDatesV1),
-        (r"/api/v1/domains/([^/]+)/available-dates/([0-9-]+)/?",
-            DomainAvailableDateV1),
-        (r"/api/v1/available-dates/?", DomainAvailableDatesV1),
+        # Getting information about met domains
+        (r"/api/v1/met/domains/?", DomainInfoV1),
+        (r"/api/v1/met/domains/([^/]+)/?", DomainInfoV1),
+
+        # Getting information about all met data archives
+        (r"/api/v1/met/archives/?", ArchivesInfoV1),
+        # Getting information about specific met archive or
+        # collection ('standard', 'special', etc.)
+        (r"/api/v1/met/archives/([^/]+)/?", ArchiveInfoV1),
+        # Checking specific date avaialbility
+        (r"/api/v1/met/archives/([^/]+)/([0-9-]+)/?", ArchiveAvailabilityV1),
+
         # Initiating runs
         (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),
         (r"/api/v1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuterV1),

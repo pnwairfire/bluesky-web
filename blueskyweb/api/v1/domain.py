@@ -9,28 +9,65 @@ import re
 
 import tornado.web
 
+import blueskyconfig
 from blueskyweb.lib import domains
 
-class DomainBaseHander(tornado.web.RequestHandler):
+##
+## Static Domain data
+##
 
-    def __init__(self, *args, **kwargs):
-        super(DomainBaseHander, self).__init__(*args, **kwargs)
-        self.domains_db = domains.DomainDB(self.settings['mongodb_url'])
+KM_PER_DEG_LAT = 111
+DEG_LAT_PER_KM = 1.0 / KM_PER_DEG_LAT
+RADIANS_PER_DEG = math.pi / 180.0
+KM_PER_DEG_LNG_AT_EQUATOR = 111.32
 
-class DomainInfo(DomainBaseHander):
 
-    async def get(self, domain_id=None):
-        data = await self.domains_db.find(domain_id=domain_id)
+class DomainInfo(tornado.web.RequestHandler):
 
+    def _marshall(self, domain_id):
+        grid_config = domains.DOMAINS[domain_id]['grid']
+        r = {
+            id: domain_id,
+            boundary: grid_config['boundary']
+        }
+        r['resolution_km'] = grid_config['spacing']
+        if grid_config['projection'] == 'LatLon':
+            r['resolution_km'] *=
+
+
+    def get(self, domain_id=None):
         if domain_id:
-            if not data:
+            if domains_id not in domains.DOMAINS:
                 self.set_status(404, "Domain does not exist")
             else:
-                self.write(data)
+                self.write({"domain_id": self._marshall(domain_id)})
         else:
-            self.write({"domains": data})
+            self.write({
+                "domains": {
+                    d: self._marshall(d) for d in domains.DOMAINS
+                }
+            })
 
-class DomainAvailableDates(DomainBaseHander):
+##
+## DB-based Domain data
+##
+
+class ArchiveBaseHander(tornado.web.RequestHandler):
+
+    def __init__(self, *args, **kwargs):
+        super(ArchiveBaseHander, self).__init__(*args, **kwargs)
+        self.domains_db = domains.DomainDB(self.settings['mongodb_url'])
+
+class ArchivesInfo(ArchiveBaseHander):
+
+    async def
+
+    async def get(self, identifier):
+        if identifier in blueskyconfig.get('archives'):
+            for
+
+
+class DomainAvailableDates(ArchiveBaseHander):
 
     async def get(self, domain_id=None):
         data = await self.domains_db.find(domain_id=domain_id)
@@ -45,7 +82,7 @@ class DomainAvailableDates(DomainBaseHander):
                 "dates": {d: data[d]['dates'] for d in data}
             })
 
-class DomainAvailableDate(DomainBaseHander):
+class DomainAvailableDate(ArchiveBaseHander):
 
     DATE_MATCHER = re.compile(
         '^(?P<year>[0-9]{4})-?(?P<month>[0-9]{2})-?(?P<day>[0-9]{2})$')
