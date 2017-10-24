@@ -93,15 +93,3 @@ class MetArchiveDB(object):
             "alternatives": alternatives
         }
 
-##
-## Utility methods
-##
-
-def get_met_boundary(domain):
-    if domain not in DOMAINS:
-        raise InvalidDomainError(domain_id)
-
-    if not DOMAINS[domain].get('grid', {}).get('boundary'):
-        raise BoundaryNotDefinedError(domain)
-
-    return DOMAINS[domain]['grid']['boundary']
