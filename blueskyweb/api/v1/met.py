@@ -104,7 +104,7 @@ class MetArchiveAvailability(MetArchiveBaseHander):
 
         try:
             data = await self.met_archives_db.check_availability(
-                domain_id, date_obj, self.get_date_range())
+                archive_id, date_obj, self.get_date_range())
             self.write(data)
         except met.InvalidArchiveError:
             raise tornado.web.HTTPError(status_code=404,
