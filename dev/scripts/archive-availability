@@ -10,11 +10,12 @@ import sys
 
 import tornado
 
-from afscripting import args as scripting_args
+import afscripting as scripting
 
 sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
 import blueskyconfig
-from blueskyweb.lib.met import MetArchiveDB
+from blueskyweb.lib import met
+from blueskyweb.app import configure_logging
 
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
@@ -22,8 +23,8 @@ EPILOG_STR = """
 Examples
 
    $ {script_name}
-   $ {script_name} -a national_12-km
-   $ {script_name} --action check -a national_12-km
+   $ {script_name} -i national_12-km
+   $ {script_name} -a check -i national_12-km --log-level=DEBUG
 
  """.format(script_name=sys.argv[0])
 
@@ -44,16 +45,16 @@ OPTIONAL_ARGS = [
     {
         'long': '--mongodb-url',
         'help': 'url to connect to mongodb for arl indexes and bsp job queues',
-        'default': "mongodb://localhost:27018/blueskyweb"
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb"
     },
     {
         'long': '--target-date',
         'help': 'Used when checking availability',
-        'action': scripting_args.ParseDatetimeAction,
+        'action': scripting.args.ParseDatetimeAction,
         'default': datetime.date.today()
     },
     {
-        'long': '--date-rante',
+        'long': '--date-range',
         'help': 'Used when checking availability',
         'type': int,
         'default': 1
@@ -62,32 +63,45 @@ OPTIONAL_ARGS = [
 
 def validate_action(args):
     if args.action not in ('get', 'check'):
-        sys.stdout.write("*** Invalid action: {}".format(args.action))
+        sys.stdout.write("*** Invalid action: {}\n".format(args.action))
         sys.exit(1)
 
-def validate_archive_id(args):
-    if args.archive_id:
-        for v in blueskyconfig.get('archives').values():
-            if args.archive_id in v:
-                break
-        else:
-            sys.stdout.write("*** Invalid archive: {}".format(args.archive_id))
-            sys.exit(1)
 
+def parse_args():
+    parser = scripting.args.ArgumentParser()
+    parser.epilog = EPILOG_STR
+    parser.formatter_class = scripting.args.RawTextHelpFormatter
+    scripting.args.add_arguments(parser, OPTIONAL_ARGS)
+    scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
+    # Use afscripting to add logging options to the parser object,
+    # but we'll configure logging oureselves
+    scripting.args.add_logging_options(parser)
+    args = parser.parse_args()
+    args.log_message_format = (args.log_message_format
+        or "%(asctime)s %(levelname)s %(filename)s#%(funcName)s: %(message)s")
+    configure_logging(**args.__dict__)
+    validate_action(args)
+    return args
 
 async def main():
-    parser, args = scripting_args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
-        epilog=EPILOG_STR)
+    args = parse_args()
+    db = met.MetArchiveDB(args.mongodb_url)
 
-    validate_action(args)
-    validate_archive_id(args)
+    try:
+        if args.action == 'get':
+            data = await db.get_availability(archive_id=args.archive_id)
+        else:
+            data = await db.check_availability(args.archive_id, args.target_date,
+                args.date_range)
 
-    db = MetArchiveDB(args.mongodb_url)
-    if args.action == 'get':
-        data = await db.get_availability(archive_id=args.archive_id)
-    else:
-        data = await db.check_availability(args.archive_id, args.target_date,
-            args.date_range)
+    except met.InvalidArchiveError:
+        sys.stdout.write("*** Invalid archive: {}\n".format(args.archive_id))
+        sys.exit(1)
+
+    except met.ArchiveNotDefinedError:
+        sys.stdout.write("*** Specify an archive\n")
+        sys.exit(1)
+
     sys.stdout.write(json.dumps(data, sort_keys=True, indent=2))
 
 if __name__ == "__main__":
