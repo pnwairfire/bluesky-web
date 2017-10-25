@@ -10,7 +10,7 @@ This API returns information about all domains with ARL data
 ### Response
 
     {
-        "data": [
+        "domains": [
             {
                 "id": "<domain_id>",
                 "resolution_km": <km>,
@@ -33,7 +33,7 @@ This API returns information about all domains with ARL data
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/domains/" | python -m json.tool
     {
-        "data": [
+        "domains": [
             {
                 "id": "NAM3km",
                 "resolution_km": 3,
@@ -81,7 +81,7 @@ This API returns information about a specific domain with ARL data
 ### Response
 
     {
-        "data": {
+        "domain": {
             "id": "<domain_id>",
             "resolution_km": <km>,
             "boundary": {
@@ -101,7 +101,7 @@ This API returns information about a specific domain with ARL data
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/domains/DRI6km/" | python -m json.tool
     {
-        "data": {
+        "domain": {
             "id": "DRI6km",
             "resolution_km": 6,
             "boundary": {
@@ -132,7 +132,7 @@ This API returns the dates for which a specific domain has ARL data
 ### Response
 
     {
-        "data": [
+        "archives": [
             {
                 "id": "<archive_id>",
                 "group": "<special|standard>",
@@ -173,7 +173,7 @@ This API returns the dates for which a specific domain has ARL data
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/" | python -m json.tool
     {
-        "data": [
+        "archives": [
             {
                 "id": "CA-OR-2018-1km06Z",
                 "group": "special",
@@ -212,7 +212,7 @@ This API returns the dates for which a specific domain has ARL data
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/special/" | python -m json.tool
     {
-        "data": [
+        "archives": [
             {
                 "id": "CA-OR-2018-1km06Z",
                 "group": "special",
@@ -248,7 +248,7 @@ This API returns the dates for which a specific domain has ARL data
 
 
     {
-        "data": {
+        "archive": {
             "id": "<archive_id>",
             "group": "<special|standard>",
             "domain_id": "<domain_id>",
@@ -262,7 +262,7 @@ This API returns the dates for which a specific domain has ARL data
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/national_12-km/" | python -m json.tool
     {
-        "data": {
+        "archive": {
             "id": "national_12-km",
             "group": "standard",
             "domain_id": "NAM84",

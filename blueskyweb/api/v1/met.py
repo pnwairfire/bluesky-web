@@ -38,9 +38,9 @@ class DomainInfo(tornado.web.RequestHandler):
             if domain_id not in met.DOMAINS:
                 self.set_status(404, "Domain does not exist")
             else:
-                self.write({'data': self._marshall(domain_id)})
+                self.write({'domain': self._marshall(domain_id)})
         else:
-            self.write({'data': [self._marshall(d) for d in met.DOMAINS]})
+            self.write({'domains': [self._marshall(d) for d in met.DOMAINS]})
 
 
 ##
@@ -71,18 +71,18 @@ class MetArchivesInfo(MetArchiveBaseHander):
             for archive_group in ARCHIVES:
                 for archive_id in ARCHIVES[archive_group]:
                     archives.append(await self._marshall(archive_group, archive_id))
-            self.write({"data": archives})
+            self.write({"archives": archives})
 
         elif identifier in ARCHIVES:
             archives = []
             for archive_id in ARCHIVES[identifier]:
                 archives.append(await self._marshall(identifier, archive_id))
-            self.write({"data": archives})
+            self.write({"archives": archives})
 
         else:
             for archive_group in ARCHIVES:
                 if identifier in ARCHIVES[archive_group]:
-                    self.write({"data": await self._marshall(archive_group, identifier)})
+                    self.write({"archive": await self._marshall(archive_group, identifier)})
                     break
             else:
                 self.set_status(404, "Archive does not exist")
