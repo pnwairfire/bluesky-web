@@ -104,12 +104,11 @@ class MetArchiveAvailability(MetArchiveBaseHander):
         date_obj = datetime.date(int(m.group('year')), int(m.group('month')),
             int(m.group('day')))
 
-
         try:
             data = await self.met_archives_db.check_availability(
                 domain_id, date_obj, self.get_date_range())
             self.write(data)
-        except met.InvalidDomainError:
+        except met.InvalidArchiveError:
             raise tornado.web.HTTPError(status_code=404,
                 log_message="Domain does not exist")
 

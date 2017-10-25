@@ -22,16 +22,18 @@ import blueskyconfig
 __all__ = [
     "DOMAINS",
     "BoundaryNotDefinedError",
-    "InvalidDomainError",
+    "InvalidArchiveError",
     "MetArchiveDB"
 ]
 
 DOMAINS = blueskyconfig.get('domains')
+ARCHIVES = blueskyconfig.get('archives')
 
 class BoundaryNotDefinedError(ValueError):
     pass
-
-class InvalidDomainError(ValueError):
+class ArchiveNotDefinedError(ValueError):
+    pass
+class InvalidArchiveError(ValueError):
     pass
 
 
@@ -58,11 +60,21 @@ class MetArchiveDB(object):
         # specify reading only the root_dir field
         d = await self.db.met_files.find_one({'domain': archive_id}, {'root_dir': 1})
         if not d:
-            raise InvalidDomainError(archive_id)
+            raise InvalidArchiveError(archive_id)
 
         return d['root_dir']
 
+    def _validate_archive_id(self, archive_id):
+        if archive_id:
+            for v in ARCHIVES.values():
+                if archive_id in v:
+                    break
+            else:
+                raise InvalidArchiveError(archive_id)
+
     async def get_availability(self, archive_id=None):
+        self._validate_archive_id(archive_id)
+
         pipeline = []
         if archive_id:
             pipeline.append({"$match": { "domain": archive_id }})
@@ -83,20 +95,46 @@ class MetArchiveDB(object):
         return r
 
     async def check_availability(self, archive_id, target_date, date_range):
-        data = await self.find(domain=archive_id)
-        if not data:
-            raise InvalidDomainError(archive_id)
+        if not archive_id:
+            raise ArchiveNotDefinedError()
+        self._validate_archive_id(archive_id)
 
         date_range *= ONE_DAY
-
         begin_date_str = (target_date - date_range).strftime('%Y-%m-%d')
         target_date_str = target_date.strftime('%Y-%m-%d')
         end_date_str = (target_date + date_range).strftime('%Y-%m-%d')
 
-        available = target_date_str in data[archive_id]["dates"]
-        alternatives = [d for d in data[archive_id]["dates"]
-            if d >= begin_date_str and d <= end_date_str and
-            d != target_date_str]
+        tornado.log.gen_log.debug('Check date availability for %s or between %s and %s',
+            target_date_str, begin_date_str, end_date_str)
+
+        pipeline = [
+            { "$match": { "domain": archive_id }},
+            {
+                "$addFields" : {
+                    "complete_dates":{
+                        "$filter": { # override the existing field
+                            "input": "$complete_dates",
+                            "as": "single_date",
+                            "cond": {
+                                '$and': [
+                                    {"$gte": ["$$single_date", begin_date_str]},
+                                    {"$lte": ["$$single_date", end_date_str]}
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+
+        # There should be at most one result
+        available_dates = []
+        async for e in self.db.dates.aggregate(pipeline):
+            tornado.log.gen_log.debug('found availability: %s', e['complete_dates'])
+            available_dates.extend(e['complete_dates'])
+
+        available = target_date_str in available_dates
+        alternatives = [d for d in available_dates if d != target_date_str]
 
         return {
             "available": available,
