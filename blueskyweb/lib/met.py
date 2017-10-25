@@ -133,6 +133,12 @@ class MetArchiveDB(object):
             tornado.log.gen_log.debug('found availability: %s', e['complete_dates'])
             available_dates.extend(e['complete_dates'])
 
+        # ***** TEMP *****
+        # TODO: remove the following once arlindexer is updated to
+        #   not save redundant dates
+        available_dates = set(available_dates)
+        # ***** TEMP *****
+
         available = target_date_str in available_dates
         alternatives = [d for d in available_dates if d != target_date_str]
 
