@@ -1,10 +1,10 @@
-if [ $# -lt 2 ] || [ $# -gt 4 ]
+if [ $# -lt 2 ] || [ $# -gt 5 ]
   then
-    echo "Usage: $0 <root_url> <domain> <date> [response output file]"
+    echo "Usage: $0 <root_url> <domain> <archive> <date> [response output file]"
     echo "Examples:"
-    echo "  $0 http://localhost:8887/bluesky-web/ DRI6km 2014-05-29 ./tmp/web-regression-out-dev.log"
-    echo "  $0 https://www.blueskywebhost.com/bluesky-web-test/ DRI2km \`date "+%Y-%m-%d"\` ./tmp/web-regression-out-test.log"
-    echo "  $0 https://www.blueskywebhost.com/bluesky-web/ DRI2km \`date "+%Y-%m-%d"\` ./tmp/web-regression-out-prod.log"
+    echo "  $0 http://localhost:8887/bluesky-web/ DRI6km ca-nv_6-km 2014-05-29 ./tmp/web-regression-out-dev.log"
+    echo "  $0 https://www.blueskywebhost.com/bluesky-web-test/ ca-nv_2-km DRI2km \`date "+%Y-%m-%d"\` ./tmp/web-regression-out-test.log"
+    echo "  $0 https://www.blueskywebhost.com/bluesky-web/ DRI2km ca-nv_2-km \`date "+%Y-%m-%d"\` ./tmp/web-regression-out-prod.log"
     echo ""
     exit 1
 fi
@@ -12,16 +12,18 @@ fi
 # trim trailing slash from root url
 ROOT_URL=$(echo $1 | sed 's:/*$::')
 DOMAIN=$2
-DATE=$3
-if [ $# -eq 4 ]
+ARCHIVE=$3
+DATE=$4
+if [ $# -eq 5 ]
   then
-    OUTPUT_FILE=$4
+    OUTPUT_FILE=$5
 else
     OUTPUT_FILE=/dev/null
 fi
 
 echo "Testing $ROOT_URL"
 echo "Domain: $DOMAIN"
+echo "Domain: $ARCHIVE"
 echo "Date: $DATE"
 echo "Outputing to $OUTPUT_FILE"
 
@@ -36,17 +38,20 @@ echo -n "" > $OUTPUT_FILE
 GET_URLS=(
     $ROOT_URL/api/ping
     $ROOT_URL/api/ping/
-    $ROOT_URL/api/v1/domains
-    $ROOT_URL/api/v1/domains/
-    $ROOT_URL/api/v1/domains/$DOMAIN
-    $ROOT_URL/api/v1/domains/$DOMAIN/
-    $ROOT_URL/api/v1/domains/$DOMAIN/available-dates
-    $ROOT_URL/api/v1/domains/$DOMAIN/available-dates/
-    $ROOT_URL/api/v1/domains/$DOMAIN/available-dates/$DATE
-    $ROOT_URL/api/v1/domains/$DOMAIN/available-dates/$DATE/
-    # TODO: test date verification API
-    $ROOT_URL/api/v1/available-dates
-    $ROOT_URL/api/v1/available-dates/
+    $ROOT_URL/api/v1/met/domains
+    $ROOT_URL/api/v1/met/domains/
+    $ROOT_URL/api/v1/met/domains/$DOMAIN
+    $ROOT_URL/api/v1/met/domains/$DOMAIN/
+    $ROOT_URL/api/v1/met/archives
+    $ROOT_URL/api/v1/met/archives/
+    $ROOT_URL/api/v1/met/archives/standard
+    $ROOT_URL/api/v1/met/archives/standard/
+    $ROOT_URL/api/v1/met/archives/special
+    $ROOT_URL/api/v1/met/archives/special/
+    $ROOT_URL/api/v1/met/archives/$ARCHIVE
+    $ROOT_URL/api/v1/met/archives/$ARCHIVE/
+    $ROOT_URL/api/v1/met/archives/$ARCHIVE/$DATE
+    $ROOT_URL/api/v1/met/archives/$ARCHIVE/$DATE/
 )
 WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 for i in "${GET_URLS[@]}"
