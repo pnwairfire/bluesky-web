@@ -73,7 +73,7 @@ def get_routes(path_prefix):
         (r"/api/v1/met/archives/?", MetArchivesInfoV1),
         # Getting information about specific met archive or
         # collection ('standard', 'special', etc.)
-        (r"/api/v1/met/archives/([^/]+)/?", MetArchiveInfoV1),
+        (r"/api/v1/met/archives/([^/]+)/?", MetArchivesInfoV1),
         # Checking specific date avaialbility
         (r"/api/v1/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailabilityV1),
 
