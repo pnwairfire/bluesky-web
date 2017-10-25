@@ -87,11 +87,20 @@ class MetArchiveDB(object):
                 }
             }
         ])
-        r = []
+        r = {}
         async for e in self.db.dates.aggregate(pipeline):
-            r.append(dict(archive_id=e['archive_id'], begin=e['begin'], end=e['end']))
+            if e['archive_id'] in r:
+                # This shouldn't happen
+                r[e['archive_id']]['begin'] = min(
+                    r[e['archive_id']]['begin'], e['begin'])
+                r[e['archive_id']]['end'] = min(
+                    r[e['archive_id']]['end'], e['end'])
+            else:
+                r[e['archive_id']] = dict(begin=e['begin'], end=e['end'])
 
         # TODO: modify r?
+        if archive_id:
+            return r.get(archive_id) or dict(begin=None, end=None)
         return r
 
     async def check_availability(self, archive_id, target_date, date_range):
