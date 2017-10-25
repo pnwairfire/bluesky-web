@@ -21,6 +21,7 @@ from blueskymongo.client import BlueSkyWebDB, RunStatuses
 # appropriate hander, returning 404 if not implemented
 from .api.ping import Ping
 from .api.v1.met import (
+    DomainInfo as DomainInfoV1,
     MetArchivesInfo as MetArchivesInfoV1,
     MetArchiveAvailability as MetArchiveAvailabilityV1
 )

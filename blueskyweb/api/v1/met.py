@@ -23,14 +23,15 @@ class DomainInfo(tornado.web.RequestHandler):
     def _marshall(self, domain_id):
         grid_config = met.DOMAINS[domain_id]['grid']
         r = {
-            id: domain_id,
-            boundary: grid_config['boundary']
+            "id": domain_id,
+            "boundary": grid_config['boundary']
         }
         r['resolution_km'] = grid_config['spacing']
         if grid_config['projection'] == 'LatLon':
             # This uses N/S resolution, which will be different E/W resolution
             # TODO: Is this appropriate
             r['resolution_km'] *= KM_PER_DEG_LAT
+        return r
 
     def get(self, domain_id=None):
         if domain_id:
