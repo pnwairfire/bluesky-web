@@ -108,7 +108,7 @@ class MetArchiveAvailability(MetArchiveBaseHander):
             self.write(data)
         except met.InvalidArchiveError:
             raise tornado.web.HTTPError(status_code=404,
-                log_message="Domain does not exist")
+                log_message="Archive does not exist")
 
     DEFAUL_DATE_RANGE = 3
 
