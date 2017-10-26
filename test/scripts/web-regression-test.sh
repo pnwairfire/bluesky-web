@@ -23,7 +23,7 @@ fi
 
 echo "Testing $ROOT_URL"
 echo "Domain: $DOMAIN"
-echo "Domain: $ARCHIVE"
+echo "Archive: $ARCHIVE"
 echo "Date: $DATE"
 echo "Outputing to $OUTPUT_FILE"
 
