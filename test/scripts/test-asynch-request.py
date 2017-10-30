@@ -90,9 +90,9 @@ OPTIONAL_ARGS = [
         'default': '-07:00'
     },
     {
-        'long': "--met-domain",
-        'help': "met domain; default 'DRI6km'",
-        'default': 'DRI6km'
+        'long': "--met-archive",
+        'help': "met archive; default 'ca-nv_6-km'",
+        'default': 'ca-nv_6-km'
     },
     {
         'short': '-m',
@@ -284,7 +284,7 @@ if __name__ == "__main__":
     else:
         url += 'all/'
         if not args.vsmoke:
-            url += '{}/'.format(args.met_domain)
+            url += '{}/'.format(args.met_archive)
 
     # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
     query["image_results_version"] = args.image_results_version
