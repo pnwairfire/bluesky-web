@@ -15,7 +15,7 @@ DEFAULTS = {
                     "ne" : {"lng": -49, "lat": 57.4}
                 }
             },
-            "index_filename_pattern": "NAM84_ARL_index.csv",
+            "arl_index_file": "NAM84_ARL_index.csv",
             "time_step": 3
         },
         "PNW1.33km": {
@@ -27,7 +27,7 @@ DEFAULTS = {
                     "ne" : {"lng": -113.5, "lat": 49.5}
                 }
             },
-            "index_filename_pattern": "arl12hrindex.csv",
+            "arl_index_file": "arl12hrindex.csv",
             "time_step": 1
         },
         "PNW4km": {
@@ -39,7 +39,7 @@ DEFAULTS = {
                     "ne" : {"lng": -107, "lat": 49.7}
                 }
             },
-            "index_filename_pattern": "arl12hrindex.csv",
+            "arl_index_file": "arl12hrindex.csv",
             "time_step": 1
         },
         "DRI2km": {
@@ -51,7 +51,7 @@ DEFAULTS = {
                     "ne" : {"lng": -113.0, "lat": 41.8}
                 }
             },
-            "index_filename_pattern": "arl12hrindex.csv",
+            "arl_index_file": "arl12hrindex.csv",
             "time_step": 1
         },
         "DRI6km": {
@@ -63,7 +63,7 @@ DEFAULTS = {
                     "ne" : {"lng": -107.0, "lat": 44.6}
                 }
             },
-            "index_filename_pattern": "arl12hrindex.csv",
+            "arl_index_file": "arl12hrindex.csv",
             "time_step": 1
         },
         "UofA1.8km": {
