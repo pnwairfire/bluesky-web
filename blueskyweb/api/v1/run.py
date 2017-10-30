@@ -1,9 +1,5 @@
 """blueskyweb.api.v1.run"""
 
-# TODO: replace each reference to met.DOMAINS with call
-#   to some method (to be implemented) in met.MetArchiveDB or to
-#   a module level function in domains wrapping the hardcoded data
-
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
@@ -113,10 +109,10 @@ class RunBase(tornado.web.RequestHandler):
 class RunExecuter(tornado.web.RequestHandler):
 
     @tornado.web.asynchronous
-    async def post(self, mode=None, domain=None):
-        if domain and domain not in met.DOMAINS:
-            self._bad_request(404, 'unrecognized domain')
-            return
+    async def post(self, mode=None, archive_id=None):
+        self._mode = mode
+        self._archive_id = archive_id
+        self._archive_info = met.get_archive_info(archive_id)
 
         if not self.request.body:
             self._bad_request(400, 'empty post data')
@@ -138,7 +134,7 @@ class RunExecuter(tornado.web.RequestHandler):
             data['run_id'] = str(uuid.uuid1())
 
         try:
-            self._set_modules(domain, mode, data)
+            self._set_modules(mode, data)
 
             # TODO: check data['modules'] specifically for 'localmet',
             # 'dispersion', 'visualization' (and 'export'?)
@@ -148,11 +144,11 @@ class RunExecuter(tornado.web.RequestHandler):
                 for m in data['modules']:
                     f = getattr(self, '_configure_{}'.format(m), None)
                     if f:
-                        await f(data, domain)
+                        await f(data)
 
-                # TODO: configure anything else (e.g. setting domain where
+                # TODO: configure anything else (e.g. setting archive_id where
                 #  appropriate)
-                self._run_asynchronously(data, domain=domain)
+                self._run_asynchronously(data)
 
             else:
                 await self._configure_emissions(data)
@@ -196,7 +192,7 @@ class RunExecuter(tornado.web.RequestHandler):
         'findmetdata', 'dispersion', 'export'
     ]
 
-    def _set_modules(self, domain, mode, data):
+    def _set_modules(self, mode, data):
         def _set(default_modules):
             if "modules" in data:  #data.get('modules'):
                 invalid_modules = set(data['modules']).difference(
@@ -212,9 +208,9 @@ class RunExecuter(tornado.web.RequestHandler):
 
         if mode in ('dispersion', 'all'):
             dispersion_modules = (self.MET_DISPERSION_MODULES
-                if domain else self.METLESS_DISPERSION_MODULES)
+                if self._archive_id else self.METLESS_DISPERSION_MODULES)
             if mode == 'all':
-                if domain:
+                if self._archive_id:
                     _set(self.FUELBEDS_MODULES +
                         self.EMISSIONS_MODULES +
                         self.PLUMERISE_MODULES +
@@ -224,7 +220,7 @@ class RunExecuter(tornado.web.RequestHandler):
                         self.EMISSIONS_MODULES +
                         dispersion_modules)
             else:
-                if domain and ('met' not in data):
+                if self._archive_id and ('met' not in data):
                     _set(['findmetdata'] + dispersion_modules)
                 else:
                     _set(dispersion_modules)
@@ -245,18 +241,8 @@ class RunExecuter(tornado.web.RequestHandler):
         #self.write({"error": msg})
         #self.finish()
 
-    def _get_queue_name(self, domain):
-        if domain:
-            if domain not in met.DOMAINS:
-                msg = "Invalid domain: {}".format(domain)
-                raise tornado.web.HTTPError(status_code=404, log_message=msg)
-            return met.DOMAINS[domain]['queue']
-        else:
-            return 'no-met'
-
-
-    def _run_asynchronously(self, data, domain=None):
-        queue_name = self._get_queue_name(domain)
+    def _run_asynchronously(self, data):
+        queue_name = self._archive_id or 'no-met'
 
         #tornado.log.gen_log.debug('input: %s', data)
         args = (data, ) # has to be a tuple
@@ -287,39 +273,39 @@ class RunExecuter(tornado.web.RequestHandler):
             tornado.log.gen_log.error('Exception: %s', e)
             self.set_status(500)
 
-    async def _configure_emissions(self, data, domain=None):
+    async def _configure_emissions(self, data):
         tornado.log.gen_log.debug('Configuring emissions')
         data['config'] = data.get('config', {})
         data['config']['emissions'] = data['config'].get('emissions', {})
         data['config']['emissions']['efs'] = "urbanski"
 
-    async def _configure_findmetdata(self, data, domain):
+    async def _configure_findmetdata(self, data):
         tornado.log.gen_log.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
         met_archives_db = met.MetArchiveDB(self.settings['mongodb_url'])
         try:
-            met_root_dir = await met_archives_db.get_root_dir(domain)
-        except met.InvalidDomainError as e:
-            msg = "Invalid domain: {}".format(domain)
+            met_root_dir = await met_archives_db.get_root_dir(self._archive_id)
+        except met.UnavailableArchiveError as e:
+            msg = "Archive unavailable: {}".format(self._archive_id)
             raise tornado.web.HTTPError(status_code=404, log_message=msg)
 
         data['config']['findmetdata'] = {
             "met_root_dir": met_root_dir,
             "arl": {
-                "index_filename_pattern":
-                    met.DOMAINS[domain]['index_filename_pattern'],
+                "arl_index_file":
+                    self._archive_info['arl_index_file'],
                 "fewer_arl_files": True
             }
         }
 
-    async def _configure_localmet(self, data, domain):
+    async def _configure_localmet(self, data):
         tornado.log.gen_log.debug('Configuring localmet')
         data['config'] = data.get('config', {})
         data['config']['localmet'] = {
-            "time_step": met.DOMAINS[domain]['time_step']
+            "time_step": met._archive_info['time_step']
         }
 
-    async def _configure_plumerising(self, data, domain):
+    async def _configure_plumerising(self, data):
         tornado.log.gen_log.debug('Configuring plumerising')
         data['config'] = data.get('config', {})
         data['config']['plumerising'] = {
@@ -328,7 +314,7 @@ class RunExecuter(tornado.web.RequestHandler):
 
     DEFAULT_HYSPLIT_GRID_LENGTH = 2000
 
-    async def _configure_dispersion(self, data, domain):
+    async def _configure_dispersion(self, data):
         tornado.log.gen_log.debug('Configuring dispersion')
         if (not data.get('config', {}).get('dispersion', {}) or not
                 data['config']['dispersion'].get('start') or not
@@ -349,13 +335,13 @@ class RunExecuter(tornado.web.RequestHandler):
         tornado.log.gen_log.debug("Working dir: %s",
             data['config']['dispersion']['working_dir'])
 
-        if not domain:
+        if not self._archive_id:
             data['config']['dispersion']['model'] = 'vsmoke'
 
         if data['config']['dispersion'].get('model') in ('hysplit', None):
-            await self._configure_hysplit(data, domain)
+            await self._configure_hysplit(data)
 
-    async def _configure_hysplit(self, data, domain):
+    async def _configure_hysplit(self, data):
         # initialize config dict
         if not data['config']['dispersion'].get('hysplit'):
             data['config']['dispersion']['hysplit'] = {}
@@ -369,7 +355,7 @@ class RunExecuter(tornado.web.RequestHandler):
                 hysplit_config[k] = hysplit_defaults[k]
 
         # set grid
-        grid_config = blueskyconfig.get('domains', domain, 'grid')
+        grid_config = self._archive_info['grid']
         if hysplit_config.get('grid'):
             # TODO: fill in any missing info from grid_config
             pass
@@ -394,7 +380,7 @@ class RunExecuter(tornado.web.RequestHandler):
 
         # TODO: any other model-specific configuration?
 
-    async def _configure_visualization(self, data, domain):
+    async def _configure_visualization(self, data):
         tornado.log.gen_log.debug('Configuring visualization')
         # Force visualization of dispersion, and let output go into dispersion
         # output directory; in case dispersion model was hysplit, specify
@@ -412,7 +398,7 @@ class RunExecuter(tornado.web.RequestHandler):
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
-    async def _configure_export(self, data, domain):
+    async def _configure_export(self, data):
         # we just run export to get image and file information
         tornado.log.gen_log.debug('Configuring export')
         # dest_dir = data['config']['dispersion']['output_dir'].replace(
@@ -422,7 +408,7 @@ class RunExecuter(tornado.web.RequestHandler):
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'])
 
-        extras = ["dispersion", "visualization"] if domain else ["dispersion"]
+        extras = ["dispersion", "visualization"] if self._archive_id else ["dispersion"]
         data['config']['export'] = {
             "modes": ["localsave"],
             "extra_exports": extras,

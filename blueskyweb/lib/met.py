@@ -23,6 +23,7 @@ __all__ = [
     "DOMAINS",
     "BoundaryNotDefinedError",
     "InvalidArchiveError",
+    "UnavailableArchiveError",
     "MetArchiveDB"
 ]
 
@@ -35,6 +36,8 @@ class ArchiveNotDefinedError(ValueError):
     pass
 class InvalidArchiveError(ValueError):
     pass
+class UnavailableArchiveError(ValueError):
+    pass
 
 
 ONE_DAY = datetime.timedelta(days=1)
@@ -42,6 +45,22 @@ ONE_DAY = datetime.timedelta(days=1)
 ##
 ## Domain database
 ##
+
+def get_archive_info(archive_id):
+    if archive_id:
+        for v in ARCHIVES.values():
+            if archive_id in v:
+                return dict(v, id=archive_id, **DOMAINS[v['domain']])
+        raise InvalidArchiveError(archive_id)
+
+
+def validate_archive_id(archive_id):
+    if archive_id:
+        for v in ARCHIVES.values():
+            if archive_id in v:
+                return archive_id
+        raise InvalidArchiveError(archive_id)
+
 
 class MetArchiveDB(object):
     """Wraps interaction with met archive index mongodb
@@ -60,20 +79,13 @@ class MetArchiveDB(object):
         # specify reading only the root_dir field
         d = await self.db.met_files.find_one({'domain': archive_id}, {'root_dir': 1})
         if not d:
-            raise InvalidArchiveError(archive_id)
+            raise UnavailableArchiveError(archive_id)
 
         return d['root_dir']
 
-    def _validate_archive_id(self, archive_id):
-        if archive_id:
-            for v in ARCHIVES.values():
-                if archive_id in v:
-                    break
-            else:
-                raise InvalidArchiveError(archive_id)
 
     async def get_availability(self, archive_id=None):
-        self._validate_archive_id(archive_id)
+        validate_archive_id(archive_id)
 
         pipeline = []
         if archive_id:
@@ -106,7 +118,7 @@ class MetArchiveDB(object):
     async def check_availability(self, archive_id, target_date, date_range):
         if not archive_id:
             raise ArchiveNotDefinedError()
-        self._validate_archive_id(archive_id)
+        validate_archive_id(archive_id)
 
         date_range *= ONE_DAY
         begin_date_str = (target_date - date_range).strftime('%Y-%m-%d')
