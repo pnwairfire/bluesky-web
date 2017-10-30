@@ -74,7 +74,9 @@ DEFAULTS = {
                     "sw": {"lng": -115,"lat": 30},
                     "ne" : {"lng": -102, "lat": 36.2}
                 }
-            }
+            },
+            "arl_index_file": None, # TODO: set correctly
+            "time_step": None # TODO: set correctly
         },
         "NAM3km": {
             "grid": {
@@ -84,7 +86,9 @@ DEFAULTS = {
                     "sw": {"lng": -122.7,"lat": 21},
                     "ne" : {"lng": -61, "lat": 48}
                 }
-            }
+            },
+            "arl_index_file": None, # TODO: set correctly
+            "time_step": None # TODO: set correctly
         },
         "LakeStates4km": {
             "grid": {
@@ -94,7 +98,9 @@ DEFAULTS = {
                     "sw": {"lng": -123.75,"lat": 33.25},
                     "ne" : {"lng": -114.25, "lat": 41.75}
                 }
-            }
+            },
+            "arl_index_file": None, # TODO: set correctly
+            "time_step": None # TODO: set correctly
         },
         "Alaska12km": {
             "grid": {
@@ -104,7 +110,9 @@ DEFAULTS = {
                     "sw": {"lng": -178.6,"lat": 40.6},
                     "ne" : {"lng": -98, "lat": 66.3}
                 }
-            }
+            },
+            "arl_index_file": None, # TODO: set correctly
+            "time_step": None # TODO: set correctly
         },
         "NWS-06Z-1km-2018-CA-NV": {
             "grid": {
@@ -114,7 +122,9 @@ DEFAULTS = {
                     "sw": {"lng": -125.3,"lat": 39.5},
                     "ne" : {"lng": -121, "lat": 44.4}
                 }
-            }
+            },
+            "arl_index_file": None, # TODO: set correctly
+            "time_step": None # TODO: set correctly
         },
         "NWS-00Z-1km-2018-MT": {
             "grid": {
@@ -124,7 +134,9 @@ DEFAULTS = {
                     "sw": {"lng": -115.8,"lat": 44.7},
                     "ne" : {"lng": -110.6, "lat": 49.2}
                 }
-            }
+            },
+            "arl_index_file": None, # TODO: set correctly
+            "time_step": None # TODO: set correctly
         }
     },
     "archives": {
