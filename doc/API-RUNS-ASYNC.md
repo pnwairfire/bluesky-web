@@ -1,4 +1,4 @@
-## POST /api/v1/run/plumerise/<met_domain>/
+## POST /api/v1/run/plumerise/<met_archive>/
 
 This API runs bluesky timeprofiling and plumerise modules.  (The
 bluesky web service runs FEPS plumerise which, unlike SEV plumerise,
@@ -33,6 +33,13 @@ An example with fire location data specified as geojson
                     {
                         "start": "2014-05-29T17:00:00",
                         "end": "2014-05-30T17:00:00",
+                        "consumption": {
+                            "summary": {
+                                "smoldering": 21712.600892425173,
+                                "flaming": 40988.711969791053,
+                                "residual": 13823.389194227209
+                            }
+                        },
                         "location": {
                             "area": 10000,
                             "ecoregion": "western",
@@ -46,7 +53,7 @@ An example with fire location data specified as geojson
         ]
     }' > dev/data/plumerise-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/DRI6km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/plumerise-input.json | python -m json.tool
 
@@ -54,7 +61,7 @@ An example with fire location data specified as geojson
 
 
 
-## POST /api/v1/run/dispersion/<met_domain>/
+## POST /api/v1/run/dispersion/<met_archive>/
 
 This API takes consumption, emissions, and plumerise data and runs
 bluesky through dispersion and visualization.  It's the dispersion
@@ -89,7 +96,7 @@ status and output API requests (described below).
 The following is a simple example that runs dispersion for only
 one hour.
 
-    $  echo '{
+    $ echo '{
         "fire_information": [
             {
                 "event_of": {
@@ -141,38 +148,46 @@ one hour.
                                 }
                             }
                         ],
+                        "timeprofile": {
+                            "2014-05-29T17:00:00": {
+                                "area_fraction": 0.42643923240938175,
+                                "flaming": 0.42643923240938175,
+                                "residual": 0.42643923240938175,
+                                "smoldering": 0.42643923240938175
+                            }
+                        },
                         "plumerise": {
-                            "2014-05-29T23:00:00": {
-                                "heights": [
-                                    33.01197995675946,
-                                    34.662578954597436,
-                                    36.31317795243541,
-                                    37.963776950273385,
-                                    39.61437594811135,
-                                    41.26497494594933,
-                                    42.9155739437873,
-                                    44.566172941625275,
-                                    46.21677193946324,
-                                    47.86737093730122,
-                                    49.51796993513919,
-                                    51.168568932977166,
-                                    52.81916793081514,
-                                    54.469766928653115,
-                                    56.12036592649109,
-                                    57.77096492432906,
-                                    59.42156392216703,
-                                    61.072162920005006,
-                                    62.72276191784297,
-                                    64.37336091568095,
-                                    66.02395991351892
-                                ],
+                            "2014-05-29T17:00:00": {
                                 "emission_fractions": [
                                     0.05, 0.05, 0.05, 0.05, 0.05,
                                     0.05, 0.05, 0.05, 0.05, 0.05,
                                     0.05, 0.05, 0.05, 0.05, 0.05,
                                     0.05, 0.05, 0.05, 0.05, 0.05
                                 ],
-                                "smolder_fraction": 0.0
+                                "heights": [
+                                    3999.906231,
+                                    18808.46359175,
+                                    33617.0209525,
+                                    48425.57831325001,
+                                    63234.135674000005,
+                                    78042.69303475,
+                                    92851.25039550001,
+                                    107659.80775625001,
+                                    122468.36511700001,
+                                    137276.92247775002,
+                                    152085.4798385,
+                                    166894.03719925001,
+                                    181702.59456000003,
+                                    196511.15192075,
+                                    211319.70928150002,
+                                    226128.26664225,
+                                    240936.82400300002,
+                                    255745.38136375003,
+                                    270553.9387245,
+                                    285362.49608525,
+                                    300171.053446
+                                ],
+                                "smolder_fraction": 0.05
                             }
                         }
                     }
@@ -187,7 +202,7 @@ one hour.
         }
     }' > dev/data/dispersion-hysplit-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI6km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-hysplit-input.json | python -m json.tool
 
@@ -245,7 +260,7 @@ however, override any of these.  For example:
         }
     }' > dev/data/dispersion-hysplit-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI6km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-hysplit-input.json | python -m json.tool
 
@@ -253,7 +268,7 @@ however, override any of these.  For example:
 
 
 
-## POST /api/v1/run/all/<met_domain>/
+## POST /api/v1/run/all/<met_archive>/
 
 This API is very similar to the met-dependent dispersion API,
 described above, except that it starts off with the
@@ -299,7 +314,7 @@ require emissions data.
         ]
     }' > dev/data/all-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/DRI6km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/all-input.json | python -m json.tool
 
