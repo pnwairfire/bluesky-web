@@ -128,6 +128,8 @@ This API returns the dates for which a specific domain has ARL data
 
  - url: $BLUESKY_API_ROOT_URL/api/v1/met/archives/[<archive_type>/]
  - method: GET
+ - optional query args:
+  - available (bool) -- filter by availability
 
 ### Response
 
