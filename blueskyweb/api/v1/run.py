@@ -189,7 +189,7 @@ class RunExecuter(tornado.web.RequestHandler):
         'findmetdata', 'dispersion', 'visualization', 'export'
     ]
     METLESS_DISPERSION_MODULES = [
-        'findmetdata', 'dispersion', 'export'
+        'dispersion', 'export'
     ]
 
     def _set_modules(self, mode, data):
@@ -218,6 +218,8 @@ class RunExecuter(tornado.web.RequestHandler):
                 else:
                     _set(self.FUELBEDS_MODULES +
                         self.EMISSIONS_MODULES +
+                        # vsmoke needs timeprofiling but not plumerise
+                        ['timeprofiling'] +
                         dispersion_modules)
             else:
                 if self._archive_id and ('met' not in data):
