@@ -64,6 +64,30 @@ class MetArchivesInfo(MetArchiveBaseHander):
         r.update(availability)
         return r
 
+    def get_boolean_arg(self, key):
+        val = self.get_query_argument(key, None)
+        if val is not None:
+            orig_val = val # for error message
+            val = val.lower()
+            if val in ('true', 'yes', 'y', '1'):
+                val = True
+            elif val in ('false', 'no', 'n', '0'):
+                val = False
+            else:
+                raise tornado.web.HTTPError(status_code=400,
+                    log_message="Invalid boolean value '{}' "
+                    "for query arg {}".format(orig_val, key))
+        return val
+
+    def write_archives(self, archives):
+        available = self.get_boolean_arg('available')
+        if available is not None:
+            if available:
+                archives = [a for a in archives if a['begin'] and a['end']]
+            else:
+                archives = [a for a in archives if not a['begin'] or not a['end']]
+        self.write({"archives": archives})
+
     async def get(self, identifier=None):
         if not identifier:
             # Note: 'await' expressions in comprehensions are not supported
@@ -71,13 +95,13 @@ class MetArchivesInfo(MetArchiveBaseHander):
             for archive_group in ARCHIVES:
                 for archive_id in ARCHIVES[archive_group]:
                     archives.append(await self._marshall(archive_group, archive_id))
-            self.write({"archives": archives})
+            self.write_archives(archives)
 
         elif identifier in ARCHIVES:
             archives = []
             for archive_id in ARCHIVES[identifier]:
                 archives.append(await self._marshall(identifier, archive_id))
-            self.write({"archives": archives})
+            self.write_archives(archives)
 
         else:
             for archive_group in ARCHIVES:
