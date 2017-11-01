@@ -1,8 +1,20 @@
-## POST /api/v1/run/plumerise/<met_archive>/
+## Plumerise
 
 This API runs bluesky timeprofiling and plumerise modules.  (The
 bluesky web service runs FEPS plumerise which, unlike SEV plumerise,
 requires timeprofiling data.)
+
+### Request
+
+ - url: $BLUESKY_API_ROOT_URL/api/v1/run/plumerise/<archive_type>/" \
+ - method: POST
+ - post data:
+
+    {
+        "fire_information": [ ... ],
+        "config": { ... },
+        "modules": [ ... ]
+    }
 
 Like the fuelbeds and emissions APIS, the plumerise API requires
 posted JSON with three possible top level keys -
@@ -12,6 +24,11 @@ more fires to process. The 'config' key is
 optional, and it specifies configuration data and other control
 parameters.  The 'modules' key is also optional, and is used to
 specify a subset of the modules normally run by this API.
+
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+for more information about required and optional post data
+
+### Response
 
 Since plumerise requires met data that may not exist on the web
 server, bluesky will be run asynchronously, and the
@@ -61,14 +78,26 @@ An example with fire location data specified as geojson
 
 
 
-## POST /api/v1/run/dispersion/<met_archive>/
+## Dispersion (HYSPLIT)
 
 This API takes consumption, emissions, and plumerise data and runs
 bluesky through dispersion and visualization.  It's the dispersion
 API to be used for met-dependent dispersion models (e.g. hysplit,
 which is currently the only such model supported).
 
-Like with the emissions API, This API requires posted JSON with three
+### Request
+
+ - url: $BLUESKY_API_ROOT_URL/api/v1/run/dispersion/<archive_type>/" \
+ - method: POST
+ - post data:
+
+    {
+        "fire_information": [ ... ],
+        "config": { ... },
+        "modules": [ ... ]
+    }
+
+Like with the plumerise API, this API requires posted JSON with three
 possible top level keys - 'fire_information', 'config', and 'modules.
 The 'fire_information' key is required, and must contain
 growth time windows with consumption, emissions, and plumerise data
@@ -77,11 +106,15 @@ required, to specify, at the very least, dispersion start time
 and num_hours.  The 'modules' key is optional.
 
 There are currently two ways the visualization images can be
-listed in the output to be retrieved later (see output API spec
-below), but you need to specify which way when initializing
+listed in the output to be retrieved later (see [output API spec](API-RUNS-STATUS-OUTPUT.md)), but you need to specify which way when initializing
 the dispersion run. Set 'image_results_version' to 'v1' or 'v2', or
 don't set it at all to get 'v1'. The output API spec, below,
 lists the two output formats.
+
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+for more information about required and optional post data
+
+### Response
 
 Bluesky will be run asynchronously, and the
 API response will include a guid to identify the run in subsequent
@@ -268,12 +301,38 @@ however, override any of these.  For example:
 
 
 
-## POST /api/v1/run/all/<met_archive>/
+## Fuelbeds + Emissions + Plumerise + Dispersion (HYSPLIT)
 
 This API is very similar to the met-dependent dispersion API,
 described above, except that it starts off with the
 'ingestion' module rather than with 'findmetdata', and so doesn't
 require emissions data.
+
+### Request
+
+ - url: $BLUESKY_API_ROOT_URL/api/v1/run/all/<archive_type>/" \
+ - method: POST
+ - post data:
+
+    {
+        "fire_information": [ ... ],
+        "config": { ... },
+        "modules": [ ... ]
+    }
+
+See hysplit dispersion API, above, as well as
+[BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+for more information about required and optional post data
+
+### Response
+
+Bluesky will be run asynchronously, and the
+API response will include a guid to identify the run in subsequent
+status and output API requests (described below).
+
+    {
+        run_id: <guid>
+    }
 
 ### Example
 
@@ -322,13 +381,26 @@ require emissions data.
 
 
 
-## POST /api/v1/run/dispersion/
+## Dispersion (VSMOKE)
 
 Like the met-dependent API described above, this API takes emissions
 and plumerise data and runs bluesky through dispersion and
 visualization.  This API, however, is to be used for dispersion
 models not requiring met data (e.g. vsmoke, which currently is the
 only such model supported).
+
+
+### Request
+
+ - url: $BLUESKY_API_ROOT_URL/api/v1/run/dispersion/" \
+ - method: POST
+ - post data:
+
+    {
+        "fire_information": [ ... ],
+        "config": { ... },
+        "modules": [ ... ]
+    }
 
 Again, this API requires posted JSON with three
 possible top level keys - 'fire_information', 'config', and 'modules'.
@@ -338,7 +410,12 @@ speed and wind direction) for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
 and num_hours. The 'modules' key is optional.
 
-Since dispersion is run, bluesky will be run asynchronously, and the
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+for more information about required and optional post data
+
+### Response
+
+Bluesky will be run asynchronously, and the
 API response will include a guid to identify the run in subsequent
 status and output API requests (described below).
 
@@ -444,12 +521,38 @@ dispersion start time is in UTC.
 
 
 
-## POST /api/v1/run/all/
+## Fuelbeds + Emissions + Plumerise + Dispersion (VSMOKE)
 
 This API is very similar to met-independent dispersion API, except that
 it starts off with the
 'ingestion' module rather than with 'findmetdata', and so doesn't require
 consumption and emissions data.
+
+### Request
+
+ - url: $BLUESKY_API_ROOT_URL/api/v1/run/all/" \
+ - method: POST
+ - post data:
+
+    {
+        "fire_information": [ ... ],
+        "config": { ... },
+        "modules": [ ... ]
+    }
+
+See VSMOKE dispersion API, above, as well as
+[BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+for more information about required and optional post data
+
+### Response
+
+Bluesky will be run asynchronously, and the
+API response will include a guid to identify the run in subsequent
+status and output API requests (described below).
+
+    {
+        run_id: <guid>
+    }
 
 ### Example
 

@@ -1,4 +1,4 @@
-## POST /api/v1/run/fuelbeds/
+## Fuelbeds
 
 This API runs bluesky through ingestion and fuelbeds.
 It requires posted JSON with three possible top level keys -
@@ -15,14 +15,14 @@ specify a subset of the modules normally run by this API.
  - method: POST
  - post data:
 
-        {
-            "fire_information": [ ... ],
-            "config": { ... },
-            "modules": [ ... ]
-        }
+    {
+        "fire_information": [ ... ],
+        "config": { ... },
+        "modules": [ ... ]
+    }
 
-See [BlueSky Pipeline](../../README.md) for more information about required
-and optional post data
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+for more information about required and optional post data
 
 ### Response
 
@@ -112,7 +112,7 @@ modules, and with fire location data specified as lat + lng + size.
 
 
 
-## POST /api/v1/run/emissions/
+## Emissions
 
 This API runs bluesky through consumption and emissions.
 It requires posted JSON with three possible top level keys -
@@ -135,8 +135,8 @@ specify a subset of the modules normally run by this API.
             "modules": [ ... ]
         }
 
-See [BlueSky Pipeline](../../README.md) for more information about required
-and optional post data
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+for more information about required and optional post data
 
 ### Response
 
