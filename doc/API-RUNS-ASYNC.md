@@ -403,7 +403,15 @@ and consumption data.
                                     }
                                 }
                             }
-                        ]
+                        ],
+                        "timeprofile": {
+                            "2014-05-29T17:00:00": {
+                                "area_fraction": 0.42643923240938175,
+                                "flaming": 0.42643923240938175,
+                                "residual": 0.42643923240938175,
+                                "smoldering": 0.42643923240938175
+                            }
+                        }
                     }
                 ]
             }
@@ -455,7 +463,7 @@ consumption and emissions data.
             },
             "dispersion": {
                 "num_hours": 24,
-                "start": " 2014-05-30T00:00:00",
+                "start": "2014-05-30T00:00:00",
                 "model": "vsmoke"
             }
         },
