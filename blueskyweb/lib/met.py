@@ -50,7 +50,9 @@ def get_archive_info(archive_id):
     if archive_id:
         for v in ARCHIVES.values():
             if archive_id in v:
-                return dict(v, id=archive_id, **DOMAINS[v['domain']])
+                archive_info = v[archive_id]
+                return dict(archive_info, id=archive_id,
+                    **DOMAINS[archive_info['domain_id']])
         raise InvalidArchiveError(archive_id)
 
 
