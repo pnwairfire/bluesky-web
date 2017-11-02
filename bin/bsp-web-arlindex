@@ -25,7 +25,7 @@ except:
 
 ACTIONS = [
     'list-obsolete',
-    'prune',
+    'prune-obsolete',
     'clear-all'
 ]
 
@@ -77,12 +77,17 @@ async def list_obsolete(db):
     tornado.log.gen_log.info('listing obsolete')
     obsolete = await db.list_obsolete_archives()
     sys.stdout.write(json.dumps(obsolete, indent=2))
+    sys.stdout.write('\n')
 
-async def prune():
+async def prune_obsolete(db):
     tornado.log.gen_log.info('pruning')
+    obsolete = await db.list_obsolete_archives(prune=True)
+    sys.stdout.write(json.dumps(obsolete, indent=2))
+    sys.stdout.write('\n')
 
-async def clear():
+async def clear_all(db):
     tornado.log.gen_log.info('clearing')
+    await db.clear_index()
 
 async def main():
     args = parse_args()

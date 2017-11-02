@@ -169,15 +169,28 @@ class MetArchiveDB(object):
             "alternatives": alternatives
         }
 
-    async def list_obsolete_archives(self):
+    async def list_obsolete_archives(self, prune=False):
+        """Lists obsolete archives in db and optionally removes them.
+        """
         obsolete = []
 
-        async for e in self.db.dates.find({}, {'domain': 1, '_id': 0}):
+        async for r in self.db.dates.find({}, {'domain': 1, '_id': 0}):
             try:
-                validate_archive_id(e['domain'])
-                tornado.log.gen_log.info('Valid archive %s', e['domain'])
+                validate_archive_id(r['domain'])
+                tornado.log.gen_log.info('Valid archive %s', r['domain'])
             except InvalidArchiveError as e:
-                tornado.log.gen_log.info('Obsolete archive %s', e['domain'])
-                obsolete.append(e['domain'])
+                tornado.log.gen_log.info('Obsolete archive %s', r['domain'])
+                obsolete.append(r['domain'])
+                if prune:
+                    q = {'domain': r['domain']}
+                    self.db.dates.remove(q)
+                    self.db.met_files.remove(q)
 
         return obsolete
+
+    async def clear_index(self):
+        """Compeletely clears the index - i.e. deletes all dates and
+        met files recorded in the index.
+        """
+        self.db.dates.remove({})
+        self.db.met_files.remove({})
