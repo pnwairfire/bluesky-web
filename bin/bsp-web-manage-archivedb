@@ -1,0 +1,151 @@
+#! /usr/bin/env python
+
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2017, AirFire, PNW, USFS"
+
+import datetime
+import json
+import sys
+import traceback
+
+import tornado
+
+import afscripting as scripting
+
+try:
+    from blueskyweb.app import configure_logging
+    from blueskyweb.lib import met
+
+except:
+    import os
+    sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../')))
+    from blueskyweb.app import configure_logging
+    from blueskyweb.lib import met
+
+
+# Note: the trailing space seems to be the only way to add an extra trailing line
+EPILOG_STR = """
+Examples
+
+   $ {script_name} -a get-availability
+   $ {script_name} -a get-availability -i national_12-km
+   $ {script_name} -a check-availability -i national_12-km
+   $ {script_name} -a check-availability -i national_12-km --target-date 2015-08-05
+   $ {script_name} -a list-obsolete --log-level=INFO
+   $ {script_name} -a prune-obsolete -m mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
+   $ {script_name} -a clear-all -m mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
+
+ """.format(script_name=sys.argv[0])
+
+ACTIONS = [
+    'get-availability',
+    'check-availability',
+    'list-obsolete',
+    'prune-obsolete',
+    'clear-all'
+]
+
+REQUIRED_ARGS = [
+    {
+        'short': '-a',
+        'long': '--action',
+        'help': ', '.join(ACTIONS)
+    }
+]
+
+OPTIONAL_ARGS = [
+    {
+        'short': '-i',
+        'long': '--archive-id',
+        'help': ('Archive identifier (used when getting'
+            ' and checking  availability)')
+    },
+    {
+        'short': '-m',
+        'long': '--mongodb-url',
+        'help': ('url to connect to mongodb for arl '
+            'indexes and bsp job queues'),
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb"
+    },
+    {
+        'long': '--target-date',
+        'help': 'Used when checking availability',
+        'action': scripting.args.ParseDatetimeAction,
+        'default': datetime.date.today()
+    },
+    {
+        'long': '--date-range',
+        'help': 'Used when checking availability',
+        'type': int,
+        'default': 1
+    }
+]
+
+def validate_action(args):
+    tornado.log.gen_log.info('action: %s', args.action)
+    if args.action not in ACTIONS:
+        tornado.log.gen_log.error('Invalid action: %s', args.action)
+        sys.exit(1)
+
+def parse_args():
+    parser = scripting.args.ArgumentParser()
+    parser.epilog = EPILOG_STR
+    parser.formatter_class = scripting.args.RawTextHelpFormatter
+    scripting.args.add_arguments(parser, OPTIONAL_ARGS)
+    scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
+    # Use afscripting to add logging options to the parser object,
+    # but we'll configure logging oureselves
+    scripting.args.add_logging_options(parser)
+    args = parser.parse_args()
+    args.log_message_format = (args.log_message_format
+        or "%(asctime)s %(levelname)s %(filename)s#%(funcName)s: %(message)s")
+    configure_logging(**args.__dict__)
+    validate_action(args)
+    return args
+
+async def get_availability(db, args):
+    tornado.log.gen_log.info('Getting availability')
+    return await db.get_availability(archive_id=args.archive_id)
+
+async def check_availability(db, args):
+    return await db.check_availability(args.archive_id, args.target_date,
+                args.date_range)
+
+async def list_obsolete(db, args):
+    tornado.log.gen_log.info('listing obsolete')
+    return await db.list_obsolete_archives()
+
+async def prune_obsolete(db, args):
+    tornado.log.gen_log.info('pruning')
+    return await db.list_obsolete_archives(prune=True)
+
+async def clear_all(db, args):
+    tornado.log.gen_log.info('clearing')
+    await db.clear_index()
+    return "Cleared Database" # nested quotes to make valid JSON
+
+async def main():
+    args = parse_args()
+    db = met.MetArchiveDB(args.mongodb_url)
+
+    try:
+        data = await globals()[args.action.replace('-','_')](db, args)
+
+    except met.InvalidArchiveError:
+        sys.stdout.write("*** Invalid archive: {}\n".format(args.archive_id))
+        sys.exit(1)
+
+    except met.ArchiveNotDefinedError:
+        sys.stdout.write("*** Specify an archive\n")
+        sys.exit(1)
+
+    except Exception as e:
+        tornado.log.gen_log.debug(traceback.format_exc())
+        tornado.log.gen_log.error(e)
+        sys.exit(1)
+
+    sys.stdout.write(json.dumps(data, sort_keys=True, indent=2))
+    sys.stdout.write('\n')
+
+if __name__ == "__main__":
+    tornado.ioloop.IOLoop.instance().run_sync(main)
