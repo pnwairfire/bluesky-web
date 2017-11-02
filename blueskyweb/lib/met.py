@@ -85,7 +85,6 @@ class MetArchiveDB(object):
 
         return d['root_dir']
 
-
     async def get_availability(self, archive_id=None):
         validate_archive_id(archive_id)
 
@@ -169,3 +168,16 @@ class MetArchiveDB(object):
             "available": available,
             "alternatives": alternatives
         }
+
+    async def list_obsolete_archives(self):
+        obsolete = []
+
+        async for e in self.db.dates.find({}, {'domain': 1, '_id': 0}):
+            try:
+                validate_archive_id(e['domain'])
+                tornado.log.gen_log.info('Valid archive %s', e['domain'])
+            except InvalidArchiveError as e:
+                tornado.log.gen_log.info('Obsolete archive %s', e['domain'])
+                obsolete.append(e['domain'])
+
+        return obsolete
