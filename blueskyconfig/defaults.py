@@ -11,11 +11,23 @@ DEFAULTS = {
                 "spacing": 12,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -133.5,"lat": 12},
-                    "ne" : {"lng": -49, "lat": 57.4}
+                    "sw": {"lng": -130.0, "lat": 22.5},
+                    "ne": {"lng": -60, "lat": 52.5}
                 }
             },
             "arl_index_file": "NAM84_ARL_index.csv",
+            "time_step": 3
+        },
+        "GFS": {
+            "grid": {
+                "spacing": 50,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lng": -130.0, "lat": 22.5},
+                    "ne": {"lng": -60, "lat": 52.5}
+                }
+            },
+            "arl_index_file": None, # TODO: set correctly
             "time_step": 3
         },
         "PNW1.33km": {
@@ -23,8 +35,8 @@ DEFAULTS = {
                 "spacing": 1.33,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -126,"lat": 41.5},
-                    "ne" : {"lng": -113.5, "lat": 49.5}
+                    "sw": {"lng": -126, "lat": 41.5},
+                    "ne": {"lng": -113.5, "lat": 49.5}
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -35,8 +47,8 @@ DEFAULTS = {
                 "spacing": 4,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -128.6,"lat": 40},
-                    "ne" : {"lng": -107, "lat": 49.7}
+                    "sw": {"lng": -128.6, "lat": 40},
+                    "ne": {"lng": -107, "lat": 49.7}
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -47,8 +59,8 @@ DEFAULTS = {
                 "spacing": 2,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -124.3,"lat": 32.5},
-                    "ne" : {"lng": -113.0, "lat": 41.8}
+                    "sw": {"lng": -124.3, "lat": 32.5},
+                    "ne": {"lng": -113.0, "lat": 41.8}
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -59,8 +71,8 @@ DEFAULTS = {
                 "spacing": 6,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -128.5,"lat": 28.7},
-                    "ne" : {"lng": -107.0, "lat": 44.6}
+                    "sw": {"lng": -128.5, "lat": 28.7},
+                    "ne": {"lng": -107.0, "lat": 44.6}
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -71,72 +83,72 @@ DEFAULTS = {
                 "spacing": 1.8,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -115,"lat": 30},
-                    "ne" : {"lng": -102, "lat": 36.2}
+                    "sw": {"lng": -115, "lat": 30},
+                    "ne": {"lng": -102, "lat": 36.2}
                 }
             },
             "arl_index_file": None, # TODO: set correctly
-            "time_step": None # TODO: set correctly
+            "time_step": 1
         },
         "NAM3km": {
             "grid": {
                 "spacing": 3,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -122.7,"lat": 21},
-                    "ne" : {"lng": -61, "lat": 48}
+                    "sw": {"lng": -130.0, "lat": 22.5},
+                    "ne": {"lng": -60, "lat": 52.5}
                 }
             },
             "arl_index_file": None, # TODO: set correctly
-            "time_step": None # TODO: set correctly
+            "time_step": 1
         },
         "LakeStates4km": {
             "grid": {
                 "spacing": 4,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -123.75,"lat": 33.25},
-                    "ne" : {"lng": -114.25, "lat": 41.75}
+                    "sw": {"lng": -123.75, "lat": 33.25},
+                    "ne": {"lng": -114.25, "lat": 41.75}
                 }
             },
             "arl_index_file": None, # TODO: set correctly
-            "time_step": None # TODO: set correctly
+            "time_step": 1
         },
         "Alaska12km": {
             "grid": {
                 "spacing": 12,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -178.6,"lat": 40.6},
-                    "ne" : {"lng": -98, "lat": 66.3}
+                    "sw": {"lng": -178.6, "lat": 40.6},
+                    "ne": {"lng": -98, "lat": 66.3}
                 }
             },
             "arl_index_file": None, # TODO: set correctly
-            "time_step": None # TODO: set correctly
+            "time_step": 1
         },
         "NWS-06Z-1km-2018-CA-NV": {
             "grid": {
                 "spacing": 1,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -125.3,"lat": 39.5},
-                    "ne" : {"lng": -121, "lat": 44.4}
+                    "sw": {"lng": -125.3, "lat": 39.5},
+                    "ne": {"lng": -121, "lat": 44.4}
                 }
             },
             "arl_index_file": None, # TODO: set correctly
-            "time_step": None # TODO: set correctly
+            "time_step": 1
         },
         "NWS-00Z-1km-2018-MT": {
             "grid": {
                 "spacing": 1,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -115.8,"lat": 44.7},
-                    "ne" : {"lng": -110.6, "lat": 49.2}
+                    "sw": {"lng": -115.8, "lat": 44.7},
+                    "ne": {"lng": -110.6, "lat": 49.2}
                 }
             },
             "arl_index_file": None, # TODO: set correctly
-            "time_step": None # TODO: set correctly
+            "time_step": 1
         }
     },
     "archives": {
@@ -144,6 +156,10 @@ DEFAULTS = {
             "national_12-km": {
                 "title": "National 12-km",
                 "domain_id": "NAM84"
+            },
+            "global":{
+                "title": "Global",
+                "domain_id": "GFS"
             },
             "national_3-km": {
                 "title": "National 3-km",
