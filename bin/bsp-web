@@ -6,7 +6,6 @@ __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 import sys
 import traceback
 
-import tornado.ioloop
 import tornado.log
 
 import afscripting as scripting
