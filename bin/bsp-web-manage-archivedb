@@ -27,6 +27,7 @@ except:
 EPILOG_STR = """
 Examples
 
+   $ {script_name} -a get-root-dirs
    $ {script_name} -a get-availability
    $ {script_name} -a get-availability -i national_12-km
    $ {script_name} -a check-availability -i national_12-km
@@ -38,6 +39,7 @@ Examples
  """.format(script_name=sys.argv[0])
 
 ACTIONS = [
+    'get-root-dirs',
     'get-availability',
     'check-availability',
     'list-obsolete',
@@ -102,6 +104,17 @@ def parse_args():
     configure_logging(**args.__dict__)
     validate_action(args)
     return args
+
+async def get_root_dirs(db, args):
+    tornado.log.gen_log.info('Getting root dirs')
+    root_dirs = {}
+    for t in met.ARCHIVES:
+        for a in met.ARCHIVES[t]:
+            try:
+                root_dirs[a] = await db.get_root_dir(a)
+            except met.UnavailableArchiveError as e:
+                pass
+    return root_dirs
 
 async def get_availability(db, args):
     tornado.log.gen_log.info('Getting availability')
