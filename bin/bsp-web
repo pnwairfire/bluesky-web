@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
@@ -21,11 +21,6 @@ except:
     from blueskyconfig import apply_overrides
 
 REQUIRED_ARGS = [
-    {
-        'short': '-b',
-        'long': '--bluesky-docker-image',
-        'help': "BlueSky pipeline docker image name"
-    },
     {
         'short': '-o',
         'long': '--output-root-dir',
@@ -82,7 +77,7 @@ OPTIONAL_ARGS = [
 EPILOG_STR = """
 Examples
 
-   $ {script_name} -b bluesky --log-level=DEBUG -d --path-prefix=bluesky \\
+   $ {script_name} --log-level=DEBUG -d --path-prefix=bluesky \\
         --mongodb-url=mongodb://localhost:27018/blueskyweb
 
 Example curl Requests

@@ -89,8 +89,6 @@ class BlueSkyRunner(object):
             not necessarily set by outside clients of this code
          - db -- bsp web mongodb client to record run status
         Settings:
-         Always required:
-          - bluesky_docker_image -- name of bluesky docker image, with version
          Required if writing to db (i.e. if `db` is defined):
           - output_url_scheme
           - output_url_port
@@ -157,7 +155,7 @@ class BlueSkyRunner(object):
         client = docker.from_env()
         container_name = 'bluesky-web-bsp-{}'.format(self.input_data['run_id'])
         volumes_dict = self._get_volumes_dict()
-        container = client.containers.create(self.settings['bluesky_docker_image'],
+        container = client.containers.create(os.environ['BLUESKY_DOCKER_IMAGE'],
             self.bsp_cmd, name=container_name, volumes=volumes_dict)
         try:
             # TODO: if not capturing output,
@@ -168,9 +166,10 @@ class BlueSkyRunner(object):
             #     - write logs to dev null?
             #     - capture and return output json
 
-            # return client.containers.run(bluesky_docker_image, bsp_cmd,
-            #     remove=True, name=container_name, volumes=volumes_dict,
-            #     tty=True)
+            # return client.containers.run(
+            #     os.environ['BLUESKY_DOCKER_IMAGE'],
+            #     bsp_cmd, remove=True, name=container_name,
+            #     volumes=volumes_dict, tty=True)
             self._create_input_file(container)
             container.start()
             self._record_run(RunStatuses.Running)

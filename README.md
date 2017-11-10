@@ -32,6 +32,8 @@ api web service, output web service, bsp workers, and ofelia.
 
     git clone git@bitbucket.org:fera/airfire-bluesky-web.git
     cd airfire-bluesky-web
+    pip install --trusted-host pypi.smoke.airfire.org \
+        -r requirements-dev.txt
     docker build -t bluesky-web .
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
         ./docker-logs/worker/dri ./docker-logs/worker/nam \
@@ -68,14 +70,17 @@ If you don't want to wait for it to run, manually run it with:
 
 ### Unit tests
 
-    py.test
+Run unit tests within docker:
+
+    docker run --rm -ti bluesky-web py.test
 
 ### Ad Hoc tests
 
-See the helpstrings for the following two scripts for examples
+These can be run outside of docker. See the helpstrings for
+the following two scripts for examples
 
-    docker exec bluesky-web ./test/scripts/web-regression-test.sh
-    docker exec bluesky-web ./test/scripts/test-asynch-request.py -h
+    ./test/scripts/web-regression-test.sh
+    ./test/scripts/test-asynch-request.py -h
 
 
 
@@ -86,8 +91,6 @@ See the helpstrings for the following two scripts for examples
 
 To see list tasks:
 
-    cd /path/to/airfire-bluesky-web
-    pip install --trusted-host pypi.smoke.airfire.org -r requirements-dev.txt
     fab -l
 
 To see documentation for a specific task, use the '-d' option. E.g.:

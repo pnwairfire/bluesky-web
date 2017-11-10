@@ -1,5 +1,7 @@
--i http://pypi.smoke.airfire.org/simple/
--f http://pypi.smoke.airfire.org/simple/
+--extra-index-url http://pypi.smoke.airfire.org/simple/
+-f https://pypi.smoke.airfire.org/simple/
 ipython
-affabric>=1.0.0
+affabric>=1.0.0,<2.0.0
+afscripting>=1.1.2,<2.0.0
 pyaml==16.12.2
+requests==2.18.1

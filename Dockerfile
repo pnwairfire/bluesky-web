@@ -1,4 +1,8 @@
-FROM bluesky
+FROM pnwairfire/bluesky:v2.7.1
+# TODO: remove the following if we switch to importing
+#   bluesky package and running in process in worker
+#   containers (in BlueSkyRunner)
+ENV BLUESKY_DOCKER_IMAGE pnwairfire/bluesky:v2.7.1
 
 RUN apt-get install less vim
 

@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 """test-asynch-request.py: for ad hoc testing the web service's handling of
 requests that result in executing bsp asynchrounously"""

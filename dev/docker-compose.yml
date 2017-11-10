@@ -39,7 +39,7 @@ services:
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    command: bsp-web -d -b bluesky -o $PWD/docker-data/output
+    command: bsp-web -d -o $PWD/docker-data/output
       --path-prefix=bluesky-web -p 8887
       --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
       --log-level=DEBUG

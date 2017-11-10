@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 if [ $# -lt 2 ] || [ $# -gt 5 ]
   then
     echo "Usage: $0 <root_url> <domain> <archive> <date> [response output file]"
