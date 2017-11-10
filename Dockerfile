@@ -1,18 +1,25 @@
-FROM python:3.5-alpine
+FROM bluesky
 
-RUN apk add --no-cache less vim
+RUN apt-get install less vim
 
 RUN mkdir -p /usr/src/blueskyweb/
 WORKDIR /usr/src/blueskyweb/
 
-COPY requirements.txt /usr/src/blueskyweb/
-RUN pip install --trusted-host pypi.smoke.airfire.org -r requirements.txt
+RUN pip install \
+    tornado==4.5.1 \
+    motor==1.1 \
+    requests==2.18.1 \
+    celery==4.0.2 \
+    docker==2.4.2 \
+    ipify==1.0.0 \
+    pytest
 
 COPY blueskyconfig /usr/src/blueskyweb/blueskyconfig
 COPY blueskymongo /usr/src/blueskyweb/blueskymongo
 COPY blueskyweb /usr/src/blueskyweb/blueskyweb
 COPY blueskyworker /usr/src/blueskyweb/blueskyworker
 COPY bin /usr/src/blueskyweb/bin
+COPY test /usr/src/blueskyweb/test
 
 ENV PYTHONPATH /usr/src/blueskyweb/:$PYTHONPATH
 ENV PATH /usr/src/blueskyweb/bin/:$PATH

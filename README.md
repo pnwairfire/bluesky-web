@@ -17,6 +17,10 @@ BlueSky web connects to a mongodb database to query met data availability
 and to enqueue background plumerise and dispersion runs.
 You just need to provide the url of one that is running.
 
+### Docker
+
+Docker is required to run the bluesky web system - mongodb,
+api web service, output web service, bsp workers, and ofelia.
 
 
 
@@ -28,24 +32,14 @@ You just need to provide the url of one that is running.
 
     git clone git@bitbucket.org:fera/airfire-bluesky-web.git
     cd airfire-bluesky-web
-    apt-get install python-pip # if necessary
-    pip install --trusted-host pypi.smoke.airfire.org -r requirements.txt
-    pip install --trusted-host pypi.smoke.airfire.org -r requirements-dev.txt
-    pip install -r requirements-test.txt
-
-### Run
-
-Create log and data dirs
-
-    cd /path/to/airfire-bluesky-web
+    docker build -t bluesky-web .
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
         ./docker-logs/worker/dri ./docker-logs/worker/nam \
         ./docker-logs/worker/no-met ./docker-data/mongodb/db \
         ./docker-data/output
 
-Run in docker
+### Run
 
-    docker build -t bluesky-web .
     docker-compose -f dev/docker-compose.yml up
 
 When using docker, arlindex will automatically be updated every
@@ -80,18 +74,8 @@ If you don't want to wait for it to run, manually run it with:
 
 See the helpstrings for the following two scripts for examples
 
-    ./test/scripts/web-regression-test.sh
-    ./test/scripts/test-asynch-request.py -h
-
-#### Test Env
-
-    ./test/scripts/web-regression-test.sh https://www.blueskywebhost.com/bluesky-web-test/ DRI2km `date +%Y-%m-%d` ./tmp/web-regression-out-test.log
-    ./test/scripts/test-asynch-request.py --log-level=DEBUG --simple -r https://www.blueskywebhost.com/bluesky-web-test/
-    ./test/scripts/test-asynch-request.py -r https://www.blueskywebhost.com/bluesky-web-test/ --log-level=DEBUG -s `date +%Y-%m-%dT00:00:00` -n 12
-
-#### Production
-
-    ...
+    docker exec bluesky-web ./test/scripts/web-regression-test.sh
+    docker exec bluesky-web ./test/scripts/test-asynch-request.py -h
 
 
 
@@ -103,6 +87,7 @@ See the helpstrings for the following two scripts for examples
 To see list tasks:
 
     cd /path/to/airfire-bluesky-web
+    pip install --trusted-host pypi.smoke.airfire.org -r requirements-dev.txt
     fab -l
 
 To see documentation for a specific task, use the '-d' option. E.g.:
