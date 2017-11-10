@@ -18,6 +18,7 @@ import traceback
 import ipify
 import tornado.web
 import tornado.log
+from bluesky import exceptions, models
 
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import run_bluesky, BlueSkyRunner
@@ -260,16 +261,30 @@ class RunExecuter(tornado.web.RequestHandler):
         self.write({"run_id": data['run_id']})
 
     async def _run_in_process(self, data):
-        try:
-            #tornado.log.gen_log.debug('input: %s', data)
-            # TODO: refactor task module so that bluesky can be
-            #    run without blocking, and use `await` here
-            stdout_data = BlueSkyRunner(data, **self.settings).run()
-            # TODO: make sure stdout_data is valid json?
-            #tornado.log.gen_log.debug('output: %s', stdout_data)
-            self.write(stdout_data)
+        # TODO: Use BlueSkyRunner if it ends up being refactored
+        #   to import bluesky package and run in-process
 
-        # TODO: return 404 if output has error related to bad module, etc.
+        try:
+            tornado.log.gen_log.debug('input: %s', data)
+            fires_manager = models.fires.FiresManager()
+            fires_manager.load(data)
+            fires_manager.run()
+            fires_manager.dumps(self) # will call self.write
+
+        except exceptions.BlueSkyModuleError as e:
+            self.set_status(400)
+            self.write({"error": fires_manager.meta['error']})
+
+        # TODO: handle each of the following individually?
+        #   (it would be good if they inherited from a common
+        #    base class, so that could be handled)
+        #     exceptions.BlueSkyImportError
+        #     exceptions.BlueSkyConfigurationError
+        #     exceptions.BlueSkyModuleError
+        #     exceptions.MissingDependencyError
+        #     exceptions.BlueSkyDatetimeValueError
+        #     exceptions.BlueSkyGeographyValueError
+
         except Exception as e:
             tornado.log.gen_log.debug(traceback.format_exc())
             tornado.log.gen_log.error('Exception: %s', e)

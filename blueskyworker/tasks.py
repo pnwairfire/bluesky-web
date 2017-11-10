@@ -152,6 +152,16 @@ class BlueSkyRunner(object):
     ##
 
     def _run_docker(self):
+
+
+        # TODO: run bsp inside this docker container, or even by
+        #    importing bsp directly in this process, since this
+        #    worker's container inhertied from bluesky image
+        #    for finer granularity in reporting status, we can
+        #    run each module individually (though we'd then have
+        #    to deal with concatenating logs)
+
+
         client = docker.from_env()
         container_name = 'bluesky-web-bsp-{}'.format(self.input_data['run_id'])
         volumes_dict = self._get_volumes_dict()
