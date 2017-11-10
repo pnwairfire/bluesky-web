@@ -17,15 +17,13 @@ RUN pip install \
     requests==2.18.1 \
     celery==4.0.2 \
     docker==2.4.2 \
-    ipify==1.0.0 \
-    pytest
+    ipify==1.0.0
 
 COPY blueskyconfig /usr/src/blueskyweb/blueskyconfig
 COPY blueskymongo /usr/src/blueskyweb/blueskymongo
 COPY blueskyweb /usr/src/blueskyweb/blueskyweb
 COPY blueskyworker /usr/src/blueskyweb/blueskyworker
 COPY bin /usr/src/blueskyweb/bin
-COPY test /usr/src/blueskyweb/test
 
 ENV PYTHONPATH /usr/src/blueskyweb/:$PYTHONPATH
 ENV PATH /usr/src/blueskyweb/bin/:$PATH
