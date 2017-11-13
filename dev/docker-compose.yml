@@ -38,7 +38,7 @@ services:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
     command: bsp-web -d -o $PWD/docker-data/output
-      --path-prefix=bluesky-web -p 8887
+      --path-prefix=bluesky-web -p 80
       --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
       --log-level=DEBUG
       --log-file=/var/log/blueskyweb/bluesky-web.log
@@ -60,7 +60,7 @@ services:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
     command: bsp-web -d -o $PWD/docker-data/output
-      --path-prefix=bluesky-web -p 8887
+      --path-prefix=bluesky-web -p 80
       --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
       --log-level=DEBUG
       --log-file=/var/log/blueskyweb/bluesky-web.log
