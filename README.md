@@ -35,6 +35,7 @@ api web service, output web service, bsp workers, and ofelia.
     pip install --trusted-host pypi.smoke.airfire.org \
         -r requirements-dev.txt
     docker build -t bluesky-web .
+    docker build -t bluesky-web-nginx -f Dockerfile-nginx .
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
         ./docker-logs/worker/dri ./docker-logs/worker/nam \
         ./docker-logs/worker/no-met ./docker-data/mongodb/db \
