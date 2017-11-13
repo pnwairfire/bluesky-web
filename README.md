@@ -89,24 +89,6 @@ To see documentation for a specific task, use the '-d' option. E.g.:
 
     fab -d deploy
 
-### Production Environment
-
-First time:
-
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A deploy
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A start
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A configure_web_apache_proxy
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A configure_output_web_apache_proxy
-
-Subsequent deployments:
-
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A deploy
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A restart
-
-Check status
-
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=production fab -A check_status
-
 ### Test Environment
 
 First time:
@@ -124,6 +106,11 @@ Subsequent deployments:
 Check status
 
     FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A check_status
+
+### Production Environment
+
+Same as test env, but substitude 'production' for 'test' in each
+command
 
 
 
