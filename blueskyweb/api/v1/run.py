@@ -341,6 +341,26 @@ class RunExecuter(RequestHandlerBase):
             if k in ('MPI', 'NCPUS') or k not in hysplit_config:
                 hysplit_config[k] = hysplit_defaults[k]
 
+        self._process_hysplit_meta_options()
+        self._set_hysplit_grid()
+        # TODO: any other model-specific configuration?
+
+    def _process_hysplit_meta_options(self):
+        pass
+
+    def _set_hysplit_grid(self):
+        # can't both directly specify grid and hysplit_
+        dispersion_speed = self.get_argument('dispersion_speed')
+        if (any([hysplit_config.get(k)
+                for k in ('grid', 'USER_DEFINED_GRID', 'compute_grid')]) and
+                dispersion_speed):
+            msg = ("You can't both specify dispersion grid and"
+                " specify")
+            self.write({"error": msg})
+            raise tornado.web.HTTPError(status_code=400,
+                log_message=msg)
+
+
         # set grid
         grid_config = self._archive_info['grid']
         if hysplit_config.get('grid'):
@@ -364,8 +384,6 @@ class RunExecuter(RequestHandlerBase):
             hysplit_config['grid'] = grid_config
 
         tornado.log.gen_log.debug("hysplit configuration: %s", hysplit_config)
-
-        # TODO: any other model-specific configuration?
 
     async def _configure_visualization(self, data):
         tornado.log.gen_log.debug('Configuring visualization')
