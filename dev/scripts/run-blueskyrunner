@@ -112,4 +112,3 @@ if __name__ == "__main__":
         output = tasks.BlueSkyRunner(INPUT, output_stream=s).run()
         logging.debug('About to dump to stdout')
         sys.stdout.write(s.getvalue())
-

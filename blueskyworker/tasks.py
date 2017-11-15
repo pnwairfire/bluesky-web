@@ -131,19 +131,25 @@ class BlueSkyRunner(object):
     ## Execution
     ##
 
+    BSP_LOG_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+
     def _run_bsp(self):
         """Runs bluesky in-process, running each module individually for
         finer granularity in status logging.
         """
         try:
+            root_logger = logging.getLogger()
+            root_logger_original_level = root_logger.level
+            log_file_handler = None
             if not self.output_stream:
-                logging.basicConfig(filename=self.output_log_filename,
-                    level=self.settings.get('bluesky_log_level', logging.INFO))
-            # TODO: temporarily configure logging to go to file specifuc
-            #  for this run; keep emissions/fuelbeds (non-async) runs
-            #  in separate dir or indicate with file name if the run is async
-            #  or not (which we know based on self.output_stream)
-            #  Use params self.output_log_filename and self.settings['bluesky_log_level']
+                # temporarily configure logging to go to file specific for this run
+                log_file_handler = logging.FileHandler(self.output_log_filename)
+                log_file_handler.setFormatter(logging.Formatter(self.BSP_LOG_FORMAT))
+                log_level = self.settings.get('bluesky_log_level', logging.INFO)
+                root_logger.setLevel(log_level)
+                log_file_handler.setLevel(log_level) # TODO: is this necessary?
+                root_logger.addHandler(log_file_handler)
+
             fires_manager = models.fires.FiresManager()
             modules = self.input_data.pop('modules')
             fires_manager.load(self.input_data)
@@ -157,6 +163,10 @@ class BlueSkyRunner(object):
                 self._record_run(RunStatuses.Running, module=m)
 
                 fires_manager.run()
+
+            if log_file_handler:
+                root_logger.removeHandler(log_file_handler)
+                root_logger.setLevel(root_logger_original_level)
 
             self._record_run(RunStatuses.ProcessingOutput)
 
