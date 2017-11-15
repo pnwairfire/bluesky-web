@@ -70,6 +70,38 @@ def run_bluesky(input_data, **settings):
 ## Launching process
 ##
 
+class configure_logging:
+    """Logging context handelr
+    """
+
+    BSP_LOG_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+
+    def __init__(self, output_log_filename, **settings):
+        self.output_log_filename = output_log_filename
+        self.settings = settings
+
+    def __enter__(self):
+        # temporarily configure logging to go to file specific for this run
+        root_logger = logging.getLogger()
+        self.root_logger_original_handlers = []
+        for h in root_logger.handlers:
+            self.root_logger_original_handlers.append(h)
+            root_logger.removeHandler(h)
+        self.root_logger_original_level = root_logger.level
+        self.log_file_handler = logging.FileHandler(self.output_log_filename)
+        self.log_file_handler.setFormatter(logging.Formatter(self.BSP_LOG_FORMAT))
+        log_level = self.settings.get('bluesky_log_level', logging.INFO)
+        root_logger.setLevel(log_level)
+        self.log_file_handler.setLevel(log_level) # TODO: is this necessary?
+        root_logger.addHandler(self.log_file_handler)
+
+    def __exit__(self, t, value, traceback):
+        root_logger = logging.getLogger()
+        for h in self.root_logger_original_handlers:
+            root_logger.addHandler(h)
+        root_logger.setLevel(self.root_logger_original_level)
+        root_logger.removeHandler(self.log_file_handler)
+
 class BlueSkyRunner(object):
 
     def __init__(self, input_data, output_stream=None, db=None, **settings):
@@ -131,28 +163,42 @@ class BlueSkyRunner(object):
     ## Execution
     ##
 
-    BSP_LOG_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-
     def _run_bsp(self):
         """Runs bluesky in-process, running each module individually for
         finer granularity in status logging.
         """
         try:
-            root_logger = logging.getLogger()
-            root_logger_original_level = root_logger.level
-            log_file_handler = None
-            if not self.output_stream:
-                # temporarily configure logging to go to file specific for this run
-                log_file_handler = logging.FileHandler(self.output_log_filename)
-                log_file_handler.setFormatter(logging.Formatter(self.BSP_LOG_FORMAT))
-                log_level = self.settings.get('bluesky_log_level', logging.INFO)
-                root_logger.setLevel(log_level)
-                log_file_handler.setLevel(log_level) # TODO: is this necessary?
-                root_logger.addHandler(log_file_handler)
+            if self.output_stream:
+                return self._run_bsp_modules()
 
-            fires_manager = models.fires.FiresManager()
-            modules = self.input_data.pop('modules')
-            fires_manager.load(self.input_data)
+            else:
+                with configure_logging(self.output_log_filename, **self.settings) as foo:
+                    error = self._run_bsp_modules()
+
+                data = {
+                    'output_url': self.output_url,
+                    'output_dir': self.output_dir
+                }
+                status = RunStatuses.Completed
+
+                if error:
+                    data['error'] = error
+                    status = RunStatuses.Failed
+
+                self._record_run(status, **data)
+
+        except Exception as e:
+            #tornado.log.gen_log.debug(traceback.format_exc())
+            self._record_run(RunStatuses.Failed,
+                error={"message": str(e)})
+            raise BlueSkyJobError(str(e))
+
+
+    def _run_bsp_modules(self):  # TODO: rename
+        fires_manager = models.fires.FiresManager()
+        modules = self.input_data.pop('modules')
+        fires_manager.load(self.input_data)
+        try:
             for m in modules:
                 # TODO: if hysplit dispersion, start thread that periodically
                 #   tails log and records status; then join thread when call
@@ -164,35 +210,20 @@ class BlueSkyRunner(object):
 
                 fires_manager.run()
 
-            if log_file_handler:
-                root_logger.removeHandler(log_file_handler)
-                root_logger.setLevel(root_logger_original_level)
+        except exceptions.BlueSkyModuleError as e:
+            # The error was added to fires_manager's meta data, and will be
+            # included in the output data
+            pass
 
-            self._record_run(RunStatuses.ProcessingOutput)
 
-            if self.output_stream:
-                return fires_manager.dumps(self.output_stream)
+        self._record_run(RunStatuses.ProcessingOutput)
 
-            else:
-                fires_manager.dumps(output_file=self.output_json_filename)
+        if self.output_stream:
+            return fires_manager.dumps(self.output_stream)
+        else:
+            fires_manager.dumps(output_file=self.output_json_filename)
+            return fires_manager.error
 
-                data = {
-                    'output_url': self.output_url,
-                    'output_dir': self.output_dir
-                }
-                status = RunStatuses.Completed
-
-                if fires_manager.error:
-                    data['error'] = fires_manager.error
-                    status = RunStatuses.Failed
-
-                self._record_run(status, **data)
-
-        except Exception as e:
-            #tornado.log.gen_log.debug(traceback.format_exc())
-            self._record_run(RunStatuses.Failed,
-                error={"message": str(e)})
-            raise BlueSkyJobError(str(e))
 
     ##
     ## DB
