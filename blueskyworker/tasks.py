@@ -71,7 +71,8 @@ def run_bluesky(input_data, **settings):
 ##
 
 class configure_logging:
-    """Logging context handelr
+    """Context handler that temporarily (for the life of a bsp run)
+    configures logging to go to a run specific file.
     """
 
     BSP_LOG_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
@@ -81,7 +82,6 @@ class configure_logging:
         self.settings = settings
 
     def __enter__(self):
-        # temporarily configure logging to go to file specific for this run
         root_logger = logging.getLogger()
         self.root_logger_original_handlers = []
         for h in root_logger.handlers:
