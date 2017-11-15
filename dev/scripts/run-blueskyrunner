@@ -1,0 +1,103 @@
+#! /usr/bin/env python3
+
+"""For adhoc testing BlueSkyRunner class.
+
+Run in docker. e.g.:
+
+ $ docker exec -ti bluesky-web-1 ./dev/scripts/run-blueskyrunner -h
+"""
+
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2017, AirFire, PNW, USFS"
+
+import io
+import json
+import os
+import sys
+
+import afscripting as scripting
+
+sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
+from blueskyweb.app import configure_logging
+from blueskyworker import tasks
+
+
+# Note: the trailing space seems to be the only way to add an extra trailing line
+EPILOG_STR = """
+Examples:
+
+  $ {script_name}
+  $ {script_name} -r
+ """.format(script_name=sys.argv[0])
+
+REQUIRED_ARGS = []
+
+OPTIONAL_ARGS = [
+    {
+        'short': '-m',
+        'long': '--mongodb-url',
+        'help': ('url to connect to mongodb for arl '
+            'indexes and bsp job queues'),
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb"
+    },
+    {
+        'short': '-r',
+        'long': '--record-run',
+        'help': 'record run in db and write output to file',
+        'action': 'store_true',
+        'default': False
+    }
+]
+
+INPUT = {
+    "modules": ['ingestion', 'fuelbeds', 'fuelbeds'],
+    "fire_information": [
+        {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Yosemite, CA"
+            },
+            "id": "SF11C14225236095807750",
+            "type": "wildfire",
+            "fuel_type": "natural",
+            "growth": [
+                {
+                    "location": {
+                        "area": 2000,
+                        "ecoregion": "western",
+                        "latitude": 37.909644,
+                        "longitude": -119.7615805,
+                        "utc_offset": -7,
+                    }
+                }
+            ]
+        }
+    ]
+}
+
+def parse_args():
+    parser = scripting.args.ArgumentParser()
+    parser.epilog = EPILOG_STR
+    parser.formatter_class = scripting.args.RawTextHelpFormatter
+    scripting.args.add_arguments(parser, OPTIONAL_ARGS)
+    scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
+    # Use afscripting to add logging options to the parser object,
+    # but we'll configure logging oureselves
+    scripting.args.add_logging_options(parser)
+    args = parser.parse_args()
+    args.log_message_format = (args.log_message_format
+        or "%(asctime)s %(levelname)s %(filename)s#%(funcName)s: %(message)s")
+    configure_logging(**args.__dict__)
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    tasks.MONGODB_URL = args.mongodb_url
+    if args.record_run:
+        tasks.run_bluesky(INPUT)
+    else:
+        s = io.StringIO()
+        output = tasks.BlueSkyRunner(INPUT, output_stream=s).run()
+        sys.stdout.write(s.getvalue())
+
