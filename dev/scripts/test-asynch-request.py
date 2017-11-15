@@ -19,15 +19,31 @@ import afscripting as scripting
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
 EPILOG_STR = """
-Examples:
+Simple case, running only through emissions
 
- Simple case, running only through emissions
-  $ {script_name} --simple -r http://localhost:8887/bluesky-web/ \\
+  $ {script_name} --simple \\
+        -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG
 
- Full run (ingestiont through visualization)
-  $ {script_name} -r http://localhost:8887/bluesky-web/ \\
+  (Change root url for test and prod envs.)
+
+
+Full run (ingestiont through visualization)
+
+  $ {script_name} \\
+        -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG -s 2014-05-30T00:00:00 -n 12
+
+  $ {script_name} \\
+        -r https://www.blueskywebhost.com/bluesky-web-test/ \\
+        --log-level=DEBUG -s `date +%Y-%m-%dT00:00:00` -n 12 \\
+        --met-archive national_12-km
+
+  $ {script_name} \\
+        -r https://www.blueskywebhost.com/bluesky-web/ \\
+        --log-level=DEBUG -s `date +%Y-%m-%dT00:00:00` -n 12 \\
+        --met-archive national_3-km
+
  """.format(script_name=sys.argv[0])
 
 REQUIRED_ARGS = [
