@@ -199,6 +199,7 @@ class BlueSkyRunner(object):
         modules = self.input_data.pop('modules')
         fires_manager.load(self.input_data)
         try:
+            self._record_run(RunStatuses.Running)
             for m in modules:
                 # TODO: if hysplit dispersion, start thread that periodically
                 #   tails log and records status; then join thread when call
@@ -206,9 +207,10 @@ class BlueSkyRunner(object):
                 tornado.log.gen_log.debug('Running %s %s',
                     self.input_data['run_id'], m)
                 fires_manager.modules = [m]
-                self._record_run(RunStatuses.Running, module=m)
 
+                self._record_run(RunStatuses.StartingModule, module=m)
                 fires_manager.run()
+                self._record_run(RunStatuses.CompletedModule, module=m)
 
         except exceptions.BlueSkyModuleError as e:
             # The error was added to fires_manager's meta data, and will be
@@ -238,7 +240,7 @@ class BlueSkyRunner(object):
     ## DB
     ##
 
-    def _record_run(self, status, log=None, stdout=None, **data):
+    def _record_run(self, status, module=None, log=None, stdout=None, **data):
         if self.db:
-            self.db.record_run(self.input_data['run_id'], status, log=log,
-                stdout=stdout, **data)
+            self.db.record_run(self.input_data['run_id'], status,
+                module=module, log=log, stdout=stdout, **data)

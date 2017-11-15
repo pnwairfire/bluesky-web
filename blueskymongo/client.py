@@ -10,6 +10,8 @@ class RunStatusesType(type):
         "Enqueued": "enqueued",
         "Dequeued": "dequeued",
         "Running": "running",
+        "StartingModule": 'starting_module',
+        'CompletedModule': 'completed_module',
         "ProcessingOutput": "processing_output",
         "Completed": "completed",
         "Failed": "failed"
@@ -34,7 +36,7 @@ class BlueSkyWebDB(object):
             or 'blueskyweb')
         self.db = motor.motor_tornado.MotorClient(mongodb_url)[db_name]
 
-    def record_run(self, run_id, status, log=None, stdout=None, callback=None,
+    def record_run(self, run_id, status, module=None, log=None, stdout=None, callback=None,
             **data):
         def _callback(result, error):
             if error:
@@ -50,12 +52,14 @@ class BlueSkyWebDB(object):
         doc = {
             "$push": {
                 "history": {
-                    # instert at position  in reverse chronological order
+                    # insert at position in reverse chronological order
                     '$each': [{'status': status, 'ts': ts}],
                     '$position': 0
                 }
             }
         }
+        if module:
+            doc["$push"]["history"]['$each'][0]["module"] = module
         if log:
             doc["$push"]["history"]['$each'][0]["log"] = log
         if stdout:
