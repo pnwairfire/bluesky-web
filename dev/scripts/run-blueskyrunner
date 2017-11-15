@@ -27,12 +27,24 @@ Examples:
 Run in docker. e.g.:
 
  $ docker run -ti -v $PWD:/usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
-    bluesky-web {script_name} --log-level=DEBUG
+    bluesky-web {script_name} --log-level=DEBUG --mode normal
  $ docker run -ti -v /usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
-    bluesky-web {script_name} -r --log-level=DEBUG
+    bluesky-web {script_name} --log-level=DEBUG --mode normal -r
  """.format(script_name=sys.argv[0])
 
-REQUIRED_ARGS = []
+MODES = {
+    'normal':['ingestion', 'fuelbeds'],
+    'double-fuelbeds': ['ingestion', 'fuelbeds', 'fuelbeds'],
+    'invalid-input': ['ingestion', 'fuelbeds', 'emissions'],
+    'invalid-module':['ingestion', 'fuelbeds', 'emissionssdf']
+}
+
+REQUIRED_ARGS = [
+    {
+        'long': '--mode',
+        'help': ', '.join(list(MODES.keys()))
+    }
+]
 
 OPTIONAL_ARGS = [
     {
@@ -53,7 +65,6 @@ OPTIONAL_ARGS = [
 
 INPUT = {
     "run_id": str(uuid.uuid1()),
-    "modules": ['ingestion', 'fuelbeds', 'fuelbeds'],
     "fire_information": [
         {
             "event_of": {
@@ -96,6 +107,11 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
+
+    if args.mode not in MODES:
+        print('** ERROR - Invalid Mode: %s', args.mode)
+        print('**    (choose from  %s)', ', '.join(list(MODES.keys())))
+    INPUT['modules'] = MODES[args.mode]
 
     if args.record_run:
         db = tasks.BlueSkyWebDB(args.mongodb_url)
