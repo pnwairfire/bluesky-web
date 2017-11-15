@@ -99,7 +99,7 @@ DEFAULTS = {
                     "ne": {"lng": -60, "lat": 52.5}
                 }
             },
-            "arl_index_file": None, # TODO: set correctly
+            "arl_index_file": "nam3km_arlindex.csv",
             "time_step": 1
         },
         "LakeStates4km": {
