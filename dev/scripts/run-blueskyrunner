@@ -1,10 +1,6 @@
 #! /usr/bin/env python3
 
 """For adhoc testing BlueSkyRunner class.
-
-Run in docker. e.g.:
-
- $ docker exec -ti bluesky-web-1 ./dev/scripts/run-blueskyrunner -h
 """
 
 __author__ = "Joel Dubowy"
@@ -12,8 +8,10 @@ __copyright__ = "Copyright 2017, AirFire, PNW, USFS"
 
 import io
 import json
+import logging
 import os
 import sys
+import uuid
 
 import afscripting as scripting
 
@@ -26,8 +24,12 @@ from blueskyworker import tasks
 EPILOG_STR = """
 Examples:
 
-  $ {script_name}
-  $ {script_name} -r
+Run in docker. e.g.:
+
+ $ docker run -ti -v $PWD:/usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
+    bluesky-web {script_name} --log-level=DEBUG
+ $ docker run -ti -v /usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
+    bluesky-web {script_name} -r --log-level=DEBUG
  """.format(script_name=sys.argv[0])
 
 REQUIRED_ARGS = []
@@ -50,6 +52,7 @@ OPTIONAL_ARGS = [
 ]
 
 INPUT = {
+    "run_id": str(uuid.uuid1()),
     "modules": ['ingestion', 'fuelbeds', 'fuelbeds'],
     "fire_information": [
         {
@@ -95,9 +98,15 @@ if __name__ == "__main__":
     args = parse_args()
     tasks.MONGODB_URL = args.mongodb_url
     if args.record_run:
-        tasks.run_bluesky(INPUT)
+        logging.debug('About to run BlueSkyRunner')
+        tasks.run_bluesky(INPUT, output_root_dir='.',
+            output_url_path_prefix="blueskyrunner-logs",
+            bluesky_log_level=logging.DEBUG)
+        logging.debug('Done running BlueSkyRunner')
     else:
         s = io.StringIO()
+        logging.debug('About to run BlueSkyRunner')
         output = tasks.BlueSkyRunner(INPUT, output_stream=s).run()
+        logging.debug('About to dump to stdout')
         sys.stdout.write(s.getvalue())
 
