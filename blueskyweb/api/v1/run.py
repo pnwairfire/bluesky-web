@@ -18,7 +18,6 @@ import traceback
 import ipify
 import tornado.web
 import tornado.log
-from bluesky import exceptions, models
 
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import run_bluesky, BlueSkyRunner
@@ -261,29 +260,9 @@ class RunExecuter(tornado.web.RequestHandler):
         self.write({"run_id": data['run_id']})
 
     async def _run_in_process(self, data):
-
-        # TODO: Use BlueSkyRunner
-
         try:
-            tornado.log.gen_log.debug('input: %s', data)
-            fires_manager = models.fires.FiresManager()
-            fires_manager.load(data)
-            fires_manager.run()
-            fires_manager.dumps(self) # will call self.write
-
-        except exceptions.BlueSkyModuleError as e:
-            self.set_status(400)
-            self.write({"error": fires_manager.meta['error']})
-
-        # TODO: handle each of the following individually?
-        #   (it would be good if they inherited from a common
-        #    base class, so that could be handled)
-        #     exceptions.BlueSkyImportError
-        #     exceptions.BlueSkyConfigurationError
-        #     exceptions.BlueSkyModuleError
-        #     exceptions.MissingDependencyError
-        #     exceptions.BlueSkyDatetimeValueError
-        #     exceptions.BlueSkyGeographyValueError
+             # will call self.write
+            output = BlueSkyRunner(data, output_stream=self).run()
 
         except Exception as e:
             tornado.log.gen_log.debug(traceback.format_exc())

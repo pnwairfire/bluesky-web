@@ -215,6 +215,15 @@ class BlueSkyRunner(object):
             # included in the output data
             pass
 
+        # TODO: handle any of the following individually?
+        #   (it would be good if they inherited from a common
+        #    base class, so that could be handled)
+        #     exceptions.BlueSkyImportError
+        #     exceptions.BlueSkyConfigurationError
+        #     exceptions.MissingDependencyError
+        #     exceptions.BlueSkyDatetimeValueError
+        #     exceptions.BlueSkyGeographyValueError
+
 
         self._record_run(RunStatuses.ProcessingOutput)
 
