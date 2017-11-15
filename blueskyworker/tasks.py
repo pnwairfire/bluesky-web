@@ -63,9 +63,6 @@ def run_bluesky(input_data, **settings):
     if hasattr(input_data, 'lower'):
         input_data = json.loads(input_data)
 
-    # TODO: (maybe run each module separately, so that more granular status
-    #       can be saved in mongodb; or have this method parse logs as bsp
-    #       is running
     return BlueSkyRunner(input_data, db=db, **settings).run()
 
 

@@ -96,13 +96,16 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    tasks.MONGODB_URL = args.mongodb_url
+
     if args.record_run:
+        db = tasks.BlueSkyWebDB(args.mongodb_url)
         logging.debug('About to run BlueSkyRunner')
-        tasks.run_bluesky(INPUT, output_root_dir='dev',
+        tasks.BlueSkyRunner(INPUT, db=db,
+            output_root_dir='dev',
             output_url_path_prefix="blueskyrunner-logs",
-            bluesky_log_level=logging.DEBUG)
+            bluesky_log_level=logging.DEBUG).run()
         logging.debug('Done running BlueSkyRunner')
+
     else:
         s = io.StringIO()
         logging.debug('About to run BlueSkyRunner')
