@@ -310,7 +310,7 @@ class RunExecuter(tornado.web.RequestHandler):
         data['config']['findmetdata'] = {
             "met_root_dir": met_root_dir,
             "arl": {
-                "arl_index_file":
+                "index_filename_pattern":
                     self._archive_info['arl_index_file'],
                 "fewer_arl_files": True
             }
