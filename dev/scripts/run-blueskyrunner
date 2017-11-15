@@ -99,7 +99,7 @@ if __name__ == "__main__":
     tasks.MONGODB_URL = args.mongodb_url
     if args.record_run:
         logging.debug('About to run BlueSkyRunner')
-        tasks.run_bluesky(INPUT, output_root_dir='.',
+        tasks.run_bluesky(INPUT, output_root_dir='dev',
             output_url_path_prefix="blueskyrunner-logs",
             bluesky_log_level=logging.DEBUG)
         logging.debug('Done running BlueSkyRunner')
