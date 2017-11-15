@@ -154,6 +154,8 @@ class BlueSkyRunner(object):
                 # TODO: if hysplit dispersion, start thread that periodically
                 #   tails log and records status; then join thread when call
                 #   to run completes
+                tornado.log.gen_log.debug('Running %s %s',
+                    self.input_data['run_id'], m)
                 fires_manager.modules = [m]
                 self._record_run(RunStatuses.Running, module=m)
 
