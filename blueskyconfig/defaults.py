@@ -222,19 +222,21 @@ DEFAULTS = {
     },
     "dispersion_meta_options": {
         "number_of_particles": {
-            "high":
+            "high": 3000,
+            "medium": 2000,
+            "low": 1000
         },
         "speed": {
             "faster": {
-                "resolution_factor": 1.5.
+                "resolution_factor": 1.5,
                 "numpar": 1000
             },
             "balanced": {
-                "resolution_factor": 1.0.
+                "resolution_factor": 1.0,
                 "numpar": 2000
             },
             "slower": {
-                "resolution_factor": 0.5.
+                "resolution_factor": 0.5,
                 "numpar": 3000
             }
         }
