@@ -21,7 +21,7 @@ specify a subset of the modules normally run by this API.
         "modules": [ ... ]
     }
 
-See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
 for more information about required and optional post data
 
 ### Response
@@ -135,7 +135,7 @@ specify a subset of the modules normally run by this API.
             "modules": [ ... ]
         }
 
-See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
 for more information about required and optional post data
 
 ### Response

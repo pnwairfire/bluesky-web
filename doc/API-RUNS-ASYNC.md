@@ -25,7 +25,7 @@ optional, and it specifies configuration data and other control
 parameters.  The 'modules' key is also optional, and is used to
 specify a subset of the modules normally run by this API.
 
-See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
 for more information about required and optional post data
 
 ### Response
@@ -111,7 +111,7 @@ the dispersion run. Set 'image_results_version' to 'v1' or 'v2', or
 don't set it at all to get 'v1'. The output API spec, below,
 lists the two output formats.
 
-See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
 for more information about required and optional post data
 
 ### Response
@@ -321,7 +321,7 @@ require emissions data.
     }
 
 See hysplit dispersion API, above, as well as
-[BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+[BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
 for more information about required and optional post data
 
 ### Response
@@ -410,7 +410,7 @@ speed and wind direction) for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
 and num_hours. The 'modules' key is optional.
 
-See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
 for more information about required and optional post data
 
 ### Response
@@ -541,7 +541,7 @@ consumption and emissions data.
     }
 
 See VSMOKE dispersion API, above, as well as
-[BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.1/README.md)
+[BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
 for more information about required and optional post data
 
 ### Response
