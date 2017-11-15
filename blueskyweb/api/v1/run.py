@@ -262,8 +262,7 @@ class RunExecuter(tornado.web.RequestHandler):
 
     async def _run_in_process(self, data):
 
-        # TODO: Use BlueSkyRunner if it ends up being refactored
-        #   to import bluesky package and run in-process
+        # TODO: Use BlueSkyRunner
 
         try:
             tornado.log.gen_log.debug('input: %s', data)
