@@ -11,6 +11,7 @@ import tornado.web
 
 import blueskyconfig
 from blueskyweb.lib import met
+from . import RequestHandlerBase
 
 ##
 ## Domains
@@ -18,7 +19,7 @@ from blueskyweb.lib import met
 
 KM_PER_DEG_LAT = 111
 
-class DomainInfo(tornado.web.RequestHandler):
+class DomainInfo(RequestHandlerBase):
 
     def _marshall(self, domain_id):
         grid_config = met.DOMAINS[domain_id]['grid']
@@ -49,7 +50,7 @@ class DomainInfo(tornado.web.RequestHandler):
 
 ARCHIVES = blueskyconfig.get('archives')
 
-class MetArchiveBaseHander(tornado.web.RequestHandler):
+class MetArchiveBaseHander(RequestHandlerBase):
 
     def __init__(self, *args, **kwargs):
         super(MetArchiveBaseHander, self).__init__(*args, **kwargs)
@@ -64,20 +65,6 @@ class MetArchivesInfo(MetArchiveBaseHander):
         r.update(availability)
         return r
 
-    def get_boolean_arg(self, key):
-        val = self.get_query_argument(key, None)
-        if val is not None:
-            orig_val = val # for error message
-            val = val.lower()
-            if val in ('true', 'yes', 'y', '1'):
-                val = True
-            elif val in ('false', 'no', 'n', '0'):
-                val = False
-            else:
-                raise tornado.web.HTTPError(status_code=400,
-                    log_message="Invalid boolean value '{}' "
-                    "for query arg {}".format(orig_val, key))
-        return val
 
     def write_archives(self, archives):
         available = self.get_boolean_arg('available')

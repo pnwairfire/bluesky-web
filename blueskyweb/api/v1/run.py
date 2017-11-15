@@ -19,10 +19,11 @@ import ipify
 import tornado.web
 import tornado.log
 
+import blueskyconfig
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import run_bluesky, BlueSkyRunner
 from blueskyweb.lib import met
-import blueskyconfig
+from . import RequestHandlerBase
 
 
 try:
@@ -96,17 +97,7 @@ def is_same_host(run):
 ### API Handlers
 ###
 
-class RunBase(tornado.web.RequestHandler):
-
-    BOOLEAN_VALUES = ('false', '0')
-
-    def get_boolean_argument(self, key):
-        # false if not specified or if '0' or 'false', 'False', 'FALSE', etc.
-        v = self.get_query_argument(key, None)
-        return v is not None and v.lower() not in self.BOOLEAN_VALUES
-
-
-class RunExecuter(tornado.web.RequestHandler):
+class RunExecuter(RequestHandlerBase):
 
     @tornado.web.asynchronous
     async def post(self, mode=None, archive_id=None):
@@ -425,12 +416,12 @@ class RunExecuter(tornado.web.RequestHandler):
         # ***** END
 
 
-class RunStatusBase(RunBase):
+class RunStatusBase(RequestHandlerBase):
 
     VERBOSE_FIELDS = ('output_dir', 'modules', 'server')
 
     async def process(self, run):
-        if not self.get_boolean_argument('raw'):
+        if not self.get_boolean_arg('raw'):
             # need to call get_queue_position before converting
             # run['status'] from array to scalar object
             position = await self.settings['mongo_db'].get_queue_position(run)
@@ -502,7 +493,7 @@ class RunsInfo(RunStatusBase):
         self.write({"runs": runs})
 
 
-class RunOutput(tornado.web.RequestHandler):
+class RunOutput(RequestHandlerBase):
 
     @tornado.web.asynchronous
     async def get(self, run_id):
