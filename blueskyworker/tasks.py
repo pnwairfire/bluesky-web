@@ -139,6 +139,9 @@ class BlueSkyRunner(object):
         finer granularity in status logging.
         """
         try:
+            if not self.output_stream:
+                logging.basicConfig(filename=self.output_log_filename,
+                    level=self.settings.get('bluesky_log_level', logging.INFO))
             # TODO: temporarily configure logging to go to file specifuc
             #  for this run; keep emissions/fuelbeds (non-async) runs
             #  in separate dir or indicate with file name if the run is async
