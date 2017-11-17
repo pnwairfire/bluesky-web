@@ -260,11 +260,19 @@ class RunExecuter(RequestHandlerBase):
             tornado.log.gen_log.error('Exception: %s', e)
             self.set_status(500)
 
+    ##
+    ## Configuration
+    ##
+
+    ## Emissions
+
     async def _configure_emissions(self, data):
         tornado.log.gen_log.debug('Configuring emissions')
         data['config'] = data.get('config', {})
         data['config']['emissions'] = data['config'].get('emissions', {})
         data['config']['emissions']['efs'] = "urbanski"
+
+    ## Findmetdata
 
     async def _configure_findmetdata(self, data):
         tornado.log.gen_log.debug('Configuring findmetdata')
@@ -285,6 +293,8 @@ class RunExecuter(RequestHandlerBase):
             }
         }
 
+    ## Localmet
+
     async def _configure_localmet(self, data):
         tornado.log.gen_log.debug('Configuring localmet')
         data['config'] = data.get('config', {})
@@ -292,12 +302,16 @@ class RunExecuter(RequestHandlerBase):
             "time_step": met._archive_info['time_step']
         }
 
+    ## Plumerise
+
     async def _configure_plumerising(self, data):
         tornado.log.gen_log.debug('Configuring plumerising')
         data['config'] = data.get('config', {})
         data['config']['plumerising'] = {
             "model": "feps"
         }
+
+    ## Dispersion
 
     DEFAULT_HYSPLIT_GRID_LENGTH = 2000
 
@@ -329,37 +343,96 @@ class RunExecuter(RequestHandlerBase):
             await self._configure_hysplit(data)
 
     async def _configure_hysplit(self, data):
-        # initialize config dict
+        # Get user-supplied hysplit config, or initialize if necessary
         if not data['config']['dispersion'].get('hysplit'):
             data['config']['dispersion']['hysplit'] = {}
         hysplit_config = data['config']['dispersion']['hysplit']
 
-        # set hysplit params
+        # Get hysplit query string options (to be translated to settings values)
+        # This has to happen before applying defaults so that we can
+        # validate that request doesn't make overlapping configuration
+        self._process_hysplit_options(hysplit_config)
+
+        # fill config with defaults
         hysplit_defaults = blueskyconfig.get('hysplit')
         for k in hysplit_defaults.keys():
             # use MPI and NCPUS defaults even if request specifies them
             if k in ('MPI', 'NCPUS') or k not in hysplit_config:
                 hysplit_config[k] = hysplit_defaults[k]
 
-        self._process_hysplit_meta_options()
-        self._set_hysplit_grid()
+        self._configure_hysplit_grid()
         # TODO: any other model-specific configuration?
 
-    def _process_hysplit_meta_options(self):
-        pass
+    def _process_hysplit_options(self, hysplit_config):
+        """Parses hysplit query string options, makes sure they
+        don't conflict with each other or with hysplit config settings
+        in the input data, and translates them to hysplit config settings.
+        """
+        # get query_parameters
+        speed = self.get_query_argument('dispersion_speed', None)
+        res = self.get_query_argument('grid_resolution', None)
+        num_par = self.get_query_argument('number_of_particles', None)
 
-    def _set_hysplit_grid(self):
-        # can't both directly specify grid and hysplit_
-        dispersion_speed = self.get_argument('dispersion_speed')
-        if (any([hysplit_config.get(k)
-                for k in ('grid', 'USER_DEFINED_GRID', 'compute_grid')]) and
-                dispersion_speed):
-            msg = ("You can't both specify dispersion grid and"
-                " specify")
-            self.write({"error": msg})
-            raise tornado.web.HTTPError(status_code=400,
-                log_message=msg)
+        self._grid_resolution_factor = 1.0
+        if any([k is not None for k in (speed, res, num_par)]):
+            if 'NUMPAR' in hysplit_config:
+                self._raise_error(400, "You can't specify NUMPAR along with"
+                    "dispersion_speed, grid_resolution, or number_of_particles.")
 
+            if any([hysplit_config.get(k) for k in
+                    ('grid', 'USER_DEFINED_GRID', 'compute_grid')]):
+                self._raise_error(400, "You can't specify 'grid', "
+                    "'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
+                    " config along with options 'dispersion_speed', "
+                    " 'grid_resolution', or 'number_of_particles'.")
+
+            if speed is not None:
+                if res is not None or num_par is not None:
+                    self._raise_error(400, "You can't specify "
+                        "dispersion_speed along with either grid_resolution "
+                        "or number_of_particles.")
+                speed = speed.lower()
+                speed_options = blueskyconfig.get('hysplit_options',
+                    'dispersion_speed')
+                if speed not in speed_options:
+                    self._raise_error(400, 'Invalid value for '
+                        'dispersion_speed: {}'.format(speed))
+                hysplit_config['NUMPAR'] = speed_options[speed]['numpar']
+                self._grid_resolution_factor = speed_options[speed]['grid_resolution_factor']
+
+            else:
+                if num_par is not None:
+                    num_par_options blueskyconfig.get('hysplit_options',
+                        'number_of_particles')
+                    if num_par not in num_par_options:
+                        self._raise_error(400, 'Invalid value for '
+                            'number_of_particles: {}'.format(num_par))
+                    hysplit_config['NUMPAR'] = num_par_options[num_par]
+
+                if res is not None:
+                    res_options blueskyconfig.get('hysplit_options',
+                        'grid_resolution')
+                    if res not in res_options:
+                        self._raise_error(400, 'Invalid value for '
+                            'grid_resolution: {}'.format(res))
+                    self._grid_resolution_factor = res_options[res]
+
+        else:
+            if len([k in hysplit_config for k in
+                    ('grid', 'USER_DEFINED_GRID', 'compute_grid')]) > 1:
+                self._raise_error(400, "You can't specify more than one of "
+                    "the following in the hysplit config: 'grid', "
+                    "'USER_DEFINED_GRID', or 'compute_grid'.")
+
+
+    def _configure_hysplit_grid(self):
+        """Configures hysplit grid.
+
+        Notes:
+         - self._grid_resolution is set in _process_hysplit_options
+         - _process_hysplit_options will have made sure there are no
+           conflicting options and settings
+        """
 
         # set grid
         grid_config = self._archive_info['grid']
@@ -378,12 +451,16 @@ class RunExecuter(RequestHandlerBase):
             #    "spacing_longitude", "spacing_latitude",
             #    "grid_length", "projection" (?)
             pass
+        elif self._grid_resolution != 1.0:
+            pass
         else:
             # TODO: check for grid size reduction factor and
             #  compute smaller grid (using Robert's calculations?)
             hysplit_config['grid'] = grid_config
 
         tornado.log.gen_log.debug("hysplit configuration: %s", hysplit_config)
+
+    ## Visualization
 
     async def _configure_visualization(self, data):
         tornado.log.gen_log.debug('Configuring visualization')
@@ -402,6 +479,8 @@ class RunExecuter(RequestHandlerBase):
         data['config']['visualization']["hysplit"]["create_summary_json"] = True
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
+
+    ## Export
 
     async def _configure_export(self, data):
         # we just run export to get image and file information
