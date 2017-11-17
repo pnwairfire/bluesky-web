@@ -357,7 +357,7 @@ class RunExecuter(RequestHandlerBase):
             if k in ('MPI', 'NCPUS') or k not in hysplit_config:
                 hysplit_config[k] = hysplit_defaults[k]
 
-        self._configure_hysplit_grid()
+        self._configure_hysplit_grid(hysplit_config)
         # TODO: any other model-specific configuration?
 
     def _process_hysplit_config(self, data):
@@ -438,19 +438,19 @@ class RunExecuter(RequestHandlerBase):
                     self._grid_resolution_factor = res_options[res]
 
         else:
-            if len([k in hysplit_config for k in
-                    ('grid', 'USER_DEFINED_GRID', 'compute_grid')]) > 1:
+            if len([v for v in [k in hysplit_config for k in
+                    ('grid', 'USER_DEFINED_GRID', 'compute_grid')] if v]) > 1:
                 self._raise_error(400, "You can't specify more than one of "
                     "the following in the hysplit config: 'grid', "
                     "'USER_DEFINED_GRID', or 'compute_grid'.")
 
-        self._grid_size = 1.0
+        self._grid_size_factor = 1.0
         size = self.get_float_arg('grid_size', default=None)
         if size is not None:
             if size <= 0 or size > 1:
                 self._raise_error(400,
                     "grid_size ({}) must be > 0 and <= 100".format(size))
-            self._grid_size = size
+            self._grid_size_factor = size
 
         self._grid_offset = 1.0
         offset = self.get_query_argument('grid_offset', None)
@@ -466,11 +466,12 @@ class RunExecuter(RequestHandlerBase):
             self._grid_offset = offset
 
 
-    def _configure_hysplit_grid(self):
+    def _configure_hysplit_grid(self, hysplit_config):
         """Configures hysplit grid.
 
         Notes:
-         - self._grid_resolution is set in _process_hysplit_options
+         - self._grid_resolution_factor, self._grid_size_factor, and
+           self._grid_offset are set in _process_hysplit_options
          - _process_hysplit_options will have made sure there are no
            conflicting options and settings
         """
@@ -493,8 +494,8 @@ class RunExecuter(RequestHandlerBase):
             #    "grid_length", "projection" (?)
             pass
         # TODO: include self._grid_offset too, or will that only be
-        #   allowed to be set if self._grid_size != 1.0 ???
-        elif self._grid_resolution != 1.0 or self._grid_size != 1.0:
+        #   allowed to be set if self._grid_size_factor != 1.0 ???
+        elif self._grid_resolution_factor != 1.0 or self._grid_size_factor != 1.0:
             pass
         else:
             # TODO: check for grid size reduction factor and

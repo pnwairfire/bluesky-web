@@ -245,7 +245,7 @@ DEFAULTS = {
                 "numpar": 3000
             }
         },
-        # For PGv3 advanced runs
+        # For PGv3 advanced and expert runs
         "number_of_particles": {
             "low": 1000,
             "medium": 2000,
