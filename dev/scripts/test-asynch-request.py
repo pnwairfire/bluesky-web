@@ -55,6 +55,22 @@ REQUIRED_ARGS = [
     }
 ]
 
+HYSPLIT_OPTIONS = {
+    'standard': {
+        'dispersion_speed': 'faster',
+    },
+    'advanced': {
+        'number_of_particles': 'low',
+        'grid_resolution': 'low'
+    },
+    'expert': {
+        'number_of_particles': 'low',
+        'grid_resolution': 'low',
+        'grid_size': 0.5,
+        'grid_offset': 'centered'
+    },
+}
+
 _NOW = datetime.datetime.utcnow()
 OPTIONAL_ARGS = [
     {
@@ -109,6 +125,10 @@ OPTIONAL_ARGS = [
         'long': "--met-archive",
         'help': "met archive; default 'ca-nv_6-km'",
         'default': 'ca-nv_6-km'
+    },
+    {
+        'long': "--hysplit-options",
+        'help': ', '.join(HYSPLIT_OPTIONS)
     },
     {
         'short': '-m',
@@ -228,6 +248,15 @@ if __name__ == "__main__":
         logging.error("Don't specify both '--simple' and '--modules'")
         sys.exit(1)
 
+    if args.hysplit_options:
+        if args.simple:
+            logging.error("Don't specify both '--simple' and '--hysplit_options'")
+            sys.exit(1)
+        if args.hysplit_options not in HYSPLIT_OPTIONS:
+            logging.error("Invalid value for '--hysplit_options': %s",
+                args.hysplit_options)
+            sys.exit(1)
+
     start_str = args.start.strftime(DT_STR)
     REQUEST['config']['dispersion']['start'] = start_str
     REQUEST['config']['dispersion']['num_hours'] = args.num_hours
@@ -306,7 +335,12 @@ if __name__ == "__main__":
     query["image_results_version"] = args.image_results_version
     # ***** END
 
+    if args.hysplit_options:
+        for k, v in HYSPLIT_OPTIONS[args.hysplit_options].items():
+            query[k] = v
+
     url = '?'.join([url, urllib.parse.urlencode(query)])
+    logging.info("Request URL: {}".format(data))
 
     logging.info("Testing {} ... ".format(url))
 
