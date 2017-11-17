@@ -342,6 +342,9 @@ class RunExecuter(RequestHandlerBase):
         if data['config']['dispersion'].get('model') in ('hysplit', None):
             await self._configure_hysplit(data)
 
+    # TODO: move hysplit configuration code into lib class, and add
+    #  unit tests
+
     async def _configure_hysplit(self, data):
         hysplit_config = self._process_hysplit_config(data)
 
