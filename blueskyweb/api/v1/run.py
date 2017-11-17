@@ -343,10 +343,7 @@ class RunExecuter(RequestHandlerBase):
             await self._configure_hysplit(data)
 
     async def _configure_hysplit(self, data):
-        # Get user-supplied hysplit config, or initialize if necessary
-        if not data['config']['dispersion'].get('hysplit'):
-            data['config']['dispersion']['hysplit'] = {}
-        hysplit_config = data['config']['dispersion']['hysplit']
+        hysplit_config = self._process_hysplit_config(data)
 
         # Get hysplit query string options (to be translated to settings values)
         # This has to happen before applying defaults so that we can
@@ -355,13 +352,36 @@ class RunExecuter(RequestHandlerBase):
 
         # fill config with defaults
         hysplit_defaults = blueskyconfig.get('hysplit')
-        for k in hysplit_defaults.keys():
+        for k in hysplit_defaults:
             # use MPI and NCPUS defaults even if request specifies them
             if k in ('MPI', 'NCPUS') or k not in hysplit_config:
                 hysplit_config[k] = hysplit_defaults[k]
 
         self._configure_hysplit_grid()
         # TODO: any other model-specific configuration?
+
+    def _process_hysplit_config(self, data):
+        """Gets user-supplied hysplit config, or initializes if necessary
+        """
+        # initialize if necessary
+        if not data['config']['dispersion'].get('hysplit'):
+            data['config']['dispersion']['hysplit'] = {}
+
+        # validate
+        hysplit_config = data['config']['dispersion']['hysplit']
+        restrictions = blueskyconfig.get('hysplit_settings_restrictions')
+        for k in hysplit_config:
+            if k in restrictions:
+                if 'max' in restrictions[k] and (
+                        hysplit_config[k] > restrictions[k]['max']):
+                    self._raise_error(400, "{} ({}) can't be greater than {} ".format(
+                        k, hysplit_config[k], restrictions[k]['max']))
+                if 'min' in restrictions[k] and (
+                        hysplit_config[k] < restrictions[k]['min']):
+                    self._raise_error(400, "{} ({}) can't be less than {} ".format(
+                        k, hysplit_config[k], restrictions[k]['min']))
+
+        return hysplit_config
 
     def _process_hysplit_options(self, hysplit_config):
         """Parses hysplit query string options, makes sure they
@@ -402,7 +422,7 @@ class RunExecuter(RequestHandlerBase):
 
             else:
                 if num_par is not None:
-                    num_par_options blueskyconfig.get('hysplit_options',
+                    num_par_options = blueskyconfig.get('hysplit_options',
                         'number_of_particles')
                     if num_par not in num_par_options:
                         self._raise_error(400, 'Invalid value for '
@@ -410,7 +430,7 @@ class RunExecuter(RequestHandlerBase):
                     hysplit_config['NUMPAR'] = num_par_options[num_par]
 
                 if res is not None:
-                    res_options blueskyconfig.get('hysplit_options',
+                    res_options = blueskyconfig.get('hysplit_options',
                         'grid_resolution')
                     if res not in res_options:
                         self._raise_error(400, 'Invalid value for '
