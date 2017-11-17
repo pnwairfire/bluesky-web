@@ -42,7 +42,7 @@ Full run (ingestiont through visualization)
   $ {script_name} \\
         -r https://www.blueskywebhost.com/bluesky-web/ \\
         --log-level=DEBUG -s `date +%Y-%m-%dT00:00:00` -n 12 \\
-        --met-archive national_3-km
+        --met-archive ca-nv_6-km
 
  """.format(script_name=sys.argv[0])
 
