@@ -233,15 +233,15 @@ DEFAULTS = {
         # For PGv3 standard runs
         "dispersion_speed": {
             "faster": {
-                "resolution_factor": 1.5,
+                "grid_resolution_factor": 1.5,
                 "numpar": 1000
             },
             "balanced": {
-                "resolution_factor": 1.0,
+                "grid_resolution_factor": 1.0,
                 "numpar": 2000
             },
             "slower": {
-                "resolution_factor": 0.5,
+                "grid_resolution_factor": 0.5,
                 "numpar": 3000
             }
         },
