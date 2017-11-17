@@ -207,6 +207,8 @@ DEFAULTS = {
             }
         }
     },
+    # These are defaults for internal hysplit settings
+    # (i.e. what's passed on to the pipeline)
     "hysplit": {
         "NUMPAR": 2000,
         "MAXPAR": 1000000000, # don"t want to ever hit MAXPAR
@@ -220,13 +222,16 @@ DEFAULTS = {
         "MPI": True,
         "NCPUS": 4
     },
-    "dispersion_meta_options": {
-        "number_of_particles": {
-            "high": 3000,
-            "medium": 2000,
-            "low": 1000
-        },
-        "speed": {
+    # These prevent users from setting values to low or high
+    "hysplit_settings_restrictions": {
+        "TOP_OF_MODEL_DOMAIN": {
+            "max": 30000.0
+        }
+    },
+    # These are options that get translated to internal hysplit settings
+    "hysplit_options": {
+        # For PGv3 standard runs
+        "dispersion_speed": {
             "faster": {
                 "resolution_factor": 1.5,
                 "numpar": 1000
@@ -239,6 +244,17 @@ DEFAULTS = {
                 "resolution_factor": 0.5,
                 "numpar": 3000
             }
+        },
+        # For PGv3 advanced runs
+        "number_of_particles": {
+            "low": 1000,
+            "medium": 2000,
+            "high": 3000
+        },
+        "grid_resolution": {
+            "low": 1.5,
+            "medium": 1.0,
+            "high": 0.5
         }
-    }
+    },
 }
