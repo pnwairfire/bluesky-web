@@ -88,28 +88,19 @@ class MetArchiveDB(object):
     async def get_availability(self, archive_id=None):
         validate_archive_id(archive_id)
 
-        pipeline = []
-        if archive_id:
-            pipeline.append({"$match": { "domain": archive_id }})
-        pipeline.extend([
-            {
-                "$project": {
-                    "archive_id": "$domain",
-                    "begin": { "$min": "$complete_dates" },
-                    "end": { "$max": "$complete_dates" }
-                }
-            }
-        ])
+        query = { "domain": archive_id } if archive_id else {}
         r = {}
-        async for e in self.db.dates.aggregate(pipeline):
-            if e['archive_id'] in r:
-                # This shouldn't happen
-                r[e['archive_id']]['begin'] = min(
-                    r[e['archive_id']]['begin'], e['begin'])
-                r[e['archive_id']]['end'] = min(
-                    r[e['archive_id']]['end'], e['end'])
+        async for e in self.db.dates.find(query, {'domain': 1, 'start': 1, 'end': 1}):
+            # Note what we're calling 'begin' here is called 'start'
+            # in the arl index db
+            if e['domain'] in r:
+                # This will happen if the archive is on mutliple servers
+                r[e['domain']]['begin'] = min(
+                    r[e['domain']]['begin'], e['start'])
+                r[e['domain']]['end'] = min(
+                    r[e['domain']]['end'], e['end'])
             else:
-                r[e['archive_id']] = dict(begin=e['begin'], end=e['end'])
+                r[e['domain']] = dict(begin=e['start'], end=e['end'])
 
         # TODO: modify r?
         if archive_id:
