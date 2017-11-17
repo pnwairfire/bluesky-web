@@ -444,6 +444,27 @@ class RunExecuter(RequestHandlerBase):
                     "the following in the hysplit config: 'grid', "
                     "'USER_DEFINED_GRID', or 'compute_grid'.")
 
+        self._grid_size = 1.0
+        size = self.get_float_arg('grid_size', default=None)
+        if size is not None:
+            if size <= 0 or size > 1:
+                self._raise_error(400,
+                    "grid_size ({}) must be > 0 and <= 100".format(size))
+            self._grid_size = size
+
+        self._grid_offset = 1.0
+        offset = self.get_query_argument('grid_offset', None)
+        if offset is not None:
+            valid_grid_offsets = blueskyconfig.get('hysplit_options',
+                    'valid_grid_offsets')
+            if offset not in valid_grid_offsets:
+                self._raise_error(400, "grid_offset ({}) must be one of the "
+                    "following: '{}'".format(offset, "', '".join(valid_grid_offsets)))
+
+            # TODO: somehow validate offset + grid size combination???
+
+            self._grid_offset = offset
+
 
     def _configure_hysplit_grid(self):
         """Configures hysplit grid.
@@ -471,7 +492,9 @@ class RunExecuter(RequestHandlerBase):
             #    "spacing_longitude", "spacing_latitude",
             #    "grid_length", "projection" (?)
             pass
-        elif self._grid_resolution != 1.0:
+        # TODO: include self._grid_offset too, or will that only be
+        #   allowed to be set if self._grid_size != 1.0 ???
+        elif self._grid_resolution != 1.0 or self._grid_size != 1.0:
             pass
         else:
             # TODO: check for grid size reduction factor and

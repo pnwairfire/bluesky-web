@@ -255,6 +255,14 @@ DEFAULTS = {
             "low": 1.5,
             "medium": 1.0,
             "high": 0.5
+        },
+        "valid_grid_offset": []
+            # TODO: not sure if there should be params associated with grid offset
+            "centered",
+            "north",
+            "south",
+            "east",
+            "west"
         }
     },
 }
