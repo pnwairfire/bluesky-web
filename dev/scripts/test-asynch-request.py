@@ -66,8 +66,7 @@ HYSPLIT_OPTIONS = {
     'expert': {
         'number_of_particles': 'low',
         'grid_resolution': 'low',
-        'grid_size': 0.5,
-        'grid_offset': 'centered'
+        'grid_size': 0.5
     },
 }
 
