@@ -466,28 +466,16 @@ class RunExecuter(RequestHandlerBase):
         """
 
         # set grid
-        grid_config = self._archive_info['grid']
-        if hysplit_config.get('grid'):
-            # TODO: fill in any missing info from grid_config
-            pass
-        elif hysplit_config.get('USER_DEFINED_GRID'):
-            # TODO: fill in any missing values for the following
-            #   using what's in grid_config
-            #    "USER_DEFINED_GRID", "CENTER_LATITUDE", "CENTER_LONGITUDE",
-            #    "WIDTH_LONGITUDE", "HEIGHT_LATITUDE", "SPACING_LONGITUDE", "SPACING_LATITUDE",
-            pass
-        elif hysplit_config.get('compute_grid'):
-            # TODO: fill in values for the following using what's
-            #   in grid_config
-            #    "spacing_longitude", "spacing_latitude",
-            #    "grid_length", "projection" (?)
-            pass
-        elif self._grid_resolution_factor != 1.0 or self._grid_size_factor != 1.0:
-            pass
-        else:
-            # TODO: check for grid size reduction factor and
-            #  compute smaller grid (using Robert's calculations?)
-            hysplit_config['grid'] = grid_config
+
+        if not any([hysplit_config.get(k) for k in
+                ('grid', 'USER_DEFINED_GRID', 'compute_grid')]):
+            hysplit_config['grid'] = copy.deepcopy(self._archive_info['grid'])
+            hysplit_config['grid']['spacing'] *= self._grid_resolution_factor
+            if self._grid_size_factor != 1.0:
+                # TODO: compute smaller grid (using Robert's calculations?)
+                self._raise_error(501, "grid_size option not yet supported")
+
+        # else, nothing to do, since user configured grid
 
         tornado.log.gen_log.debug("hysplit configuration: %s", hysplit_config)
 
