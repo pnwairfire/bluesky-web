@@ -1,11 +1,13 @@
-
+import copy
 import blueskyconfig
+import tornado.log
 
 class HysplitConfigurator(object):
 
-    def __init__(self, request_handler, input_data):
+    def __init__(self, request_handler, input_data, archive_info):
         self._request_handler = request_handler
         self._input_data = input_data
+        self._archive_info = archive_info
 
         # Defaults must be filled in after input config and request
         # options are processed, so that we can validate that the
@@ -13,7 +15,10 @@ class HysplitConfigurator(object):
         self._process_config()
         self._process_options()
         self._fill_in_defaults()
-        self._configure_grid(hysplit_config)
+        self._configure_grid()
+
+        tornado.log.gen_log.debug("hysplit configuration: %s",
+            self._hysplit_config)
 
     @property
     def config(self):
@@ -25,7 +30,8 @@ class HysplitConfigurator(object):
         """Gets user-supplied hysplit config, or initializes if necessary
         """
         # validate
-        self._hysplit_config = self._input_data['config']['dispersion']['hysplit']
+        self._hysplit_config = self._input_data['config']['dispersion'].get(
+            'hysplit') or {}
         restrictions = blueskyconfig.get('hysplit_settings_restrictions')
         for k in self._hysplit_config:
             if k in restrictions:
@@ -112,8 +118,8 @@ class HysplitConfigurator(object):
         hysplit_defaults = blueskyconfig.get('hysplit')
         for k in hysplit_defaults:
             # use MPI and NCPUS defaults even if request specifies them
-            if k in ('MPI', 'NCPUS') or k not in hysplit_config:
-                hysplit_config[k] = hysplit_defaults[k]
+            if k in ('MPI', 'NCPUS') or k not in self._hysplit_config:
+                self._hysplit_config[k] = hysplit_defaults[k]
 
     def _configure_grid(self):
         """Configures hysplit grid.
@@ -132,8 +138,6 @@ class HysplitConfigurator(object):
                 self._configure_hysplit_reduced_grid()
 
         # else, nothing to do, since user configured grid
-
-        tornado.log.gen_log.debug("hysplit configuration: %s", hysplit_config)
 
     def _configure_hysplit_reduced_grid(self):
         """From Robert:

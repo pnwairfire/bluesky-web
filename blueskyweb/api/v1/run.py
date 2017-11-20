@@ -3,14 +3,10 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-import copy
 import datetime
-import io
 import json
 import os
-import re
 import requests
-import socket
 import urllib.request, urllib.error, urllib.parse
 import uuid
 import traceback
@@ -339,7 +335,8 @@ class RunExecuter(RequestHandlerBase):
             data['config']['dispersion']['model'] = 'vsmoke'
 
         if data['config']['dispersion'].get('model') in ('hysplit', None):
-            configurator = hysplit.HysplitConfigurator(data)
+            configurator = hysplit.HysplitConfigurator(self, data,
+                self._archive_info)
             data['config']['dispersion']['hysplit'] = configurator.config
 
 
