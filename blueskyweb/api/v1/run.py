@@ -19,10 +19,9 @@ import ipify
 import tornado.web
 import tornado.log
 
-import blueskyconfig
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import run_bluesky, BlueSkyRunner
-from blueskyweb.lib import met
+from blueskyweb.lib import met, hysplit
 from . import RequestHandlerBase
 
 
@@ -340,8 +339,8 @@ class RunExecuter(RequestHandlerBase):
             data['config']['dispersion']['model'] = 'vsmoke'
 
         if data['config']['dispersion'].get('model') in ('hysplit', None):
-            HysplitConfigurator = self._configure_hysplit(data)
-            data['config']['dispersion']['hysplit'] = .config
+            configurator = hysplit.HysplitConfigurator(data)
+            data['config']['dispersion']['hysplit'] = configurator.config
 
 
     ## Visualization

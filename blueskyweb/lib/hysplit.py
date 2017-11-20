@@ -1,3 +1,6 @@
+
+import blueskyconfig
+
 class HysplitConfigurator(object):
 
     def __init__(self, request_handler, input_data):
