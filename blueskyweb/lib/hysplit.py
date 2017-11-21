@@ -141,78 +141,128 @@ class HysplitConfigurator(object):
 
     def _configure_hysplit_reduced_grid(self):
         """From Robert:
-          >  here is some logic to pass along about how to work out the hysplit domain with reduced met domain size. in this logic it keeps the hysplit domain equal in area to the reduced fraction size, ie, if a 50% reduction equals an area representing 25% of the met domain to be used but located as best as possible to keep the fire and that 25% of area all in the met domain (does that make sense?). The 50% is a reduction of the X and Y extents which means a 75% reduction in area....
-          >
-          >  Consider a met domain defined by bounds
-          >
-          >  Xmin, Xmax, Ymin, Ymax
-          >
-          >  Midpoint (Xc,Yc) = ( (Xmax + Xmin)/2, (Ymax + Ymin)/2 )
-          >
-          >  and length, width given by
-          >
-          >  X = Xmax - Xmin
-          >  Y = Ymax - Ymin
-          >
-          >  a fire location given by (Xf,Yf)
-          >
-          >  and F is a reduction factor, ie, what fraction do we modify the X and Y extents by...
-          >
-          >  if F = 1 then hysplit domain is same as met domain:
-          >
-          >     with midpoint (Xc,Yc) and length,width of X,Y and bounds Xmin,Xmax,Ymin,Ymax
-          >     although you can go through the remaining calcs and end up with the same answer
-          >
-          >  else:
-          >
-          >    new extents (length and width) are:
-          >
-          >    X' = X*F
-          >    Y' = Y*F
-          >
-          >    new bounding box is for X:
-          >
-          >    X'min = Xf - X'/2
-          >    X'max = Xf + X'/2
-          >
-          >    if  X'min < Xmin
-          >
-          >      X'max = X'max + Xmin - X'min
-          >      X'min = Xmin
-          >
-          >    else if  X'max > Xmax
-          >
-          >      X'min = X'min + X`max - Xmax
-          >      X'max = Xmax
-          >
-          >    end
-          >
-          >    similarly for Y:
-          >
-          >    Y'min = Yf - Y'/2
-          >    Y'max = Yf + Y'/2
-          >
-          >    if  Y'min < Ymin
-          >
-          >      Y'max = Y'max + Ymin - Y'min
-          >      Y'min = Ymin
-          >
-          >    else if Y'max > Ymax
-          >
-          >      Y'min = Y'min + Y`max - Ymax
-          >      Y'max = Ymax
-          >
-          >    end
-          >
-          >    new hysplit center point is:
-          >
-          >    (X'c,Y'c) = ((X'max+X'min)/2,(Y'max+Y'min)/2)
-          >
-          >  end
-          >
-          >  This is one way of doing it. Another would be to define the extents as X/2 and Y/2 then truncate relative to fire location as the fire get closer to a boundary....is potentially faster as it makes the hysplit domain smaller more rapidly...however, it also doesn't default to the full domain for F = 1 when the fire isn't in the center as the above method does.
-          >
-          >  anyway, let me know if i need to explain it more clearly :P
+            >  here is some logic to pass along about how to work out
+            >  the hysplit domain with reduced met domain size. in this
+            >  logic it keeps the hysplit domain equal in area to the
+            >  reduced fraction size, ie, if a 50% reduction equals an
+            >  area representing 25% of the met domain to be used but
+            >  located as best as possible to keep the fire and that
+            >  25% of area all in the met domain (does that make
+            >  sense?). The 50% is a reduction of the X and Y extents
+            >  which means a 75% reduction in area....
+            >
+            >  Consider a met domain defined by bounds
+            >
+            >  Xmin, Xmax, Ymin, Ymax
+            >
+            >  Midpoint (Xc,Yc) = ( (Xmax + Xmin)/2, (Ymax + Ymin)/2 )
+            >
+            >  and length, width given by
+            >
+            >  X = Xmax - Xmin
+            >  Y = Ymax - Ymin
+            >
+            >  a fire location given by (Xf,Yf)
+            >
+            >  and F is a reduction factor, ie, what fraction do we modify the X and Y extents by...
+            >
+            >  if F = 1 then hysplit domain is same as met domain:
+            >
+            >     with midpoint (Xc,Yc) and length,width of X,Y and bounds Xmin,Xmax,Ymin,Ymax
+            >     although you can go through the remaining calcs and end up with the same answer
+            >
+            >  else:
+            >
+            >    new extents (length and width) are:
+            >
+            >    X' = X*F
+            >    Y' = Y*F
+            >
+            >    new bounding box is for X:
+            >
+            >    X'min = Xf - X'/2
+            >    X'max = Xf + X'/2
+            >
+            >    if  X'min < Xmin
+            >
+            >      X'max = X'max + Xmin - X'min
+            >      X'min = Xmin
+            >
+            >    else if  X'max > Xmax
+            >
+            >      X'min = X'min + X`max - Xmax
+            >      X'max = Xmax
+            >
+            >    end
+            >
+            >    similarly for Y:
+            >
+            >    Y'min = Yf - Y'/2
+            >    Y'max = Yf + Y'/2
+            >
+            >    if  Y'min < Ymin
+            >
+            >      Y'max = Y'max + Ymin - Y'min
+            >      Y'min = Ymin
+            >
+            >    else if Y'max > Ymax
+            >
+            >      Y'min = Y'min + Y`max - Ymax
+            >      Y'max = Ymax
+            >
+            >    end
+            >
+            >    new hysplit center point is:
+            >
+            >    (X'c,Y'c) = ((X'max+X'min)/2,(Y'max+Y'min)/2)
+            >
+            >  end
+            >
+            >  This is one way of doing it. Another would be to define the extents as X/2 and Y/2 then truncate relative to fire location as the fire get closer to a boundary....is potentially faster as it makes the hysplit domain smaller more rapidly...however, it also doesn't default to the full domain for F = 1 when the fire isn't in the center as the above method does.
+            >
+            >  anyway, let me know if i need to explain it more clearly :P
         """
-        # TODO: compute smaller grid (using Robert's calculations?)
-        self._raise_error(501, "grid_size option not yet supported")
+        if not self._is_single_lat_lng():
+            self._request_handler._raise_error(400,
+                "grid_size option only supported for single fire at specific lat,lng")
+
+        loc = self._input_data['fire_information'][0]['growth'][0]['location']
+        lat = loc['latitude']
+        lng = loc['longitude']
+        sw = self._archive_info['grid']['boundary']['sw']
+        ne = self._archive_info['grid']['boundary']['ne']
+        # Note: none of the met domains cross the international
+        # dateline, so we can safely subract sw from ne
+        new_lat_diff = self._grid_size_factor * (ne['lat'] - sw['lat'])
+        new_lng_diff = self._grid_size_factor * (ne['lng'] - sw['lng'])
+        new_sw_lat = max(sw['lat'])
+        self._hysplit_config['grid']['boundary'] = {
+            "sw": {
+                "lat": min(max(lat - new_lat_diff / 2, sw['lat']),
+                        ne['lat'] - new_lat_diff),
+                "lng": min(max(lng - new_lng_diff / 2, sw['lng']),
+                        ne['lng'] - new_lng_diff),
+            },
+            'ne': {
+                "lat": max(min(lat + new_lat_diff / 2, ne['lat']),
+                        sw['lat'] + new_lat_diff),
+                "lng": max(min(lng + new_lng_diff / 2, ne['lng']),
+                        sw['lng'] + new_lng_diff),
+            }
+        }
+
+    def _is_single_lat_lng(self):
+        if (len(self._input_data['fire_information']) > 1:
+            # input data could possibly specifu multiple fires at
+            # the same location, but we won't bother trying to accept that
+            return False
+        if any([not set(['latitude','longitude']).issubset(set(g['location'].keys()))
+                for g in self._input_data['fire_information'][0]['growth']]):
+            # TODO: accept geoJSON Points
+            return False
+        if (len(list(set([g['location']['latitide'] for g in
+                self._input_data['fire_information'][0]['growth']]))) > 1
+                or len(list(set([g['location']['longitude'] for g in
+                self._input_data['fire_information'][0]['growth']]))) > 1):
+            # growth windows are for different points
+            return False
