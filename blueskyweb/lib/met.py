@@ -89,18 +89,23 @@ class MetArchiveDB(object):
         validate_archive_id(archive_id)
 
         query = { "domain": archive_id } if archive_id else {}
+        select_set = {'domain': 1, 'start': 1, 'end': 1, 'latest_forecast': 1}
         r = {}
-        async for e in self.db.dates.find(query, {'domain': 1, 'start': 1, 'end': 1}):
+        async for e in self.db.dates.find(query, select_set):
             # Note what we're calling 'begin' here is called 'start'
             # in the arl index db
             if e['domain'] in r:
-                # This will happen if the archive is on mutliple servers
+                # This should never happen, since dates collection
+                # is already aggregated across all servers
                 r[e['domain']]['begin'] = min(
                     r[e['domain']]['begin'], e['start'])
                 r[e['domain']]['end'] = min(
                     r[e['domain']]['end'], e['end'])
+                r[e['domain']]['latest_forecast'] = min(
+                    r[e['domain']]['latest_forecast'], e['latest_forecast'])
             else:
-                r[e['domain']] = dict(begin=e['start'], end=e['end'])
+                r[e['domain']] = dict(begin=e['start'], end=e['end'],
+                    latest_forecast=e['latest_forecast'])
 
         # TODO: modify r?
         if archive_id:
