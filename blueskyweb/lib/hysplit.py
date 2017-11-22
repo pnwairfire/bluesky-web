@@ -252,7 +252,7 @@ class HysplitConfigurator(object):
         }
 
     def _is_single_lat_lng(self):
-        if (len(self._input_data['fire_information']) > 1:
+        if len(self._input_data['fire_information']) > 1:
             # input data could possibly specifu multiple fires at
             # the same location, but we won't bother trying to accept that
             return False
