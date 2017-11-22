@@ -1,4 +1,4 @@
-FROM pnwairfire/bluesky:v2.7.7
+FROM pnwairfire/bluesky:v2.7.8
 
 RUN apt-get install less vim
 
