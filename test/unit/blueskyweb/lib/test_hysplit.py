@@ -521,7 +521,7 @@ class TestHysplitOptions(object):
 
     # TODO: implement more conflict tests
 
-    def test_faster(self):
+    def test_faster_dispersion_speed(self):
         input_data = {
             "config": {
                 "dispersion": {
@@ -629,6 +629,43 @@ class TestHysplitOptions(object):
                 },
                 'projection': 'LCC',
                 'spacing': 1.0
+            }
+        }
+        assert hycon._hysplit_config == expected_hysplit_config
+
+    def test_custom_numpar(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {"NUMPAR": 4500}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(),
+            input_data, ARCHIVE_INFO)
+        expected_hysplit_config = {
+            'DELT': 0.0,
+            'INITD': 0,
+            'KHMAX': 72,
+            'MAXPAR': 1000000000,
+            'MPI': True,
+            'NCPUS': 4,
+            'NINIT': 0,
+            'NUMPAR': 4500,
+            'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
+            'VERTICAL_LEVELS': [100],
+            'grid': {
+                'boundary': {
+                    'ne': {'lat': 40.0, 'lng': -60.0},
+                    'sw': {'lat': 30.0, 'lng': -100.0}
+                },
+                'projection': 'LCC',
+                'spacing': 2.0
             }
         }
         assert hycon._hysplit_config == expected_hysplit_config
