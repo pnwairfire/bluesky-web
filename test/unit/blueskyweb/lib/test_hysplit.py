@@ -337,3 +337,298 @@ class TestHysplitConfiguratorConfigureGrid(object):
         assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
         assert 'compute_grid' not in hycon._hysplit_config
         assert hycon._hysplit_config['grid'] == ARCHIVE_INFO['grid']
+
+
+class TestHysplitOptions(object):
+    """Unit tests for hysplit options (disperion_speed, etc.)
+    """
+    def test_no_options(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(),
+            input_data, ARCHIVE_INFO)
+        expected_hysplit_config = {
+            'DELT': 0.0,
+            'INITD': 0,
+            'KHMAX': 72,
+            'MAXPAR': 1000000000,
+            'MPI': True,
+            'NCPUS': 4,
+            'NINIT': 0,
+            'NUMPAR': 2000,
+            'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
+            'VERTICAL_LEVELS': [100],
+            'grid': {
+                'boundary': {
+                    'ne': {'lat': 40.0, 'lng': -60.0},
+                    'sw': {'lat': 30.0, 'lng': -100.0}
+                },
+                'projection': 'LCC',
+                'spacing': 2.0
+            }
+        }
+        assert hycon._hysplit_config == expected_hysplit_config
+
+    def test_invalid_options(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(dispersion_speed='sdfsdf'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.INVALID_DISPERSION_SPEED.format('sdfsdf')
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(number_of_particles='sdfsdf'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.INVALID_NUMBER_OF_PARTICLES.format('sdfsdf')
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(grid_resolution='sdfsdf'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.INVALID_GRID_RESOLUTION.format('sdfsdf')
+
+    def test_conflict_numpar_with_other_options(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {'NUMPAR': 4000}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(dispersion_speed='faster'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(number_of_particles='medium'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(grid_resolution='medium'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS
+
+    def test_conflict_speed_with_other_options(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(dispersion_speed='balanced',
+                    number_of_particles='low'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.DISPERSION_SPEED_CONFLICTS_WITH_OTHER_OPTIONS
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(dispersion_speed='balanced',
+                    grid_resolution='low'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.DISPERSION_SPEED_CONFLICTS_WITH_OTHER_OPTIONS
+
+    def test_grid_with_other_options(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {
+                        'grid': {
+                            'boundary': {
+                                'ne': {'lat': 40.0, 'lng': -60.0},
+                                'sw': {'lat': 30.0, 'lng': -100.0}
+                            },
+                            'projection': 'LCC',
+                            'spacing': 2.0
+                        }
+                    }
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(dispersion_speed='faster'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(number_of_particles='medium'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS
+
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(grid_resolution='medium'),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS
+
+    # TODO: implement more conflict tests
+
+    def test_faster(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(dispersion_speed='faster'),
+            input_data, ARCHIVE_INFO)
+        expected_hysplit_config = {
+            'DELT': 0.0,
+            'INITD': 0,
+            'KHMAX': 72,
+            'MAXPAR': 1000000000,
+            'MPI': True,
+            'NCPUS': 4,
+            'NINIT': 0,
+            'NUMPAR': 1000,
+            'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
+            'VERTICAL_LEVELS': [100],
+            'grid': {
+                'boundary': {
+                    'ne': {'lat': 40.0, 'lng': -60.0},
+                    'sw': {'lat': 30.0, 'lng': -100.0}
+                },
+                'projection': 'LCC',
+                'spacing': 3.0
+            }
+        }
+        assert hycon._hysplit_config == expected_hysplit_config
+
+    def test_high_number_of_particles(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(number_of_particles='high'),
+            input_data, ARCHIVE_INFO)
+        expected_hysplit_config = {
+            'DELT': 0.0,
+            'INITD': 0,
+            'KHMAX': 72,
+            'MAXPAR': 1000000000,
+            'MPI': True,
+            'NCPUS': 4,
+            'NINIT': 0,
+            'NUMPAR': 3000,
+            'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
+            'VERTICAL_LEVELS': [100],
+            'grid': {
+                'boundary': {
+                    'ne': {'lat': 40.0, 'lng': -60.0},
+                    'sw': {'lat': 30.0, 'lng': -100.0}
+                },
+                'projection': 'LCC',
+                'spacing': 2.0
+            }
+        }
+        assert hycon._hysplit_config == expected_hysplit_config
+
+
+    def test_high_grid_resolution(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(grid_resolution='high'),
+            input_data, ARCHIVE_INFO)
+        expected_hysplit_config = {
+            'DELT': 0.0,
+            'INITD': 0,
+            'KHMAX': 72,
+            'MAXPAR': 1000000000,
+            'MPI': True,
+            'NCPUS': 4,
+            'NINIT': 0,
+            'NUMPAR': 2000,
+            'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
+            'VERTICAL_LEVELS': [100],
+            'grid': {
+                'boundary': {
+                    'ne': {'lat': 40.0, 'lng': -60.0},
+                    'sw': {'lat': 30.0, 'lng': -100.0}
+                },
+                'projection': 'LCC',
+                'spacing': 1.0
+            }
+        }
+        assert hycon._hysplit_config == expected_hysplit_config
