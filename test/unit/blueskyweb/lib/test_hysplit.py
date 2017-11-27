@@ -3,7 +3,10 @@ import pytest
 from blueskyweb.lib import hysplit
 
 class MockHTTPError(RuntimeError):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(MockHTTPError, self).__init__(*args, **kwargs)
+        self.status_code = args[0]
+        self.msg = args[1]
 
 class MockRequestHandler(object):
     def __init__(self, **query_args):
@@ -37,6 +40,8 @@ ARCHIVE_INFO = {
 
 
 class TestHysplitConfiguratorConfigureReducedGrid(object):
+    """Unit tests for grid reduction logic.
+    """
 
     def test_multiple_fire_objects(self):
         input_data = {
@@ -52,6 +57,8 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
             MockRequestHandler(), input_data, ARCHIVE_INFO)
         with pytest.raises(MockHTTPError) as e:
             hycon._configure_hysplit_reduced_grid()
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.SINGLE_LAT_LNG_ONLY
 
     def test_not_single_lat_lng(self):
         input_data = {
