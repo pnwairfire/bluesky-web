@@ -66,7 +66,7 @@ HYSPLIT_OPTIONS = {
     'expert': {
         'number_of_particles': 'low',
         'grid_resolution': 'low',
-        'grid_size': 0.5
+        'grid_size': 0.25
     },
 }
 
@@ -337,6 +337,11 @@ if __name__ == "__main__":
     if args.hysplit_options:
         for k, v in HYSPLIT_OPTIONS[args.hysplit_options].items():
             query[k] = v
+        if 'grid_size' in HYSPLIT_OPTIONS[args.hysplit_options]:
+            # can only specify 'grid_size' option for single-fire runs
+            data = json.loads(data)
+            data['fire_information'].pop()
+            data = json.dumps(data)
 
     url = '?'.join([url, urllib.parse.urlencode(query)])
     logging.info("Request URL: {}".format(data))
