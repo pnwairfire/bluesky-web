@@ -136,87 +136,9 @@ class HysplitConfigurator(object):
         # else, nothing to do, since user configured grid
 
     def _configure_hysplit_reduced_grid(self):
-        """From Robert:
-            >  here is some logic to pass along about how to work out
-            >  the hysplit domain with reduced met domain size. in this
-            >  logic it keeps the hysplit domain equal in area to the
-            >  reduced fraction size, ie, if a 50% reduction equals an
-            >  area representing 25% of the met domain to be used but
-            >  located as best as possible to keep the fire and that
-            >  25% of area all in the met domain (does that make
-            >  sense?). The 50% is a reduction of the X and Y extents
-            >  which means a 75% reduction in area....
-            >
-            >  Consider a met domain defined by bounds
-            >
-            >  Xmin, Xmax, Ymin, Ymax
-            >
-            >  Midpoint (Xc,Yc) = ( (Xmax + Xmin)/2, (Ymax + Ymin)/2 )
-            >
-            >  and length, width given by
-            >
-            >  X = Xmax - Xmin
-            >  Y = Ymax - Ymin
-            >
-            >  a fire location given by (Xf,Yf)
-            >
-            >  and F is a reduction factor, ie, what fraction do we modify the X and Y extents by...
-            >
-            >  if F = 1 then hysplit domain is same as met domain:
-            >
-            >     with midpoint (Xc,Yc) and length,width of X,Y and bounds Xmin,Xmax,Ymin,Ymax
-            >     although you can go through the remaining calcs and end up with the same answer
-            >
-            >  else:
-            >
-            >    new extents (length and width) are:
-            >
-            >    X' = X*F
-            >    Y' = Y*F
-            >
-            >    new bounding box is for X:
-            >
-            >    X'min = Xf - X'/2
-            >    X'max = Xf + X'/2
-            >
-            >    if  X'min < Xmin
-            >
-            >      X'max = X'max + Xmin - X'min
-            >      X'min = Xmin
-            >
-            >    else if  X'max > Xmax
-            >
-            >      X'min = X'min + X`max - Xmax
-            >      X'max = Xmax
-            >
-            >    end
-            >
-            >    similarly for Y:
-            >
-            >    Y'min = Yf - Y'/2
-            >    Y'max = Yf + Y'/2
-            >
-            >    if  Y'min < Ymin
-            >
-            >      Y'max = Y'max + Ymin - Y'min
-            >      Y'min = Ymin
-            >
-            >    else if Y'max > Ymax
-            >
-            >      Y'min = Y'min + Y`max - Ymax
-            >      Y'max = Ymax
-            >
-            >    end
-            >
-            >    new hysplit center point is:
-            >
-            >    (X'c,Y'c) = ((X'max+X'min)/2,(Y'max+Y'min)/2)
-            >
-            >  end
-            >
-            >  This is one way of doing it. Another would be to define the extents as X/2 and Y/2 then truncate relative to fire location as the fire get closer to a boundary....is potentially faster as it makes the hysplit domain smaller more rapidly...however, it also doesn't default to the full domain for F = 1 when the fire isn't in the center as the above method does.
-            >
-            >  anyway, let me know if i need to explain it more clearly :P
+        """Reduces the hyplit grid by a factor between 0.0 and 1.0,
+        centering the reduced grid around the fire location as much as
+        possible without going outside of the original archive domain.
         """
         if not self._is_single_lat_lng():
             self._request_handler._raise_error(400,
