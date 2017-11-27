@@ -1,6 +1,5 @@
 import copy
 import blueskyconfig
-import tornado.log
 
 class HysplitConfigurator(object):
 
@@ -16,9 +15,6 @@ class HysplitConfigurator(object):
         self._process_options()
         self._fill_in_defaults()
         self._configure_grid()
-
-        tornado.log.gen_log.debug("hysplit configuration: %s",
-            self._hysplit_config)
 
     @property
     def config(self):
