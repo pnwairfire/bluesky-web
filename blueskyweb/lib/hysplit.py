@@ -231,7 +231,6 @@ class HysplitConfigurator(object):
         # dateline, so we can safely subract sw from ne
         new_lat_diff = self._grid_size_factor * (ne['lat'] - sw['lat'])
         new_lng_diff = self._grid_size_factor * (ne['lng'] - sw['lng'])
-        new_sw_lat = max(sw['lat'])
         self._hysplit_config['grid']['boundary'] = {
             "sw": {
                 "lat": min(max(lat - new_lat_diff / 2, sw['lat']),
