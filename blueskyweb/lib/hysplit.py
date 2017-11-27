@@ -10,6 +10,9 @@ class ErrorMessages(object):
         "'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
         " config along with options 'dispersion_speed', "
         " 'grid_resolution', or 'number_of_particles'.")
+    TOO_MANY_GRID_SPECIFICATIONS = ("You can't specify more than one of "
+        "the following in the hysplit config: 'grid', "
+        "'USER_DEFINED_GRID', or 'compute_grid'.")
 
 class HysplitConfigurator(object):
 
@@ -103,9 +106,8 @@ class HysplitConfigurator(object):
         else:
             if len([v for v in [k in self._hysplit_config for k in
                     ('grid', 'USER_DEFINED_GRID', 'compute_grid')] if v]) > 1:
-                self._request_handler._raise_error(400, "You can't specify more than one of "
-                    "the following in the hysplit config: 'grid', "
-                    "'USER_DEFINED_GRID', or 'compute_grid'.")
+                self._request_handler._raise_error(400,
+                    ErrorMessages.TOO_MANY_GRID_SPECIFICATIONS)
 
         self._grid_size_factor = 1.0
         size = self._request_handler.get_float_arg('grid_size', default=None)
