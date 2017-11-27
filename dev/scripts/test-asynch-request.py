@@ -380,4 +380,5 @@ if __name__ == "__main__":
     data = json.loads(response.content.decode())
     # TODO: log individual bits of information
     logging.info("Reponse: {}".format(data))
+    logging.info("Root Url: %s", data.get('root_url', 'N/A'))
 
