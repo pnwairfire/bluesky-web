@@ -252,11 +252,13 @@ class HysplitConfigurator(object):
             # input data could possibly specifu multiple fires at
             # the same location, but we won't bother trying to accept that
             return False
+
         if any([not set(['latitude','longitude']).issubset(set(g['location'].keys()))
                 for g in self._input_data['fire_information'][0]['growth']]):
             # TODO: accept geoJSON Points
             return False
-        if (len(list(set([g['location']['latitide'] for g in
+
+        if (len(list(set([g['location']['latitude'] for g in
                 self._input_data['fire_information'][0]['growth']]))) > 1
                 or len(list(set([g['location']['longitude'] for g in
                 self._input_data['fire_information'][0]['growth']]))) > 1):
