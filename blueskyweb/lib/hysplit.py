@@ -264,3 +264,5 @@ class HysplitConfigurator(object):
                 self._input_data['fire_information'][0]['growth']]))) > 1):
             # growth windows are for different points
             return False
+
+        return True
