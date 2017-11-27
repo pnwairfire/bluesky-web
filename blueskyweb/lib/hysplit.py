@@ -4,15 +4,21 @@ import blueskyconfig
 class ErrorMessages(object):
     SINGLE_LAT_LNG_ONLY = ("grid_size option only supported for "
         "single fire at specific lat,lng")
-    NUMPAR_CONFLICT = ("You can't specify NUMPAR along with"
+    NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify NUMPAR along with"
         "dispersion_speed, grid_resolution, or number_of_particles.")
-    GRID_CONFLICT = ("You can't specify 'grid', "
+    GRID_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify 'grid', "
         "'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
         " config along with options 'dispersion_speed', "
         " 'grid_resolution', or 'number_of_particles'.")
     TOO_MANY_GRID_SPECIFICATIONS = ("You can't specify more than one of "
         "the following in the hysplit config: 'grid', "
         "'USER_DEFINED_GRID', or 'compute_grid'.")
+    INVALID_DISPERSION_SPEED = 'Invalid value for dispersion_speed: {}'
+    INVALID_NUMBER_OF_PARTICLES = 'Invalid value for number_of_particles: {}'
+    INVALID_GRID_RESOLUTION = 'Invalid value for grid_resolution: {}'
+    DISPERSION_SPEED_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify "
+        "dispersion_speed along with either grid_resolution "
+        "or number_of_particles.")
 
 class HysplitConfigurator(object):
 
@@ -66,23 +72,22 @@ class HysplitConfigurator(object):
         self._grid_resolution_factor = 1.0
         if any([k is not None for k in (speed, res, num_par)]):
             if 'NUMPAR' in self._hysplit_config:
-                self._request_handler._raise_error(400, ErrorMessages.NUMPAR_CONFLICT)
+                self._request_handler._raise_error(400, ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS)
 
             if any([self._hysplit_config.get(k) for k in
                     ('grid', 'USER_DEFINED_GRID', 'compute_grid')]):
-                self._request_handler._raise_error(400, ErrorMessages.GRID_CONFLICT)
+                self._request_handler._raise_error(400, ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS)
 
             if speed is not None:
                 if res is not None or num_par is not None:
-                    self._request_handler._raise_error(400, "You can't specify "
-                        "dispersion_speed along with either grid_resolution "
-                        "or number_of_particles.")
+                    self._request_handler._raise_error(400,
+                        ErrorMessages.DISPERSION_SPEED_CONFLICTS_WITH_OTHER_OPTIONS)
                 speed = speed.lower()
                 speed_options = blueskyconfig.get('hysplit_options',
                     'dispersion_speed')
                 if speed not in speed_options:
-                    self._request_handler._raise_error(400, 'Invalid value for '
-                        'dispersion_speed: {}'.format(speed))
+                    self._request_handler._raise_error(400,
+                        ErrorMessages.INVALID_DISPERSION_SPEED.format(speed))
                 self._hysplit_config['NUMPAR'] = speed_options[speed]['numpar']
                 self._grid_resolution_factor = speed_options[speed]['grid_resolution_factor']
 
@@ -91,16 +96,16 @@ class HysplitConfigurator(object):
                     num_par_options = blueskyconfig.get('hysplit_options',
                         'number_of_particles')
                     if num_par not in num_par_options:
-                        self._request_handler._raise_error(400, 'Invalid value for '
-                            'number_of_particles: {}'.format(num_par))
+                        self._request_handler._raise_error(400,
+                            ErrorMessages.INVALID_NUMBER_OF_PARTICLES.format(num_par))
                     self._hysplit_config['NUMPAR'] = num_par_options[num_par]
 
                 if res is not None:
                     res_options = blueskyconfig.get('hysplit_options',
                         'grid_resolution')
                     if res not in res_options:
-                        self._request_handler._raise_error(400, 'Invalid value for '
-                            'grid_resolution: {}'.format(res))
+                        self._request_handler._raise_error(400,
+                            ErrorMessages.INVALID_GRID_RESOLUTION.format(res))
                     self._grid_resolution_factor = res_options[res]
 
         else:
