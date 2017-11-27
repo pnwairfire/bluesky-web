@@ -1,6 +1,16 @@
 import copy
 import blueskyconfig
 
+class ErrorMessages(object):
+    SINGLE_LAT_LNG_ONLY = ("grid_size option only supported for "
+        "single fire at specific lat,lng")
+    NUMPAR_CONFLICT = ("You can't specify NUMPAR along with"
+        "dispersion_speed, grid_resolution, or number_of_particles.")
+    GRID_CONFLICT = ("You can't specify 'grid', "
+        "'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
+        " config along with options 'dispersion_speed', "
+        " 'grid_resolution', or 'number_of_particles'.")
+
 class HysplitConfigurator(object):
 
     def __init__(self, request_handler, input_data, archive_info):
@@ -33,11 +43,11 @@ class HysplitConfigurator(object):
             if k in restrictions:
                 if 'max' in restrictions[k] and (
                         self._hysplit_config[k] > restrictions[k]['max']):
-                    self._raise_error(400, "{} ({}) can't be greater than {} ".format(
+                    self._request_handler._raise_error(400, "{} ({}) can't be greater than {} ".format(
                         k, self._hysplit_config[k], restrictions[k]['max']))
                 if 'min' in restrictions[k] and (
                         self._hysplit_config[k] < restrictions[k]['min']):
-                    self._raise_error(400, "{} ({}) can't be less than {} ".format(
+                    self._request_handler._raise_error(400, "{} ({}) can't be less than {} ".format(
                         k, self._hysplit_config[k], restrictions[k]['min']))
 
     def _process_options(self):
@@ -53,26 +63,22 @@ class HysplitConfigurator(object):
         self._grid_resolution_factor = 1.0
         if any([k is not None for k in (speed, res, num_par)]):
             if 'NUMPAR' in self._hysplit_config:
-                self._raise_error(400, "You can't specify NUMPAR along with"
-                    "dispersion_speed, grid_resolution, or number_of_particles.")
+                self._request_handler._raise_error(400, ErrorMessages.NUMPAR_CONFLICT)
 
             if any([self._hysplit_config.get(k) for k in
                     ('grid', 'USER_DEFINED_GRID', 'compute_grid')]):
-                self._raise_error(400, "You can't specify 'grid', "
-                    "'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
-                    " config along with options 'dispersion_speed', "
-                    " 'grid_resolution', or 'number_of_particles'.")
+                self._request_handler._raise_error(400, ErrorMessages.GRID_CONFLICT)
 
             if speed is not None:
                 if res is not None or num_par is not None:
-                    self._raise_error(400, "You can't specify "
+                    self._request_handler._raise_error(400, "You can't specify "
                         "dispersion_speed along with either grid_resolution "
                         "or number_of_particles.")
                 speed = speed.lower()
                 speed_options = blueskyconfig.get('hysplit_options',
                     'dispersion_speed')
                 if speed not in speed_options:
-                    self._raise_error(400, 'Invalid value for '
+                    self._request_handler._raise_error(400, 'Invalid value for '
                         'dispersion_speed: {}'.format(speed))
                 self._hysplit_config['NUMPAR'] = speed_options[speed]['numpar']
                 self._grid_resolution_factor = speed_options[speed]['grid_resolution_factor']
@@ -82,7 +88,7 @@ class HysplitConfigurator(object):
                     num_par_options = blueskyconfig.get('hysplit_options',
                         'number_of_particles')
                     if num_par not in num_par_options:
-                        self._raise_error(400, 'Invalid value for '
+                        self._request_handler._raise_error(400, 'Invalid value for '
                             'number_of_particles: {}'.format(num_par))
                     self._hysplit_config['NUMPAR'] = num_par_options[num_par]
 
@@ -90,14 +96,14 @@ class HysplitConfigurator(object):
                     res_options = blueskyconfig.get('hysplit_options',
                         'grid_resolution')
                     if res not in res_options:
-                        self._raise_error(400, 'Invalid value for '
+                        self._request_handler._raise_error(400, 'Invalid value for '
                             'grid_resolution: {}'.format(res))
                     self._grid_resolution_factor = res_options[res]
 
         else:
             if len([v for v in [k in self._hysplit_config for k in
                     ('grid', 'USER_DEFINED_GRID', 'compute_grid')] if v]) > 1:
-                self._raise_error(400, "You can't specify more than one of "
+                self._request_handler._raise_error(400, "You can't specify more than one of "
                     "the following in the hysplit config: 'grid', "
                     "'USER_DEFINED_GRID', or 'compute_grid'.")
 
@@ -105,7 +111,7 @@ class HysplitConfigurator(object):
         size = self._request_handler.get_float_arg('grid_size', default=None)
         if size is not None:
             if size <= 0 or size > 1:
-                self._raise_error(400,
+                self._request_handler._raise_error(400,
                     "grid_size ({}) must be > 0 and <= 100".format(size))
             self._grid_size_factor = size
 
@@ -142,7 +148,7 @@ class HysplitConfigurator(object):
         """
         if not self._is_single_lat_lng():
             self._request_handler._raise_error(400,
-                "grid_size option only supported for single fire at specific lat,lng")
+                ErrorMessages.SINGLE_LAT_LNG_ONLY)
 
         loc = self._input_data['fire_information'][0]['growth'][0]['location']
         lat = loc['latitude']
