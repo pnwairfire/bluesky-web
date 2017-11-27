@@ -66,6 +66,12 @@ If you don't want to wait for it to run, manually run it with:
 
 
 
+## Tests
+
+### Unit Tests
+
+    pip install -r requirements-test.txt
+    py.test
 
 ## Ad Hoc tests
 
@@ -74,7 +80,6 @@ the following two scripts for examples
 
     ./dev/scripts/web-regression-test.sh
     ./dev/scripts/test-asynch-request.py -h
-
 
 
 
