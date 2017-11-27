@@ -174,3 +174,166 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
             'spacing': 2.0
         }
         assert hycon._hysplit_config['grid'] == expected_grid
+
+class TestHysplitConfiguratorConfigureGrid(object):
+    """Unit tests for grid configuration.
+
+    Note: See unit tests, above, for grid reduction
+    """
+
+    def test_too_many_grid_definitions(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {
+                        # 'grid'
+                        "grid": {
+                            "spacing": 2,
+                            "projection": "LCC",
+                            "boundary": {
+                                "sw": {"lng": -100.0, "lat": 30.0},
+                                "ne": {"lng": -60.0, "lat": 40.0}
+                            }
+                        },
+                        # 'USER_DEFINED_GRID'
+                        "USER_DEFINED_GRID": True,
+                        "CENTER_LATITUDE": 40,
+                        "CENTER_LONGITUDE": -80,
+                        "HEIGHT_LATITUDE": 20,
+                        "WIDTH_LONGITUDE": 40,
+                        "SPACING_LONGITUDE": 2,
+                        "SPACING_LATITUDE": 2,
+                        # 'compute_grid'
+                        "compute_grid": True
+                    },
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                MockRequestHandler(),
+                input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.TOO_MANY_GRID_SPECIFICATIONS
+
+
+    def test_with_grid(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {
+                        # 'grid'
+                        "grid": {
+                            "spacing": 2,
+                            "projection": "LCC",
+                            "boundary": {
+                                "sw": {"lng": -100.0, "lat": 30.0},
+                                "ne": {"lng": -60.0, "lat": 40.0}
+                            }
+                        }
+                    }
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(),
+            input_data, ARCHIVE_INFO)
+        assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
+        assert 'compute_grid' not in hycon._hysplit_config
+        expected_grid = {
+            "spacing": 2,
+            "projection": "LCC",
+            "boundary": {
+                "sw": {"lng": -100.0, "lat": 30.0},
+                "ne": {"lng": -60.0, "lat": 40.0}
+            }
+        }
+        assert hycon._hysplit_config['grid'] == expected_grid
+
+
+    def test_user_defined_grid(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {
+                        # 'USER_DEFINED_GRID'
+                        "USER_DEFINED_GRID": True,
+                        "CENTER_LATITUDE": 40,
+                        "CENTER_LONGITUDE": -80,
+                        "HEIGHT_LATITUDE": 20,
+                        "WIDTH_LONGITUDE": 40,
+                        "SPACING_LONGITUDE": 2,
+                        "SPACING_LATITUDE": 2,
+                    }
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(),
+            input_data, ARCHIVE_INFO)
+        assert 'grid' not in hycon._hysplit_config
+        assert 'compute_grid' not in hycon._hysplit_config
+        expected_params = {
+            "USER_DEFINED_GRID": True,
+            "CENTER_LATITUDE": 40,
+            "CENTER_LONGITUDE": -80,
+            "HEIGHT_LATITUDE": 20,
+            "WIDTH_LONGITUDE": 40,
+            "SPACING_LONGITUDE": 2,
+            "SPACING_LATITUDE": 2,
+        }
+        for k in expected_params:
+            assert hycon._hysplit_config[k] == expected_params[k]
+
+    def test_user_defined_grid(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {
+                        "compute_grid": True
+                    }
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(),
+            input_data, ARCHIVE_INFO)
+        assert 'grid' not in hycon._hysplit_config
+        assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
+        assert hycon._hysplit_config['compute_grid'] == True
+
+    def test_use_default_grid(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {
+                    }
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(),
+            input_data, ARCHIVE_INFO)
+        assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
+        assert 'compute_grid' not in hycon._hysplit_config
+        assert hycon._hysplit_config['grid'] == ARCHIVE_INFO['grid']
