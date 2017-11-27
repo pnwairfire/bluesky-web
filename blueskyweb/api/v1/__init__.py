@@ -30,7 +30,7 @@ class RequestHandlerBase(tornado.web.RequestHandler):
         val = self.get_query_argument(key, None)
         if val is not None:
             try:
-                return int(val)
+                return value_type(val)
             except ValueError as e:
                 raise tornado.web.HTTPError(status_code=400,
                     log_message="Invalid {} value '{}' for query arg {}".format(
