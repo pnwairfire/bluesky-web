@@ -13,7 +13,7 @@ class MockRequestHandler(object):
         raise MockHTTPError(*args, **kwargs)
 
     def get(self, key, default=None):
-        return self._query_args.get('key') or default
+        return self._query_args.get(key) or default
 
     def __getattr__(self, name):
         if name.startswith('get_'):
