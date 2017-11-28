@@ -500,13 +500,6 @@ class TestHysplitOptions(object):
 
         with pytest.raises(MockHTTPError) as e:
             hycon = hysplit.HysplitConfigurator(
-                MockRequestHandler(number_of_particles='medium'),
-                input_data, ARCHIVE_INFO)
-        assert e.value.status_code == 400
-        assert e.value.msg == hysplit.ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS
-
-        with pytest.raises(MockHTTPError) as e:
-            hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(grid_resolution='medium'),
                 input_data, ARCHIVE_INFO)
         assert e.value.status_code == 400
@@ -696,6 +689,52 @@ class TestHysplitOptions(object):
                 },
                 'projection': 'LCC',
                 'spacing': 3.0
+            }
+        }
+        assert hycon._hysplit_config == expected_hysplit_config
+
+    def test_user_configured_grid_and_number_of_particles(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {
+                        'grid': {
+                            'boundary': {
+                                'ne': {'lat': 40.0, 'lng': -60.0},
+                                'sw': {'lat': 20.0, 'lng': -100.0}
+                            },
+                            'projection': 'LCC',
+                            'spacing': 4.0
+                        }
+                    }
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(number_of_particles='high'),
+            input_data, ARCHIVE_INFO)
+        expected_hysplit_config = {
+            'DELT': 0.0,
+            'INITD': 0,
+            'KHMAX': 72,
+            'MAXPAR': 1000000000,
+            'MPI': True,
+            'NCPUS': 4,
+            'NINIT': 0,
+            'NUMPAR': 3000,
+            'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
+            'VERTICAL_LEVELS': [100],
+            'grid': {
+                'boundary': {
+                    'ne': {'lat': 40.0, 'lng': -60.0},
+                    'sw': {'lat': 20.0, 'lng': -100.0}
+                },
+                'projection': 'LCC',
+                'spacing': 4.0
             }
         }
         assert hycon._hysplit_config == expected_hysplit_config

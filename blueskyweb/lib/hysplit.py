@@ -8,8 +8,8 @@ class ErrorMessages(object):
         "dispersion_speed or number_of_particles.")
     GRID_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify 'grid', "
         "'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
-        " config along with options 'dispersion_speed', "
-        " 'grid_resolution', or 'number_of_particles'.")
+        " config along with options 'dispersion_speed' or "
+        " 'grid_resolution'.")
     TOO_MANY_GRID_SPECIFICATIONS = ("You can't specify more than one of "
         "the following in the hysplit config: 'grid', "
         "'USER_DEFINED_GRID', or 'compute_grid'.")
@@ -74,7 +74,7 @@ class HysplitConfigurator(object):
             if (speed or num_par) and 'NUMPAR' in self._hysplit_config:
                 self._request_handler._raise_error(400, ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS)
 
-            if any([self._hysplit_config.get(k) for k in
+            if (speed or res) and any([self._hysplit_config.get(k) for k in
                     ('grid', 'USER_DEFINED_GRID', 'compute_grid')]):
                 self._request_handler._raise_error(400, ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS)
 
