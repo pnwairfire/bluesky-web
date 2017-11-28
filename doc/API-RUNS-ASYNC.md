@@ -308,33 +308,33 @@ the hysplit configuration
 
 Possible values, and how they affect the config:
 
- - 'faster'
-   - default grid resolution multiplied by 1.5
-   - NUMPAR = 1000
- - 'balanced'
-   - default grid resolution multiplied by 1.0
-   - NUMPAR = 2000
- - 'slower'
-   - default grid resolution multiplied by 0.5
-   - NUMPAR = 3000
+- 'faster'
+  - default grid resolution multiplied by 1.5
+  - NUMPAR = 1000
+- 'balanced'
+  - default grid resolution multiplied by 1.0
+  - NUMPAR = 2000
+- 'slower'
+  - default grid resolution multiplied by 0.5
+  - NUMPAR = 3000
 
 #### number_of_particles
 
- - 'low'
-   - NUMPAR = 1000
- - 'medium'
-   - NUMPAR = 2000
- - 'high'
-   - NUMPAR = 3000
+- 'low'
+  - NUMPAR = 1000
+- 'medium'
+  - NUMPAR = 2000
+- 'high'
+  - NUMPAR = 3000
 
 #### grid_resolution
 
- - 'low'
-   - default grid resolution multiplied by 1.5
- - 'medium'
-   - default grid resolution multiplied by 1.0
- - 'high'
-   - default grid resolution multiplied by 0.5
+- 'low'
+  - default grid resolution multiplied by 1.5
+- 'medium'
+  - default grid resolution multiplied by 1.0
+- 'high'
+  - default grid resolution multiplied by 0.5
 
 #### grid_size
 
