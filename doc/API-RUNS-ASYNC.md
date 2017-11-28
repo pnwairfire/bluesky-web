@@ -297,6 +297,58 @@ however, override any of these.  For example:
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-hysplit-input.json | python -m json.tool
 
+### Extra hysplit options
+
+In addition to setting hysplit's internal configuration parameters,
+there are some meta options that are used to configure hysplit.  The
+following lists the options, their possible values, and how they affect
+the hysplit configuration
+
+#### dispersion_speed
+
+Possible values, and how they affect the config:
+
+ - 'faster'
+   - default grid resolution multiplied by 1.5
+   - NUMPAR = 1000
+ - 'balanced'
+   - default grid resolution multiplied by 1.0
+   - NUMPAR = 2000
+ - 'slower'
+   - default grid resolution multiplied by 0.5
+   - NUMPAR = 3000
+
+#### number_of_particles
+
+ - 'low'
+   - NUMPAR = 1000
+ - 'medium'
+   - NUMPAR = 2000
+ - 'high'
+   - NUMPAR = 3000
+
+#### grid_resolution
+
+ - 'low'
+   - default grid resolution multiplied by 1.5
+ - 'medium'
+   - default grid resolution multiplied by 1.0
+ - 'high'
+   - default grid resolution multiplied by 0.5
+
+#### grid_size
+
+Grid size can be any value greater than 0.0 and less than or
+equal to 1.0.  If less that 1.0, the default dispersion grid
+for the met archive is reduced in size accordingly.  The reduced
+grid is centered around the fire as much as possible without spilling
+outside of the default met.
+
+Note that grid_size is only supported for requests containing a single
+fire at a single lat/lng (e.g. not fires with multiple growth windows
+at different locations, and not fires with location defined as
+a polygon).
+
 
 
 
