@@ -440,13 +440,6 @@ class TestHysplitOptions(object):
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS
 
-        with pytest.raises(MockHTTPError) as e:
-            hycon = hysplit.HysplitConfigurator(
-                MockRequestHandler(grid_resolution='medium'),
-                input_data, ARCHIVE_INFO)
-        assert e.value.status_code == 400
-        assert e.value.msg == hysplit.ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS
-
     def test_conflict_speed_with_other_options(self):
         input_data = {
             "config": {
@@ -666,6 +659,43 @@ class TestHysplitOptions(object):
                 },
                 'projection': 'LCC',
                 'spacing': 2.0
+            }
+        }
+        assert hycon._hysplit_config == expected_hysplit_config
+
+    def test_custom_numpar_with_low_grid_resolution(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {"NUMPAR": 4500}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(grid_resolution='low'),
+            input_data, ARCHIVE_INFO)
+        expected_hysplit_config = {
+            'DELT': 0.0,
+            'INITD': 0,
+            'KHMAX': 72,
+            'MAXPAR': 1000000000,
+            'MPI': True,
+            'NCPUS': 4,
+            'NINIT': 0,
+            'NUMPAR': 4500,
+            'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
+            'VERTICAL_LEVELS': [100],
+            'grid': {
+                'boundary': {
+                    'ne': {'lat': 40.0, 'lng': -60.0},
+                    'sw': {'lat': 30.0, 'lng': -100.0}
+                },
+                'projection': 'LCC',
+                'spacing': 3.0
             }
         }
         assert hycon._hysplit_config == expected_hysplit_config

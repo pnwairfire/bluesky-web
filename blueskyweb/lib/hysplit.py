@@ -5,7 +5,7 @@ class ErrorMessages(object):
     SINGLE_LAT_LNG_ONLY = ("grid_size option only supported for "
         "single fire at specific lat,lng")
     NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify NUMPAR along with"
-        "dispersion_speed, grid_resolution, or number_of_particles.")
+        "dispersion_speed or number_of_particles.")
     GRID_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify 'grid', "
         "'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
         " config along with options 'dispersion_speed', "
@@ -71,7 +71,7 @@ class HysplitConfigurator(object):
 
         self._grid_resolution_factor = 1.0
         if any([k is not None for k in (speed, res, num_par)]):
-            if 'NUMPAR' in self._hysplit_config:
+            if (speed or num_par) and 'NUMPAR' in self._hysplit_config:
                 self._request_handler._raise_error(400, ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS)
 
             if any([self._hysplit_config.get(k) for k in
