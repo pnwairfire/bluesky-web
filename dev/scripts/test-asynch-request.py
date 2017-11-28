@@ -32,12 +32,13 @@ Full run (ingestiont through visualization)
 
   $ {script_name} \\
         -r http://localhost:8887/bluesky-web/ \\
-        --log-level=DEBUG -s 2014-05-30T00:00:00 -n 12
+        --log-level=DEBUG -s 2014-05-30T00:00:00 -n 12 \\
+        --met-archive ca-nv_6-km
 
   $ {script_name} \\
         -r https://www.blueskywebhost.com/bluesky-web-test/ \\
         --log-level=DEBUG -s `date -v-1d +%Y-%m-%dT00:00:00` -n 12 \\
-        --met-archive national_12-km
+        --met-archive ca-nv_6-km
 
   $ {script_name} \\
         -r https://www.blueskywebhost.com/bluesky-web/ \\
