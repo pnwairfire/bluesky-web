@@ -314,11 +314,6 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123/output"
 
-As mentioned above, there are currently two ways the visualization
-images may be specified in the results json object.  If you specified
-'image_results_version=v2' in the request to initiate the dispersion
-run, you'll get something like the following:
-
     {
         "images": {
             "daily_average": {
@@ -372,31 +367,4 @@ run, you'll get something like the following:
         },
         "netCDF": "dispersion-visualization/hysplit_conc.nc",
         "root_url": "http://localhost:8888/bluesky-web-output/abc123"
-    }
-
-Otherwise, if you set 'image_results_version=v1' or if you didn't
-set it at all, you'll get something like the following:
-
-    {
-        "images": {
-            "daily": {
-                "average": [
-                    "dispersion-visualization/images/daily_average/RedColorBar/daily_average_20140530.png"
-                ],
-                "maximum": [
-                    "dispersion-visualization/images/daily_maximum/RedColorBar/daily_maximum_20140530.png"
-                ]
-            },
-            "hourly": [
-                "dispersion-visualization/images/hourly/RedColorBar/hourly_201405300000.png",
-                ...,
-                "dispersion-visualization/images/hourly/RedColorBar/hourly_201405302300.png"
-            ]
-        },
-        "kmzs": {
-            "fire": "dispersion-visualization/fire_information.kmz",
-            "smoke": "dispersion-visualization/smoke_dispersion.kmz"
-        },
-        "netCDF": "dispersion-visualization/hysplit_conc.nc",
-        "root_url": "http://localhost:8888/bluesky-web-output/812ee94a-cb78-11e5-9d7c-0242ac110003-image-format-v1"
     }

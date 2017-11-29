@@ -381,16 +381,6 @@ class RunExecuter(RequestHandlerBase):
                 "dest_dir": dest_dir
             }
         }
-        # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
-        try:
-            image_results_version = self.get_argument('image_results_version')
-            if image_results_version:
-                tornado.log.gen_log.debug('Setting image_results_version: %s',
-                    image_results_version)
-                data['config']['export']['localsave']['image_results_version'] = image_results_version
-        except tornado.web.MissingArgumentError:
-            tornado.log.gen_log.debug('image_results_version not specified')
-        # ***** END
 
 
 class RunStatusBase(RequestHandlerBase):
@@ -518,13 +508,7 @@ class RunOutput(RequestHandlerBase):
         vis_info = output['export']['localsave'].get('visualization')
         if vis_info:
             # images
-            # TODO: simplify code once v1 is obsoleted
-            # TODO: make sure both v1 and v2 work
-            if output['config']['export']['localsave'].get(
-                    'image_results_version') == 'v2':
-                self._parse_images_v2(r, vis_info)
-            else:
-                self._parse_images_v1(r, vis_info)
+            self._parse_images(r, vis_info)
 
             # kmzs
             self._parse_kmzs_info(r, vis_info)
@@ -548,23 +532,7 @@ class RunOutput(RequestHandlerBase):
             r['kmzs'] = {k: '{}/{}'.format(section_info['sub_directory'], v)
                 for k, v in list(kmz_info.items()) if k in ('fire', 'smoke')}
 
-    ## ******************** TO DELETE - BEGIN  <-- (once v1 is obsoleted)
-    def _parse_images_v1(self, r, vis_info):
-        images_info = vis_info.get('images')
-        if images_info:
-            r['images'] = {
-                "hourly": ['{}/{}'.format(vis_info['sub_directory'], e)
-                    for e in images_info.get('hourly', [])],
-                "daily": {
-                    "average": ['{}/{}'.format(vis_info['sub_directory'], e)
-                        for e in images_info.get('daily', {}).get('average', [])],
-                    "maximum": ['{}/{}'.format(vis_info['sub_directory'], e)
-                        for e in images_info.get('daily', {}).get('maximum', [])],
-                }
-            }
-    ## ******************** TO DELETE - END
-
-    def _parse_images_v2(self, r, vis_info):
+    def _parse_images(self, r, vis_info):
         r["images"] = vis_info.get('images')
         for d in r['images']:
             for c in r['images'][d]:

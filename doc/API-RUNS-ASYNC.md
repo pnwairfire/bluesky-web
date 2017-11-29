@@ -105,12 +105,6 @@ for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
 and num_hours.  The 'modules' key is optional.
 
-There are currently two ways the visualization images can be
-listed in the output to be retrieved later (see [output API spec](API-RUNS-STATUS-OUTPUT.md)), but you need to specify which way when initializing
-the dispersion run. Set 'image_results_version' to 'v1' or 'v2', or
-don't set it at all to get 'v1'. The output API spec, below,
-lists the two output formats.
-
 See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
 for more information about required and optional post data
 

@@ -150,13 +150,6 @@ OPTIONAL_ARGS = [
         'action': "store_true",
         'default': False
     }
-    # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
-    ,{
-        'long': "--image-results-version",
-        'help': "v1 or v2",
-        'default': 'v1'
-    }
-    # ***** END
 ]
 
 REQUEST = {
@@ -309,7 +302,6 @@ if __name__ == "__main__":
     if args.modules:
         logging.info("Modules: {}".format(args.modules))
     logging.info("Reprojecting images?: %s", args.reproject_images)
-    logging.info("Image Results Version: %s", args.image_results_version)
 
     data = json.dumps(REQUEST)
     logging.info("Request JSON: {}".format(data))
@@ -330,10 +322,6 @@ if __name__ == "__main__":
         url += 'all/'
         if not args.vsmoke:
             url += '{}/'.format(args.met_archive)
-
-    # ***** BEGIN -- TODO: DELETE ONCE 'v1' is removed
-    query["image_results_version"] = args.image_results_version
-    # ***** END
 
     if args.hysplit_options:
         for k, v in HYSPLIT_OPTIONS[args.hysplit_options].items():
