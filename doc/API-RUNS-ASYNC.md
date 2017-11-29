@@ -353,11 +353,11 @@ a polygon).
 
 Note the following restrictions:
 
--   NUMPAR can not along with options 'dispersion_speed' or
-    'number_of_particles'.
+-   'NUMPAR' can not be specified along with
+    'dispersion_speed' or 'number_of_particles'.
 -   User defined grid configuration (i.e. 'grid', 'USER_DEFINED_GRID' or
-    'compute_grid' in the hysplit config) can't be specified along with
-    options 'dispersion_speed' or 'grid_resolution'.
+    'compute_grid' in the hysplit config) can not be specified
+    along with 'dispersion_speed' or 'grid_resolution'.
 -   'dispersion_speed' can't be specified along with either
     'grid_resolution' or 'number_of_particles'.
 -   You can't specify more than one user-defined grid configuration
