@@ -159,7 +159,19 @@ REQUEST = {
         },
         "dispersion": {
             "start": None,  # WILL BE FILLED IN
-            "num_hours": None  # WILL BE FILLED IN
+            "num_hours": None,  # WILL BE FILLED IN
+            'hysplit': {
+                "VERTICAL_LEVELS": [100, 500, 1000]
+            }
+        },
+        'visualization': {
+            'hysplit': {
+                "blueskykml_config": {
+                    "DispersionGridInput": {
+                        "LAYERS": [0, 1, 2]
+                    }
+                }
+            }
         },
         "export": {
             "extra_exports": ["dispersion", "visualization"]
@@ -280,14 +292,8 @@ if __name__ == "__main__":
         REQUEST['modules'] = args.modules
 
     if args.reproject_images:
-        REQUEST['config']['visualization'] = {
-            "hysplit": {
-                "blueskykml_config": {
-                    "DispersionImages": {
-                        "REPROJECT_IMAGES": "True"
-                    }
-                }
-            }
+        REQUEST['config']['visualization']["hysplit"]["blueskykml_config"]["DispersionImages"] = {
+            "REPROJECT_IMAGES": "True"
         }
 
     args.root_url = args.root_url.rstrip('/')
