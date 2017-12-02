@@ -319,7 +319,7 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
             "100m": {
                 "daily_average": {
                     "RedColorBar": {
-                        "directory": "dispersion-visualization/images/daily_average/RedColorBar",
+                        "directory": "dispersion-visualization/images/100m/daily_average/RedColorBar",
                         "legend": "colorbar_daily_average.png",
                         "other_images": [],
                         "series": [
@@ -329,7 +329,7 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
                 },
                 "daily_maximum": {
                     "RedColorBar": {
-                        "directory": "dispersion-visualization/images/daily_maximum/RedColorBar",
+                        "directory": "dispersion-visualization/images/100m/daily_maximum/RedColorBar",
                         "legend": "colorbar_daily_maximum.png",
                         "other_images": [],
                         "series": [
@@ -339,7 +339,7 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
                 },
                 "hourly": {
                     "RedColorBar": {
-                        "directory": "dispersion-visualization/images/hourly/RedColorBar",
+                        "directory": "dispersion-visualization/images/100m/hourly/RedColorBar",
                         "legend": "colorbar_hourly.png",
                         "other_images": [],
                         "series": [
@@ -351,7 +351,7 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
                 },
                 "three_hour": {
                     "RedColorBar": {
-                        "directory": "dispersion-visualization/images/three_hour/RedColorBar",
+                        "directory": "dispersion-visualization/images/100m/three_hour/RedColorBar",
                         "legend": "colorbar_three_hour.png",
                         "other_images": [],
                         "series": [
