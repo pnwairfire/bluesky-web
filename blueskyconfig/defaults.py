@@ -152,6 +152,9 @@ DEFAULTS = {
         }
     },
     "archives": {
+        "fast": {
+            # TODO: add entries here once archives are available
+        },
         "standard": {
             "national_12-km": {
                 "title": "National 12-km",

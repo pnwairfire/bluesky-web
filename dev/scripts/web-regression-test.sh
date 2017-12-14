@@ -50,6 +50,8 @@ GET_URLS=(
     $ROOT_URL/api/v1/met/archives/standard/
     $ROOT_URL/api/v1/met/archives/special
     $ROOT_URL/api/v1/met/archives/special/
+    $ROOT_URL/api/v1/met/archives/fast
+    $ROOT_URL/api/v1/met/archives/fast/
     $ROOT_URL/api/v1/met/archives/$ARCHIVE
     $ROOT_URL/api/v1/met/archives/$ARCHIVE/
     $ROOT_URL/api/v1/met/archives/$ARCHIVE/$DATE

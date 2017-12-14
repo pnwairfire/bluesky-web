@@ -137,7 +137,7 @@ This API returns the dates for which a specific domain has ARL data
         "archives": [
             {
                 "id": "<archive_id>",
-                "group": "<special|standard>",
+                "group": "<special|standard|fast>",
                 "domain_id": "<domain_id>",
                 "begin": "<YYYY-MM-DD>",
                 "end": "<YYYY-MM-DD>",
@@ -145,7 +145,7 @@ This API returns the dates for which a specific domain has ARL data
             },
             {
                 "id": <archive_id>",
-                "group": "<special|standard>",
+                "group": "<special|standard|fast>",
                 "domain_id": "<domain_id>",
                 "begin": "<YYYY-MM-DD>",
                 "end": "<YYYY-MM-DD>",
@@ -153,7 +153,7 @@ This API returns the dates for which a specific domain has ARL data
             },
             {
                 "id": "<archive_id>",
-                "group": "<special|standard>",
+                "group": "<special|standard|fast>",
                 "domain_id": "<domain_id>",
                 "begin": "<YYYY-MM-DD>",
                 "end": "<YYYY-MM-DD>",
@@ -161,7 +161,7 @@ This API returns the dates for which a specific domain has ARL data
             },
             {
                 "id": "<archive_id>",
-                "group": "<special|standard>",
+                "group": "<special|standard|fast>",
                 "domain_id": "<domain_id>",
                 "begin": "<YYYY-MM-DD>",
                 "end": "<YYYY-MM-DD>",
@@ -252,7 +252,7 @@ This API returns the dates for which a specific domain has ARL data
     {
         "archive": {
             "id": "<archive_id>",
-            "group": "<special|standard>",
+            "group": "<special|standard|fast>",
             "domain_id": "<domain_id>",
             "begin": "<YYYY-MM-DD>",
             "end": "<YYYY-MM-DD>",
