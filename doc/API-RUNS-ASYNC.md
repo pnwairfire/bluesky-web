@@ -246,7 +246,7 @@ dispersion start time is in UTC.
 
 ### Extra hysplit parameters
 
-If you don't specify any dispersion configuration beyond 'start'
+If you don't specify any hysplit configuration beyond dispersion 'start'
 and 'num_hours', hysplit will be configured with a set of default
 parameters, and will be run over the entire met domain.  You may,
 however, override any of these.  For example:
@@ -277,11 +277,23 @@ however, override any of these.  For example:
                     "NUMPAR": 3000,
                     "MAXPAR": 1000000000,
                     "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 10,
-                    "VERTICAL_LEVELS": [100],
+                    "VERTICAL_LEVELS": [100, 500, 1000],
                     "INITD": 0,
                     "NINIT": 0,
                     "DELT": 0.0,
                     "KHMAX": 72
+                }
+            },
+            "visualization": {
+                "hysplit": {
+                    "blueskykml_config": {
+                        "DispersionGridInput": {
+                            "LAYERS": [0, 1, 2]
+                        },
+                        "DispersionImages": {
+                            "DAILY_IMAGES_UTC_OFFSETS": [-7, 0]
+                        }
+                    }
                 }
             }
         }
