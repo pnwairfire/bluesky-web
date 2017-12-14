@@ -315,58 +315,80 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
     $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123/output"
 
     {
+        "netCDF": "dispersion-visualization/hysplit_conc.nc",
+        "kmzs": {
+            "fire": "dispersion-visualization/fire_locations.kmz",
+            "smoke": "dispersion-visualization/smoke_dispersion.kmz"
+        },
         "images": {
-            "100m": {
-                "daily_average": {
+            "1000m": {
+                "three_hour": {
                     "RedColorBar": {
-                        "directory": "dispersion-visualization/images/100m/daily_average/RedColorBar",
-                        "legend": "colorbar_daily_average.png",
+                        "legend": "1000m_colorbar_three_hour.png",
+                        "directory": "images/1000m/three_hour/RedColorBar",
                         "other_images": [],
                         "series": [
-                            "daily_average_20140530.png"
-                        ]
-                    }
-                },
-                "daily_maximum": {
-                    "RedColorBar": {
-                        "directory": "dispersion-visualization/images/100m/daily_maximum/RedColorBar",
-                        "legend": "colorbar_daily_maximum.png",
-                        "other_images": [],
-                        "series": [
-                            "daily_maximum_20140530.png"
+                            "1000m_three_hour_201405300100.png",
+                            ...,
+                            "1000m_three_hour_201405301000.png"
                         ]
                     }
                 },
                 "hourly": {
                     "RedColorBar": {
-                        "directory": "dispersion-visualization/images/100m/hourly/RedColorBar",
-                        "legend": "colorbar_hourly.png",
+                        "legend": "1000m_colorbar_hourly.png",
+                        "directory": "images/1000m/hourly/RedColorBar",
                         "other_images": [],
                         "series": [
-                            "hourly_201405300000.png",
+                            "1000m_hourly_201405300000.png",
                             ...,
-                            "hourly_201405302300.png"
+                            "1000m_hourly_201405301100.png"
                         ]
                     }
                 },
-                "three_hour": {
-                    "RedColorBar": {
-                        "directory": "dispersion-visualization/images/100m/three_hour/RedColorBar",
-                        "legend": "colorbar_three_hour.png",
-                        "other_images": [],
-                        "series": [
-                            "three_hour_201405300100.png",
-                            ...,
-                            "three_hour_201405302200.png"
-                        ]
+                "daily_maximum": {
+                    "UTC+0000": {
+                        "RedColorBar": {
+                            "legend": "1000m_colorbar_daily_maximum_UTC+0000.png",
+                            "directory": "images/1000m/daily_maximum/UTC+0000/RedColorBar",
+                            "other_images": [
+                                "1000m_daily_maximum_20140530_UTC+0000.png"
+                            ],
+                            "series": []
+                        }
+                    },
+                    ...
+                },
+                "daily_average": {
+                    "UTC+0000": {
+                        "RedColorBar": {
+                            "legend": "1000m_colorbar_daily_average_UTC+0000.png",
+                            "directory": "images/1000m/daily_average/UTC+0000/RedColorBar",
+                            "other_images": [
+                                "1000m_daily_average_20140530_UTC+0000.png"
+                            ],
+                            "series": []
+                        }
+                    },
+                    "UTC-0700": {
+                        "RedColorBar": {
+                            "legend": "1000m_colorbar_daily_average_UTC-0700.png",
+                            "directory": "images/1000m/daily_average/UTC-0700/RedColorBar",
+                            "other_images": [
+                                "1000m_daily_average_20140529_UTC-0700.png",
+                                "1000m_daily_average_20140530_UTC-0700.png"
+                            ],
+                            "series": []
+                        }
                     }
                 }
+            },
+            "100m": {
+                ...
+            },
+            "500m": {
+                ...
             }
         },
-        "kmzs": {
-            "fire": "dispersion-visualization/fire_information.kmz",
-            "smoke": "dispersion-visualization/smoke_dispersion.kmz"
-        },
-        "netCDF": "dispersion-visualization/hysplit_conc.nc",
-        "root_url": "http://localhost:8888/bluesky-web-output/abc123"
+        "root_url": "http://localhost:8886/bluesky-web-output/abc123"
     }
