@@ -534,12 +534,13 @@ class RunOutput(RequestHandlerBase):
 
     def _parse_images(self, r, vis_info):
         r["images"] = vis_info.get('images')
-        for h in r['images']:
-            for d in r['images'][h]:
-                for c in r['images'][h][d]:
-                    r['images'][h][d][c]["directory"] = os.path.join(
-                        vis_info['sub_directory'], r['images'][h][d][c]["directory"])
-
+        def _parse(r):
+            if "directory" in d:
+                d["directory"] = os.path.join(
+                    vis_info['sub_directory'], d["directory"])
+            else:
+                for e in d:
+                    _parse(e)
 
 
     ##
