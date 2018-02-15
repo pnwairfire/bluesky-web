@@ -401,10 +401,14 @@ class RunStatusBase(RequestHandlerBase):
                 tornado.log.gen_log.debug(run)
                 run.pop('queue', None)
 
-            # history is in reverse chronological order
             # Note: history will always be defined; a run is never
             #  recorded in the db without adding to the history
-            run['status'] = run.pop('history')[0] # if run.get('history') else None
+            # Note: though history should be in reverse chronological order,
+            #  there have been cases where, due to the asynchronous wriing of
+            #  statuses to monbodb, they end up out of order in the db. The
+            #  timestamps, however, reflect the true order.
+            run['status'] = sorted(run.pop('history'),
+                key=lambda e:e['ts'])[-1]
 
             #run['complete'] = 'output_url' in run
             run['complete'] = (run['status']['status']
