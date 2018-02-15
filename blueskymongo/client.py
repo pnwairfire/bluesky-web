@@ -48,7 +48,7 @@ class BlueSkyWebDB(object):
 
         spec = {"run_id": run_id}
         # include run_id in doc in case it's an insert
-        ts = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+        ts = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         doc = {
             "$push": {
                 "history": {
