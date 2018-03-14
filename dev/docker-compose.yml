@@ -87,62 +87,28 @@ services:
     - $PWD/docker-data/output/:$PWD/docker-data/output/
     working_dir: $PWD/docker-data/output/
     command: python -m http.server 8886
-  worker_no_met:
+  worker:
     image: bluesky-web
-    container_name: bluesky-web-worker-no-met
+    container_name: bluesky-web-worker
     volumes:
     - $PWD/:/usr/src/blueskyweb/
-    - $PWD/docker-logs/worker/no-met/:/var/log/blueskyworker/
-    - $PWD/docker-data/output/:$PWD/docker-data/output/
-    - /var/run/docker.sock:/var/run/docker.sock
-    # - $HOME/DRI_6km/:/data/Met/CANSAC/6km/ARL/
-    # - $HOME/NAM84/:/data/Met/NAM/12km/ARL/
-    links:
-    - mongo
-    environment:
-    #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
-    - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
-    - PUBLIC_HOSTNAME=localhost
-    command: celery -Q no-met -c 5 -A blueskyworker.tasks worker
-      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-no-met.log
-  worker_ca-nv_6-km:
-    image: bluesky-web
-    container_name: bluesky-web-worker-ca-nv_6-km
-    volumes:
-    - $PWD/:/usr/src/blueskyweb/
-    - $PWD/docker-logs/worker/ca-nv_6-km/:/var/log/blueskyworker/
+    - $PWD/docker-logs/worker/all/:/var/log/blueskyworker/
     - $PWD/docker-data/output/:$PWD/docker-data/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # mount met for ofelia
     # Note: met root dir has to be the same on host and in this container,
     #   since bsp container will have the same mount
-    - $HOME/DRI_6km/:$HOME/DRI_6km/
+    - $HOME/DRI_6km/:/data/Met/CANSAC/6km/ARL/
+    - $HOME/NAM84/:/data/Met/NAM/12km/ARL/
     links:
     - mongo
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q ca-nv_6-km -c 5 -A blueskyworker.tasks worker
-      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-ca-nv_6-km.log
-  worker_national_12-km:
-    image: bluesky-web
-    container_name: bluesky-web-worker-national_12-km
-    volumes:
-    - $PWD/:/usr/src/blueskyweb/
-    - $PWD/docker-logs/worker/national_12-km/:/var/log/blueskyworker/
-    - $PWD/docker-data/output/:$PWD/docker-data/output/
-    - /var/run/docker.sock:/var/run/docker.sock
-    # mount met for ofelia
-    - $HOME/NAM84/:$HOME/NAM84/
-    links:
-    - mongo
-    environment:
-    #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
-    - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
-    - PUBLIC_HOSTNAME=localhost
-    command: celery -Q national_12-km -c 5 -A blueskyworker.tasks worker
-      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-national_12-km.log
+    command: celery -Q no-met,ca-nv_6-km,national_12-km
+      -c 5 -A blueskyworker.tasks worker
+      -l INFO -f /var/log/blueskyworker/bluesky-web-worker.log
   ofelia:
     image: mcuadros/ofelia
     container_name: bluesky-web-ofelia
