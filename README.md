@@ -121,6 +121,24 @@ command
 
 
 
+## Manually checking deployment
+
+Check processes and look at files installed on web service server,
+e.g. haze
+
+    ssh server1 docker ps -a |grep bluesky-web-test
+    ssh server1 cat /etc/docker-compose/bluesky-web-test/docker-compose.yml
+    ssh server1 cat /etc/bluesky-web/test/config.json
+
+And on worker servers, e.g. judy
+
+    ssh server2 docker ps -a |grep bluesky-web-test
+    ssh server2 cat /etc/docker-compose/bluesky-web-test/docker-compose.yml
+    ssh server2 cat /etc/bluesky-web/test/config.json
+    ssh server2 cat /etc/bluesky-web/test/ofelia/config.ini
+
+
+
 
 ## APIs
 
