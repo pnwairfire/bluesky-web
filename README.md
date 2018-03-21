@@ -30,7 +30,7 @@ api web service, output web service, bsp workers, and ofelia.
 
 ### Setup
 
-    git clone git@bitbucket.org:fera/airfire-bluesky-web.git
+    git clone git@github.com:pnwairfire/airfire-bluesky-web.git
     cd airfire-bluesky-web
     pip install --trusted-host pypi.smoke.airfire.org \
         -r requirements-dev.txt
