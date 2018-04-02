@@ -26,8 +26,9 @@ class MockRequestHandler(object):
 
 
 ARCHIVE_INFO = {
-    # "id": "dummy-archive-2km",
-    # "title": "Dummy Archive 2km",
+    "id": "dummy-archive-2km",
+    "title": "Dummy Archive 2km",
+    "domain_id": "DRI2km",
     "grid": {
         "spacing": 2,
         "projection": "LCC",
@@ -37,8 +38,7 @@ ARCHIVE_INFO = {
         }
     },
     "arl_index_file": "arl12hrindex.csv",
-    "time_step": 1,
-    "domain_id": "DRI2km"
+    "time_step": 1
 }
 
 
