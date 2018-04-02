@@ -225,6 +225,12 @@ DEFAULTS = {
         "MPI": True,
         "NCPUS": 4
     },
+    # These are met-specific defaults for internal hysplit settings
+    "hysplit_met_specific": {
+        "NAM3km": {
+            "DISPERSION_OFFSET": 1
+        }
+    },
     # These prevent users from setting values to low or high
     "hysplit_settings_restrictions": {
         "TOP_OF_MODEL_DOMAIN": {

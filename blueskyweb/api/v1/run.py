@@ -336,7 +336,7 @@ class RunExecuter(RequestHandlerBase):
 
         if data['config']['dispersion'].get('model') in ('hysplit', None):
             configurator = hysplit.HysplitConfigurator(self, data,
-                self._archive_info)
+                self._archive_id, self._archive_info)
             data['config']['dispersion']['hysplit'] = configurator.config
 
 

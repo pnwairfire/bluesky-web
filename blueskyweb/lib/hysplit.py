@@ -22,9 +22,10 @@ class ErrorMessages(object):
 
 class HysplitConfigurator(object):
 
-    def __init__(self, request_handler, input_data, archive_info):
+    def __init__(self, request_handler, input_data, archive_id, archive_info):
         self._request_handler = request_handler
         self._input_data = input_data
+        self._archive_id = archive_id
         self._archive_info = archive_info
 
         # Defaults must be filled in after input config and request
@@ -125,10 +126,14 @@ class HysplitConfigurator(object):
     def _fill_in_defaults(self):
         # fill config with defaults
         hysplit_defaults = blueskyconfig.get('hysplit')
+        hysplit_defaults.update(
+            blueskyconfig.get('hysplit_met_specific').get(
+                self._archive_id, {}))
         for k in hysplit_defaults:
             # use MPI and NCPUS defaults even if request specifies them
             if k in ('MPI', 'NCPUS') or k not in self._hysplit_config:
                 self._hysplit_config[k] = hysplit_defaults[k]
+
 
     def _configure_grid(self):
         """Configures hysplit grid.

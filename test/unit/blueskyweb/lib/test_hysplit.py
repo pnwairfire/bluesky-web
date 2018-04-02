@@ -22,10 +22,10 @@ class MockRequestHandler(object):
         if name.startswith('get_'):
             return self.get
 
+ARCHIVE_ID = "DRI2km"
 ARCHIVE_INFO = {
-    "id": "dummy-archive-2km",
-    "title": "Dummy Archive 2km",
-    "domain_id": "DRI2km",
+    # "id": "dummy-archive-2km",
+    # "title": "Dummy Archive 2km",
     "grid": {
         "spacing": 2,
         "projection": "LCC",
@@ -54,7 +54,7 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
             ]
         }
         hycon = hysplit.HysplitConfigurator(
-            MockRequestHandler(), input_data, ARCHIVE_INFO)
+            MockRequestHandler(), input_data, ARCHIVE_ID, ARCHIVE_INFO)
         with pytest.raises(MockHTTPError) as e:
             hycon._configure_hysplit_reduced_grid()
         assert e.value.status_code == 400
@@ -69,7 +69,7 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
             ]
         }
         hycon = hysplit.HysplitConfigurator(
-            MockRequestHandler(), input_data, ARCHIVE_INFO)
+            MockRequestHandler(), input_data, ARCHIVE_ID, ARCHIVE_INFO)
         with pytest.raises(MockHTTPError) as e:
             hycon._configure_hysplit_reduced_grid()
 
@@ -85,7 +85,7 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
             ]
         }
         hycon = hysplit.HysplitConfigurator(
-            MockRequestHandler(), input_data, ARCHIVE_INFO)
+            MockRequestHandler(), input_data, ARCHIVE_ID, ARCHIVE_INFO)
         hycon._configure_hysplit_reduced_grid()
         expected_grid = {
             'boundary': {
@@ -111,7 +111,7 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(grid_size=0.50),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         hycon._configure_hysplit_reduced_grid()
         expected_grid = {
             'boundary': {
@@ -137,7 +137,7 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(grid_size=0.50),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         hycon._configure_hysplit_reduced_grid()
         expected_grid = {
             'boundary': {
@@ -163,7 +163,7 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(grid_size=0.50),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         hycon._configure_hysplit_reduced_grid()
         expected_grid = {
             'boundary': {
@@ -216,7 +216,7 @@ class TestHysplitConfiguratorConfigureGrid(object):
         with pytest.raises(MockHTTPError) as e:
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.TOO_MANY_GRID_SPECIFICATIONS
 
@@ -245,7 +245,7 @@ class TestHysplitConfiguratorConfigureGrid(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
         assert 'compute_grid' not in hycon._hysplit_config
         expected_grid = {
@@ -282,7 +282,7 @@ class TestHysplitConfiguratorConfigureGrid(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert 'grid' not in hycon._hysplit_config
         assert 'compute_grid' not in hycon._hysplit_config
         expected_params = {
@@ -313,7 +313,7 @@ class TestHysplitConfiguratorConfigureGrid(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert 'grid' not in hycon._hysplit_config
         assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
         assert hycon._hysplit_config['compute_grid'] == True
@@ -333,7 +333,7 @@ class TestHysplitConfiguratorConfigureGrid(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
         assert 'compute_grid' not in hycon._hysplit_config
         assert hycon._hysplit_config['grid'] == ARCHIVE_INFO['grid']
@@ -356,7 +356,7 @@ class TestHysplitOptions(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         expected_hysplit_config = {
             'DELT': 0.0,
             'INITD': 0,
@@ -368,6 +368,44 @@ class TestHysplitOptions(object):
             'NUMPAR': 2000,
             'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
             'VERTICAL_LEVELS': [100],
+            'grid': {
+                'boundary': {
+                    'ne': {'lat': 40.0, 'lng': -60.0},
+                    'sw': {'lat': 30.0, 'lng': -100.0}
+                },
+                'projection': 'LCC',
+                'spacing': 2.0
+            }
+        }
+        assert hycon._hysplit_config == expected_hysplit_config
+
+    def test_no_options_nam3km(self):
+        input_data = {
+            "config": {
+                "dispersion": {
+                    "hysplit": {}
+                }
+            },
+            "fire_information": [
+                {"growth": [{"location": {"latitude": 31.0,
+                    "longitude": -64.0}}]}
+            ]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(),
+            input_data, 'NAM3km', ARCHIVE_INFO)
+        expected_hysplit_config = {
+            'DELT': 0.0,
+            'INITD': 0,
+            'KHMAX': 72,
+            'MAXPAR': 1000000000,
+            'MPI': True,
+            'NCPUS': 4,
+            'NINIT': 0,
+            'NUMPAR': 2000,
+            'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
+            'VERTICAL_LEVELS': [100],
+            'DISPERSION_OFFSET': 1,
             'grid': {
                 'boundary': {
                     'ne': {'lat': 40.0, 'lng': -60.0},
@@ -395,21 +433,21 @@ class TestHysplitOptions(object):
         with pytest.raises(MockHTTPError) as e:
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(dispersion_speed='sdfsdf'),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.INVALID_DISPERSION_SPEED.format('sdfsdf')
 
         with pytest.raises(MockHTTPError) as e:
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(number_of_particles='sdfsdf'),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.INVALID_NUMBER_OF_PARTICLES.format('sdfsdf')
 
         with pytest.raises(MockHTTPError) as e:
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(grid_resolution='sdfsdf'),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.INVALID_GRID_RESOLUTION.format('sdfsdf')
 
@@ -429,14 +467,14 @@ class TestHysplitOptions(object):
         with pytest.raises(MockHTTPError) as e:
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(dispersion_speed='faster'),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS
 
         with pytest.raises(MockHTTPError) as e:
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(number_of_particles='medium'),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS
 
@@ -457,7 +495,7 @@ class TestHysplitOptions(object):
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(dispersion_speed='balanced',
                     number_of_particles='low'),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.DISPERSION_SPEED_CONFLICTS_WITH_OTHER_OPTIONS
 
@@ -465,7 +503,7 @@ class TestHysplitOptions(object):
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(dispersion_speed='balanced',
                     grid_resolution='low'),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.DISPERSION_SPEED_CONFLICTS_WITH_OTHER_OPTIONS
 
@@ -494,14 +532,14 @@ class TestHysplitOptions(object):
         with pytest.raises(MockHTTPError) as e:
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(dispersion_speed='faster'),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS
 
         with pytest.raises(MockHTTPError) as e:
             hycon = hysplit.HysplitConfigurator(
                 MockRequestHandler(grid_resolution='medium'),
-                input_data, ARCHIVE_INFO)
+                input_data, ARCHIVE_ID, ARCHIVE_INFO)
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS
 
@@ -521,7 +559,7 @@ class TestHysplitOptions(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(dispersion_speed='faster'),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         expected_hysplit_config = {
             'DELT': 0.0,
             'INITD': 0,
@@ -558,7 +596,7 @@ class TestHysplitOptions(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(number_of_particles='high'),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         expected_hysplit_config = {
             'DELT': 0.0,
             'INITD': 0,
@@ -596,7 +634,7 @@ class TestHysplitOptions(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(grid_resolution='high'),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         expected_hysplit_config = {
             'DELT': 0.0,
             'INITD': 0,
@@ -633,7 +671,7 @@ class TestHysplitOptions(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         expected_hysplit_config = {
             'DELT': 0.0,
             'INITD': 0,
@@ -670,7 +708,7 @@ class TestHysplitOptions(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(grid_resolution='low'),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         expected_hysplit_config = {
             'DELT': 0.0,
             'INITD': 0,
@@ -716,7 +754,7 @@ class TestHysplitOptions(object):
         }
         hycon = hysplit.HysplitConfigurator(
             MockRequestHandler(number_of_particles='high'),
-            input_data, ARCHIVE_INFO)
+            input_data, ARCHIVE_ID, ARCHIVE_INFO)
         expected_hysplit_config = {
             'DELT': 0.0,
             'INITD': 0,

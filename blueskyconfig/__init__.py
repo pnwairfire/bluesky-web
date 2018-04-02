@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 
@@ -12,4 +13,4 @@ def apply_overrides(overrides):
         afconfig.merge_configs(config, overrides)
 
 def get(*args):
-    return afconfig.get_config_value(config, *args)
+    return copy.deepcopy(afconfig.get_config_value(config, *args))
