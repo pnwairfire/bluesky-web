@@ -25,7 +25,8 @@ class DomainInfo(RequestHandlerBase):
         grid_config = met.DOMAINS[domain_id]['grid']
         r = {
             "id": domain_id,
-            "boundary": grid_config['boundary']
+            "boundary": grid_config['boundary'],
+            "grid_size_options": grid_config['grid_size_options']
         }
         r['resolution_km'] = grid_config['spacing']
         if grid_config['projection'] == 'LatLon':

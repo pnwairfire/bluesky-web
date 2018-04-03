@@ -13,6 +13,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -130.0, "lat": 22.5},
                     "ne": {"lng": -60, "lat": 52.5}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": "NAM84_ARL_index.csv",
@@ -25,6 +30,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -130.0, "lat": 22.5},
                     "ne": {"lng": -60, "lat": 52.5}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -37,6 +47,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -126, "lat": 41.5},
                     "ne": {"lng": -113.5, "lat": 49.5}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -49,6 +64,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -128.6, "lat": 40},
                     "ne": {"lng": -107, "lat": 49.7}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -61,6 +81,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -124.3, "lat": 32.5},
                     "ne": {"lng": -113.0, "lat": 41.8}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -73,6 +98,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -128.5, "lat": 28.7},
                     "ne": {"lng": -107.0, "lat": 44.6}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -85,6 +115,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -115, "lat": 30},
                     "ne": {"lng": -102, "lat": 36.2}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -97,6 +132,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -130.0, "lat": 22.5},
                     "ne": {"lng": -60, "lat": 52.5}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": "nam3km_arlindex.csv",
@@ -109,6 +149,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -123.75, "lat": 33.25},
                     "ne": {"lng": -114.25, "lat": 41.75}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -121,6 +166,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -178.6, "lat": 40.6},
                     "ne": {"lng": -98, "lat": 66.3}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -133,6 +183,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -125.3, "lat": 39.5},
                     "ne": {"lng": -121, "lat": 44.4}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -145,6 +200,11 @@ DEFAULTS = {
                 "boundary": {
                     "sw": {"lng": -115.8, "lat": 44.7},
                     "ne": {"lng": -110.6, "lat": 49.2}
+                },
+                "grid_size_options": {
+                    "100": None,
+                    "50": None,
+                    "25": None
                 }
             },
             "arl_index_file": None, # TODO: set correctly
