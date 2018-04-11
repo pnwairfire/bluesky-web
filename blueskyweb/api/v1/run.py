@@ -165,17 +165,17 @@ class RunExecuter(RequestHandlerBase):
         'consumption', 'emissions'
     ]
     PLUMERISE_MODULES = [
-        'timeprofiling', 'plumerising'
+        'timeprofiling', 'plumerising', 'extrafiles'
     ]
     # TODO: for dispersion requests, instead of running findmetdata, get
     #   met data from indexed met data in mongodb;  maybe fall back on
     #   running findmetdata if indexed data isn't there or if mongodb
     #   query fails
     MET_DISPERSION_MODULES = [
-        'findmetdata', 'dispersion', 'visualization', 'export'
+        'findmetdata', 'extrafiles', 'dispersion', 'visualization', 'export'
     ]
     METLESS_DISPERSION_MODULES = [
-        'dispersion', 'export'
+        'extrafiles', 'dispersion', 'export'
     ]
 
     def _set_modules(self, mode, data):
@@ -306,6 +306,24 @@ class RunExecuter(RequestHandlerBase):
             "model": "feps"
         }
 
+    ## Extra Files
+
+    async def _configure_extrafiles(self, data):
+        tornado.log.gen_log.debug('Configuring extrafiles')
+        data['config'] = data.get('config', {})
+        dest_dir = os.path.join(
+            self.settings['output_root_dir'],
+            self.settings['output_url_path_prefix'],
+            '{run_id}', 'extrafiles'
+        )
+        data['config']['extrafiles'] = {
+            "dest_dir": dest_dir,
+            "sets": ["emissionscsv"],
+            "emissionscsv": {
+                "filename": "emissions.csv"
+            }
+        }
+
     ## Dispersion
 
     DEFAULT_HYSPLIT_GRID_LENGTH = 2000
@@ -372,7 +390,7 @@ class RunExecuter(RequestHandlerBase):
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'])
 
-        extras = ["dispersion", "visualization"] if self._archive_id else ["dispersion"]
+        extras = ["dispersion", "visualization", "extrafiles"] if self._archive_id else ["dispersion"]
         data['config']['export'] = {
             "modes": ["localsave"],
             "extra_exports": extras,
