@@ -177,7 +177,7 @@ REQUEST = {
             }
         },
         "export": {
-            "extra_exports": ["dispersion", "visualization"]
+            "extra_exports": ["dispersion", "visualization", "extrafiles"]
         }
     },
     "fire_information": [
