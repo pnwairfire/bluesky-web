@@ -165,17 +165,19 @@ class RunExecuter(RequestHandlerBase):
         'consumption', 'emissions'
     ]
     PLUMERISE_MODULES = [
-        'timeprofiling', 'plumerising', 'extrafiles'
+        'timeprofiling', 'plumerising'#, 'extrafiles'
     ]
     # TODO: for dispersion requests, instead of running findmetdata, get
     #   met data from indexed met data in mongodb;  maybe fall back on
     #   running findmetdata if indexed data isn't there or if mongodb
     #   query fails
     MET_DISPERSION_MODULES = [
-        'findmetdata', 'extrafiles', 'dispersion', 'visualization', 'export'
+        #'findmetdata', 'extrafiles', 'dispersion', 'visualization', 'export'
+        'findmetdata', 'dispersion', 'visualization', 'export'
     ]
     METLESS_DISPERSION_MODULES = [
-        'extrafiles', 'dispersion', 'export'
+        # 'extrafiles', 'dispersion', 'export'
+        'dispersion', 'export'
     ]
 
     def _set_modules(self, mode, data):
