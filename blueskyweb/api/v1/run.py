@@ -314,7 +314,7 @@ class RunExecuter(RequestHandlerBase):
         dest_dir = os.path.join(
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'],
-            '{run_id}', 'extrafiles'
+            '{run_id}', 'csvs'
         )
         data['config']['extrafiles'] = {
             "dest_dir": dest_dir,
