@@ -107,7 +107,8 @@ First time:
 Subsequent deployments:
 
     FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A deploy
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A restart
+
+(Note that the deploy tasks takes care of restarting the docker containers.)
 
 Check status
 
