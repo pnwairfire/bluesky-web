@@ -15,9 +15,10 @@ DEFAULTS = {
                     "ne": {"lng": -60, "lat": 52.5}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [2400, 7800],
+                    "75": [1800, 5800],
+                    "50": [1200, 3900],
+                    "25": [600, 1900],
                 }
             },
             "arl_index_file": "NAM84_ARL_index.csv",
@@ -32,9 +33,10 @@ DEFAULTS = {
                     "ne": {"lng": -60, "lat": 52.5}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [2400, 7800],
+                    "75": [1800, 5800],
+                    "50": [1200, 3900],
+                    "25": [600, 1900]
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -49,9 +51,10 @@ DEFAULTS = {
                     "ne": {"lng": -113.5, "lat": 49.5}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [600, 1400],
+                    "75": [500, 1000],
+                    "50": [300, 700],
+                    "25": [200, 300]
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -66,9 +69,10 @@ DEFAULTS = {
                     "ne": {"lng": -107, "lat": 49.7}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [800, 2400],
+                    "75": [600, 1800],
+                    "50": [400, 1200],
+                    "25": [200, 600]
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -83,9 +87,10 @@ DEFAULTS = {
                     "ne": {"lng": -113.0, "lat": 41.8}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [700, 1300],
+                    "75": [600, 900],
+                    "50": [400, 600],
+                    "25": [200, 300]
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -100,9 +105,10 @@ DEFAULTS = {
                     "ne": {"lng": -107.0, "lat": 44.6}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [1300, 2400],
+                    "75": [900, 1800],
+                    "50": [600, 1200],
+                    "25": [300, 600]
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -117,9 +123,10 @@ DEFAULTS = {
                     "ne": {"lng": -102, "lat": 36.2}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [500, 1400],
+                    "75": [400, 1100],
+                    "50": [200, 700],
+                    "25": [100, 400]
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -134,9 +141,10 @@ DEFAULTS = {
                     "ne": {"lng": -60, "lat": 52.5}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [2400, 7800],
+                    "75": [1800, 5800],
+                    "50": [1200, 3900],
+                    "25": [600, 1900]
                 }
             },
             "arl_index_file": "nam3km_arlindex.csv",
@@ -151,9 +159,10 @@ DEFAULTS = {
                     "ne": {"lng": -114.25, "lat": 41.75}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [700, 1100],
+                    "75": [500, 800],
+                    "50": [300, 500],
+                    "25": [200, 300]
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -168,9 +177,11 @@ DEFAULTS = {
                     "ne": {"lng": -98, "lat": 66.3}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "50": None,
-                    "25": None
+                    "100": [2000, 8900],
+                    "75": [1500, 6700],
+                    "50": [1000, 4500],
+                    "25": [500, 2200]
+
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -186,6 +197,7 @@ DEFAULTS = {
                 },
                 "grid_size_options": {
                     "100": None,
+                    "75": None,
                     "50": None,
                     "25": None
                 }
@@ -203,6 +215,7 @@ DEFAULTS = {
                 },
                 "grid_size_options": {
                     "100": None,
+                    "75": None,
                     "50": None,
                     "25": None
                 }
