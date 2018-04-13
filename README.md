@@ -32,8 +32,7 @@ api web service, output web service, bsp workers, and ofelia.
 
     git clone git@github.com:pnwairfire/bluesky-web.git
     cd airfire-bluesky-web
-    pip install --trusted-host pypi.smoke.airfire.org \
-        -r requirements-dev.txt
+    pip install -r requirements-dev.txt
     docker build -t bluesky-web .
     docker build -t bluesky-web-nginx -f Dockerfile-nginx .
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
