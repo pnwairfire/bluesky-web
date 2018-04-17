@@ -314,28 +314,45 @@ DEFAULTS = {
         # For PGv3 standard runs
         "dispersion_speed": {
             "faster": {
+                # TODO: Change to:
+                #  - grid size factor 25%
+                #  - grid_resolution_factor 1.0 or greater
+                #  - numpar reduced from 'balanced' setting
                 "grid_resolution_factor": 1.5,
                 "numpar": 1000
             },
             "balanced": {
+                # TODO: Change to:
+                #  - grid size factor 33%
+                #  - grid_resolution_factor 1.0
+                #  - numpar reduced from 'slower' setting
                 "grid_resolution_factor": 1.0,
                 "numpar": 2000
             },
             "slower": {
+                # TODO: Change to:
+                #  - grid size factor 50%
+                #  - grid_resolution_factor 1.0
+                #  - numpar what we use in daily runs
                 "grid_resolution_factor": 0.5,
                 "numpar": 3000
             }
         },
         # For PGv3 advanced and expert runs
         "number_of_particles": {
+            # TODO: Change these to match the values
+            #   in the 'dispersion_speed' translations, above
             "low": 1000,
             "medium": 2000,
             "high": 3000
         },
         "grid_resolution": {
+            # TODO: change to something like:
+            # - 'nominal': 1.0
+            # - 'sub-sample': something less that 1.0
             "low": 1.5,
             "medium": 1.0,
             "high": 0.5
         }
-    },
+    }
 }
