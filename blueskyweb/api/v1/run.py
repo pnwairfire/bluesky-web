@@ -302,8 +302,15 @@ class RunExecuter(RequestHandlerBase):
     async def _configure_plumerising(self, data):
         tornado.log.gen_log.debug('Configuring plumerising')
         data['config'] = data.get('config', {})
+        working_dir = os.path.join(
+            self.settings['output_root_dir'],
+            self.settings['output_url_path_prefix'],
+            '{run_id}', 'plumerise')
         data['config']['plumerising'] = {
-            "model": "feps"
+            "model": "feps",
+            "feps": {
+                "working_dir": working_dir
+            }
         }
 
     ## Extra Files
@@ -390,7 +397,7 @@ class RunExecuter(RequestHandlerBase):
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'])
 
-        extras = ["dispersion", "visualization", "extrafiles"] if self._archive_id else ["dispersion"]
+        extras = ["dispersion", "visualization", "extrafiles", "plumerising"] if self._archive_id else ["dispersion"]
         data['config']['export'] = {
             "modes": ["localsave"],
             "extra_exports": extras,
