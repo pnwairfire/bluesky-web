@@ -397,7 +397,7 @@ class RunExecuter(RequestHandlerBase):
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'])
 
-        extras = ["dispersion", "visualization", "extrafiles", "plumerising"] if self._archive_id else ["dispersion"]
+        extras = ["dispersion", "visualization"] if self._archive_id else ["dispersion"]
         data['config']['export'] = {
             "modes": ["localsave"],
             "extra_exports": extras,
