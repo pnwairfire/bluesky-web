@@ -327,7 +327,7 @@ class RunExecuter(RequestHandlerBase):
             "dest_dir": dest_dir,
             "sets": ["emissionscsv"],
             "emissionscsv": {
-                "filename": "emissions.csv"
+                "filename": "fire_emissions.csv"
             }
         }
 
