@@ -165,7 +165,7 @@ class RunExecuter(RequestHandlerBase):
         'consumption', 'emissions'
     ]
     PLUMERISE_MODULES = [
-        'timeprofiling', 'plumerising', 'extrafiles'
+        'plumerising', 'extrafiles'
     ]
     # TODO: for dispersion requests, instead of running findmetdata, get
     #   met data from indexed met data in mongodb;  maybe fall back on
