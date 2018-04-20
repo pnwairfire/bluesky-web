@@ -118,6 +118,8 @@ class RunExecuter(RequestHandlerBase):
         # it has to be set before _run_asynchronously
         if not data.get('run_id'):
             data['run_id'] = str(uuid.uuid1())
+        tornado.log.gen_log.info("%s request for run id: %s", mode,
+            data['run_id'])
 
         try:
             self._set_modules(mode, data)
