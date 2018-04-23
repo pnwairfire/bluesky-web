@@ -381,9 +381,14 @@ class RunExecuter(RequestHandlerBase):
         data['config']['visualization'] =  data['config'].get('visualization', {})
         data['config']['visualization']["target"] = "dispersion"
         data['config']['visualization']["hysplit"] = data['config']['visualization'].get("hysplit", {})
-        data['config']['visualization']["hysplit"]["images_dir"] = "images/"
-        data['config']['visualization']["hysplit"]["data_dir"] = "data/"
-        data['config']['visualization']["hysplit"]["create_summary_json"] = True
+        hy_con = data['config']['visualization']["hysplit"]
+        hy_con["images_dir"] = "images/"
+        hy_con["data_dir"] = "data/"
+        hy_con["create_summary_json"] = True
+        hy_con["blueskykml_config"] = hy_con.get("blueskykml_config", {})
+        bkml_con = hy_con["blueskykml_config"]
+        bkml_con["SmokeDispersionKMLOutput"] = bkml_con.get("SmokeDispersionKMLOutput", {})
+        bkml_con["SmokeDispersionKMLOutput"]["INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS"] = "False"
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
