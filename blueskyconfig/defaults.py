@@ -15,10 +15,10 @@ DEFAULTS = {
                     "ne": {"lng": -60, "lat": 52.5}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 7800 x 2400",
-                    "75": "xy(km): 5800 x 1800",
-                    "50": "xy(km): 3900 x 1200",
-                    "25": "xy(km): 1900 x 600",
+                    "1.0": "xy(km): 7800 x 2400",
+                    "0.75": "xy(km): 5800 x 1800",
+                    "0.50": "xy(km): 3900 x 1200",
+                    "0.25": "xy(km): 1900 x 600",
                 }
             },
             "arl_index_file": "NAM84_ARL_index.csv",
@@ -33,10 +33,10 @@ DEFAULTS = {
                     "ne": {"lng": -60, "lat": 52.5}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 7800 x 2400",
-                    "75": "xy(km): 5800 x 1800",
-                    "50": "xy(km): 3900 x 1200",
-                    "25": "xy(km): 1900 x 600"
+                    "1.0": "xy(km): 7800 x 2400",
+                    "0.75": "xy(km): 5800 x 1800",
+                    "0.50": "xy(km): 3900 x 1200",
+                    "0.25": "xy(km): 1900 x 600"
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -51,10 +51,10 @@ DEFAULTS = {
                     "ne": {"lng": -113.5, "lat": 49.5}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 1400 x 600",
-                    "75": "xy(km): 1000 x 500",
-                    "50": "xy(km): 700 x 300",
-                    "25": "xy(km): 300 x 200"
+                    "1.0": "xy(km): 1400 x 600",
+                    "0.75": "xy(km): 1000 x 500",
+                    "0.50": "xy(km): 700 x 300",
+                    "0.25": "xy(km): 300 x 200"
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -69,10 +69,10 @@ DEFAULTS = {
                     "ne": {"lng": -107, "lat": 49.7}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 2400 x 800",
-                    "75": "xy(km): 1800 x 600",
-                    "50": "xy(km): 1200 x 400",
-                    "25": "xy(km): 600 x 200"
+                    "1.0": "xy(km): 2400 x 800",
+                    "0.75": "xy(km): 1800 x 600",
+                    "0.50": "xy(km): 1200 x 400",
+                    "0.25": "xy(km): 600 x 200"
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -87,10 +87,10 @@ DEFAULTS = {
                     "ne": {"lng": -113.0, "lat": 41.8}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 1300 x 700",
-                    "75": "xy(km): 900 x 600",
-                    "50": "xy(km): 600 x 400",
-                    "25": "xy(km): 300 x 200"
+                    "1.0": "xy(km): 1300 x 700",
+                    "0.75": "xy(km): 900 x 600",
+                    "0.50": "xy(km): 600 x 400",
+                    "0.25": "xy(km): 300 x 200"
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -105,10 +105,10 @@ DEFAULTS = {
                     "ne": {"lng": -107.0, "lat": 44.6}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 2400 x 1300",
-                    "75": "xy(km): 1800 x 900",
-                    "50": "xy(km): 1200 x 600",
-                    "25": "xy(km): 600 x 300"
+                    "1.0": "xy(km): 2400 x 1300",
+                    "0.75": "xy(km): 1800 x 900",
+                    "0.50": "xy(km): 1200 x 600",
+                    "0.25": "xy(km): 600 x 300"
                 }
             },
             "arl_index_file": "arl12hrindex.csv",
@@ -123,10 +123,10 @@ DEFAULTS = {
                     "ne": {"lng": -102, "lat": 36.2}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 1400 x 500",
-                    "75": "xy(km): 1100 x 400",
-                    "50": "xy(km): 700 x 200",
-                    "25": "xy(km): 400 x 100"
+                    "1.0": "xy(km): 1400 x 500",
+                    "0.75": "xy(km): 1100 x 400",
+                    "0.50": "xy(km): 700 x 200",
+                    "0.25": "xy(km): 400 x 100"
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -141,10 +141,10 @@ DEFAULTS = {
                     "ne": {"lng": -60, "lat": 52.5}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 7800 x 2400",
-                    "75": "xy(km): 5800 x 1800",
-                    "50": "xy(km): 3900 x 1200",
-                    "25": "xy(km): 1900 x 600"
+                    "1.0": "xy(km): 7800 x 2400",
+                    "0.75": "xy(km): 5800 x 1800",
+                    "0.50": "xy(km): 3900 x 1200",
+                    "0.25": "xy(km): 1900 x 600"
                 }
             },
             "arl_index_file": "nam3km_arlindex.csv",
@@ -159,10 +159,10 @@ DEFAULTS = {
                     "ne": {"lng": -114.25, "lat": 41.75}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 1100 x 700",
-                    "75": "xy(km): 800 x 500",
-                    "50": "xy(km): 500 x 300",
-                    "25": "xy(km): 300 x 200"
+                    "1.0": "xy(km): 1100 x 700",
+                    "0.75": "xy(km): 800 x 500",
+                    "0.50": "xy(km): 500 x 300",
+                    "0.25": "xy(km): 300 x 200"
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -177,10 +177,10 @@ DEFAULTS = {
                     "ne": {"lng": -98, "lat": 66.3}
                 },
                 "grid_size_options": {
-                    "100": "xy(km): 8900 x 2000",
-                    "75": "xy(km): 6700 x 1500",
-                    "50": "xy(km): 4500 x 1000",
-                    "25": "xy(km): 2200 x 500"
+                    "1.0": "xy(km): 8900 x 2000",
+                    "0.75": "xy(km): 6700 x 1500",
+                    "0.50": "xy(km): 4500 x 1000",
+                    "0.25": "xy(km): 2200 x 500"
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -195,10 +195,10 @@ DEFAULTS = {
                     "ne": {"lng": -121, "lat": 44.4}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "75": None,
-                    "50": None,
-                    "25": None
+                    "1.0": None,
+                    "0.75": None,
+                    "0.50": None,
+                    "0.25": None
                 }
             },
             "arl_index_file": None, # TODO: set correctly
@@ -213,10 +213,10 @@ DEFAULTS = {
                     "ne": {"lng": -110.6, "lat": 49.2}
                 },
                 "grid_size_options": {
-                    "100": None,
-                    "75": None,
-                    "50": None,
-                    "25": None
+                    "1.0": None,
+                    "0.75": None,
+                    "0.50": None,
+                    "0.25": None
                 }
             },
             "arl_index_file": None, # TODO: set correctly
