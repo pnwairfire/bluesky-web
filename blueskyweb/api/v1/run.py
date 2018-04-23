@@ -6,6 +6,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import datetime
 import json
 import os
+import re
 import requests
 import urllib.request, urllib.error, urllib.parse
 import uuid
@@ -113,13 +114,7 @@ class RunExecuter(RequestHandlerBase):
         #  any restrictions, check here or check in specific _configure_*
         #  methods, below
 
-        # run_id is only necessary if running asynchronously, but it doesn't
-        # hurt to set it anyway; it's needed in configuring dispersion, so
-        # it has to be set before _run_asynchronously
-        if not data.get('run_id'):
-            data['run_id'] = str(uuid.uuid1())
-        tornado.log.gen_log.info("%s request for run id: %s", mode,
-            data['run_id'])
+        self._set_run_id_and_name(data)
 
         try:
             self._set_modules(mode, data)
@@ -159,6 +154,26 @@ class RunExecuter(RequestHandlerBase):
             self.set_status(500)
 
     ## Helpers
+
+    RUN_ID_SUFFIX_REMOVER = re.compile('-(plumerise|dispersion)$')
+
+    def _set_run_id_and_name(self, data):
+        # run_id is only necessary if running asynchronously, but it doesn't
+        # hurt to set it anyway; it's needed in configuring dispersion, so
+        # it has to be set before _run_asynchronously
+        if not data.get('run_id'):
+            data['run_id'] = str(uuid.uuid1())
+        tornado.log.gen_log.info("%s request for run id: %s", self._mode,
+            data['run_id'])
+
+        # This is really just for PGv3 runs
+        if self.RUN_ID_SUFFIX_REMOVER.search(data['run_id']):
+            for f in data["fire_information"]:
+                f['event_of'] = f.get('event_of', {})
+                if not f['event_of'].get('name'):
+                    name = 'Scenario Id {}'.format(
+                        self.RUN_ID_SUFFIX_REMOVER.sub('', data['run_id']))
+                    f['event_of']['name'] = name
 
     FUELBEDS_MODULES = [
         'ingestion', 'fuelbeds'
