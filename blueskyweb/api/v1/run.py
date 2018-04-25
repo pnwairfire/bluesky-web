@@ -225,10 +225,7 @@ class RunExecuter(RequestHandlerBase):
                         ['timeprofiling'] +
                         dispersion_modules)
             else:
-                if self._archive_id and ('met' not in data):
-                    _set(['findmetdata'] + dispersion_modules)
-                else:
-                    _set(dispersion_modules)
+                _set(dispersion_modules)
         elif mode == 'plumerise':
             _set(self.PLUMERISE_MODULES)
         elif mode == 'emissions':
