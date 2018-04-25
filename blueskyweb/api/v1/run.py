@@ -195,6 +195,13 @@ class RunExecuter(RequestHandlerBase):
         'extrafiles', 'dispersion', 'export'
     ]
 
+    def _plumerise_modules(self, data):
+        # just look at first growth object of first fire
+        if 'timeprofile' in data['fire_information'][0]['growth'][0]:
+            return self.PLUMERISE_MODULES
+        else:
+            return ['timeprofiling'] + self.PLUMERISE_MODULES
+
     def _set_modules(self, mode, data):
         def _set(default_modules):
             if "modules" in data:  #data.get('modules'):
@@ -216,7 +223,7 @@ class RunExecuter(RequestHandlerBase):
                 if self._archive_id:
                     _set(self.FUELBEDS_MODULES +
                         self.EMISSIONS_MODULES +
-                        self.PLUMERISE_MODULES +
+                        self._plumerise_modules(data) +
                         dispersion_modules)
                 else:
                     _set(self.FUELBEDS_MODULES +
@@ -227,7 +234,7 @@ class RunExecuter(RequestHandlerBase):
             else:
                 _set(dispersion_modules)
         elif mode == 'plumerise':
-            _set(self.PLUMERISE_MODULES)
+            _set(self._plumerise_modules(data))
         elif mode == 'emissions':
             _set(self.EMISSIONS_MODULES)
         elif mode == 'fuelbeds':
