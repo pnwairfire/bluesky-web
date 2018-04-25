@@ -273,7 +273,7 @@ DEFAULTS = {
         },
         "special": {
             "ca-nv_2km-sep-2015": {
-                "title": "CA/NV 2-km (Sep 2015)",
+                "title": "Rough Fire",
                 "domain_id": "DRI2km"
             },
             "CA-OR-2018-1km06Z": {
