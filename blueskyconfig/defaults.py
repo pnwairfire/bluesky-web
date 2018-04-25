@@ -272,6 +272,10 @@ DEFAULTS = {
             }
         },
         "special": {
+            "ca-nv_2km-sep-2015": {
+                "title": "CA/NV 2-km (Sep 2015)",
+                "domain_id": "DRI2km"
+            },
             "CA-OR-2018-1km06Z": {
                 "title": "NWS 1km 06Z CA/OR",
                 "domain_id": "NWS-06Z-1km-2018-CA-NV",
