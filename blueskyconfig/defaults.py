@@ -48,7 +48,7 @@ DEFAULTS = {
                 "projection": "LCC",
                 "boundary": {
                     "sw": {"lng": -126, "lat": 41.5},
-                    "ne": {"lng": -113.5, "lat": 49.5}
+                    "ne": {"lng": -114.5, "lat": 49.5}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 1400 x 600",
@@ -65,8 +65,8 @@ DEFAULTS = {
                 "spacing": 4,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -128.6, "lat": 40},
-                    "ne": {"lng": -107, "lat": 49.7}
+                    "sw": {"lng": -128.6, "lat": 40.125},
+                    "ne": {"lng": -107.05, "lat": 49.8}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 2400 x 800",
@@ -84,7 +84,7 @@ DEFAULTS = {
                 "projection": "LCC",
                 "boundary": {
                     "sw": {"lng": -124.3, "lat": 32.5},
-                    "ne": {"lng": -113.0, "lat": 41.8}
+                    "ne": {"lng": -114.0, "lat": 42.0}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 1300 x 700",
@@ -101,8 +101,8 @@ DEFAULTS = {
                 "spacing": 6,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -128.5, "lat": 28.7},
-                    "ne": {"lng": -107.0, "lat": 44.6}
+                    "sw": {"lng": -128.5, "lat": 29.0},
+                    "ne": {"lng": -109.0, "lat": 44.7}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 2400 x 1300",
@@ -137,8 +137,8 @@ DEFAULTS = {
                 "spacing": 3,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -130.0, "lat": 22.5},
-                    "ne": {"lng": -60, "lat": 52.5}
+                    "sw": {"lng": -125.0, "lat": 25.0},
+                    "ne": {"lng": -65.0, "lat": 50.0}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 7800 x 2400",
