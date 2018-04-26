@@ -98,8 +98,7 @@ services:
     # mount met for ofelia
     # Note: met root dir has to be the same on host and in this container,
     #   since bsp container will have the same mount
-    - $HOME/DRI_6km/:/data/Met/CANSAC/6km/ARL/
-    - $HOME/NAM84/:/data/Met/NAM/12km/ARL/
+    - $HOME/Met/:/data/Met/
     links:
     - mongo
     environment:

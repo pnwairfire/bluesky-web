@@ -49,10 +49,10 @@ When using docker, arlindex will automatically be updated every
 If you don't want to wait for it to run, manually run it with:
 
     docker exec bluesky-web-worker-dri \
-        arlindexer -d DRI6km -r $HOME/DRI_6km \
+        arlindexer -d DRI6km -r $HOME/Met/CANSAC/6km/ARL/ \
         -m mongodb://mongo/blueskywe
     docker exec bluesky-web-worker-nam \
-        arlindexer -d NAM84 -r $HOME/NAM84 \
+        arlindexer -d NAM84 -r $HOME/Met/NAM/12km/ARL/ \
         -p NAM84_ARL_index.csv \
         -m mongodb://localhost:27018/blueskyweb
 
