@@ -192,7 +192,7 @@ class RunExecuter(RequestHandlerBase):
         'findmetdata', 'extrafiles', 'dispersion', 'visualization', 'export'
     ]
     METLESS_DISPERSION_MODULES = [
-        'extrafiles', 'dispersion', 'export'
+        'dispersion', 'export'
     ]
 
     def _plumerise_modules(self, data):
