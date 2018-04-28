@@ -48,7 +48,7 @@ DEFAULTS = {
                 "projection": "LCC",
                 "boundary": {
                     "sw": {"lng": -126, "lat": 41.5},
-                    "ne": {"lng": -114.5, "lat": 49.5}
+                    "ne": {"lng": -114.6, "lat": 49.4}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 1400 x 600",
