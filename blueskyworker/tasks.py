@@ -132,13 +132,14 @@ class monitor_run(object):
     def __enter__(self):
         tornado.log.gen_log.info("Entering monitor_run context manager")
         if self._is_hysplit():
-            tornado.log.gen_log.debug("starting thread to monitor hysplit")
+            tornado.log.gen_log.info("Starting thread to monitor hysplit")
             self.thread = HysplitMonitor(self._record_run, fires_manager)
             self.thread.start()
 
     def __exit__(self, e_type, value, tb):
         if self.thread:
             self.thread.terminate = True
+            tornado.log.gen_log.info("joining hysplit monitoring thread")
             self.thread.join()
 
     def _is_hysplit(self, ):
@@ -251,7 +252,7 @@ class BlueSkyRunner(object):
                 # TODO: if hysplit dispersion, start thread that periodically
                 #   tails log and records status; then join thread when call
                 #   to run completes
-                tornado.log.gen_log.debug('Running %s %s',
+                tornado.log.gen_log.info('Running %s %s',
                     self.input_data['run_id'], m)
                 fires_manager.modules = [m]
                 self._record_run(RunStatuses.StartingModule, module=m)
