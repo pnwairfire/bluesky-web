@@ -91,7 +91,7 @@ OPTIONAL_ARGS = [
         'long': '--num-hours',
         'help': 'number of hours in hysplit run',
         "type": int,
-        'default': 24
+        'default': 12
     },
     {
         'short': '-a',
