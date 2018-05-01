@@ -439,6 +439,7 @@ class RunExecuter(RequestHandlerBase):
 class RunStatusBase(RequestHandlerBase):
 
     VERBOSE_FIELDS = ('output_dir', 'modules', 'server')
+    AVERAGE_RUN_TIME_IN_SECONDS = 360 # 6 minutes
 
     async def process(self, run):
         if not self.get_boolean_arg('raw'):
@@ -476,15 +477,27 @@ class RunStatusBase(RequestHandlerBase):
             elif run['status']['status'] == RunStatuses.ProcessingOutput:
                 run['percent'] = 99  # HACK
             else: # RunStatuses.Running
-                # TODO: figure out how to estimate percentage from
-                #   log and stdout information
-                run['percent'] = 50  # HACK
+                self._set_percent_for_running(run)
 
             # prune
             for k in self.VERBOSE_FIELDS:
                 run.pop(k, None)
 
         return run
+
+    def _set_percent_for_running(self, run):
+        # TODO: figure out how to estimate percentage from
+        #   log and stdout information
+        try:
+            # HACH 1
+            i = datetime.datetime.strptime(run['initiated_at'],
+                "%Y-%m-%dT%H:%M:%SZ")
+            n = datetime.datetime.utcnow()
+            p = int(100 * ((n - i).seconds / self.AVERAGE_RUN_TIME_IN_SECONDS))
+            run['percent'] = min(98, max(1, p))
+        except:
+            run['percent'] = 50  # HACK 2
+
 
 
 class RunStatus(RunStatusBase):
