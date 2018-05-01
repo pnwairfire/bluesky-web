@@ -28,7 +28,7 @@ Run in docker. e.g.:
 
  $ docker run -ti -v $PWD:/usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG --mode normal
- $ docker run -ti -v /usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
+ $ docker run -ti -v $PWD:/usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG --mode normal -r
  """.format(script_name=sys.argv[0])
 
