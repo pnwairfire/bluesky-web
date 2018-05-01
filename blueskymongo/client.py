@@ -11,6 +11,7 @@ class RunStatusesType(type):
         "Dequeued": "dequeued",
         "Running": "running",
         "StartingModule": 'starting_module',
+        'RunningModule': 'running_module',
         'CompletedModule': 'completed_module',
         "ProcessingOutput": "processing_output",
         "Completed": "completed",

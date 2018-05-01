@@ -4,6 +4,7 @@ import logging
 import re
 import os
 import tarfile
+import threading
 import time
 import uuid
 from io import BytesIO
@@ -101,6 +102,52 @@ class configure_logging:
             root_logger.addHandler(h)
         root_logger.setLevel(self.root_logger_original_level)
         root_logger.removeHandler(self.log_file_handler)
+
+
+class HysplitMonitor(threading.Thread):
+    def __init__(self, record_run_func, fires_manager):
+        super(HysplitMonitor, self).__init__()
+        self.record_run_func = record_run_func
+        self.fires_manager = fires_manager
+        self.terminate = False
+
+    def run(self):
+        while not self.terminate:
+            self.check_progress()
+            time.sleep(5)
+
+    def check_progress(self):
+        # TODO: scrape MESSAGE files or hysplit output for idea of output
+        self.record_run_func(RunStatuses.RunningModule, module=m,
+            percent_complete=time.clock())
+
+class monitor_run(object):
+
+    def __init__(self, m, fires_manager):
+        tornado.log.gen_log.info("Constructing monitor_run context manager")
+        self.m = m
+        self.fires_manager = fires_manager
+        self.thread = None
+
+    def __enter__(self):
+        tornado.log.gen_log.info("Entering monitor_run context manager")
+        if self._is_hysplit():
+            tornado.log.gen_log.debug("starting thread to monitor hysplit")
+            self.thread = HysplitMonitor(self._record_run, fires_manager)
+            self.thread.start()
+
+    def __exit__(self, e_type, value, tb):
+        if self.thread:
+            self.thread.terminate = True
+            self.thread.join()
+
+    def _is_hysplit(self, ):
+        if self.m =='dispersion':
+            model = self.fires_manager.get_config_value(
+                'dispersion', 'model')
+            return model == 'hysplit'
+        return False
+
 
 class BlueSkyRunner(object):
 
@@ -207,9 +254,11 @@ class BlueSkyRunner(object):
                 tornado.log.gen_log.debug('Running %s %s',
                     self.input_data['run_id'], m)
                 fires_manager.modules = [m]
-
                 self._record_run(RunStatuses.StartingModule, module=m)
-                fires_manager.run()
+
+                with monitor_run(m, fires_manager) as monitor:
+                    fires_manager.run()
+
                 self._record_run(RunStatuses.CompletedModule, module=m)
 
         except exceptions.BlueSkyModuleError as e:
