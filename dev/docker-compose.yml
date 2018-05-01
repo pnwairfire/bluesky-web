@@ -87,6 +87,27 @@ services:
     - $PWD/docker-data/output/:$PWD/docker-data/output/
     working_dir: $PWD/docker-data/output/
     command: python -m http.server 8886
+  worker_plumerise:
+    image: bluesky-web
+    container_name: bluesky-web-worker-plumerise
+    volumes:
+    - $PWD/:/usr/src/blueskyweb/
+    - $PWD/docker-logs/worker/all/:/var/log/blueskyworker/
+    - $PWD/docker-data/output/:$PWD/docker-data/output/
+    - /var/run/docker.sock:/var/run/docker.sock
+    # mount met for ofelia
+    # Note: met root dir has to be the same on host and in this container,
+    #   since bsp container will have the same mount
+    - $HOME/Met/:/data/Met/
+    links:
+    - mongo
+    environment:
+    #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
+    - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
+    - PUBLIC_HOSTNAME=localhost
+    command: celery -Q no-met-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise
+      -c 5 -A blueskyworker.tasks worker
+      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-plumerise.log
   worker:
     image: bluesky-web
     container_name: bluesky-web-worker

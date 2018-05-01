@@ -131,13 +131,13 @@ class RunExecuter(RequestHandlerBase):
 
                 # TODO: configure anything else (e.g. setting archive_id where
                 #  appropriate)
-                self._run_asynchronously(data)
+                self._run_asynchronously(data, mode)
 
             else:
                 await self._configure_emissions(data)
                 # fuelbeds or emissions request
                 if self.get_query_argument('_a', default=None) is not None:
-                    self._run_asynchronously(data)
+                    self._run_asynchronously(data, mode)
                 else:
                     await self._run_in_process(data)
 
@@ -250,8 +250,10 @@ class RunExecuter(RequestHandlerBase):
         #self.write({"error": msg})
         #self.finish()
 
-    def _run_asynchronously(self, data):
+    def _run_asynchronously(self, data, mode):
         queue_name = self._archive_id or 'no-met'
+        if mode == 'plumerise':
+            queue_name += '-plumerise'
 
         #tornado.log.gen_log.debug('input: %s', data)
         args = (data, ) # has to be a tuple
