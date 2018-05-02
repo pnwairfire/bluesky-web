@@ -105,10 +105,11 @@ class configure_logging:
 
 
 class HysplitMonitor(threading.Thread):
-    def __init__(self, record_run_func, fires_manager):
+    def __init__(self, m, fires_manager, record_run_func):
         super(HysplitMonitor, self).__init__()
-        self.record_run_func = record_run_func
+        self.m = m
         self.fires_manager = fires_manager
+        self.record_run_func = record_run_func
         self.terminate = False
 
     def run(self):
@@ -118,34 +119,35 @@ class HysplitMonitor(threading.Thread):
 
     def check_progress(self):
         # TODO: scrape MESSAGE files or hysplit output for idea of output
-        self.record_run_func(RunStatuses.RunningModule, module=m,
+        self.record_run_func(RunStatuses.RunningModule, module=self.m,
             percent_complete=time.clock())
 
 class monitor_run(object):
 
-    def __init__(self, m, fires_manager):
+    def __init__(self, m, fires_manager, record_run_func):
         tornado.log.gen_log.info("Constructing monitor_run context manager")
         self.m = m
         self.fires_manager = fires_manager
-        self.thread = None
+        self.record_run_func = record_run_func
+        self.monitor = None
 
     def __enter__(self):
         tornado.log.gen_log.info("Entering monitor_run context manager")
         if self._is_hysplit():
             tornado.log.gen_log.info("Starting thread to monitor hysplit")
-            self.thread = HysplitMonitor(self._record_run, fires_manager)
-            self.thread.start()
+            self.monitor = HysplitMonitor(self.m, self.fires_manager, self.record_run_func)
+            self.monitor.start()
 
     def __exit__(self, e_type, value, tb):
-        if self.thread:
-            self.thread.terminate = True
+        if self.monitor:
+            self.monitor.terminate = True
             tornado.log.gen_log.info("joining hysplit monitoring thread")
-            self.thread.join()
+            self.monitor.join()
 
-    def _is_hysplit(self, ):
+    def _is_hysplit(self):
         if self.m =='dispersion':
             model = self.fires_manager.get_config_value(
-                'dispersion', 'model')
+                'dispersion', 'model', default='hysplit')
             return model == 'hysplit'
         return False
 
@@ -257,7 +259,7 @@ class BlueSkyRunner(object):
                 fires_manager.modules = [m]
                 self._record_run(RunStatuses.StartingModule, module=m)
 
-                with monitor_run(m, fires_manager) as monitor:
+                with monitor_run(m, fires_manager, self._record_run) as monitor:
                     fires_manager.run()
 
                 self._record_run(RunStatuses.CompletedModule, module=m)
