@@ -1,4 +1,5 @@
 import getpass
+import glob
 import json
 import logging
 import re
@@ -109,8 +110,25 @@ class HysplitMonitor(threading.Thread):
         super(HysplitMonitor, self).__init__()
         self.m = m
         self.fires_manager = fires_manager
+        self.start_hour = self.fires_manager.get_config_value(
+            'dispersion', 'start')
+        self.num_hours = self.fires_manager.get_config_value(
+            'dispersion', 'num_hours')
+
         self.record_run_func = record_run_func
         self.terminate = False
+        self._message_file_names = []
+
+    @property
+    def message_file_names(self):
+        if not self._message_file_names:
+            # this code will run again if no message files are found
+            working_dir = self.fires_manager.get_config_value(
+                'dispersion', 'working_dir')
+            glob_pattern = os.path.join(working_dir, 'MESSAGE*')
+            self._message_file_names = glob.glob(glob_pattern)
+
+        return self._message_file_names
 
     def run(self):
         while not self.terminate:
@@ -118,9 +136,28 @@ class HysplitMonitor(threading.Thread):
             time.sleep(5)
 
     def check_progress(self):
-        # TODO: scrape MESSAGE files or hysplit output for idea of output
+        tornado.log.gen_log.info("Checking hysplit progress")
+        percent_complete = None
+        if self.message_file_names:
+            # we'll estimate percent complete based on slowest of
+            # all hysplit processes
+            current_hour = self.num_hours
+            for f in self.message_file_names:
+                current_hour = min(self.get_current_hour(f), current_hour)
+            # we want percent_complete to be between 5 and 95
+            percent_complete = (current_hour - self.start_hour).hours / self.num_hours
+            percent_complete = int((90 * percent_complete) + 5)
+        # else, percent_complete as None
+        # TODO should we set percent_complete to 0?
+
         self.record_run_func(RunStatuses.RunningModule, module=self.m,
-            percent_complete=time.clock())
+            percent_complete=percent_complete)
+
+    def get_current_hour(self, f):
+        #import pdb;pdb.set_trace()
+        return 3 # TODO: scrape it and compare to self.start_hour
+
+
 
 class monitor_run(object):
 
@@ -129,20 +166,20 @@ class monitor_run(object):
         self.m = m
         self.fires_manager = fires_manager
         self.record_run_func = record_run_func
-        self.monitor = None
+        self.thread = None
 
     def __enter__(self):
         tornado.log.gen_log.info("Entering monitor_run context manager")
         if self._is_hysplit():
             tornado.log.gen_log.info("Starting thread to monitor hysplit")
-            self.monitor = HysplitMonitor(self.m, self.fires_manager, self.record_run_func)
-            self.monitor.start()
+            self.thread = HysplitMonitor(self.m, self.fires_manager, self.record_run_func)
+            self.thread.start()
 
     def __exit__(self, e_type, value, tb):
-        if self.monitor:
-            self.monitor.terminate = True
+        if self.thread:
+            self.thread.terminate = True
             tornado.log.gen_log.info("joining hysplit monitoring thread")
-            self.monitor.join()
+            self.thread.join()
 
     def _is_hysplit(self):
         if self.m =='dispersion':
