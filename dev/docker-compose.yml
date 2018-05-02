@@ -33,11 +33,11 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
-    - $PWD/docker-data/output/:$PWD/docker-data/output/
+    - $PWD/docker-data/output/:/data/bluesky/output/
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    command: bsp-web -d -o $PWD/docker-data/output
+    command: bsp-web -d -o /data/bluesky/output/
       --path-prefix=bluesky-web -p 80
       --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
       --log-level=DEBUG
@@ -55,11 +55,11 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
-    - $PWD/docker-data/output/:$PWD/docker-data/output/
+    - $PWD/docker-data/output/:/data/bluesky/output/
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
-    command: bsp-web -d -o $PWD/docker-data/output
+    command: bsp-web -d -o /data/bluesky/output/
       --path-prefix=bluesky-web -p 80
       --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
       --log-level=DEBUG
@@ -84,8 +84,8 @@ services:
     ports:
     - 8886:8886
     volumes:
-    - $PWD/docker-data/output/:$PWD/docker-data/output/
-    working_dir: $PWD/docker-data/output/
+    - $PWD/docker-data/output/:/data/bluesky/output/
+    working_dir: /data/bluesky/output/
     command: python -m http.server 8886
   worker_plumerise:
     image: bluesky-web
@@ -93,7 +93,7 @@ services:
     volumes:
     - $PWD/:/usr/src/blueskyweb/
     - $PWD/docker-logs/worker/all/:/var/log/blueskyworker/
-    - $PWD/docker-data/output/:$PWD/docker-data/output/
+    - $PWD/docker-data/output/:/data/bluesky/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # mount met for ofelia
     # Note: met root dir has to be the same on host and in this container,
@@ -114,7 +114,7 @@ services:
     volumes:
     - $PWD/:/usr/src/blueskyweb/
     - $PWD/docker-logs/worker/all/:/var/log/blueskyworker/
-    - $PWD/docker-data/output/:$PWD/docker-data/output/
+    - $PWD/docker-data/output/:/data/bluesky/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # mount met for ofelia
     # Note: met root dir has to be the same on host and in this container,
