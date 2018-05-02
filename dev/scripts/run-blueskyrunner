@@ -145,8 +145,8 @@ INPUT = {
         "dispersion": {
             "start": None,  # WILL BE FILLED IN
             "num_hours": None,  # WILL BE FILLED IN
-            "output_dir": "/data/bluesky/{}/output".format(RUN_ID),
-            "working_dir": "/data/bluesky/{}/working".format(RUN_ID),
+            "output_dir": "/data/bluesky/output/{}/output".format(RUN_ID),
+            "working_dir": "/data/bluesky/output/{}/working".format(RUN_ID),
             'hysplit': {
                 "DELT": 0.0,
                 "INITD": 0,
