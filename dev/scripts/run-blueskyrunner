@@ -18,10 +18,11 @@ import afscripting as scripting
 
 sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
 
-# Note: blueskyweb.app.configure_logging and
+# Note: tornado, blueskyweb.app.configure_logging and
 #   from blueskyworker.tasks are imported inline so that
 #   the you can run this script with `-h` without needing tornado
-#   installed in your local (non-docker) python env
+#   and other python pacakges installed in your local (non-docker)
+#   python env
 from blueskyconfig.defaults import DEFAULTS
 
 
@@ -39,9 +40,14 @@ Run in docker. e.g.:
     bluesky-web {script_name} --log-level=DEBUG --mode normal -r
 
  $ docker run -ti -v $PWD:/usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
-    -v $HOME/Met:/data/Met/ -v $PWD/tmp/:/data/bluesky/ bluesky-web \\
-    {script_name} --record-run --log-level=DEBUG --mode dispersion \\
+    -v $HOME/Met:/data/Met/ -v $PWD/docker-data/output/:/data/bluesky/output/ \\
+    bluesky-web {script_name} --record-run --log-level=DEBUG --mode dispersion \\
     -s 2014-05-30T00:00:00 -n 12 --met-archive ca-nv_6-km
+
+ $ docker exec -ti bluesky-web-worker \\
+    {script_name} --record-run --log-level=DEBUG --mode dispersion \\
+    -s 2014-05-30T00:00:00 -n 12 --met-archive ca-nv_6-km \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
 
 """.format(script_name=sys.argv[0])
 
