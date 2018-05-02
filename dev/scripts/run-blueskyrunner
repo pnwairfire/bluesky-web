@@ -252,8 +252,7 @@ def get_input(args):
 
     return INPUT
 
-if __name__ == "__main__":
-    args = parse_args()
+async def main(args):
     input = get_input(args)
 
     from blueskyworker import tasks
@@ -265,6 +264,8 @@ if __name__ == "__main__":
             output_url_path_prefix="blueskyrunner-logs",
             bluesky_log_level=logging.DEBUG).run()
         logging.debug('Done running BlueSkyRunner')
+        run_info = await db.find_run(RUN_ID)
+        sys.stdout.write(json.dumps(run_info))
 
     else:
         s = io.StringIO()
@@ -272,3 +273,11 @@ if __name__ == "__main__":
         output = tasks.BlueSkyRunner(INPUT, output_stream=s).run()
         logging.debug('About to dump to stdout')
         sys.stdout.write(s.getvalue())
+
+if __name__ == "__main__":
+    args = parse_args()
+
+    from functools import partial
+    main = partial(main, args=args)
+    import tornado.ioloop
+    tornado.ioloop.IOLoop.instance().run_sync(main)
