@@ -6,6 +6,7 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2017, AirFire, PNW, USFS"
 
+import datetime
 import io
 import json
 import logging
@@ -16,8 +17,13 @@ import uuid
 import afscripting as scripting
 
 sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
-from blueskyweb.app import configure_logging
-from blueskyworker import tasks
+
+# Note: blueskyweb.app.configure_logging and
+#   from blueskyworker.tasks are imported inline so that
+#   the you can run this script with `-h` without needing tornado
+#   installed in your local (non-docker) python env
+from blueskyconfig.defaults import DEFAULTS
+
 
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
@@ -28,15 +34,24 @@ Run in docker. e.g.:
 
  $ docker run -ti -v $PWD:/usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG --mode normal
+
  $ docker run -ti -v $PWD:/usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG --mode normal -r
- """.format(script_name=sys.argv[0])
+
+ $ docker run -ti -v $PWD:/usr/src/blueskyweb/ -w /usr/src/blueskyweb/ \\
+    -v $HOME/Met:/data/Met/ -v $PWD/tmp/:/data/bluesky/ bluesky-web \\
+    {script_name} --record-run --log-level=DEBUG --mode dispersion \\
+    -s 2014-05-30T00:00:00 -n 12 --met-archive ca-nv_6-km
+
+""".format(script_name=sys.argv[0])
 
 MODES = {
     'normal':['ingestion', 'fuelbeds'],
     'double-fuelbeds': ['ingestion', 'fuelbeds', 'fuelbeds'],
     'invalid-input': ['ingestion', 'fuelbeds', 'emissions'],
-    'invalid-module':['ingestion', 'fuelbeds', 'emissionssdf']
+    'invalid-module':['ingestion', 'fuelbeds', 'emissionssdf'],
+    'dispersion':['ingestion', 'fuelbeds', 'consumption', 'emissions',
+        'timeprofiling', 'plumerising', 'findmetdata', 'dispersion']
 }
 
 REQUIRED_ARGS = [
@@ -46,6 +61,7 @@ REQUIRED_ARGS = [
     }
 ]
 
+_NOW = datetime.datetime.utcnow()
 OPTIONAL_ARGS = [
     {
         'short': '-m',
@@ -60,11 +76,91 @@ OPTIONAL_ARGS = [
         'help': 'record run in db and write output to file',
         'action': 'store_true',
         'default': False
+    },
+    {
+        'short': '-s',
+        'long': '--start',
+        'help': "UTC start time of hysplit run; e.g. '2015-08-15T00:00:00'",
+        'action': scripting.args.ParseDatetimeAction,
+        'default': datetime.datetime(_NOW.year, _NOW.month, _NOW.day)
+    },
+    {
+        'short': '-n',
+        'long': '--num-hours',
+        'help': 'number of hours in hysplit run',
+        "type": int,
+        'default': 12
+    },
+    {
+        'short': '-a',
+        'long': '--area',
+        'help': 'area of fire, in acres; default 10000',
+        "type": float,
+        'default': 10000.0
+    },
+    {
+        'long': "--latitude",
+        'help': 'latitude of fire location; default: 37.909644',
+        'default':  37.909644,
+        'type': float
+    },
+    {
+        'long': "--longitude",
+        'help': 'longitude of fire location; default: -119.7615805',
+        'default': -119.7615805,
+        'type': float
+    },
+    {
+        'long': "--utc-offset",
+        'help': 'utc offest of fire location; default: "-07:00"',
+        'default': '-07:00'
+    },
+    {
+        'long': "--met-archive",
+        'help': "met archive; default 'ca-nv_6-km'",
+        'default': 'DRI6km'
     }
 ]
 
+RUN_ID = 'blueskyrunner-' + _NOW.strftime('%Y%m%dT%H%M%S')
 INPUT = {
     "run_id": str(uuid.uuid1()),
+    "config": {
+        "emissions": {
+            "species": ["PM2.5"]
+        },
+        "findmetdata": {
+            "arl": {
+                "fewer_arl_files": True,
+                "index_filename_pattern": None,  # WILL BE FILLED IN
+            },
+            "met_root_dir": None  # WILL BE FILLED IN
+        },
+        "dispersion": {
+            "start": None,  # WILL BE FILLED IN
+            "num_hours": None,  # WILL BE FILLED IN
+            "output_dir": "/data/bluesky/{}/output".format(RUN_ID),
+            "working_dir": "/data/bluesky/{}/working".format(RUN_ID),
+            'hysplit': {
+                "DELT": 0.0,
+                "INITD": 0,
+                "KHMAX": 72,
+                "MAXPAR": 1000000000,
+                "MPI": True,
+                "NCPUS": 2,
+                "NINIT": 0,
+                "NUMPAR": 1000,
+                "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
+                "VERTICAL_LEVELS": [
+                    100
+                ],
+                "grid": None,  # WILL BE FILLED IN
+            }
+        },
+        "export": {
+            "extra_exports": ["dispersion", "visualization", "extrafiles"]
+        }
+    },
     "fire_information": [
         {
             "event_of": {
@@ -76,12 +172,14 @@ INPUT = {
             "fuel_type": "natural",
             "growth": [
                 {
+                    "start": None,  # WILL BE FILLED IN
+                    "end": None,  # WILL BE FILLED IN
                     "location": {
-                        "area": 2000,
+                        "area": None,  # WILL BE FILLED IN
                         "ecoregion": "western",
-                        "latitude": 37.909644,
-                        "longitude": -119.7615805,
-                        "utc_offset": -7,
+                        "latitude": None,  # WILL BE FILLED IN
+                        "longitude": None,  # WILL BE FILLED IN
+                        "utc_offset": None,  # WILL BE FILLED IN
                     }
                 }
             ]
@@ -101,18 +199,58 @@ def parse_args():
     args = parser.parse_args()
     args.log_message_format = (args.log_message_format
         or "%(asctime)s %(levelname)s %(filename)s#%(funcName)s: %(message)s")
+    from blueskyweb.app import configure_logging
     configure_logging(**args.__dict__)
     return args
 
+MET_ROOT_DIRS = {
+    "national_12-km": "/data/Met/NAM/12km/ARL/",
+    "national_3-km": "/data/Met/NAM/3km/ARL/",
+    "pacific_northwest_1.33-km": "/data/Met/PNW/1.33km/ARL/",
+    "pacific_northwest_4-km": "/data/Met/PNW/4km/ARL/",
+    "ca-nv_2-km": "/data/Met/CANSAC/2km/ARL/",
+    "ca-nv_6-km": "/data/Met/CANSAC/6km/ARL/"
+}
+DT_STR = '%Y-%m-%dT%H:%M:%S'
+def get_input(args):
+    archive = (DEFAULTS['archives']['standard'].get(args.met_archive)
+        or DEFAULTS['archives']['fast'].get(args.met_archive)
+        or DEFAULTS['archives']['special'].get(args.met_archive))
+    if not archive or args.met_archive not in MET_ROOT_DIRS:
+        print('** ERROR - Archive not supported: %s', args.met_archive)
+        print('**    (choose from  %s)', ', '.join(list(MET_ROOT_DIRS.keys())))
 
-if __name__ == "__main__":
-    args = parse_args()
+    domain = DEFAULTS['domains'][archive['domain_id']]
+    INPUT['config']['findmetdata']['arl']['index_filename_pattern'] = domain['arl_index_file']
+    INPUT['config']['findmetdata']['met_root_dir'] = MET_ROOT_DIRS[args.met_archive]
+
+    start_str = args.start.strftime(DT_STR)
+    INPUT['config']['dispersion']['start'] = start_str
+    INPUT['config']['dispersion']['num_hours'] = args.num_hours
+    INPUT['config']['dispersion']['grid'] = domain['grid']
+    local_start_str = (
+        args.start + datetime.timedelta(hours=-7)).strftime(DT_STR)
+    local_end_str = (
+        args.start + datetime.timedelta(hours=args.num_hours-7)).strftime(DT_STR)
+    INPUT['fire_information'][0]['growth'][0]['start'] = local_start_str
+    INPUT['fire_information'][0]['growth'][0]['end'] = local_end_str
+    INPUT['fire_information'][0]['growth'][0]['location']['area'] = args.area
+    INPUT['fire_information'][0]['growth'][0]['location']['latitude'] = args.latitude
+    INPUT['fire_information'][0]['growth'][0]['location']['longitude'] = args.longitude
+    INPUT['fire_information'][0]['growth'][0]['location']['utc_offset'] = args.utc_offset
 
     if args.mode not in MODES:
         print('** ERROR - Invalid Mode: %s', args.mode)
         print('**    (choose from  %s)', ', '.join(list(MODES.keys())))
     INPUT['modules'] = MODES[args.mode]
 
+    return INPUT
+
+if __name__ == "__main__":
+    args = parse_args()
+    input = get_input(args)
+
+    from blueskyworker import tasks
     if args.record_run:
         db = tasks.BlueSkyWebDB(args.mongodb_url)
         logging.debug('About to run BlueSkyRunner')
