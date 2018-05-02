@@ -37,8 +37,8 @@ class BlueSkyWebDB(object):
             or 'blueskyweb')
         self.db = motor.motor_tornado.MotorClient(mongodb_url)[db_name]
 
-    def record_run(self, run_id, status, module=None, log=None, stdout=None, callback=None,
-            **data):
+    def record_run(self, run_id, status, module=None, log=None, stdout=None,
+            percent_complete=None, callback=None, **data):
         def _callback(result, error):
             if error:
                 tornado.log.gen_log.error('Error recording run: %s', error)
@@ -65,6 +65,8 @@ class BlueSkyWebDB(object):
             doc["$push"]["history"]['$each'][0]["log"] = log
         if stdout:
             doc["$push"]["history"]['$each'][0]["stdout"] = stdout
+        if percent_complete is not None:
+            doc["$push"]["history"]['$each'][0]["percent_complete"] = percent_complete
         if data:
             doc["$set"] = data
 
