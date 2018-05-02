@@ -468,7 +468,10 @@ class RunStatusBase(RequestHandlerBase):
             run['complete'] = (run['status']['status']
                 in (RunStatuses.Completed, RunStatuses.Failed))
 
-            if (run['status']['status'] in
+            percent_complete = run['status'].get('percent_complete')
+            if percent_complete:
+                run['percent'] = percent_complete
+            elif (run['status']['status'] in
                     (RunStatuses.Enqueued, RunStatuses.Dequeued)):
                 run['percent'] = 0
             elif (run['status']['status'] in
@@ -477,7 +480,7 @@ class RunStatusBase(RequestHandlerBase):
             elif run['status']['status'] == RunStatuses.ProcessingOutput:
                 run['percent'] = 99  # HACK
             else: # RunStatuses.Running
-                self._set_percent_for_running(run)
+                self._estimate_percent_for_running(run)
 
             # prune
             for k in self.VERBOSE_FIELDS:
@@ -485,7 +488,7 @@ class RunStatusBase(RequestHandlerBase):
 
         return run
 
-    def _set_percent_for_running(self, run):
+    def _estimate_percent_for_running(self, run):
         # TODO: figure out how to estimate percentage from
         #   log and stdout information
         try:
