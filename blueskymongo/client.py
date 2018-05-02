@@ -66,12 +66,12 @@ class BlueSkyWebDB(object):
         if stdout:
             doc["$push"]["history"]['$each'][0]["stdout"] = stdout
         if percent_complete is not None:
-            doc["$push"]["history"]['$each'][0]["percent_complete"] = percent_complete
+            doc["$push"]["history"]['$each'][0]["perc"] = percent_complete
             # als put percent complete in data
             if data:
-                data['percent_complete'] = percent_complete
+                data['percent'] = percent_complete
             else:
-                data = {'percent_complete': percent_complete}
+                data = {'percent': percent_complete}
 
         if data:
             doc["$set"] = data

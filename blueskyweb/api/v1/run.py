@@ -468,19 +468,17 @@ class RunStatusBase(RequestHandlerBase):
             run['complete'] = (run['status']['status']
                 in (RunStatuses.Completed, RunStatuses.Failed))
 
-            percent_complete = run['status'].get('percent_complete')
-            if percent_complete:
-                run['percent'] = percent_complete
-            elif (run['status']['status'] in
-                    (RunStatuses.Enqueued, RunStatuses.Dequeued)):
-                run['percent'] = 0
-            elif (run['status']['status'] in
-                    (RunStatuses.Completed, RunStatuses.Failed)):
-                run['percent'] = 100
-            elif run['status']['status'] == RunStatuses.ProcessingOutput:
-                run['percent'] = 99  # HACK
-            else: # RunStatuses.Running
-                self._estimate_percent_for_running(run)
+            if 'percent' not in run:
+                if (run['status']['status'] in
+                        (RunStatuses.Enqueued, RunStatuses.Dequeued)):
+                    run['percent'] = 0
+                elif (run['status']['status'] in
+                        (RunStatuses.Completed, RunStatuses.Failed)):
+                    run['percent'] = 100
+                elif run['status']['status'] == RunStatuses.ProcessingOutput:
+                    run['percent'] = 99  # HACK
+                else: # RunStatuses.Running
+                    self._estimate_percent_for_running(run)
 
             # prune
             for k in self.VERBOSE_FIELDS:

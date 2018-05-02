@@ -1,3 +1,4 @@
+import datetime
 import getpass
 import glob
 import json
@@ -145,8 +146,7 @@ class HysplitMonitor(threading.Thread):
             for f in self.message_file_names:
                 current_hour = min(self.get_current_hour(f), current_hour)
             # we want percent_complete to be between 5 and 95
-            percent_complete = (current_hour - self.start_hour).hours / self.num_hours
-            percent_complete = int((90 * percent_complete) + 5)
+            percent_complete = int((90 * (current_hour / self.num_hours)) + 5)
         # else, percent_complete as None
         # TODO should we set percent_complete to 0?
 
@@ -155,6 +155,7 @@ class HysplitMonitor(threading.Thread):
 
     def get_current_hour(self, f):
         #import pdb;pdb.set_trace()
+
         return 3 # TODO: scrape it and compare to self.start_hour
 
 
