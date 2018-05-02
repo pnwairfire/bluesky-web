@@ -262,7 +262,7 @@ async def main(args):
         tasks.BlueSkyRunner(INPUT, db=db,
             output_root_dir='dev',
             output_url_path_prefix="blueskyrunner-logs",
-            bluesky_log_level=logging.DEBUG).run()
+            bluesky_log_level=args.log_level).run()
         logging.debug('Done running BlueSkyRunner')
         run_info = await db.find_run(RUN_ID)
         sys.stdout.write(json.dumps(run_info))
@@ -270,7 +270,10 @@ async def main(args):
     else:
         s = io.StringIO()
         logging.debug('About to run BlueSkyRunner')
-        output = tasks.BlueSkyRunner(INPUT, output_stream=s).run()
+        output = tasks.BlueSkyRunner(INPUT,
+            output_stream=s,
+            bluesky_log_level=args.log_level
+        ).run()
         logging.debug('About to dump to stdout')
         sys.stdout.write(s.getvalue())
 
