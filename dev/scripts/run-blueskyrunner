@@ -233,7 +233,7 @@ def get_input(args):
     start_str = args.start.strftime(DT_STR)
     INPUT['config']['dispersion']['start'] = start_str
     INPUT['config']['dispersion']['num_hours'] = args.num_hours
-    INPUT['config']['dispersion']['grid'] = domain['grid']
+    INPUT['config']['dispersion']['hysplit']['grid'] = domain['grid']
     local_start_str = (
         args.start + datetime.timedelta(hours=-7)).strftime(DT_STR)
     local_end_str = (
