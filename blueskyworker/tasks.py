@@ -119,18 +119,23 @@ class HysplitMonitor(threading.Thread):
 
         self.record_run_func = record_run_func
         self.terminate = False
-        self._message_file_names = []
+        self._message_file_name = None
 
     @property
-    def message_file_names(self):
-        if not self._message_file_names:
+    def message_file_name(self):
+        if self._message_file_name is None:
             # this code will run again if no message files are found
             working_dir = self.fires_manager.get_config_value(
                 'dispersion', 'working_dir')
-            glob_pattern = os.path.join(working_dir, 'MESSAGE*')
-            self._message_file_names = glob.glob(glob_pattern)
+            mp1 = os.path.join(working_dir, 'MESSAGE')
+            if os.path.exists(mp1):
+                self._message_file_name = mp1
+            else:
+                mpN = os.path.join(working_dir, 'MESSAGE.001')
+                if os.path.exists(mpN):
+                    self._message_file_name = mpN
 
-        return self._message_file_names
+        return self._message_file_name
 
     def run(self):
         while not self.terminate:
@@ -139,11 +144,11 @@ class HysplitMonitor(threading.Thread):
 
     def check_progress(self):
         percent_complete = 2
-        if self.message_file_names:
+        if self.message_file_name:
             try:
                 # estimate percent complete based on slowest of
                 # all hysplit processes
-                current_hour = self.get_min_current_hour()
+                current_hour = self.get_current_hour()
                 # we want percent_complete to be between 3 and 90
                 percent_complete = int((90 * (current_hour / self.num_hours)) + 2)
             except Exception as e:
@@ -156,15 +161,9 @@ class HysplitMonitor(threading.Thread):
         self.record_run_func(RunStatuses.RunningModule, module=self.m,
             percent_complete=percent_complete)
 
-    def get_min_current_hour(self):
-        current_hour = self.num_hours
-        for f in self.message_file_names:
-            current_hour = min(self.get_current_hour(f), current_hour)
-        return current_hour
-
-    def get_current_hour(self, filename):
+    def get_current_hour(self):
         output_lines = [l for l in subprocess.check_output(
-            ["grep", "output", filename]).decode().split('\n') if l]
+            ["grep", "output", self.message_file_name]).decode().split('\n') if l]
         return len(output_lines)
 
 
