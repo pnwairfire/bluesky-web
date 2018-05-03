@@ -5,6 +5,7 @@ import json
 import logging
 import re
 import os
+import subprocess
 import tarfile
 import threading
 import time
@@ -137,27 +138,34 @@ class HysplitMonitor(threading.Thread):
             time.sleep(5)
 
     def check_progress(self):
-        tornado.log.gen_log.info("Checking hysplit progress")
-        percent_complete = None
+        percent_complete = 2
         if self.message_file_names:
-            # we'll estimate percent complete based on slowest of
-            # all hysplit processes
-            current_hour = self.num_hours
-            for f in self.message_file_names:
-                current_hour = min(self.get_current_hour(f), current_hour)
-            # we want percent_complete to be between 3 and 90
-            percent_complete = int((90 * (current_hour / self.num_hours)) + 5)
-        else:
-            percent_complete = 2
+            try:
+                # estimate percent complete based on slowest of
+                # all hysplit processes
+                current_hour = self.get_min_current_hour()
+                # we want percent_complete to be between 3 and 90
+                percent_complete = int((90 * (current_hour / self.num_hours)) + 2)
+            except Exception as e:
+                tornado.log.gen_log.info("Failed to check progress: %s", e)
+
+        # else, leave at 2
+        tornado.log.gen_log.info("Run %s hysplit %d complete",
+            self.fires_manager.run_id, percent_complete)
 
         self.record_run_func(RunStatuses.RunningModule, module=self.m,
             percent_complete=percent_complete)
 
-    def get_current_hour(self, f):
-        #import pdb;pdb.set_trace()
+    def get_min_current_hour(self):
+        current_hour = self.num_hours
+        for f in self.message_file_names:
+            current_hour = min(self.get_current_hour(f), current_hour)
+        return current_hour
 
-        return 3 # TODO: scrape it and compare to self.start_hour
-
+    def get_current_hour(self, filename):
+        output_lines = [l for l in subprocess.check_output(
+            ["grep", "output", filename]).decode().split('\n') if l]
+        return len(output_lines)
 
 
 class monitor_run(object):
