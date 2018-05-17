@@ -108,6 +108,9 @@ class configure_logging:
 
 
 class HysplitMonitor(threading.Thread):
+    """Monitor thread that scrapes hysplit MESSAGE files to determine
+    how many hours are complete
+    """
     def __init__(self, m, fires_manager, record_run_func):
         super(HysplitMonitor, self).__init__()
         self.m = m
