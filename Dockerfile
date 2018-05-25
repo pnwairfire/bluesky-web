@@ -9,7 +9,7 @@ RUN pip install \
     tornado==4.5.1 \
     motor==1.1 \
     requests==2.18.1 \
-    celery==4.0.2 \
+    celery==4.1.1 \
     docker==2.4.2 \
     ipify==1.0.0
 
