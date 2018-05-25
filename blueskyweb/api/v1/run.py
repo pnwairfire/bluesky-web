@@ -561,7 +561,7 @@ class RunOutput(RequestHandlerBase):
         if not run:
             self.set_status(404, "Run doesn't exist")
             self.write({"error": "Run doesn't exist"})
-        elif not run['output_url']:
+        elif not run.get('output_url'):
             self.set_status(404, "Run output doesn't exist")
             self.write({"error": "Run output doesn't exist"})
         else:
