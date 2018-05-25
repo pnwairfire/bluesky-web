@@ -134,6 +134,6 @@ class BlueSkyWebDB(object):
             run['run_id'] += '-' + datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
             tornado.log.gen_log.info('Setting run %s with new run_id %s',
                 old_run_id, run['run_id'])
-            await self.db.runs.insert_one(run)
-            await self.db.runs.delete_one({'run_id': old_run_id})
+            await self.db.runs.update_one({'run_id': old_run_id},
+                {'$set': {'run_id': run['run_id']}})
     # *** Temporarary HACK ***
