@@ -74,6 +74,9 @@ HYSPLIT_OPTIONS = {
 _NOW = datetime.datetime.utcnow()
 OPTIONAL_ARGS = [
     {
+        'long': '--run-id'
+    },
+    {
         'long': '--simple',
         'help': 'Run simple emissions request asynchronously',
         'action': "store_true",
@@ -291,6 +294,9 @@ if __name__ == "__main__":
             "smtp_port": smtp_port
         }
 
+    if args.run_id:
+        REQUEST['run_id'] = args.run_id
+
     if args.modules:
         REQUEST['modules'] = args.modules
 
@@ -308,6 +314,8 @@ if __name__ == "__main__":
     logging.info("Lat: {}".format(args.latitude))
     logging.info("Lng: {}".format(args.longitude))
     logging.info("Area: {}".format(args.area))
+    if args.run_id:
+        logging.info("Run Id: {}".format(args.run_id))
     if args.modules:
         logging.info("Modules: {}".format(args.modules))
     logging.info("Reprojecting images?: %s", args.reproject_images)
