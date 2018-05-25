@@ -126,3 +126,14 @@ class BlueSkyWebDB(object):
             return await self.db.runs.find(query).count()
 
         # else, returns None -> i.e. not in queue
+
+    # *** Temporarary HACK ***
+    async def _archive_run(self, run):
+        if run:
+            old_run_id = run['run_id']
+            run['run_id'] += '-' + datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
+            tornado.log.gen_log.info('Setting run %s with new run_id %s',
+                old_run_id, run['run_id'])
+            await self.db.runs.insert_one(run)
+            await self.db.runs.delete_one({'run_id': old_run_id})
+    # *** Temporarary HACK ***

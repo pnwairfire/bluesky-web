@@ -131,13 +131,13 @@ class RunExecuter(RequestHandlerBase):
 
                 # TODO: configure anything else (e.g. setting archive_id where
                 #  appropriate)
-                self._run_asynchronously(data, mode)
+                await self._run_asynchronously(data, mode)
 
             else:
                 await self._configure_emissions(data)
                 # fuelbeds or emissions request
                 if self.get_query_argument('_a', default=None) is not None:
-                    self._run_asynchronously(data, mode)
+                    await self._run_asynchronously(data, mode)
                 else:
                     await self._run_in_process(data)
 
@@ -250,7 +250,22 @@ class RunExecuter(RequestHandlerBase):
         #self.write({"error": msg})
         #self.finish()
 
-    def _run_asynchronously(self, data, mode):
+    async def _check_for_existing_run_id(self, run_id):
+        run = await self.settings['mongo_db'].find_run(run_id)
+        if run:
+            # TODO: eventually, when STI's code is updated to handle it,
+            #   we want to do one of two things:
+            #     - fail and return 409
+            #     - create a new run_id for this run, and maybe
+            #       include a warning in the API response that the run_id
+            #       was changed.
+            #   for now, just move existing record in the db
+            await self.settings['mongo_db']._archive_run(run)
+
+
+    async def _run_asynchronously(self, data, mode):
+        await self._check_for_existing_run_id(data['run_id'])
+
         queue_name = self._archive_id or 'no-met'
         if mode == 'plumerise':
             queue_name += '-plumerise'
