@@ -275,7 +275,8 @@ class BlueSkyRunner(object):
 
                 data = {
                     'output_url': self.output_url,
-                    'output_dir': self.output_dir
+                    'output_dir': self.output_dir,
+                    'percent_complete': 100
                 }
                 status = RunStatuses.Completed
 
