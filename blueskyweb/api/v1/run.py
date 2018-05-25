@@ -449,7 +449,10 @@ class RunExecuter(RequestHandlerBase):
                 # if handle_existing == 'write_in_place', export
                 # fails in shutil.copytree
                 "handle_existing": "write_in_place",
-                "dest_dir": dest_dir
+                "dest_dir": dest_dir,
+                # HACK: to get re-runs to work, we need to
+                #  make sure the extra exports dir is unique
+                "extra_exports_dir_name": "extras-"+ str(uuid.uuid4())
             }
         }
 
