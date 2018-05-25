@@ -433,7 +433,7 @@ class RunExecuter(RequestHandlerBase):
             "localsave": {
                 # if handle_existing == 'write_in_place', export
                 # fails in shutil.copytree
-                "handle_existing": "replace",
+                "handle_existing": "write_in_place",
                 "dest_dir": dest_dir
             }
         }
