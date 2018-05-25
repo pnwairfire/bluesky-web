@@ -366,6 +366,7 @@ class RunExecuter(RequestHandlerBase):
             self._bad_request(400, "dispersion 'start' and 'num_hours' must be specified")
             return
 
+        data['config']['dispersion']['handle_existing'] = "replace"
         data['config']['dispersion']['output_dir'] = os.path.join(
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'],
@@ -430,7 +431,9 @@ class RunExecuter(RequestHandlerBase):
             "modes": ["localsave"],
             "extra_exports": extras,
             "localsave": {
-                "handle_existing": "write_in_place",
+                # if handle_existing == 'write_in_place', export
+                # fails in shutil.copytree
+                "handle_existing": "replace",
                 "dest_dir": dest_dir
             }
         }
