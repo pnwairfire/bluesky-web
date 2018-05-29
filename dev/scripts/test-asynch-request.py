@@ -19,13 +19,19 @@ import afscripting as scripting
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
 EPILOG_STR = """
-Simple case, running only through emissions
+Running only through emissions
 
-  $ {script_name} --simple \\
+  $ {script_name} --emissions \\
         -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG
 
   (Change root url for test and prod envs.)
+
+Run through plumerise
+
+  $ {script_name} --plumerise \\
+        -r http://localhost:8887/bluesky-web/ \\
+        --log-level=DEBUG
 
 
 Full run (ingestiont through visualization)
@@ -77,8 +83,14 @@ OPTIONAL_ARGS = [
         'long': '--run-id'
     },
     {
-        'long': '--simple',
-        'help': 'Run simple emissions request asynchronously',
+        'long': '--emissions',
+        'help': 'Run emissions request asynchronously',
+        'action': "store_true",
+        'default': False
+    },
+    {
+        'long': '--plumerise',
+        'help': 'Run plumerise',
         'action': "store_true",
         'default': False
     },
@@ -143,7 +155,7 @@ OPTIONAL_ARGS = [
     },
     {
         'long': "--vsmoke",
-        'help': "run VSMOKE dispersion model (if not running '--simple' mode)",
+        'help': "run VSMOKE dispersion model (if not running '--emissions' mode)",
         'action': "store_true",
         'default': False
     },
@@ -255,13 +267,15 @@ if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EPILOG_STR)
 
-    if args.simple and args.modules:
-        logging.error("Don't specify both '--simple' and '--modules'")
+    if (args.emissions or args.plumerise) and args.modules:
+        logging.error("Don't specify '--modules' with either "
+            "'--emissions' and '--plumerise'")
         sys.exit(1)
 
     if args.hysplit_options:
-        if args.simple:
-            logging.error("Don't specify both '--simple' and '--hysplit_options'")
+        if args.emissions or args.plumerise:
+            logging.error("Don't specify '--hysplit_options' "
+            "with either '--emissions' and '--plumerise'")
             sys.exit(1)
         if args.hysplit_options not in HYSPLIT_OPTIONS:
             logging.error("Invalid value for '--hysplit_options': %s",
@@ -299,6 +313,16 @@ if __name__ == "__main__":
 
     if args.modules:
         REQUEST['modules'] = args.modules
+    elif args.plumerise:
+        # a plumerise/ request would take input including emissions
+        # data, and then run 'plumerising' and 'extrafiles'; we'll
+        # run all through plumerise, to avoid having to create
+        # plumerise' expecting input.
+        REQUEST['modules'] = [
+            'ingestion', 'fuelbeds', 'consumption',
+            'emissions', 'timeprofiling', 'plumerising', 'extrafiles'
+        ]
+
 
     if args.reproject_images:
         REQUEST['config']['visualization']["hysplit"]["blueskykml_config"]["DispersionImages"] = {
@@ -325,7 +349,7 @@ if __name__ == "__main__":
 
     url = "{}/api/v1/run/".format(args.root_url)
     query = {}
-    if args.simple:
+    if args.emissions:
         #first get fuelbeds
         response = requests.post(url + 'fuelbeds/', data=data, headers=HEADERS)
         if response.status_code != 200:
@@ -335,6 +359,7 @@ if __name__ == "__main__":
 
         url += 'emissions/'
         query['_a'] = ''
+
     else:
         url += 'all/'
         if not args.vsmoke:
