@@ -315,7 +315,7 @@ class BlueSkyRunner(object):
                 data = {}
                 if m == 'export' and 'dispersion' in modules:
                     data['export'] = fires_manager.meta['export']
-                elif 'plumerising' in modules:
+                elif m == 'plumerising':
                     data['fire_information'] = prune_for_plumerise(
                         fires_manager.fires)
 
