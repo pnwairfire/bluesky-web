@@ -208,8 +208,8 @@ class RunExecuter(RequestHandlerBase):
                 invalid_modules = set(data['modules']).difference(
                     default_modules)
                 if invalid_modules:
-                    self._bad_request(400, "invalid module(s) for emissions "
-                        "request: {}".format(','.join(invalid_modules)))
+                    self._bad_request(400, "invalid module(s) for {} "
+                        "request: {}".format(mode, ','.join(invalid_modules)))
                     return
                 # else, leave as is
             else:
