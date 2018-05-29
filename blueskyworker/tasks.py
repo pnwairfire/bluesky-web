@@ -313,9 +313,13 @@ class BlueSkyRunner(object):
                     fires_manager.run()
 
                 data = {}
-                if m == 'export' and 'dispersion' in modules:
-                    data['export'] = fires_manager.meta['export']
+                if 'dispersion' in modules:
+                    # It's a dispersion run
+                    if m == 'export':
+                        data['export'] = fires_manager.meta['export']
                 elif m == 'plumerising':
+                    # It's not a dispersion run, so this must be a
+                    # plumerise run
                     data['fire_information'] = prune_for_plumerise(
                         fires_manager.fires)
 
