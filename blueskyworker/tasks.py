@@ -311,7 +311,12 @@ class BlueSkyRunner(object):
                 with monitor_run(m, fires_manager, self._record_run) as monitor:
                     fires_manager.run()
 
-                self._record_run(RunStatuses.CompletedModule, module=m)
+                data = {}
+                if m == 'export' and 'dispersion' in modules:
+                    data['export'] = fires_manager.meta['export']
+
+                self._record_run(RunStatuses.CompletedModule, module=m, **data)
+
 
         except exceptions.BlueSkyModuleError as e:
             # The error was added to fires_manager's meta data, and will be

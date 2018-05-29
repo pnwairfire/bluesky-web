@@ -459,7 +459,7 @@ class RunExecuter(RequestHandlerBase):
 
 class RunStatusBase(RequestHandlerBase):
 
-    VERBOSE_FIELDS = ('output_dir', 'modules', 'server')
+    VERBOSE_FIELDS = ('output_dir', 'modules', 'server', 'export')
     AVERAGE_RUN_TIME_IN_SECONDS = 360 # 6 minutes
 
     async def process(self, run):
@@ -565,21 +565,23 @@ class RunOutput(RequestHandlerBase):
             self.set_status(404, "Run output doesn't exist")
             self.write({"error": "Run output doesn't exist"})
         else:
-            output = self._load_output(run)
             if 'dispersion' in run['modules']:
                 #if output['config']['dispersion'].get('model') != 'vsmoke'):
-                self._get_dispersion(run, output)
+                self._get_dispersion(run)
             elif run['modules'][-1] == 'plumerising':
-                self._get_plumerise(run, output)
+                self._get_plumerise(run)
             else:
                 # TODO: is returning raw input not ok?
+                output = self._load_output(run)
                 self.write(output)
 
     ##
     ## Plumerise
     ##
 
-    def _get_plumerise(self, run, output):
+    def _get_plumerise(self, run):
+        # TODO: load plumerise from db, if it's there, and don't load output
+        output = self._load_output(run)
         output = {k:v for k,v in output.items()
             if k in ('run_id', 'fire_information')}
         for f in output['fire_information']:
@@ -593,11 +595,16 @@ class RunOutput(RequestHandlerBase):
     ## Dispersion
     ##
 
-    def _get_dispersion(self, run, output):
+    def _get_dispersion(self, run):
         r = {
             "root_url": run['output_url']
         }
-        vis_info = output['export']['localsave'].get('visualization')
+        if 'export' in run:
+            export_info = run['export']
+        else:
+            export_info = self._load_output(run)['export']
+
+        vis_info = export_info['localsave'].get('visualization')
         if vis_info:
             # images
             self._parse_images(r, vis_info)
@@ -605,7 +612,7 @@ class RunOutput(RequestHandlerBase):
             # kmzs
             self._parse_kmzs_info(r, vis_info)
 
-        disp_info = output['export']['localsave'].get('dispersion')
+        disp_info = export_info['localsave'].get('dispersion')
         if disp_info:
             r.update(**{
                 k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
