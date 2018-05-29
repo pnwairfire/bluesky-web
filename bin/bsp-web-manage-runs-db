@@ -1,0 +1,120 @@
+#! /usr/bin/env python3
+
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2017, AirFire, PNW, USFS"
+
+import datetime
+import json
+import sys
+import traceback
+
+import tornado
+
+import afscripting as scripting
+
+try:
+    from blueskyweb.app import configure_logging
+    from blueskymongo.client import BlueSkyWebDB
+
+except:
+    import os
+    sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../')))
+    from blueskyweb.app import configure_logging
+    from blueskymongo.client import BlueSkyWebDB
+
+
+# Note: the trailing space seems to be the only way to add an extra trailing line
+EPILOG_STR = """
+Examples
+
+   $ {script_name} -a get-run --run-id abc123-plumerise
+   $ {script_name} -a delete-run --run-id abc123-plumerise
+   $ {script_name} -a delete-all-runs
+
+ """.format(script_name=sys.argv[0])
+
+ACTIONS = [
+    'get-run',
+    'delete-run',
+    'delete-all-runs'
+]
+
+REQUIRED_ARGS = [
+    {
+        'short': '-a',
+        'long': '--action',
+        'help': ', '.join(ACTIONS)
+    }
+]
+
+OPTIONAL_ARGS = [
+    {
+        'short': '-m',
+        'long': '--mongodb-url',
+        'help': ('url to connect to mongodb for arl '
+            'indexes and bsp job queues'),
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb"
+    },
+    {
+        'long': '--run-id',
+        'help': 'Used when getting or deleting a run'
+    }
+]
+
+def validate_action(args):
+    tornado.log.gen_log.info('action: %s', args.action)
+    if args.action not in ACTIONS:
+        tornado.log.gen_log.error('Invalid action: %s', args.action)
+        sys.exit(1)
+
+def parse_args():
+    parser = scripting.args.ArgumentParser()
+    parser.epilog = EPILOG_STR
+    parser.formatter_class = scripting.args.RawTextHelpFormatter
+    scripting.args.add_arguments(parser, OPTIONAL_ARGS)
+    scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
+    # Use afscripting to add logging options to the parser object,
+    # but we'll configure logging oureselves
+    scripting.args.add_logging_options(parser)
+    args = parser.parse_args()
+    args.log_message_format = (args.log_message_format
+        or "%(asctime)s %(levelname)s %(filename)s#%(funcName)s: %(message)s")
+    configure_logging(**args.__dict__)
+    validate_action(args)
+    return args
+
+async def get_run(db, args):
+    tornado.log.gen_log.info('Getting run')
+    if not args.run_id:
+        raise RuntimeError("Specify --run-id")
+    return await db.find_run(args.run_id)
+
+async def delete_run(db, args):
+    tornado.log.gen_log.info('Deleting run')
+    if not args.run_id:
+        raise RuntimeError("Specify --run-id")
+    deleted = await db.delete_run(args.run_id)
+    return "Deleted {} run records".format(deleted)
+
+async def delete_all_runs(db, args):
+    tornado.log.gen_log.info('clearing')
+    deleted = await db.delete_all_runs()
+    return "Deleted {} run records".format(deleted)
+
+async def main():
+    args = parse_args()
+    db = BlueSkyWebDB(args.mongodb_url)
+
+    try:
+        data = await globals()[args.action.replace('-','_')](db, args)
+
+    except Exception as e:
+        tornado.log.gen_log.debug(traceback.format_exc())
+        tornado.log.gen_log.error(e)
+        sys.exit(1)
+
+    sys.stdout.write(json.dumps(data, sort_keys=True, indent=2))
+    sys.stdout.write('\n')
+
+if __name__ == "__main__":
+    tornado.ioloop.IOLoop.instance().run_sync(main)
