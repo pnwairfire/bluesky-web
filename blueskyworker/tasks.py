@@ -297,9 +297,10 @@ class BlueSkyRunner(object):
         fires_manager = models.fires.FiresManager()
         modules = self.input_data.pop('modules')
         fires_manager.load(self.input_data)
-        try:
-            self._record_run(RunStatuses.Running)
-            for m in modules:
+
+        self._record_run(RunStatuses.Running)
+        for m in modules:
+            try:
                 # TODO: if hysplit dispersion, start thread that periodically
                 #   tails log and records status; then join thread when call
                 #   to run completes
@@ -314,14 +315,17 @@ class BlueSkyRunner(object):
                 data = {}
                 if m == 'export' and 'dispersion' in modules:
                     data['export'] = fires_manager.meta['export']
+                elif 'plumerising' in modules:
+                    data['fire_information'] = prune_for_plumerise(
+                        fires_manager.fires)
 
                 self._record_run(RunStatuses.CompletedModule, module=m, **data)
 
-
-        except exceptions.BlueSkyModuleError as e:
-            # The error was added to fires_manager's meta data, and will be
-            # included in the output data
-            pass
+            except exceptions.BlueSkyModuleError as e:
+                # The error was added to fires_manager's meta data, and will be
+                # included in the output data
+                self._record_run(RunStatuses.FailedModule, module=m,
+                    msg=e.args[0])
 
         # TODO: handle any of the following individually?
         #   (it would be good if they inherited from a common
