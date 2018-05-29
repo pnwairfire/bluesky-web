@@ -140,3 +140,11 @@ class BlueSkyWebDB(object):
             await self.db.runs.update_one({'run_id': old_run_id},
                 {'$set': {'run_id': run['run_id']}})
     # *** Temporarary HACK ***
+
+    async def delete_run(self, run_id):
+        r = await self.db.runs.delete_one({'run_id': run_id})
+        return r.deleted_count
+
+    async def delete_all_runs(self):
+        r = await self.db.runs.delete_many({})
+        return r.deleted_count
