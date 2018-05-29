@@ -313,16 +313,6 @@ if __name__ == "__main__":
 
     if args.modules:
         REQUEST['modules'] = args.modules
-    elif args.plumerise:
-        # a plumerise/ request would take input including emissions
-        # data, and then run 'plumerising' and 'extrafiles'; we'll
-        # run all through plumerise, to avoid having to create
-        # plumerise' expecting input.
-        REQUEST['modules'] = [
-            'ingestion', 'fuelbeds', 'consumption',
-            'emissions', 'timeprofiling', 'plumerising', 'extrafiles'
-        ]
-
 
     if args.reproject_images:
         REQUEST['config']['visualization']["hysplit"]["blueskykml_config"]["DispersionImages"] = {
@@ -349,16 +339,27 @@ if __name__ == "__main__":
 
     url = "{}/api/v1/run/".format(args.root_url)
     query = {}
-    if args.emissions:
+    if args.emissions or args.plumerise:
         #first get fuelbeds
         response = requests.post(url + 'fuelbeds/', data=data, headers=HEADERS)
         if response.status_code != 200:
-            logging.error("Failed to look up fuelbeds to run emissions")
+            logging.error("Failed to look up fuelbeds to run %s",
+                'emissions' if args.emissions else 'plumerise')
             sys.exit(1)
         data = response.content
 
-        url += 'emissions/'
-        query['_a'] = ''
+        if args.plumerise:
+            # next, for plumerise run, get emissions
+            response = requests.post(url + 'emissions/', data=data, headers=HEADERS)
+            if response.status_code != 200:
+                logging.error("Failed to run emissions to run plumerise")
+                sys.exit(1)
+            data = response.content
+            url += 'plumerise/{}/'.format(args.met_archive)
+
+        else:
+            url += 'emissions/'
+            query['_a'] = ''
 
     else:
         url += 'all/'
