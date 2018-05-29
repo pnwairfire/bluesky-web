@@ -13,7 +13,7 @@ class RunStatusesType(type):
         "StartingModule": 'starting_module',
         'RunningModule': 'running_module',
         'CompletedModule': 'completed_module',
-        'FailedModule': 'failed_module'
+        'FailedModule': 'failed_module',
         "ProcessingOutput": "processing_output",
         "Completed": "completed",
         "Failed": "failed"
