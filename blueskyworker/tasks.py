@@ -325,7 +325,8 @@ class BlueSkyRunner(object):
                 # The error was added to fires_manager's meta data, and will be
                 # included in the output data
                 self._record_run(RunStatuses.FailedModule, module=m,
-                    msg=e.args[0])
+                    status_message=e.args[0])
+                break
 
         # TODO: handle any of the following individually?
         #   (it would be good if they inherited from a common
@@ -350,10 +351,12 @@ class BlueSkyRunner(object):
     ## DB
     ##
 
-    def _record_run(self, status, module=None, log=None, stdout=None, **data):
+    def _record_run(self, status, module=None, log=None, stdout=None,
+            status_message=None, **data):
         if self.db:
             self.db.record_run(self.input_data['run_id'], status,
-                module=module, log=log, stdout=stdout, **data)
+                module=module, log=log, stdout=stdout,
+                status_message=status_message, **data)
 
 
 # ##
