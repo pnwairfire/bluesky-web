@@ -579,15 +579,26 @@ class RunOutput(RequestHandlerBase):
     ## Plumerise
     ##
 
+    def _slice(self, info_dict, whitelist):
+        # Need to create list of keys in order to pop within iteration
+        for k in list(info_dict.keys()):
+            if k not in whitelist:
+                info_dict.pop(k)
+
     def _get_plumerise(self, run):
         # TODO: load plumerise from db, if it's there, and don't load output
         output = self._load_output(run)
-        output = {k:v for k,v in output.items()
-            if k in ('run_id', 'fire_information')}
+
+        self._slice(output, ('run_id', 'fire_information'))
+
         for f in output['fire_information']:
+            self._slice(f, ('id', 'growth'))
+
             for i in range(len(f['growth'])):
-                f['growth'][i] = {k:v for k,v in f['growth'][i].items()
-                    if k in ('start', 'end', 'location', 'plumerise')}
+                self._slice(f['growth'][i],
+                    ('start', 'end', 'location', 'plumerise'))
+                self._slice(f['growth'][i]['location'],
+                    ('latitude', 'utc_offset', 'longitude', 'area', 'geojson'))
 
         self.write(output)
 
