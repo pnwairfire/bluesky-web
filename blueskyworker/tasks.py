@@ -354,3 +354,36 @@ class BlueSkyRunner(object):
         if self.db:
             self.db.record_run(self.input_data['run_id'], status,
                 module=module, log=log, stdout=stdout, **data)
+
+
+# ##
+# ## Helper functions used by BlueSkyRunner, but defined at module
+# ## scope to be resused by other modules
+# ##
+
+
+def prune_for_plumerise(fire_info):
+    """Creates a new list of fires, pruned to include only data relevant
+    to plumerise API requests.
+
+    Note: To avoid modifying fire_into as well as creating a complete
+    copy of fire_info, to be pruned in place, this method creates a new
+    list of pruned fire information from scratch (i.e. without
+    deepcopying fire_info)
+    """
+    return [prune_fire_for_plumerise(f) for f in fire_info]
+
+def prune_fire_for_plumerise(f):
+    return {
+        "id": f.get('id'),
+        "growth": [prune_growth_for_plumerise(g) for g in f.get('growth', [])]
+    }
+
+def prune_growth_for_plumerise(g):
+    new_g = slice_dict(g, {'start', 'end', 'location', 'plumerise'})
+    new_g['location'] = slice_dict(new_g['location'],
+        {'latitude', 'utc_offset', 'longitude', 'area', 'geojson'})
+    return new_g
+
+def slice_dict(d, whitelist):
+    return {k: d[k] for k in d.keys() & whitelist}

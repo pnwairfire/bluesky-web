@@ -17,7 +17,9 @@ import tornado.web
 import tornado.log
 
 from blueskymongo.client import RunStatuses
-from blueskyworker.tasks import run_bluesky, BlueSkyRunner
+from blueskyworker.tasks import (
+    run_bluesky, BlueSkyRunner, prune_for_plumerise
+)
 from blueskyweb.lib import met, hysplit
 from . import RequestHandlerBase
 
@@ -459,7 +461,8 @@ class RunExecuter(RequestHandlerBase):
 
 class RunStatusBase(RequestHandlerBase):
 
-    VERBOSE_FIELDS = ('output_dir', 'modules', 'server', 'export')
+    VERBOSE_FIELDS = ('output_dir', 'modules', 'server', 'export',
+        'fire_information')
     AVERAGE_RUN_TIME_IN_SECONDS = 360 # 6 minutes
 
     async def process(self, run):
@@ -586,21 +589,14 @@ class RunOutput(RequestHandlerBase):
                 info_dict.pop(k)
 
     def _get_plumerise(self, run):
-        # TODO: load plumerise from db, if it's there, and don't load output
-        output = self._load_output(run)
+        if 'fire_information' in run:
+            fire_information = run['fire_information']
+        else:
+            fire_information = prune_for_plumerise(
+                self._load_output(run)['fire_information'])
 
-        self._slice(output, ('run_id', 'fire_information'))
-
-        for f in output['fire_information']:
-            self._slice(f, ('id', 'growth'))
-
-            for i in range(len(f['growth'])):
-                self._slice(f['growth'][i],
-                    ('start', 'end', 'location', 'plumerise'))
-                self._slice(f['growth'][i]['location'],
-                    ('latitude', 'utc_offset', 'longitude', 'area', 'geojson'))
-
-        self.write(output)
+        self.write(dict(run_id=run['run_id'],
+            fire_information=fire_information))
 
     ##
     ## Dispersion
