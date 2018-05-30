@@ -365,7 +365,11 @@ class RunExecuter(RequestHandlerBase):
         )
         data['config']['extrafiles'] = {
             "dest_dir": dest_dir,
-            "sets": ["emissionscsv"],
+            "sets": ["firescsvs", "emissionscsv"],
+            "firescsvs": {
+                "fire_locations_filename": "fire_locations.csv",
+                "fire_events_filename": "fire_events.csv"
+            },
             "emissionscsv": {
                 "filename": "fire_emissions.csv"
             }
