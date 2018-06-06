@@ -8,6 +8,7 @@ services:
   mongo:
     image: mongo:3.4.6
     container_name: bluesky-web-mongo
+    hostname: bluesky-web-mongo
     environment:
     # These are meant to be overridden
     - MONGO_INITDB_ROOT_USERNAME=blueskywebadmin
@@ -19,10 +20,11 @@ services:
     - $PWD/docker-data/mongodb/db/:/data/db/
     - $PWD/docker-data/mongodb/configdb/:/data/configdb/
     - $PWD/dev/mongo-entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
+    - $PWD/dev/ssl/:/etc/ssl/
     # Note: '--auth' is automatically added to command if
     #   MONGO_INITDB_ROOT_[USERNAME|PASSWORD] are set, but we need to
     #   set `command` in order to specify `--logpath`
-    command: mongod --auth --logpath /var/log/mongodb/mongodb.log
+    command: mongod --auth --logpath /var/log/mongodb/mongodb.log --sslMode requireSSL --sslPEMKeyFile /etc/ssl/mongo-server.pem --sslAllowInvalidHostnames
   web1:
     image: bluesky-web
     container_name: bluesky-web-1
@@ -34,6 +36,7 @@ services:
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
     - $PWD/docker-data/output/:/data/bluesky/output/
+    - $PWD/dev/ssl/:/etc/ssl/
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
@@ -56,6 +59,7 @@ services:
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
     - $PWD/docker-data/output/:/data/bluesky/output/
+    - $PWD/dev/ssl/:/etc/ssl/
     links:
     - mongo
     # note: log should be in /var/log/blueskyweb/bluesky-web.log, the default
@@ -99,6 +103,7 @@ services:
     # Note: met root dir has to be the same on host and in this container,
     #   since bsp container will have the same mount
     - $HOME/Met/:/data/Met/
+    - $PWD/dev/ssl/:/etc/ssl/
     links:
     - mongo
     environment:
@@ -120,6 +125,7 @@ services:
     # Note: met root dir has to be the same on host and in this container,
     #   since bsp container will have the same mount
     - $HOME/Met/:/data/Met/
+    - $PWD/dev/ssl/:/etc/ssl/
     links:
     - mongo
     environment:

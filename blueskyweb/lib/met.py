@@ -13,6 +13,7 @@ import datetime
 import logging
 import math
 import os
+import ssl
 from urllib.parse import urlparse
 
 import motor
@@ -74,7 +75,16 @@ class MetArchiveDB(object):
         db_name = (urlparse(mongodb_url).path.lstrip('/').split('/')[0]
             or 'blueskyweb')
         tornado.log.gen_log.debug('Using %s for domain data', mongodb_url)
-        self.db = motor.motor_tornado.MotorClient(mongodb_url)[db_name]
+        client_args = {
+            'ssl': True,
+            'ssl_match_hostname': False, # Note: makes vulnerable to man-in-the-middle attacks
+            'ssl_cert_reqs': ssl.CERT_NONE,
+            'ssl_certfile': '/etc/ssl/mongo-client-cert.crt',
+            'ssl_keyfile': '/etc/ssl/mongo-client-cert.key',
+            #'ssl_ca_certs': '/etc/ssl/mongo-client.pem'
+        }
+        self.db = motor.motor_tornado.MotorClient(
+            mongodb_url, **client_args)[db_name]
 
     async def get_root_dir(self, archive_id):
         # Use met_files collection object directly so that we can

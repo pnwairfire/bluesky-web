@@ -1,4 +1,5 @@
 import datetime
+import ssl
 from urllib.parse import urlparse
 
 import motor
@@ -36,7 +37,16 @@ class BlueSkyWebDB(object):
     def __init__(self, mongodb_url):
         db_name = (urlparse(mongodb_url).path.lstrip('/').split('/')[0]
             or 'blueskyweb')
-        self.db = motor.motor_tornado.MotorClient(mongodb_url)[db_name]
+        client_args = {
+            'ssl': True,
+            'ssl_match_hostname': False, # Note: makes vulnerable to man-in-the-middle attacks
+            'ssl_cert_reqs': ssl.CERT_NONE,
+            'ssl_certfile': '/etc/ssl/mongo-client-cert.crt',
+            'ssl_keyfile': '/etc/ssl/mongo-client-cert.key',
+            #'ssl_ca_certs': '/etc/ssl/mongo-client.pem'
+        }
+        self.db = motor.motor_tornado.MotorClient(
+            mongodb_url, **client_args)[db_name]
 
     def record_run(self, run_id, status, module=None, log=None, stdout=None,
             percent_complete=None, status_message=None, callback=None, **data):
