@@ -36,9 +36,9 @@ app.conf.update(
         "database": parse_object.path.strip('/'),
         "taskmeta_collection": "stock_taskmeta_collection",
         'ssl': True,
-        'ssl_keyfile': '/etc/ssl/client-cert.key',
-        'ssl_certfile': '/etc/ssl/client-cert.crt',
-        'ssl_ca_certs': '/etc/ssl/client.pem',
+        'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
+        'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',
+        'ssl_ca_certs': '/etc/ssl/bluesky-web-client.pem',
         'ssl_cert_reqs': ssl.CERT_NONE
     }
 )

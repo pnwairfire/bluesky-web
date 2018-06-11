@@ -75,7 +75,8 @@ DNS.2 = bluesky-web-mongo
 
 def create_config_file(args):
     contents = CONFIG_FILE_TEMPLATE.format(name=args.name.capitalize())
-    filename = os.path.join(args.dir, args.name + '-ssl.ini')
+    filename = os.path.join(args.dir,
+        'bluesky-web-' + args.name + '-ssl.ini')
     with open(filename, 'w') as f:
         f.write(contents)
 
@@ -83,9 +84,12 @@ def create_config_file(args):
 
 def generate(args):
     cmd_args = {
-        "certfile": os.path.join(args.dir, args.name + '-cert.crt'),
-        "keyfile": os.path.join(args.dir, args.name + '-cert.key'),
-        "pemfile": os.path.join(args.dir, args.name + '.pem'),
+        "certfile": os.path.join(args.dir,
+            'bluesky-web-' + args.name + '-cert.crt'),
+        "keyfile": os.path.join(args.dir,
+            'bluesky-web-' + args.name + '-cert.key'),
+        "pemfile": os.path.join(args.dir,
+            'bluesky-web-' + args.name + '.pem'),
         "configfile": create_config_file(args)
     }
     # ~10 year cert

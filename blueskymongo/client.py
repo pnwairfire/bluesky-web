@@ -41,9 +41,9 @@ class BlueSkyWebDB(object):
             'ssl': True,
             #'ssl_match_hostname': False, # Note: makes vulnerable to man-in-the-middle attacks
             'ssl_cert_reqs': ssl.CERT_NONE,
-            # 'ssl_certfile': '/etc/ssl/client-cert.crt',
-            # 'ssl_keyfile': '/etc/ssl/client-cert.key',
-            'ssl_ca_certs': '/etc/ssl/client.pem'
+            # 'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',
+            # 'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
+            'ssl_ca_certs': '/etc/ssl/bluesky-web-client.pem'
         }
         self.db = motor.motor_tornado.MotorClient(
             mongodb_url, **client_args)[db_name]
