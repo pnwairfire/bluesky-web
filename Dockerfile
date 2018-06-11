@@ -13,7 +13,7 @@ RUN pip install \
     docker==2.4.2 \
     ipify==1.0.0
 
-COPY dev/scripts/generate-ssl-certs.sh /usr/local/bin/
+COPY generate-ssl-certs.sh /usr/local/bin/
 RUN /usr/local/bin/generate-ssl-certs.sh /etc/ssl/ mongod
 
 COPY blueskyconfig /usr/src/blueskyweb/blueskyconfig
