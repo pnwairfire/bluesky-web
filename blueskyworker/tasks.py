@@ -20,7 +20,8 @@ from bluesky import exceptions, models
 
 from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
-MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://localhost:27018/blueskyweb'
+MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
+
 app = Celery('blueskyworker.tasks', broker=MONGODB_URL)
 
 parse_object = urlparse(MONGODB_URL)
