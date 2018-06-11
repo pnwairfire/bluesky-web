@@ -1,0 +1,6 @@
+FROM mongo:3.4.6
+
+MAINTAINER jdubowy@gmail.com
+
+COPY dev/scripts/generate-ssl-certs.py /usr/local/bin/
+RUN /usr/local/bin/generate-ssl-certs.py -d /etc/ssl/ -n mongod

@@ -21,11 +21,15 @@ import afscripting as scripting
 EPILOG_STR = """
 Dev:
 
-  $ {script_name} -d ./dev
+  $ {script_name} -d ./dev/ssl -n client
+  $ {script_name} -d ./dev/ssl -n mongod
+  $ {script_name} -d ./dev/ssl -n rabbitmq
 
 Production:
 
-  $ {script_name} -d ./ssl
+  $ {script_name} -d /etc/ssl/ -n client
+  $ {script_name} -d /etc/ssl/ -n mongod
+  $ {script_name} -d /etc/ssl/ -n rabbitmq
 
  """.format(script_name=sys.argv[0])
 
@@ -34,6 +38,11 @@ REQUIRED_ARGS = [
         'short': '-d',
         'long': '--dir',
         'help': 'where to create cert, key, and pem files'
+    },
+    {
+        'short': '-n',
+        'long': '--name',
+        'help': "'client', 'mongod', or 'rabbitmq'"
     }
 ]
 
@@ -53,7 +62,7 @@ C = US
 ST = WA
 L = Seattle
 O = ORGANIZATION
-OU = BlueSkyWeb {client_or_server}
+OU = BlueSkyWeb {name}
 CN = bluesky-web-mongo
 
 [v3_req]
@@ -64,24 +73,20 @@ DNS.1 = *.bluesky-web-mongo
 DNS.2 = bluesky-web-mongo
 """
 
-def create_config_file(args, client_or_server):
-    contents = CONFIG_FILE_TEMPLATE.format(
-        client_or_server=client_or_server.capitalize())
-    filename = os.path.join(args.dir, 'mongo-' + client_or_server + '-ssl.ini')
+def create_config_file(args):
+    contents = CONFIG_FILE_TEMPLATE.format(name=args.name.capitalize())
+    filename = os.path.join(args.dir, args.name + '-ssl.ini')
     with open(filename, 'w') as f:
         f.write(contents)
 
     return filename
 
-def generate(args, client_or_server):
+def generate(args):
     cmd_args = {
-        "certfile": os.path.join(args.dir,
-            'mongo-' + client_or_server + '-cert.crt'),
-        "keyfile": os.path.join(args.dir,
-            'mongo-' + client_or_server + '-cert.key'),
-        "pemfile": os.path.join(args.dir,
-            'mongo-' + client_or_server + '.pem'),
-        "configfile": create_config_file(args, client_or_server)
+        "certfile": os.path.join(args.dir, args.name + '-cert.crt'),
+        "keyfile": os.path.join(args.dir, args.name + '-cert.key'),
+        "pemfile": os.path.join(args.dir, args.name + '.pem'),
+        "configfile": create_config_file(args)
     }
     # ~10 year cert
     cmd = ("openssl req -newkey rsa:2048 -new -x509 -days 3650 "
@@ -98,5 +103,4 @@ if __name__ == "__main__":
 
     os.makedirs(args.dir)
 
-    generate(args, 'server')
-    generate(args, 'client')
+    generate(args)

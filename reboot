@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-    docker build -t bluesky-web .
-    docker build -t bluesky-web-nginx -f Dockerfile-nginx .
-    mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
-        ./docker-logs/worker/dri ./docker-logs/worker/nam \
-        ./docker-logs/worker/no-met ./docker-data/mongodb/db \
-        ./docker-data/output
-    docker-compose -f dev/docker-compose.yml up
+docker build -t bluesky-web .
+docker build -t bluesky-web-nginx -f Dockerfile-nginx .
+docker build -t bluesky-web-mongo -f Dockerfile-mongo .
+mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
+    ./docker-logs/worker/dri ./docker-logs/worker/nam \
+    ./docker-logs/worker/no-met ./docker-data/mongodb/db \
+    ./docker-data/output
+docker-compose -f dev/docker-compose.yml up

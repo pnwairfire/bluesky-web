@@ -30,11 +30,12 @@ api web service, output web service, bsp workers, and ofelia.
 
 ### Setup
 
-    git clone git@github.com:pnwairfire/bluesky-web.git
-    cd airfire-bluesky-web
+    git clone git@github.com:pnwairfire/bluesky-web.git pnwairfire-bluesky-web
+    cd pnwairfire-bluesky-web
     pip install -r requirements-dev.txt
     docker build -t bluesky-web .
     docker build -t bluesky-web-nginx -f Dockerfile-nginx .
+    docker build -t bluesky-web-mongo -f Dockerfile-mongo .
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
         ./docker-logs/worker/dri ./docker-logs/worker/nam \
         ./docker-logs/worker/no-met ./docker-data/mongodb/db \
@@ -51,12 +52,12 @@ If you don't want to wait for it to run, manually run it with:
     docker exec bluesky-web-worker \
         arlindexer -d DRI6km -r /data/Met/CANSAC/6km/ARL/ \
         -m mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \
-        --mongo-ssl-ca-certs /etc/ssl/mongo-client.pem
+        --mongo-ssl-ca-certs /etc/ssl/client.pem
     docker exec bluesky-web-worker \
         arlindexer -d NAM84 -r /data/Met/NAM/12km/ARL/ \
         -p NAM84_ARL_index.csv \
         -m mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \
-        --mongo-ssl-ca-certs /etc/ssl/mongo-client.pem
+        --mongo-ssl-ca-certs /etc/ssl/client.pem
 
 ### Tail logs
 
