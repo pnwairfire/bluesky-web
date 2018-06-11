@@ -5,6 +5,7 @@ import json
 import logging
 import re
 import os
+import ssl
 import subprocess
 import tarfile
 import threading
@@ -33,7 +34,12 @@ app.conf.update(
         "user": parse_object.username,
         "password": parse_object.password,
         "database": parse_object.path.strip('/'),
-        "taskmeta_collection": "stock_taskmeta_collection"
+        "taskmeta_collection": "stock_taskmeta_collection",
+        'ssl': True,
+        'ssl_keyfile': '/etc/ssl/client-cert.key',
+        'ssl_certfile': '/etc/ssl/client-cert.crt',
+        'ssl_ca_certs': '/etc/ssl/client.pem',
+        'ssl_cert_reqs': ssl.CERT_NONE
     }
 )
 
