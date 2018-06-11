@@ -105,6 +105,7 @@ if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EPILOG_STR)
 
-    os.makedirs(args.dir)
+    if not os.path.exists(args.dir):
+        os.makedirs(args.dir)
 
     generate(args)
