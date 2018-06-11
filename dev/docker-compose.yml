@@ -70,7 +70,6 @@ services:
       --output-url-path-prefix= --bluesky-log-level=DEBUG
       -c /etc/bluesky-web/config.json
   nginx:
-    restart: unless-stopped
     container_name: bluesky-web-nginx
     image: bluesky-web-nginx
     ports:
