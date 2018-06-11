@@ -2,6 +2,5 @@ FROM mongo:3.4.6
 
 MAINTAINER jdubowy@gmail.com
 
-RUN apt-get update && apt-get install python3
-COPY dev/scripts/generate-ssl-certs.py /usr/local/bin/
-RUN /usr/local/bin/generate-ssl-certs.py -d /etc/ssl/ -n mongod
+COPY dev/scripts/generate-ssl-certs.sh /usr/local/bin/
+RUN /usr/local/bin/generate-ssl-certs.sh /etc/ssl/ mongod
