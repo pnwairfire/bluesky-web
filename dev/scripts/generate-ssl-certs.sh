@@ -47,14 +47,14 @@ ST = WA
 L = Seattle
 O = ORGANIZATION
 OU = BlueSkyWeb $NAME
-CN = bluesky-web-mongo
+CN = bluesky-web-$NAME
 
 [v3_req]
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1 = *.bluesky-web-mongo
-DNS.2 = bluesky-web-mongo
+DNS.1 = *.bluesky-web-$NAME
+DNS.2 = bluesky-web-$NAME
 EOT
 
 
