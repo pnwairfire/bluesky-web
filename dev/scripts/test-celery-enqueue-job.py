@@ -57,7 +57,6 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
     output_filename = '/usr/src/blueskyweb/go-foo.txt'
     logging.debug("output file: %s", output_filename)
-    import pdb;pdb.set_trace()
     go.apply_async(args=[output_filename], queue='no-met')
 
 
