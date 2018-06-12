@@ -23,24 +23,30 @@ from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
 
-app = Celery('blueskyworker.tasks', broker=MONGODB_URL)
+# BROKER_URL = MONGODB_URL
+# app = Celery('blueskyworker.tasks', backend='mongodb', broker=BROKER_URL)
+BROKER_URL = 'amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit'
+app = Celery('blueskyworker.tasks', broker=BROKER_URL)
 
-parse_object = urlparse(MONGODB_URL)
+
+parse_object = urlparse(BROKER_URL)
 app.conf.update(
-    result_backend='mongodb',
-    mongodb_backend_settings={
-        "host": parse_object.hostname,
-        "port": parse_object.port or 27017,
-        "user": parse_object.username,
-        "password": parse_object.password,
-        "database": parse_object.path.strip('/'),
-        "taskmeta_collection": "stock_taskmeta_collection",
-        'ssl': True,
-        'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
-        'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',
-        'ssl_ca_certs': '/etc/ssl/bluesky-web-client.pem',
-        'ssl_cert_reqs': ssl.CERT_NONE
-    }
+    # result_backend='mongodb',
+    # mongodb_backend_settings={
+    #     "host": parse_object.hostname,
+    #     "port": parse_object.port or 27017,
+    #     "user": parse_object.username,
+    #     "password": parse_object.password,
+    #     "database": parse_object.path.strip('/'),
+    #     "taskmeta_collection": "stock_taskmeta_collection"
+    # },
+    # broker_use_ssl={
+    #     'ssl': True,
+    #     'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
+    #     'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',
+    #     'ssl_ca_certs': '/etc/ssl/bluesky-web-client.pem',
+    #     'ssl_cert_reqs': ssl.CERT_NONE
+    # }
 )
 
 try:

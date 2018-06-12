@@ -1,0 +1,12 @@
+FROM rabbitmq:3.7.5-alpine
+
+MAINTAINER jdubowy@gmail.com
+
+RUN apk update && \
+    apk add --no-cache openssl && \
+    rm -rf /var/cache/apk/*
+
+COPY generate-ssl-cert.sh /usr/local/bin/
+RUN /usr/local/bin/generate-ssl-cert.sh /etc/ssl/ rabbitmq
+
+COPY rabbitmq.conf /etc/rabbitmq/

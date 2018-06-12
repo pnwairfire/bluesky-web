@@ -36,6 +36,7 @@ api web service, output web service, bsp workers, and ofelia.
     docker build -t bluesky-web .
     docker build -t bluesky-web-nginx -f Dockerfile-nginx .
     docker build -t bluesky-web-mongo -f Dockerfile-mongo .
+    docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .
     mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
         ./docker-logs/worker/dri ./docker-logs/worker/nam \
         ./docker-logs/worker/no-met ./docker-data/mongodb/db \
