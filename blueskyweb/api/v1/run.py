@@ -277,6 +277,8 @@ class RunExecuter(RequestHandlerBase):
 
         # TODO: figure out how to enqueue without blocking
         settings = {k:v for k, v in self.settings.items() if k != 'mongo_db'}
+        tornado.log.gen_log.debug("About to enqueue run %s",
+            data.get('run_id'))
         run_bluesky.apply_async(args=args, kwargs=settings, queue=queue_name)
         # TODO: specify callback in record_run, calling
         #    self.write in callback, so we can handle failure?
