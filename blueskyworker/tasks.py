@@ -21,8 +21,10 @@ from bluesky import exceptions, models
 
 from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
+# mongodb used for recording run information, status, etc.
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
-RABBITMQ_URL = os.environ.get('RABBITMQ_URL') or 'amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit'
+# rabbitmq used for enqueueing runs
+RABBITMQ_URL = os.environ.get('RABBITMQ_URL') or 'amqps://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671'
 
 
 # BROKER_URL = MONGODB_URL
@@ -42,13 +44,12 @@ app.conf.update(
     #     "database": parse_object.path.strip('/'),
     #     "taskmeta_collection": "stock_taskmeta_collection"
     # },
-    # broker_use_ssl={
-    #     'ssl': True,
-    #     'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
-    #     'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',
-    #     'ssl_ca_certs': '/etc/ssl/bluesky-web-client.pem',
-    #     'ssl_cert_reqs': ssl.CERT_NONE
-    # }
+    broker_use_ssl={
+        'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
+        'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',
+        'ssl_ca_certs': '/etc/ssl/bluesky-web-client.pem',
+        'ssl_cert_reqs': ssl.CERT_NONE
+    }
 )
 
 try:

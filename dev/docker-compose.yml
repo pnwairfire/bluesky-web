@@ -16,7 +16,8 @@ services:
         - HOSTNAME=blueskyweb
         - RABBITMQ_NODENAME=blueskyweb
     ports:
-        - "5887:5672"  # we forward this port because it's useful for debugging
+        # we forward 5671 (ssl port) because it's useful for debugging
+        - "5887:5671"
         - "15887:15672"  # here, we can access rabbitmq management plugin
     volumes:
     - $PWD/docker-logs/rabbitmq/:/var/log/rabbitmq/
@@ -130,7 +131,7 @@ services:
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
-    - RABBITMQ_URL=amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit
+    - RABBITMQ_URL=amqps://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q no-met-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise
       -c 5 -A blueskyworker.tasks worker
@@ -155,7 +156,7 @@ services:
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
-    - RABBITMQ_URL=amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit
+    - RABBITMQ_URL=amqps://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q no-met,ca-nv_6-km,national_12-km
       -c 5 -A blueskyworker.tasks worker

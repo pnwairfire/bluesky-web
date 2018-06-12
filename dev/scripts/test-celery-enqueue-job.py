@@ -22,10 +22,10 @@ from urllib.parse import urlparse
 
 from celery import Celery
 
-BROKER_URL = 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
-app = Celery('test.tasks', backend='mongodb', broker=BROKER_URL)
-# BROKER_URL = 'amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit'
-# app = Celery('test.tasks', backend='amqp', broker=BROKER_URL)
+# BROKER_URL = 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
+# app = Celery('test.tasks', backend='mongodb', broker=BROKER_URL)
+BROKER_URL = 'amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671'
+app = Celery('test.tasks', backend='amqp', broker=BROKER_URL)
 
 parse_object = urlparse(BROKER_URL)
 app.conf.update(
@@ -38,13 +38,13 @@ app.conf.update(
     #     "database": parse_object.path.strip('/'),
     #     "taskmeta_collection": "stock_taskmeta_collection"
     # },
-    # broker_use_ssl={
-    #     #'ssl': True,
-    #     'keyfile': '/etc/ssl/bluesky-web-client-cert.key',
-    #     'certfile': '/etc/ssl/bluesky-web-client-cert.crt',
-    #     'ca_certs': '/etc/ssl/bluesky-web-client.pem',
-    #     'cert_reqs': ssl.CERT_NONE
-    # }
+    broker_use_ssl={
+        #'ssl': True,
+        'keyfile': '/etc/ssl/bluesky-web-client-cert.key',
+        'certfile': '/etc/ssl/bluesky-web-client-cert.crt',
+        'ca_certs': '/etc/ssl/bluesky-web-client.pem',
+        'cert_reqs': ssl.CERT_NONE
+    }
 )
 @app.task
 def go(output_filename):
