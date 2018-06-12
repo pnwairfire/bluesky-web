@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 
 from celery import Celery
 
-BROKER_URL = 'amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671'
+BROKER_URL = 'amqp://blueskyweb:blueskywebrabbitpassword@rabbit:5671'
 app = Celery('test.tasks', backend='amqp', broker=BROKER_URL)
 
 parse_object = urlparse(BROKER_URL)

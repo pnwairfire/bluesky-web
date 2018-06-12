@@ -24,7 +24,7 @@ from blueskymongo.client import BlueSkyWebDB, RunStatuses
 # mongodb used for recording run information, status, etc.
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
 # rabbitmq used for enqueueing runs
-RABBITMQ_URL = os.environ.get('RABBITMQ_URL') or 'amqps://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671'
+RABBITMQ_URL = os.environ.get('RABBITMQ_URL') or 'amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671'
 
 app = Celery('blueskyworker.tasks', broker=RABBITMQ_URL)
 app.conf.update(

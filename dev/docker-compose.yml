@@ -11,7 +11,7 @@ services:
     # setting hostname to match ssl cert
     hostname: bluesky-web-rabbitmq
     environment:
-        - RABBITMQ_DEFAULT_USER=blueskywebadmin
+        - RABBITMQ_DEFAULT_USER=blueskyweb
         - RABBITMQ_DEFAULT_PASS=blueskywebrabbitpassword
         - HOSTNAME=blueskyweb
         - RABBITMQ_NODENAME=blueskyweb
@@ -28,7 +28,8 @@ services:
     # setting hostname to match ssl cert
     hostname: bluesky-web-mongo
     environment:
-    # These are meant to be overridden
+    # This is the admin user, not the user used by the app
+    # to record run information
     - MONGO_INITDB_ROOT_USERNAME=blueskywebadmin
     - MONGO_INITDB_ROOT_PASSWORD=blueskywebmongopasswordadmin
     ports:
@@ -131,7 +132,7 @@ services:
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
-    - RABBITMQ_URL=amqps://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671
+    - RABBITMQ_URL=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q no-met-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise
       -c 5 -A blueskyworker.tasks worker
@@ -156,7 +157,7 @@ services:
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
-    - RABBITMQ_URL=amqps://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671
+    - RABBITMQ_URL=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q no-met,ca-nv_6-km,national_12-km
       -c 5 -A blueskyworker.tasks worker
