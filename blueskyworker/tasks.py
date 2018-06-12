@@ -26,24 +26,8 @@ MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://blueskyweb:blueskywebm
 # rabbitmq used for enqueueing runs
 RABBITMQ_URL = os.environ.get('RABBITMQ_URL') or 'amqps://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671'
 
-
-# BROKER_URL = MONGODB_URL
-# app = Celery('blueskyworker.tasks', backend='mongodb', broker=BROKER_URL)
-BROKER_URL = RABBITMQ_URL
-app = Celery('blueskyworker.tasks', broker=BROKER_URL)
-
-
-#parse_object = urlparse(BROKER_URL)
+app = Celery('blueskyworker.tasks', broker=RABBITMQ_URL)
 app.conf.update(
-    # result_backend='mongodb',
-    # mongodb_backend_settings={
-    #     "host": parse_object.hostname,
-    #     "port": parse_object.port or 27017,
-    #     "user": parse_object.username,
-    #     "password": parse_object.password,
-    #     "database": parse_object.path.strip('/'),
-    #     "taskmeta_collection": "stock_taskmeta_collection"
-    # },
     broker_use_ssl={
         'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
         'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',

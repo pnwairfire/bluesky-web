@@ -22,22 +22,11 @@ from urllib.parse import urlparse
 
 from celery import Celery
 
-# BROKER_URL = 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
-# app = Celery('test.tasks', backend='mongodb', broker=BROKER_URL)
 BROKER_URL = 'amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit:5671'
 app = Celery('test.tasks', backend='amqp', broker=BROKER_URL)
 
 parse_object = urlparse(BROKER_URL)
 app.conf.update(
-    #result_backend='mongodb',
-    # mongodb_backend_settings={
-    #     "host": parse_object.hostname,
-    #     "port": parse_object.port or 27017,
-    #     "user": parse_object.username,
-    #     "password": parse_object.password,
-    #     "database": parse_object.path.strip('/'),
-    #     "taskmeta_collection": "stock_taskmeta_collection"
-    # },
     broker_use_ssl={
         #'ssl': True,
         'keyfile': '/etc/ssl/bluesky-web-client-cert.key',
