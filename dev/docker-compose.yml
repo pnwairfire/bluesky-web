@@ -42,6 +42,8 @@ services:
     #   set `command` in order to specify `--logpath`
     command: mongod --auth --logpath /var/log/mongodb/mongodb.log --sslMode requireSSL --sslPEMKeyFile /etc/ssl/bluesky-web-mongod.pem --sslAllowInvalidHostnames
   web1:
+    # stdin_open: true
+    # tty: true
     image: bluesky-web
     container_name: bluesky-web-1
     volumes:
@@ -65,6 +67,8 @@ services:
       --output-url-path-prefix= --bluesky-log-level=DEBUG
       -c /etc/bluesky-web/config.json
   web2:
+    # stdin_open: true
+    # tty: true
     image: bluesky-web
     container_name: bluesky-web-2
     volumes:
@@ -107,6 +111,8 @@ services:
     working_dir: /data/bluesky/output/
     command: python -m http.server 8886
   worker_plumerise:
+    # stdin_open: true
+    # tty: true
     image: bluesky-web
     container_name: bluesky-web-worker-plumerise
     volumes:
@@ -120,14 +126,18 @@ services:
     - $HOME/Met/:/data/Met/
     links:
     - mongo
+    - rabbit
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
+    - RABBITMQ_URL=amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q no-met-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise
       -c 5 -A blueskyworker.tasks worker
       -l INFO -f /var/log/blueskyworker/bluesky-web-worker-plumerise.log
   worker:
+    # stdin_open: true
+    # tty: true
     image: bluesky-web
     container_name: bluesky-web-worker
     volumes:
@@ -145,7 +155,7 @@ services:
     environment:
     #- MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
-    - RABBITMQ_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
+    - RABBITMQ_URL=amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q no-met,ca-nv_6-km,national_12-km
       -c 5 -A blueskyworker.tasks worker

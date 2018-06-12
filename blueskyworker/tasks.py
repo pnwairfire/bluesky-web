@@ -22,14 +22,16 @@ from bluesky import exceptions, models
 from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
+RABBITMQ_URL = os.environ.get('RABBITMQ_URL') or 'amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit'
+
 
 # BROKER_URL = MONGODB_URL
 # app = Celery('blueskyworker.tasks', backend='mongodb', broker=BROKER_URL)
-BROKER_URL = 'amqp://blueskywebadmin:blueskywebrabbitpassword@rabbit'
+BROKER_URL = RABBITMQ_URL
 app = Celery('blueskyworker.tasks', broker=BROKER_URL)
 
 
-parse_object = urlparse(BROKER_URL)
+#parse_object = urlparse(BROKER_URL)
 app.conf.update(
     # result_backend='mongodb',
     # mongodb_backend_settings={
