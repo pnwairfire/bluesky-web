@@ -63,6 +63,7 @@ services:
     command: bsp-web -d -o /data/bluesky/output/
       --path-prefix=bluesky-web -p 80
       --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
+      --rabbitmq-url=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
       --log-level=DEBUG
       --log-file=/var/log/blueskyweb/bluesky-web.log
       --output-url-scheme=http --output-url-port=8886
@@ -88,6 +89,7 @@ services:
     command: bsp-web -d -o /data/bluesky/output/
       --path-prefix=bluesky-web -p 80
       --mongodb-url=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
+      --rabbitmq-url=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
       --log-level=DEBUG
       --log-file=/var/log/blueskyweb/bluesky-web.log
       --output-url-scheme=http --output-url-port=8886

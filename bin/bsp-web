@@ -69,7 +69,11 @@ OPTIONAL_ARGS = [
     },
     {
         'long': '--mongodb-url',
-        'help': 'url to connect to mongodb for arl indexes and bsp job queues'
+        'help': 'url to connect to mongodb for arl indexes and recording run status'
+    },
+    {
+        'long': '--rabbitmq-url',
+        'help': 'url to connect to rabbitmq for bsp job queues'
     }
 ]
 
@@ -78,7 +82,8 @@ EPILOG_STR = """
 Examples
 
    $ {script_name} --log-level=DEBUG -d --path-prefix=bluesky \\
-        --mongodb-url=mongodb://localhost:27018/blueskyweb
+        --mongodb-url=mongodb://localhost:27018/blueskyweb \\
+        --rabbitmq-url=amqps://localhost:5671
 
 Example curl Requests
 

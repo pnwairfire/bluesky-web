@@ -42,7 +42,8 @@ def configure_logging(**settings):
 
 DEFAULT_SETTINGS = {
     'port': 8887,
-    'mongodb_url': "mongodb://localhost:27018/blueskyweb",
+    'mongodb_url': "mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb",
+    'rabbitmq_url': "amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671",
     'log_file': '/var/log/blueskyweb/bluesky-web.log',
     # Output url - to access output from the outside world
     'output_url_scheme': 'https',
@@ -118,6 +119,8 @@ def main(**settings):
 
     os.environ["MONGODB_URL"] = settings['mongodb_url']
     settings['mongo_db'] = BlueSkyWebDB(settings['mongodb_url'])
+
+    os.environ["RABBITMQ_URL"] = settings['rabbitmq_url']
 
     routes = get_routes(settings.get('path_prefix'))
     application = tornado.web.Application(routes, **settings)
