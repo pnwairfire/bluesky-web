@@ -28,6 +28,7 @@ RABBITMQ_URL = os.environ.get('RABBITMQ_URL') or 'amqps://blueskyweb:blueskywebr
 
 app = Celery('blueskyworker.tasks', broker=RABBITMQ_URL)
 app.conf.update(
+    task_ignore_result=True,
     broker_use_ssl={
         'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
         'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',
