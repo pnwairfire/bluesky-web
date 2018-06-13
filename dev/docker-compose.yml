@@ -15,6 +15,7 @@ services:
         - RABBITMQ_DEFAULT_PASS=blueskywebrabbitpassword
         - HOSTNAME=blueskyweb
         - RABBITMQ_NODENAME=blueskyweb
+        - RABBITMQ_LOG_BASE=/var/log/rabbitmq/
     ports:
         # we forward 5671 (ssl port) because it's useful for debugging
         - "5887:5671"
