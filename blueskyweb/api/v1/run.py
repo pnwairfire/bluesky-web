@@ -558,7 +558,7 @@ class RunsInfo(RunStatusBase):
 
         # TODO: include total count of runs with given status, and of runs
         #    of all statuses?
-        self.write({"runs": runs})
+        self.write({"runs": runs, "count": len(runs)})
 
 
 class RunOutput(RequestHandlerBase):
