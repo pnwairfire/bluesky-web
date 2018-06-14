@@ -147,3 +147,16 @@ And on worker servers, e.g. judy
 ## APIs
 
 See [APIs](doc/API.md)
+
+
+
+
+## Manually connecting to mongodb
+
+    mkdir -p tmp/
+    ./generate-ssl-cert.sh ./tmp/ssl client
+    docker exec -ti bluesky-web-mongo \
+        mongo -u blueskyweb -p blueskywebmongopassword --ssl \
+        --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
+        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        blueskyweb
