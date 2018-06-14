@@ -551,14 +551,19 @@ class RunsInfo(RunStatusBase):
     async def get(self, status=None):
         limit = int(self.get_query_argument('limit', 10))
         offset = int(self.get_query_argument('offset', 0))
-        runs = await self.settings['mongo_db'].find_runs(status=status,
+        runs, total_count = await self.settings['mongo_db'].find_runs(status=status,
             limit=limit, offset=offset)
         for run in runs:
             await self.process(run)
 
-        # TODO: include total count of runs with given status, and of runs
-        #    of all statuses?
-        self.write({"runs": runs, "count": len(runs)})
+        # TODO: include total count of runs of *all* statuses?
+        self.write({
+            "runs": runs,
+            "count": len(runs),
+            "limit": limit,
+            "offset": offset,
+            "total": total_count
+        })
 
 
 class RunOutput(RequestHandlerBase):

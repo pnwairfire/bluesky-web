@@ -104,6 +104,14 @@ class BlueSkyWebDB(object):
         tornado.log.gen_log.debug('query, limit, offset: %s, %s, %s',
             query, limit, offset)
 
+        # Count sometimes returns wront vallue if there are
+        # 'orphaned' (?) documents. So, use aggregate instead:
+        #total_count = await self.db.runs.count(query)
+        cursor = self.db.runs.aggregate([
+            { "$match": query },
+            { "$count": "count" }
+        ])
+        total_count = (await cursor.to_list(1))[0]['count']
         cursor = self.db.runs.find(query)
         cursor = cursor.sort([('initiated_at', -1)]).limit(limit).skip(offset)
 
@@ -117,7 +125,7 @@ class BlueSkyWebDB(object):
         for r in runs:
             r.pop('_id')
 
-        return runs
+        return runs, total_count
 
     async def get_queue_position(self, run):
         """
