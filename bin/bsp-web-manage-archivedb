@@ -5,22 +5,22 @@ __copyright__ = "Copyright 2017, AirFire, PNW, USFS"
 
 import datetime
 import json
+import os
 import sys
 import traceback
 
-import tornado
-
-import afscripting as scripting
-
 try:
-    from blueskyweb.app import configure_logging
-    from blueskyweb.lib import met
+    import tornado
 
-except:
-    import os
+    import afscripting as scripting
+
     sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../')))
     from blueskyweb.app import configure_logging
     from blueskyweb.lib import met
+
+except ImportError:
+    sys.stdout.write("\n*** Use docker run or exec to run this script\n\n")
+    sys.exit(1)
 
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
