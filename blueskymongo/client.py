@@ -111,7 +111,10 @@ class BlueSkyWebDB(object):
             { "$match": query },
             { "$count": "count" }
         ])
-        total_count = (await cursor.to_list(1))[0]['count']
+
+        r = await cursor.to_list(1)
+        total_count = r[0]['count'] if r else 0
+
         cursor = self.db.runs.find(query)
         cursor = cursor.sort([('initiated_at', -1)]).limit(limit).skip(offset)
 
