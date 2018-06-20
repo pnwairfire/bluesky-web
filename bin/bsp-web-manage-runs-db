@@ -28,6 +28,8 @@ EPILOG_STR = """
 Examples
 
    $ {script_name} -a get-run --run-id abc123-plumerise
+   $ {script_name} -a get-runs
+   $ {script_name} -a get-runs --status enqueud --limit 5 --offset 10
    $ {script_name} -a delete-run --run-id abc123-plumerise
    $ {script_name} -a delete-all-runs
 
@@ -35,6 +37,7 @@ Examples
 
 ACTIONS = [
     'get-run',
+    'get-runs',
     'delete-run',
     'delete-all-runs'
 ]
@@ -58,7 +61,22 @@ OPTIONAL_ARGS = [
     {
         'long': '--run-id',
         'help': 'Used when getting or deleting a run'
+    },
+    {
+        'long': '--status',
+        'help': 'Used when getting runs'
+    },
+    {
+        'long': '--limit',
+        'help': 'Used when getting runs',
+        'type': int
+    },
+    {
+        'long': '--offset',
+        'help': 'Used when getting runs',
+        'type': int
     }
+
 ]
 
 def validate_action(args):
@@ -88,6 +106,11 @@ async def get_run(db, args):
     if not args.run_id:
         raise RuntimeError("Specify --run-id")
     return await db.find_run(args.run_id)
+
+async def get_runs(db, args):
+    tornado.log.gen_log.info('Getting runs')
+    return await db.find_runs(status=args.status,
+        limit=args.limit, offset=args.offset)
 
 async def delete_run(db, args):
     tornado.log.gen_log.info('Deleting run')
