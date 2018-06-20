@@ -115,18 +115,21 @@ class BlueSkyWebDB(object):
         r = await cursor.to_list(1)
         total_count = r[0]['count'] if r else 0
 
-        cursor = self.db.runs.find(query)
-        cursor = cursor.sort([('initiated_at', -1)]).limit(limit).skip(offset)
+        if total_count > 0:
+            cursor = self.db.runs.find(query)
+            cursor = cursor.sort([('initiated_at', -1)]).limit(limit).skip(offset)
 
-        # runs = []
-        # async for r in cursor:
-        #     tornado.log.gen_log.debug('run: %s', r)
-        #     r.pop('_id')
-        #     runs.append(r)
-        runs = await cursor.to_list(limit)
+            # runs = []
+            # async for r in cursor:
+            #     tornado.log.gen_log.debug('run: %s', r)
+            #     r.pop('_id')
+            #     runs.append(r)
+            runs = await cursor.to_list(limit)
 
-        for r in runs:
-            r.pop('_id')
+            for r in runs:
+                r.pop('_id')
+        else:
+            runs = []
 
         return runs, total_count
 
