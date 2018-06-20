@@ -8,13 +8,16 @@ services:
   rabbit:
     image: bluesky-web-rabbitmq
     container_name: bluesky-web-rabbitmq
-    # setting hostname to match ssl cert
+    # setting hostname to A) prevent rabbit from
+    # crashing between restarts when loading
+    # mounted rabbitmq/db/mnesia/ dir, and b) to
+    # match ssl cert
+    # See https://github.com/docker-library/rabbitmq/issues/6
     hostname: bluesky-web-rabbitmq
     environment:
         - RABBITMQ_DEFAULT_USER=blueskyweb
         - RABBITMQ_DEFAULT_PASS=blueskywebrabbitpassword
-        - HOSTNAME=blueskyweb
-        - RABBITMQ_NODENAME=blueskyweb
+        - RABBITMQ_NODENAME=bluesky-web-rabbitmq
         - RABBITMQ_LOG_BASE=/var/log/rabbitmq/
     ports:
         # we forward 5671 (ssl port) because it's useful for debugging
