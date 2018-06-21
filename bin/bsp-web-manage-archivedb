@@ -67,7 +67,7 @@ OPTIONAL_ARGS = [
         'long': '--mongodb-url',
         'help': ('url to connect to mongodb for arl '
             'indexes and bsp job queues'),
-        'default': "mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb"
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb"
     },
     {
         'long': '--target-date',
