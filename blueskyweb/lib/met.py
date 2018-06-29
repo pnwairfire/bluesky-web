@@ -95,13 +95,25 @@ class MetArchiveDB(object):
 
         return d['root_dir']
 
+    def _merge_availability_windows(self, avail1, avail2):
+        merged_avail = []
+        for w in sorted(avail1 + avail2, key=lambda e: e['first_hour']):
+            if not merged_avail or merged_avail[-1]['last_hour'] < w['first_hour']:
+                merged_avail.append(w)
+            else:
+                merged_avail[-1]['last_hour'] = w['last_hour']
+        return merged_avail
+
     async def get_availability(self, archive_id=None):
         validate_archive_id(archive_id)
 
         query = { "domain": archive_id } if archive_id else {}
-        select_set = {'domain': 1, 'start': 1, 'end': 1, 'latest_forecast': 1}
+        select_set = {
+            'domain': 1, 'availability': 1, 'start': 1, 'end': 1, 'latest_forecast': 1
+        }
         r = {}
-        async for e in self.db.dates.find(query, select_set):
+        async for e in self.db.met_files.find(query, select_set):
+
             # Note what we're calling 'begin' here is called 'start'
             # in the arl index db
             if e['domain'] in r:
@@ -113,9 +125,12 @@ class MetArchiveDB(object):
                     r[e['domain']]['end'], e['end'])
                 r[e['domain']]['latest_forecast'] = min(
                     r[e['domain']]['latest_forecast'], e['latest_forecast'])
+                r[e['domain']]['availability'] = self._merge_availability_windows(
+                    r[e['domain']]['availability'], e.get('availability', []))
             else:
                 r[e['domain']] = dict(begin=e['start'], end=e['end'],
-                    latest_forecast=e['latest_forecast'])
+                    latest_forecast=e['latest_forecast'],
+                    availability=e.get('availability', []))
 
         # TODO: modify r?
         if archive_id:
