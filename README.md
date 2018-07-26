@@ -153,8 +153,18 @@ See [APIs](doc/API.md)
 
 ## Manually connecting to mongodb
 
+start session
+
     docker exec -ti bluesky-web-mongo \
         mongo -u blueskyweb -p blueskywebmongopassword --ssl \
         --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
         --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
         blueskyweb
+
+run query on command line
+
+    docker exec -ti bluesky-web-mongo \
+        mongo -u blueskyweb -p blueskywebmongopassword --ssl \
+        --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
+        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        blueskyweb --eval 'db.met_files.findOne()'
