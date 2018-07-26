@@ -123,6 +123,7 @@ services:
     # tty: true
     image: bluesky-web
     container_name: bluesky-web-worker-plumerise
+    hostname: bluesky-web-worker-plumerise
     volumes:
     - $PWD/:/usr/src/blueskyweb/
     - $PWD/docker-logs/worker/all/:/var/log/blueskyworker/
@@ -148,6 +149,7 @@ services:
     # tty: true
     image: bluesky-web
     container_name: bluesky-web-worker
+    hostname: bluesky-web-worker
     volumes:
     - $PWD/:/usr/src/blueskyweb/
     - $PWD/docker-logs/worker/all/:/var/log/blueskyworker/
