@@ -307,7 +307,7 @@ class RunExecuter(RequestHandlerBase):
         tornado.log.gen_log.debug('Configuring emissions')
         data['config'] = data.get('config', {})
         data['config']['emissions'] = data['config'].get('emissions', {})
-        data['config']['emissions']['efs'] = "urbanski"
+        data['config']['emissions']['efs'] = "prichard-oneill"
 
     ## Findmetdata
 
