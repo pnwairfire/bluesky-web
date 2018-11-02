@@ -31,6 +31,20 @@ echo "Outputing to $OUTPUT_FILE"
 
 echo -n "" > $OUTPUT_FILE
 
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+print_response() {
+    response=$1
+    if [ ${response:0:3} = 200 ]; then
+        printf "${GREEN}${response}${NC}\n"
+    else
+        printf "${RED}${response}${NC}\n"
+    fi
+}
+
+
 # Note: this test does not include dispersion related apis, i.e.
 #   - /api/v1/run/dispersion/
 #   - /api/v1/run/all/
@@ -65,7 +79,7 @@ for i in "${GET_URLS[@]}"
     response=$(curl "$i" --write-out "$WRITE_OUT_PATTERN" --silent -o "$OUTPUT_FILE-t")
     cat $OUTPUT_FILE-t >> $OUTPUT_FILE
     echo "" >> $OUTPUT_FILE
-    echo $response
+    print_response $response
     rm $OUTPUT_FILE-t
 done
 
@@ -110,7 +124,7 @@ response=$(curl "$ROOT_URL/api/v1/run/fuelbeds/" --write-out "$WRITE_OUT_PATTERN
     }' -o "$OUTPUT_FILE-t")
 cat $OUTPUT_FILE-t >> $OUTPUT_FILE
 echo "" >> $OUTPUT_FILE
-echo $response
+print_response $response
 #next_request=$(cat $OUTPUT_FILE-t)
 #echo $next_request
 rm $OUTPUT_FILE-t
@@ -168,7 +182,7 @@ response=$(curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTER
     }' -o "$OUTPUT_FILE-t")
 cat $OUTPUT_FILE-t >> $OUTPUT_FILE
 echo "" >> $OUTPUT_FILE
-echo $response
+print_response $response
 rm $OUTPUT_FILE-t
 
 
