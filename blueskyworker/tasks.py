@@ -324,6 +324,8 @@ class BlueSkyRunner(object):
                     data['fire_information'] = prune_for_plumerise(
                         fires_manager.fires)
 
+                data['runtime'] = fires_manager.runtime
+
                 self._record_run(RunStatuses.CompletedModule, module=m, **data)
 
             except exceptions.BlueSkyModuleError as e:
