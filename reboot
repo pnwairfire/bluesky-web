@@ -1,12 +1,62 @@
 #!/usr/bin/env bash
 
-docker build -t bluesky-web .
-docker build -t bluesky-web-nginx -f Dockerfile-nginx .
-docker build -t bluesky-web-mongo -f Dockerfile-mongo .
-docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .
-mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
-    ./docker-logs/worker/dri ./docker-logs/worker/nam \
-    ./docker-logs/worker/no-met ./docker-data/mongodb/db \
-    ./docker-data/output
-docker-compose -f dev/docker-compose.yml down --remove-orphans
-docker-compose -f dev/docker-compose.yml up
+show_help=false
+rebuild=false
+yaml_file=dev/docker-compose.yml
+shut_down=false
+
+while [ -n "$1" ]; do # while loop starts
+    case "$1" in
+    -h) show_help=true && shift ;;
+    --help) show_help=true && shift ;;
+    --rebuild) rebuild=true && shift ;;
+    --yaml-file) yaml_file="$2" && shift && shift ;;
+    --shut-down) shut_down=true && shift ;;
+    *) echo "Option $1 not recognized" && exit 1 ;;
+    esac
+done
+
+if [ "$show_help" = true ] ; then
+    echo ""
+    echo "Options:"
+    echo "   -h/--help     - show this help message"
+    echo "   --rebuild     - rebuild docker images"
+    echo "   --yaml-file   - default: dev/docker-compose-dev.yml"
+    echo "   --shut-down   - don't restart"
+    echo ""
+    echo "Usage:"
+    echo "   $0"
+    echo "   $0 --yaml-file dev/docker-compose.yml --rebuild"
+    echo "   $0 --shut-down"
+    echo ""
+    exit 0
+fi
+
+if [ ! -e $yaml_file ]; then
+    echo "ERROR:  docker-compose YAML file doesn't exist"
+    echo "ERROR:     $yaml_file"
+    exit 1
+fi
+
+echo "Options"
+echo "  Rebuild docker images: $rebuild"
+echo "  docker-compose YAML file: $yaml_file"
+
+# call `down` on all known yaml files, in case previously used yaml file
+# is different than this one.
+docker-compose -p bluesky-web -f dev/docker-compose.yml down --remove-orphans
+docker-compose -p bluesky-web -f $yaml_file down --remove-orphans
+if [ "$rebuild" = true ] ; then
+    docker build -t bluesky-web .
+    docker build -t bluesky-web-nginx -f Dockerfile-nginx .
+    docker build -t bluesky-web-mongo -f Dockerfile-mongo .
+    docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .
+fi
+if [ "$shut_down" = false ] ; then
+    mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
+        ./docker-logs/worker/dri ./docker-logs/worker/nam \
+        ./docker-logs/worker/no-met ./docker-data/mongodb/db \
+        ./docker-data/output
+    docker-compose -f dev/docker-compose.yml up
+    docker-compose -p bluesky-web -f $yaml_file up
+fi
