@@ -4,10 +4,9 @@ tmp/
 build/
 dist/
 blueskyweb.egg-info/
-logs/
+dev/logs/
 db/
 .cache/
 docker-data/
-docker-logs/
 dev/data/*.json
 dev/blueskyrunner-logs/

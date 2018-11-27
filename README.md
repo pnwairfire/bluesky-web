@@ -37,9 +37,9 @@ api web service, output web service, bsp workers, and ofelia.
     docker build -t bluesky-web-nginx -f Dockerfile-nginx .
     docker build -t bluesky-web-mongo -f Dockerfile-mongo .
     docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .
-    mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
-        ./docker-logs/worker/dri ./docker-logs/worker/nam \
-        ./docker-logs/worker/no-met ./docker-data/mongodb/db \
+    mkdir -p ./dev/logs/mongodb/ ./dev/logs/web/ \
+        ./dev/logs/worker/dri ./dev/logs/worker/nam \
+        ./dev/logs/worker/no-met ./docker-data/mongodb/db \
         ./docker-data/output
 
 ### Run
@@ -63,7 +63,7 @@ If you don't want to wait for it to run, manually run it with:
 ### Tail logs
 
     cd /path/to/airfire-bluesky-web
-    find ./docker-logs/ -name *.log -exec tail -f "$file" {} +
+    find ./dev/logs/ -name *.log -exec tail -f "$file" {} +
 
 
 

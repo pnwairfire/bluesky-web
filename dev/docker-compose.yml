@@ -24,7 +24,7 @@ services:
         - "5887:5671"
         - "15887:15672"  # here, we can access rabbitmq management plugin
     volumes:
-    - $PWD/docker-logs/rabbitmq/:/var/log/rabbitmq/
+    - ./logs/rabbitmq/:/var/log/rabbitmq/
     - $PWD/docker-data/rabbitmq/:/var/lib/rabbitmq/
   mongo:
     image: bluesky-web-mongo
@@ -39,7 +39,7 @@ services:
     ports:
     - 27887:27017
     volumes:
-    - $PWD/docker-logs/mongodb/:/var/log/mongodb/
+    - ./logs/mongodb/:/var/log/mongodb/
     - $PWD/docker-data/mongodb/db/:/data/db/
     - $PWD/docker-data/mongodb/configdb/:/data/configdb/
     - $PWD/dev/mongo-entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
@@ -54,7 +54,7 @@ services:
     container_name: bluesky-web-1
     volumes:
     - $PWD/:/usr/src/blueskyweb/
-    - $PWD/docker-logs/web/:/var/log/blueskyweb/
+    - ./logs/web/:/var/log/blueskyweb/
     - $PWD/dev/config.json:/etc/bluesky-web/config.json
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
@@ -80,7 +80,7 @@ services:
     container_name: bluesky-web-2
     volumes:
     - $PWD/:/usr/src/blueskyweb/
-    - $PWD/docker-logs/web/:/var/log/blueskyweb/
+    - ./logs/web/:/var/log/blueskyweb/
     - $PWD/dev/config.json:/etc/bluesky-web/config.json
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
@@ -105,7 +105,7 @@ services:
     ports:
     - 8887:80
     volumes:
-    - $PWD/docker-logs/nginx/:/var/log/nginx/
+    - ./logs/nginx/:/var/log/nginx/
     links:
     - web1
     - web2
@@ -126,7 +126,7 @@ services:
     hostname: bluesky-web-worker-plumerise
     volumes:
     - $PWD/:/usr/src/blueskyweb/
-    - $PWD/docker-logs/worker/all/:/var/log/blueskyworker/
+    - ./logs/worker/all/:/var/log/blueskyworker/
     - $PWD/docker-data/output/:/data/bluesky/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # mount met for ofelia
@@ -152,7 +152,7 @@ services:
     hostname: bluesky-web-worker
     volumes:
     - $PWD/:/usr/src/blueskyweb/
-    - $PWD/docker-logs/worker/all/:/var/log/blueskyworker/
+    - ./logs/worker/all/:/var/log/blueskyworker/
     - $PWD/docker-data/output/:/data/bluesky/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # mount met for ofelia

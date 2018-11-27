@@ -53,9 +53,9 @@ if [ "$rebuild" = true ] ; then
     docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .
 fi
 if [ "$shut_down" = false ] ; then
-    mkdir -p ./docker-logs/mongodb/ ./docker-logs/web/ \
-        ./docker-logs/worker/dri ./docker-logs/worker/nam \
-        ./docker-logs/worker/no-met ./docker-data/mongodb/db \
+    mkdir -p ./dev/logs/mongodb/ ./dev/logs/web/ \
+        ./dev/logs/worker/dri ./dev/logs/worker/nam \
+        ./dev/logs/worker/no-met ./docker-data/mongodb/db \
         ./docker-data/output
     docker-compose -f dev/docker-compose.yml up
     docker-compose -p bluesky-web -f $yaml_file up
