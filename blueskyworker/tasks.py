@@ -332,7 +332,7 @@ class BlueSkyRunner(object):
                 # The error was added to fires_manager's meta data, and will be
                 # included in the output data
                 self._record_run(RunStatuses.FailedModule, module=m,
-                    status_message=e.args[0])
+                    status_message=e.args and e.args[0])
                 break
 
         # TODO: handle any of the following individually?
