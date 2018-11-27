@@ -42,7 +42,7 @@ services:
     - ./logs/mongodb/:/var/log/mongodb/
     - ./data/mongodb/db/:/data/db/
     - ./data/mongodb/configdb/:/data/configdb/
-    - $PWD/dev/mongo-entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
+    - ./mongo-entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
     # Note: '--auth' is automatically added to command if
     #   MONGO_INITDB_ROOT_[USERNAME|PASSWORD] are set, but we need to
     #   set `command` in order to specify `--logpath`
@@ -53,9 +53,9 @@ services:
     image: bluesky-web
     container_name: bluesky-web-1
     volumes:
-    - $PWD/:/usr/src/blueskyweb/
+    - ../:/usr/src/blueskyweb/
     - ./logs/web/:/var/log/blueskyweb/
-    - $PWD/dev/config.json:/etc/bluesky-web/config.json
+    - ./config.json:/etc/bluesky-web/config.json
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
@@ -79,9 +79,9 @@ services:
     image: bluesky-web
     container_name: bluesky-web-2
     volumes:
-    - $PWD/:/usr/src/blueskyweb/
+    - ../:/usr/src/blueskyweb/
     - ./logs/web/:/var/log/blueskyweb/
-    - $PWD/dev/config.json:/etc/bluesky-web/config.json
+    - ./config.json:/etc/bluesky-web/config.json
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
@@ -125,7 +125,7 @@ services:
     container_name: bluesky-web-worker-plumerise
     hostname: bluesky-web-worker-plumerise
     volumes:
-    - $PWD/:/usr/src/blueskyweb/
+    - ../:/usr/src/blueskyweb/
     - ./logs/worker/all/:/var/log/blueskyworker/
     - ./data/output/:/data/bluesky/output/
     - /var/run/docker.sock:/var/run/docker.sock
@@ -151,7 +151,7 @@ services:
     container_name: bluesky-web-worker
     hostname: bluesky-web-worker
     volumes:
-    - $PWD/:/usr/src/blueskyweb/
+    - ../:/usr/src/blueskyweb/
     - ./logs/worker/all/:/var/log/blueskyworker/
     - ./data/output/:/data/bluesky/output/
     - /var/run/docker.sock:/var/run/docker.sock
@@ -174,6 +174,6 @@ services:
     image: mcuadros/ofelia
     container_name: bluesky-web-ofelia
     volumes:
-    - $PWD/dev/ofelia.ini:/etc/ofelia/config.ini
+    - ./ofelia.ini:/etc/ofelia/config.ini
     - /var/run/docker.sock:/var/run/docker.sock
     #command: ofelia daemon --config /etc/ofelia/config.ini
