@@ -164,6 +164,11 @@ OPTIONAL_ARGS = [
         'help': "reproject images in blueskykml",
         'action': "store_true",
         'default': False
+    },
+    {
+        'long': '--indent',
+        'help': 'Format output json with newlines and given indent',
+        'type': int
     }
 ]
 
@@ -411,6 +416,6 @@ if __name__ == "__main__":
 
     data = json.loads(response.content.decode())
     # TODO: log individual bits of information
-    logging.info("Reponse: {}".format(data))
+    logging.info("Reponse: {}".format(json.dumps(data, indent=args.indent)))
     logging.info("Root Url: %s", data.get('root_url', 'N/A'))
 
