@@ -39,8 +39,8 @@ api web service, output web service, bsp workers, and ofelia.
     docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .
     mkdir -p ./dev/logs/mongodb/ ./dev/logs/web/ \
         ./dev/logs/worker/dri ./dev/logs/worker/nam \
-        ./dev/logs/worker/no-met ./docker-data/mongodb/db \
-        ./docker-data/output
+        ./dev/logs/worker/no-met ./dev/data/mongodb/db \
+        ./dev/data/output
 
 ### Run
 

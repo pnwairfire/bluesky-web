@@ -7,6 +7,5 @@ blueskyweb.egg-info/
 dev/logs/
 db/
 .cache/
-docker-data/
-dev/data/*.json
+dev/data/
 dev/blueskyrunner-logs/

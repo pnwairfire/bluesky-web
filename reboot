@@ -55,8 +55,8 @@ fi
 if [ "$shut_down" = false ] ; then
     mkdir -p ./dev/logs/mongodb/ ./dev/logs/web/ \
         ./dev/logs/worker/dri ./dev/logs/worker/nam \
-        ./dev/logs/worker/no-met ./docker-data/mongodb/db \
-        ./docker-data/output
+        ./dev/logs/worker/no-met ./dev/data/mongodb/db \
+        ./dev/data/output
     docker-compose -f dev/docker-compose.yml up
     docker-compose -p bluesky-web -f $yaml_file up
 fi
