@@ -618,10 +618,12 @@ class RunOutput(RequestHandlerBase):
         r = {
             "root_url": run['output_url']
         }
-        if 'export' in run:
-            export_info = run['export']
-        else:
-            export_info = self._load_output(run)['export']
+        run_info = run if 'export' in run else self._load_output(run)
+
+        # TODO: refine what runtime info is returned
+        r['runtime'] = run_info.get('runtime', {})
+
+        export_info = run_info['export']
 
         vis_info = export_info['localsave'].get('visualization')
         if vis_info:
