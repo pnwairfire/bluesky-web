@@ -324,7 +324,7 @@ class BlueSkyRunner(object):
                     data['fire_information'] = prune_for_plumerise(
                         fires_manager.fires)
 
-                data['runtime'] = fires_manager.runtime
+                data['runtime'] = process_runtime(fires_manager.runtime)
 
                 self._record_run(RunStatuses.CompletedModule, module=m, **data)
 
@@ -397,3 +397,24 @@ def prune_growth_for_plumerise(g):
 
 def slice_dict(d, whitelist):
     return {k: d[k] for k in d.keys() & whitelist}
+
+def process_runtime(runtime_info):
+    runtime_info = runtime_info or {}
+    processed = {}
+    modules = runtime_info.get('modules', [])
+    if modules:
+        processed['start'] = min([e['start'] for e in modules])
+        processed['end'] = max([e['end'] for e in modules])
+        if processed['start'] and processed['end']:
+            s = datetime.datetime.strptime(processed['start'], "%Y-%m-%dT%H:%M:%SZ")
+            e = datetime.datetime.strptime(processed['end'], "%Y-%m-%dT%H:%M:%SZ")
+            tdelta = (e - s)
+            days = tdelta.days
+            hours, rem = divmod(tdelta.seconds, 3600)
+            minutes, seconds = divmod(rem, 60)
+            processed['total'] = "{}d {}h {}m {}s".format(
+                days, hours, minutes, seconds)
+    else:
+        processed = runtime_info
+
+    return processed

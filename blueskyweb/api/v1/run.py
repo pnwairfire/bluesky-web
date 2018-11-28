@@ -18,7 +18,7 @@ import tornado.log
 
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import (
-    run_bluesky, BlueSkyRunner, prune_for_plumerise
+    run_bluesky, BlueSkyRunner, prune_for_plumerise, process_runtime
 )
 from blueskyweb.lib import met, hysplit
 from . import RequestHandlerBase
@@ -601,14 +601,13 @@ class RunOutput(RequestHandlerBase):
                 info_dict.pop(k)
 
     def _get_plumerise(self, run):
-        if 'fire_information' in run:
-            fire_information = run['fire_information']
-        else:
-            fire_information = prune_for_plumerise(
-                self._load_output(run)['fire_information'])
+        run_info = run if 'fire_information' in run else self._load_output(run)
+        fire_information = run_info['fire_information']
+        runtime_info = process_runtime(run_info.get('runtime'))
 
         self.write(dict(run_id=run['run_id'],
-            fire_information=fire_information))
+            fire_information=fire_information,
+            runtime=runtime_info))
 
     ##
     ## Dispersion
@@ -621,7 +620,7 @@ class RunOutput(RequestHandlerBase):
         run_info = run if 'export' in run else self._load_output(run)
 
         # TODO: refine what runtime info is returned
-        r['runtime'] = run_info.get('runtime', {})
+        r['runtime'] = process_runtime(run_info.get('runtime'))
 
         export_info = run_info['export']
 
