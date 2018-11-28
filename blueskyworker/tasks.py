@@ -299,7 +299,15 @@ class BlueSkyRunner(object):
         modules = self.input_data.pop('modules')
         fires_manager.load(self.input_data)
 
-        self._record_run(RunStatuses.Running)
+        # Note that, once the run completes, this runtime will be
+        # overwritten with a different start time, though the two
+        # starts should be within milliseconds of each other
+        runtime = {
+            "start": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "end": None, "total": None
+        }
+        self._record_run(RunStatuses.Running, runtime=runtime)
+
         for m in modules:
             try:
                 # TODO: if hysplit dispersion, start thread that periodically
@@ -324,8 +332,6 @@ class BlueSkyRunner(object):
                     data['fire_information'] = prune_for_plumerise(
                         fires_manager.fires)
 
-                data['runtime'] = process_runtime(fires_manager.runtime)
-
                 self._record_run(RunStatuses.CompletedModule, module=m, **data)
 
             except exceptions.BlueSkyModuleError as e:
@@ -345,7 +351,8 @@ class BlueSkyRunner(object):
         #     exceptions.BlueSkyGeographyValueError
 
 
-        self._record_run(RunStatuses.ProcessingOutput)
+        self._record_run(RunStatuses.ProcessingOutput,
+            runtime=process_runtime(fires_manager.runtime))
 
         if self.output_stream:
             return fires_manager.dumps(self.output_stream)
