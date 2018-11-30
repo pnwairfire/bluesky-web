@@ -405,6 +405,8 @@ def prune_growth_for_plumerise(g):
 def slice_dict(d, whitelist):
     return {k: d[k] for k in d.keys() & whitelist}
 
+MICRO_SECOND_REMOVER = re.compile("\.[0-9]+Z$")
+
 def process_runtime(runtime_info):
     runtime_info = runtime_info or {}
     processed = {}
@@ -414,5 +416,9 @@ def process_runtime(runtime_info):
         processed['end'] = max([e['end'] for e in modules])
     else:
         processed = {k: runtime_info.get(k) for k in ('start', 'end')}
+
+    for k in ('start', 'end'):
+        if processed[k]:
+            processed[k] = MICRO_SECOND_REMOVER.sub('Z', processed[k])
 
     return processed
