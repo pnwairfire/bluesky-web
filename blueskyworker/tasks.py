@@ -413,6 +413,6 @@ def process_runtime(runtime_info):
         processed['start'] = min([e['start'] for e in modules])
         processed['end'] = max([e['end'] for e in modules])
     else:
-        processed = {k: runtime_info.get(k) or k in ('start', 'end')}
+        processed = {k: runtime_info.get(k) for k in ('start', 'end')}
 
     return processed
