@@ -304,7 +304,7 @@ class BlueSkyRunner(object):
         # starts should be within milliseconds of each other
         runtime = {
             "start": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "end": None, "total": None
+            "end": None
         }
         self._record_run(RunStatuses.Running, runtime=runtime)
 
@@ -412,16 +412,7 @@ def process_runtime(runtime_info):
     if modules:
         processed['start'] = min([e['start'] for e in modules])
         processed['end'] = max([e['end'] for e in modules])
-        if processed['start'] and processed['end']:
-            s = datetime.datetime.strptime(processed['start'], "%Y-%m-%dT%H:%M:%S.%fZ")
-            e = datetime.datetime.strptime(processed['end'], "%Y-%m-%dT%H:%M:%S.%fZ")
-            tdelta = (e - s)
-            days = tdelta.days
-            hours, rem = divmod(tdelta.seconds, 3600)
-            minutes, seconds = divmod(rem, 60)
-            processed['total'] = "{}d {}h {}m {}s".format(
-                days, hours, minutes, seconds)
     else:
-        processed = runtime_info
+        processed = {k: runtime_info.get(k) or k in ('start', 'end')}
 
     return processed
