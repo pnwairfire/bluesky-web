@@ -413,8 +413,8 @@ def process_runtime(runtime_info):
         processed['start'] = min([e['start'] for e in modules])
         processed['end'] = max([e['end'] for e in modules])
         if processed['start'] and processed['end']:
-            s = datetime.datetime.strptime(processed['start'], "%Y-%m-%dT%H:%M:%SZ")
-            e = datetime.datetime.strptime(processed['end'], "%Y-%m-%dT%H:%M:%SZ")
+            s = datetime.datetime.strptime(processed['start'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            e = datetime.datetime.strptime(processed['end'], "%Y-%m-%dT%H:%M:%S.%fZ")
             tdelta = (e - s)
             days = tdelta.days
             hours, rem = divmod(tdelta.seconds, 3600)
