@@ -57,6 +57,5 @@ if [ "$shut_down" = false ] ; then
         ./dev/logs/worker/dri ./dev/logs/worker/nam \
         ./dev/logs/worker/no-met ./dev/data/mongodb/db \
         ./dev/data/output
-    docker-compose -f dev/docker-compose.yml up
     docker-compose -p bluesky-web -f $yaml_file up
 fi
