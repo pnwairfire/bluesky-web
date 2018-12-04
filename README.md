@@ -120,7 +120,11 @@ Check status
 ### Production Environment
 
 Same as test env, but substitude 'production' for 'test' in each
-command
+command.
+
+### All envs
+
+    ./deploy-all-envs
 
 
 
