@@ -434,6 +434,8 @@ class RunExecuter(RequestHandlerBase):
         bkml_con = hy_con["blueskykml_config"]
         bkml_con["SmokeDispersionKMLOutput"] = bkml_con.get("SmokeDispersionKMLOutput", {})
         bkml_con["SmokeDispersionKMLOutput"]["INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS"] = "False"
+        bkml_con["DispersionImages"] = bkml_con.get("DispersionImages", {})
+        bkml_con["DispersionImages"]["DAILY_IMAGES_UTC_OFFSETS"] = "auto"
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
