@@ -5,7 +5,7 @@ if [ $# -lt 2 ] || [ $# -gt 5 ]
     echo "Usage: $0 <root_url> <domain> <archive> <date> [response output file]"
     echo "Examples:"
     echo "  $0 http://localhost:8887/bluesky-web/ DRI6km ca-nv_6-km 2014-05-29 ./tmp/web-regression-out-dev.log"
-    echo "  $0 https://test-c1.airfire.org/bluesky-web-test/ DRI2km ca-nv_2-km \`date "+%Y-%m-%d"\` ./tmp/web-regression-out-test.log"
+    echo "  $0 https://www.blueskywebhost.com/bluesky-web-test/ DRI2km ca-nv_2-km \`date "+%Y-%m-%d"\` ./tmp/web-regression-out-test.log"
     echo "  $0 https://www.blueskywebhost.com/bluesky-web/ DRI2km ca-nv_2-km \`date "+%Y-%m-%d"\` ./tmp/web-regression-out-prod.log"
     echo ""
     exit 1

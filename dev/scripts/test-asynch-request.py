@@ -42,7 +42,7 @@ Full run (ingestiont through visualization)
         --met-archive ca-nv_6-km
 
   $ {script_name} \\
-        -r https://test-c1.airfire.org/bluesky-web-test/ \\
+        -r https://www.blueskywebhost.com/bluesky-web-test/ \\
         --log-level=DEBUG -s `date -v-1d +%Y-%m-%dT00:00:00` -n 12 \\
         --met-archive ca-nv_6-km
 
