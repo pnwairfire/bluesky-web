@@ -39,7 +39,8 @@ services:
     ports:
     - 27887:27017
     volumes:
-    - ./logs/mongodb/:/var/log/mongodb/
+    # TODO: figure out permissions issue with mounting log dir
+    #- ./logs/mongodb/:/var/log/mongodb/
     - ./data/mongodb/db/:/data/db/
     - ./data/mongodb/configdb/:/data/configdb/
     - ./mongo-entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
