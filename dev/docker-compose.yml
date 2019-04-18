@@ -30,7 +30,7 @@ services:
     image: bluesky-web-mongo
     container_name: bluesky-web-mongo
     # setting hostname to match ssl cert
-    hostname: bluesky-web-mongo
+    hostname: bluesky-web-mongod
     environment:
     # This is the admin user, not the user used by the app
     # to record run information

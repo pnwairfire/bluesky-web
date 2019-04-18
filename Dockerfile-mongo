@@ -3,4 +3,4 @@ FROM mongo:3.4.6
 MAINTAINER jdubowy@gmail.com
 
 COPY generate-ssl-cert.sh /usr/local/bin/
-RUN /usr/local/bin/generate-ssl-cert.sh /etc/ssl/ mongo
+RUN /usr/local/bin/generate-ssl-cert.sh /etc/ssl/ mongod
