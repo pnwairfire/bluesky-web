@@ -104,12 +104,12 @@ class RunExecuter(RequestHandlerBase):
         self._archive_info = met.get_archive_info(archive_id)
 
         if not self.request.body:
-            self._bad_request(400, 'empty post data')
+            self._raise_error(400, 'empty post data')
             return
 
         data = json.loads(self.request.body.decode())
         if "fire_information" not in data:
-            self._bad_request(400, "'fire_information' not specified")
+            self._raise_error(400, "'fire_information' not specified")
             return
 
         # TODO: should no configuration be allowed at all?  or only some? if
@@ -210,7 +210,7 @@ class RunExecuter(RequestHandlerBase):
                 invalid_modules = set(data['modules']).difference(
                     default_modules)
                 if invalid_modules:
-                    self._bad_request(400, "invalid module(s) for {} "
+                    self._raise_error(400, "invalid module(s) for {} "
                         "request: {}".format(mode, ','.join(invalid_modules)))
                     return
                 # else, leave as is
@@ -244,13 +244,6 @@ class RunExecuter(RequestHandlerBase):
         # There are no other possibilities for mode
 
         tornado.log.gen_log.debug("Modules be run: {}".format(', '.join(data['modules'])))
-
-    def _bad_request(self, status, msg):
-        msg = "Bad request: " + msg
-        tornado.log.gen_log.warn(msg)
-        self.set_status(status, msg)
-        #self.write({"error": msg})
-        #self.finish()
 
     async def _check_for_existing_run_id(self, run_id):
         run = await self.settings['mongo_db'].find_run(run_id)
@@ -386,7 +379,7 @@ class RunExecuter(RequestHandlerBase):
         if (not data.get('config', {}).get('dispersion', {}) or not
                 data['config']['dispersion'].get('start') or not
                 data['config']['dispersion'].get('num_hours')):
-            self._bad_request(400, "dispersion 'start' and 'num_hours' must be specified")
+            self._raise_error(400, "dispersion 'start' and 'num_hours' must be specified")
             return
 
         data['config']['dispersion']['handle_existing'] = "replace"
