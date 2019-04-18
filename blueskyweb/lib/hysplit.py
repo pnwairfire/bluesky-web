@@ -2,12 +2,12 @@ import copy
 import blueskyconfig
 
 class ErrorMessages(object):
-    SINGLE_LAT_LNG_ONLY = ("grid_size option only supported for "
-        "single fire at specific lat,lng")
+    SINGLE_LAT_LNG_ONLY = ("grid_size option only supported for"
+        " single fire at specific lat,lng")
     NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify NUMPAR along with"
-        "dispersion_speed or number_of_particles.")
-    GRID_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify 'grid', "
-        "'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
+        " dispersion_speed or number_of_particles.")
+    GRID_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify 'grid',"
+        " 'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
         " config along with options 'dispersion_speed' or "
         " 'grid_resolution'.")
     TOO_MANY_GRID_SPECIFICATIONS = ("You can't specify more than one of "
