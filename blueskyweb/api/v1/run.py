@@ -599,13 +599,15 @@ class RunOutput(RequestHandlerBase):
                 info_dict.pop(k)
 
     def _get_plumerise(self, run):
+        version_info = run.get('version_info') or {}
         run_info = run if 'fire_information' in run else self._load_output(run)
         fire_information = run_info['fire_information']
         runtime_info = process_runtime(run_info.get('runtime'))
 
         self.write(dict(run_id=run['run_id'],
             fire_information=fire_information,
-            runtime=runtime_info))
+            runtime=runtime_info,
+            version_info=version_info))
 
     ##
     ## Dispersion
@@ -613,9 +615,12 @@ class RunOutput(RequestHandlerBase):
 
     def _get_dispersion(self, run):
         r = {
-            "root_url": run['output_url']
+            "root_url": run['output_url'],
+            "version_info": run.get('version_info') or {}
         }
         run_info = run if 'export' in run else self._load_output(run)
+
+        run['version_info'] = self._parse_version_info(r, run_info)
 
         # TODO: refine what runtime info is returned
         r['runtime'] = process_runtime(run_info.get('runtime'))

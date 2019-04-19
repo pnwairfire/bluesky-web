@@ -17,7 +17,9 @@ from urllib.parse import urlparse
 import ipify
 import tornado.log
 from celery import Celery
-from bluesky import exceptions, models
+from bluesky import (
+    exceptions, models, __version__ as bluesky_version
+)
 
 from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
@@ -352,7 +354,8 @@ class BlueSkyRunner(object):
 
 
         self._record_run(RunStatuses.ProcessingOutput,
-            runtime=process_runtime(fires_manager.runtime))
+            runtime=process_runtime(fires_manager.runtime),
+            version_info=process_version_info(fires_manager.processing))
 
         if self.output_stream:
             return fires_manager.dumps(self.output_stream)
@@ -422,3 +425,12 @@ def process_runtime(runtime_info):
             processed[k] = MICRO_SECOND_REMOVER.sub('Z', processed[k])
 
     return processed
+
+def process_version_info(processing_info):
+    v = {
+        "bluesky_version": bluesky_version,
+    }
+    for p in processing_info:
+        v[p['module']] = {k: p[k] for k in p if k.endswith('version') }
+
+    return v
