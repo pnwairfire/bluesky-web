@@ -125,6 +125,11 @@ OPTIONAL_ARGS = [
         'long': "--met-archive",
         'help': "met archive; default 'ca-nv_6-km'",
         'default': 'DRI6km'
+    },
+    {
+        'long': "--indent",
+        "help": "json indentation",
+        "type": int
     }
 ]
 
@@ -275,7 +280,10 @@ async def main(args):
             bluesky_log_level=args.log_level
         ).run()
         logging.debug('About to dump to stdout')
-        sys.stdout.write(s.getvalue())
+        s = s.getvalue()
+        if args.indent:
+            s = json.dumps(json.loads(s), indent=args.indent)
+        sys.stdout.write(s)
 
 if __name__ == "__main__":
     args = parse_args()
