@@ -124,7 +124,7 @@ OPTIONAL_ARGS = [
     {
         'long': "--met-archive",
         'help': "met archive; default 'ca-nv_6-km'",
-        'default': 'DRI6km'
+        'default': 'ca-nv_6-km'
     },
     {
         'long': "--indent",
