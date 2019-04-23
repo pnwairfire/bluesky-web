@@ -28,23 +28,12 @@ api web service, output web service, bsp workers, and ofelia.
 
 ## Development
 
-### Setup
+### Setup and Run in Docker
 
     git clone git@github.com:pnwairfire/bluesky-web.git pnwairfire-bluesky-web
     cd pnwairfire-bluesky-web
     pip install -r requirements-dev.txt
-    docker build -t bluesky-web .
-    docker build -t bluesky-web-nginx -f Dockerfile-nginx .
-    docker build -t bluesky-web-mongo -f Dockerfile-mongo .
-    docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .
-    mkdir -p ./dev/logs/mongodb/ ./dev/logs/web/ \
-        ./dev/logs/worker/dri ./dev/logs/worker/nam \
-        ./dev/logs/worker/no-met ./dev/data/mongodb/db \
-        ./dev/data/output
-
-### Run
-
-    docker-compose -f dev/docker-compose.yml up
+    ./reboot --rebuild
 
 When using docker, arlindex will automatically be updated every
 15 minutes using the mcuadros/ofelia docker image.
@@ -59,6 +48,10 @@ If you don't want to wait for it to run, manually run it with:
         -p NAM84_ARL_index.csv \
         -m mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \
         --mongo-ssl-ca-certs /etc/ssl/bluesky-web-client.pem
+
+Check that service is running:
+
+    curl http://localhost:8887/bluesky-web/api/ping
 
 ### Tail logs
 
