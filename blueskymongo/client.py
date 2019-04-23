@@ -54,7 +54,7 @@ class BlueSkyWebDB(object):
             if error:
                 tornado.log.gen_log.error('Error recording run: %s', error)
             else:
-                tornado.log.gen_log.debug('Recorded run: %s', result)
+                tornado.log.gen_log.debug('Recorded run: %s', result.raw_result)
             if callback:
                 callback(result, error)
 
