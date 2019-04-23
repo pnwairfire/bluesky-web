@@ -431,6 +431,6 @@ def process_version_info(processing_info):
         "bluesky_version": bluesky_version,
     }
     for p in processing_info:
-        v[p['module']] = {k: p[k] for k in p if k.endswith('version') }
+        v[p['module'].split('.')[-1]] = {k: p[k] for k in p if k.endswith('version') }
 
     return v
