@@ -620,8 +620,6 @@ class RunOutput(RequestHandlerBase):
         }
         run_info = run if 'export' in run else self._load_output(run)
 
-        run['version_info'] = self._parse_version_info(r, run_info)
-
         # TODO: refine what runtime info is returned
         r['runtime'] = process_runtime(run_info.get('runtime'))
 
