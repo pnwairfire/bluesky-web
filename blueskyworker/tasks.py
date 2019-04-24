@@ -352,10 +352,11 @@ class BlueSkyRunner(object):
         #     exceptions.BlueSkyDatetimeValueError
         #     exceptions.BlueSkyGeographyValueError
 
-
+        fires_manager.version_info = process_version_info(
+            fires_manager.processing)
         self._record_run(RunStatuses.ProcessingOutput,
             runtime=process_runtime(fires_manager.runtime),
-            version_info=process_version_info(fires_manager.processing))
+            version_info=fires_manager.version_info)
 
         if self.output_stream:
             return fires_manager.dumps(self.output_stream)

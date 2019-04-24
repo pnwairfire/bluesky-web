@@ -282,7 +282,7 @@ class RunExecuter(RequestHandlerBase):
 
     async def _run_in_process(self, data):
         try:
-             # will call self.write
+            # will call self.write
             output = BlueSkyRunner(data, output_stream=self).run()
 
         except Exception as e:
