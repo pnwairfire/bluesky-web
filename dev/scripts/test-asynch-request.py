@@ -87,14 +87,12 @@ OPTIONAL_ARGS = [
     {
         'long': '--emissions',
         'help': 'Run emissions request asynchronously',
-        'action': "store_true",
-        'default': False
+        'action': "store_true"
     },
     {
         'long': '--plumerise',
         'help': 'Run plumerise',
-        'action': "store_true",
-        'default': False
+        'action': "store_true"
     },
     {
         'short': '-s',
