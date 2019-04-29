@@ -156,14 +156,12 @@ OPTIONAL_ARGS = [
     {
         'long': "--vsmoke",
         'help': "run VSMOKE dispersion model (if not running '--emissions' mode)",
-        'action': "store_true",
-        'default': False
+        'action': "store_true"
     },
     {
         'long': "--reproject-images",
         'help': "reproject images in blueskykml",
-        'action': "store_true",
-        'default': False
+        'action': "store_true"
     },
     {
         'long': '--indent',
