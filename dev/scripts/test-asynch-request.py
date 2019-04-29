@@ -146,6 +146,11 @@ OPTIONAL_ARGS = [
         'help': ', '.join(HYSPLIT_OPTIONS)
     },
     {
+        'long': "--polygon",
+        'help': 'specify polygon area instead of single lat,lng',
+        'action': 'store_true'
+    },
+    {
         'short': '-m',
         'long': '--module',
         'dest': 'modules',
@@ -220,8 +225,7 @@ REQUEST = {
                     "location": {
                         "area": None,  # WILL BE FILLED IN
                         "ecoregion": "western",
-                        "latitude": None,  # WILL BE FILLED IN
-                        "longitude": None,  # WILL BE FILLED IN
+                        # 'latitude' & longitude or geojson WILL BE FILLED IN
                         "utc_offset": None,  # WILL BE FILLED IN
                     }
                 }
@@ -248,8 +252,7 @@ REQUEST = {
                     "location": {
                         "area": None,  # WILL BE FILLED IN
                         "ecoregion": "western",
-                        "latitude": None,  # WILL BE FILLED IN
-                        "longitude": None,  # WILL BE FILLED IN
+                        # 'latitude' & longitude or geojson WILL BE FILLED IN
                         "utc_offset": None,  # WILL BE FILLED IN
                     }
                 }
@@ -257,6 +260,7 @@ REQUEST = {
         }
     ]
 }
+
 WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 
 DT_STR = '%Y-%m-%dT%H:%M:%S'
@@ -296,8 +300,25 @@ if __name__ == "__main__":
         REQUEST['fire_information'][i]['growth'][0]['start'] = local_start_str
         REQUEST['fire_information'][i]['growth'][0]['end'] = local_end_str
         REQUEST['fire_information'][i]['growth'][0]['location']['area'] = args.area
-        REQUEST['fire_information'][i]['growth'][0]['location']['latitude'] = args.latitude + ((i-0.5)/10.0)
-        REQUEST['fire_information'][i]['growth'][0]['location']['longitude'] = args.longitude
+        lat = args.latitude + ((i-0.5)/10.0)
+        if args.polygon:
+            REQUEST['fire_information'][i]['growth'][0]['location']['geojson'] = {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [args.longitude - 0.03, lat + 0.02],
+                            [args.longitude + 0.03, lat + 0.02],
+                            [args.longitude + 0.03, lat - 0.02],
+                            [args.longitude - 0.03, lat - 0.02],
+                            [args.longitude - 0.03, lat + 0.02]
+                        ]
+                    ]
+                ]
+            }
+        else:
+            REQUEST['fire_information'][i]['growth'][0]['location']['latitude'] = lat
+            REQUEST['fire_information'][i]['growth'][0]['location']['longitude'] = args.longitude
         REQUEST['fire_information'][i]['growth'][0]['location']['utc_offset'] = args.utc_offset
 
     if args.smtp_server:
