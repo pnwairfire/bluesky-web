@@ -9,6 +9,7 @@ __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 import datetime
 import json
 import logging
+import os
 import requests
 import subprocess
 import sys
@@ -16,6 +17,9 @@ import time
 import urllib.request, urllib.parse, urllib.error
 
 import afscripting as scripting
+
+
+DEV_LOG_DIR = os.path.abspath(os.path.join(sys.path[0], '..', 'logs', os.path.basename(sys.argv[0]))).strip('.py')
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
 EPILOG_STR = """
@@ -172,6 +176,11 @@ OPTIONAL_ARGS = [
         'long': '--indent',
         'help': 'Format output json with newlines and given indent',
         'type': int
+    },
+    {
+        'long': '--write-req-resp-to-file',
+        'help': 'write the request and response to file',
+        'action': 'store_true'
     }
 ]
 
@@ -270,6 +279,44 @@ HEADERS = {
     'Accept': 'application/json'
 }
 
+def to_indented_json_string(data):
+    if hasattr('lower', data):
+        data = json.loads(data)
+    return json.dumps(data, indent=args.indent)
+
+def write_to_req_resp_file(args, run_id, title, url, req, resp):
+    req = to_indented_json_string(req)
+    resp = to_indented_json_string(resp)
+
+    logging.info("{}: {}", title, data)
+    if args.write_req_resp_to_file:
+        with open(write_req_resp_to_file, 'w') as f:
+            f.write('-' * 80)
+            f.write(title + ":\n")
+            f.write(run_id + "\n")
+            f.write(url + "\n")
+            f.write(req + "\n")
+            f.write(resp + "\n")
+
+def get(url, title, ignore_fail=False):
+    response = requests.get(url, HEADERS)
+    if not ignore_fail and response.status_code != 200:
+        # TODO: add retry logic, since the run did succeed and complete
+        logging.error("Failed to get %s", title)
+        sys.exit(1)
+
+    return json.loads(response.content.decode())
+
+def post(args, run_id, url, data, desc):
+    response = requests.post(url, data=data, headers=HEADERS)
+    if response.status_code != 200:
+        logging.error("Failed to %s", desc)
+        sys.exit(1)
+    write_to_req_resp_file(args, REQUEST['run_id'], desc,
+        url + 'fuelbeds/', data, response.content)
+    return  json.loads(response.content.decode())
+
+
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EPILOG_STR)
@@ -357,27 +404,19 @@ if __name__ == "__main__":
         logging.info("Modules: {}".format(args.modules))
     logging.info("Reprojecting images?: %s", args.reproject_images)
 
-    data = json.dumps(REQUEST)
-    logging.info("Request JSON: {}".format(data))
 
+    data = json.dumps(REQUEST)
     url = "{}/api/v1/run/".format(args.root_url)
+
     query = {}
     if args.emissions or args.plumerise:
         #first get fuelbeds
-        response = requests.post(url + 'fuelbeds/', data=data, headers=HEADERS)
-        if response.status_code != 200:
-            logging.error("Failed to look up fuelbeds to run %s",
-                'emissions' if args.emissions else 'plumerise')
-            sys.exit(1)
-        data = response.content
+        data = post(args, REQUEST["run_id"], url + 'fuelbeds/', data, "Looking up fuelbeds to run %s",
+            'emissions' if args.emissions else 'plumerise')
 
         if args.plumerise:
             # next, for plumerise run, get emissions
-            response = requests.post(url + 'emissions/', data=data, headers=HEADERS)
-            if response.status_code != 200:
-                logging.error("Failed to run emissions to run plumerise")
-                sys.exit(1)
-            data = response.content
+            data = post(args, REQUEST["run_id"], url + 'emissions/', data, "Running emissions to run plumerise")
             url += 'plumerise/{}/'.format(args.met_archive)
 
         else:
@@ -399,23 +438,14 @@ if __name__ == "__main__":
             data = json.dumps(data)
 
     url = '?'.join([url, urllib.parse.urlencode(query)])
-    logging.info("Request URL: {}".format(data))
-
-    logging.info("Testing {} ... ".format(url))
-
-    response = requests.post(url, data=data, headers=HEADERS)
-    logging.info("Response: {} - {}".format(response.status_code, response.content))
-
-    if response.status_code != 200:
-        logging.error("Failed initiate run")
-        sys.exit(1)
+    data = post(args, REQUEST["run_id"], url, data=data, "Initiating Run")
 
     logging.info("Run id: {}".format(REQUEST['run_id']))
     while True:
         time.sleep(5)
         logging.info("Checking status...")
         url = "{}/api/v1/runs/{}/".format(args.root_url, REQUEST['run_id'])
-        response = requests.get(url, HEADERS)
+        response = get(url, "status", ignore_fail=True)
         if response.status_code == 200:
             data = json.loads(response.content.decode())
             if data['complete']:
@@ -425,13 +455,8 @@ if __name__ == "__main__":
                 logging.info("{} Complete".format(data['percent']))
 
     url =  "{}/api/v1/runs/{}/output/".format(args.root_url, REQUEST['run_id'])
-    response = requests.get(url, HEADERS)
-    if response.status_code != 200:
-        # TODO: add retry logic, since the run did succeed and complete
-        logging.error("Failed to get output")
-        sys.exit(1)
+    data = get(url, "output")
 
-    data = json.loads(response.content.decode())
     # TODO: log individual bits of information
     logging.info("Reponse: {}".format(json.dumps(data, indent=args.indent)))
     logging.info("Root Url: %s", data.get('root_url', 'N/A'))
