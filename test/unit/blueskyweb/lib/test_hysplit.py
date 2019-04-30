@@ -61,9 +61,9 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
         with pytest.raises(MockHTTPError) as e:
             hycon._configure_hysplit_reduced_grid()
         assert e.value.status_code == 400
-        assert e.value.msg == hysplit.ErrorMessages.SINGLE_LAT_LNG_ONLY
+        assert e.value.msg == hysplit.ErrorMessages.SINGLE_FIRE_ONLY
 
-    def test_not_single_lat_lng(self):
+    def test_missing_lat(self):
         input_data = {
             "config": {"dispersion": {}},
             "fire_information": [
@@ -177,6 +177,116 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
             'spacing': 2.0
         }
         assert hycon._hysplit_config['grid'] == expected_grid
+
+    def test_polygon_reduced_fire_in_middle(self):
+        """This tests the case where the grid is reduced, and the fire
+        is central enough so that the reduced grid can be centered
+        around it, and the fire has polygon geometry.
+        """
+        input_data = {
+            "config": {"dispersion": {}},
+            "fire_information": [{
+                "growth": [{
+                    "location": {
+                        "geojson": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [-84.0, 37.0],
+                                [],
+                                [],
+                                [],
+                                []
+                            ]
+                        }
+                    }
+                }]
+            }]
+        }
+        hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(grid_size=0.50),
+            input_data, ARCHIVE_INFO)
+        hycon._configure_hysplit_reduced_grid()
+        expected_grid = {
+            'boundary': {
+                "sw": {"lng": -94.0, "lat": 34.5},
+                "ne": {"lng": -74.0, "lat": 39.5}
+            },
+            'projection': 'LCC',
+            'spacing': 2.0
+        }
+        assert hycon._hysplit_config['grid'] == expected_grid
+
+class TestHysplitConfiguratorGetCentralLatLng(object):
+
+    LAT_LNG = {
+        "location": {
+            "latitude": 31.0,
+            "longitude": -64.0
+        }
+    }
+
+    def setup(self):
+        self.input_data = {
+            "fire_information": [
+                {
+                    "growth": []
+                }
+            ]
+        }
+        self.hycon = hysplit.HysplitConfigurator(
+            MockRequestHandler(),
+            input_data, ARCHIVE_INFO)
+
+    def test_multiple_fires(self):
+        self.hycon.input_data["fire_information"].append({"growth":[]})
+        with pytest.raises(MockHTTPError) as e:
+            hycon._get_central_lat_lng()
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.SINGLE_FIRE_ONLY
+
+    def test_missing_location_info(self):
+        # missing location
+        with pytest.raises(MockHTTPError) as e:
+            hycon._get_central_lat_lng()
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.INVALID_FIRE_LOCATION_INFO
+
+        # missing lat and lng
+        self.hycon.input_data["fire_information"][0]["growth"]["location"] = {}
+        with pytest.raises(MockHTTPError) as e:
+            hycon._get_central_lat_lng()
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.INVALID_FIRE_LOCATION_INFO
+
+        # missing longitude
+        self.hycon.input_data["fire_information"][0]["growth"]["location"]["latitude"] = 45.1
+        with pytest.raises(MockHTTPError) as e:
+            hycon._get_central_lat_lng()
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.INVALID_FIRE_LOCATION_INFO
+
+
+    def test_lat_lng(self):
+        pass
+
+    def test_multi_point(self):
+        pass
+
+    def test_polygon(self):
+        pass
+
+    def test_lat_lng_and_polygon(self):
+        pass
+
+    def test_two_lat_lngs(self):
+        pass
+
+    def test_two_polygons(self):
+        pass
+
+    def test_(self):
+        pass
+
 
 class TestHysplitConfiguratorConfigureGrid(object):
     """Unit tests for grid configuration.

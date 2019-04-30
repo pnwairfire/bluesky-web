@@ -1,9 +1,10 @@
 import copy
 import blueskyconfig
+from geoutils.geojson import get_centroid
 
 class ErrorMessages(object):
-    SINGLE_LAT_LNG_ONLY = ("grid_size option only supported for"
-        " single fire at specific lat,lng")
+    SINGLE_FIRE_ONLY = "grid_size option only supported for single fire"
+    INVALID_FIRE_LOCATION_INFO = "Fire growth data must contain lat and lng or geojson data"
     NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify NUMPAR along with"
         " dispersion_speed or number_of_particles.")
     GRID_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify 'grid',"
@@ -157,13 +158,7 @@ class HysplitConfigurator(object):
         centering the reduced grid around the fire location as much as
         possible without going outside of the original archive domain.
         """
-        if not self._is_single_lat_lng():
-            self._request_handler._raise_error(400,
-                ErrorMessages.SINGLE_LAT_LNG_ONLY)
-
-        loc = self._input_data['fire_information'][0]['growth'][0]['location']
-        lat = loc['latitude']
-        lng = loc['longitude']
+        lat, lng = self._get_central_lat_lng()
         sw = self._archive_info['grid']['boundary']['sw']
         ne = self._archive_info['grid']['boundary']['ne']
         # Note: none of the met domains cross the international
@@ -184,23 +179,41 @@ class HysplitConfigurator(object):
                         sw['lng'] + new_lng_diff),
             }
         }
+        if 'latitude' in self._location and 'longitude' in self._location:
+            self._latitude = self._location['latitude']
+            self._longitude = self._location['longitude']
+        elif 'geojson' in self._location:
+            coordinate = get_centroid(self._location['geojson'])
+            self._latitude = coordinate[1]
+            self._longitude = coordinate[0]
 
-    def _is_single_lat_lng(self):
+    def _get_central_lat_lng(self):
         if len(self._input_data['fire_information']) > 1:
             # input data could possibly specifu multiple fires at
             # the same location, but we won't bother trying to accept that
-            return False
+            self._request_handler._raise_error(400,
+                ErrorMessages.SINGLE_FIRE_ONLY)
 
-        if any([not set(['latitude','longitude']).issubset(set(g['location'].keys()))
-                for g in self._input_data['fire_information'][0]['growth']]):
-            # TODO: accept geoJSON Points
-            return False
+        centroids = []
+        for g in self._input_data['fire_information'][0]['growth']:
+            loc = g.get('location', {})
+            if set(['latitude','longitude']).issubset(set(loc.keys())):
+                centroids.append((loc['latitude'], loc['longitude']))
 
-        if (len(list(set([g['location']['latitude'] for g in
-                self._input_data['fire_information'][0]['growth']]))) > 1
-                or len(list(set([g['location']['longitude'] for g in
-                self._input_data['fire_information'][0]['growth']]))) > 1):
-            # growth windows are for different points
-            return False
+            elif 'geojson' in loc:
+                coords = get_centroid(loc['geojson']) # returns lng, lat
+                centroids.append((coords[1], coords[0]))
 
-        return True
+            else:
+                self._request_handler._raise_error(400,
+                    ErrorMessages.INVALID_FIRE_LOCATION_INFO)
+
+        if len(centroids) > 1:
+            multi_point = {
+                "type": 'MultiPoint',
+                "coordinates": [ [e[1], e[0]] for e in centroids ]
+            }
+            coords = get_centroid(multi_point)
+            return (coords[1], coords[1])
+        else:
+            return centroids[0]
