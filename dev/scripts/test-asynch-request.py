@@ -280,7 +280,9 @@ HEADERS = {
 }
 
 def to_indented_json_string(data):
-    if hasattr('lower', data):
+    if hasattr(data, 'lower'):
+        if hasattr(data, 'decode'):
+            data = data.decode()
         data = json.loads(data)
     return json.dumps(data, indent=args.indent)
 
