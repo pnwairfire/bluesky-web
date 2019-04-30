@@ -294,7 +294,7 @@ def write_to_req_resp_file(args, run_id, title, url, req, resp):
     logging.info("%s: %s", title, data)
     if args.write_req_resp_to_file:
         filename = os.path.join(DEV_LOG_DIR, run_id + '.log')
-        with open(filename, 'w') as f:
+        with open(filename, 'a') as f:
             f.write('-' * 80)
             f.write(title + ":\n")
             f.write(url + "\n")
