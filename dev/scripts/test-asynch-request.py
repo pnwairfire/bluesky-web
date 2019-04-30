@@ -332,8 +332,8 @@ if __name__ == "__main__":
             "smtp_port": smtp_port
         }
 
-    if args.run_id:
-        REQUEST['run_id'] = args.run_id
+    REQUEST['run_id'] = args.run_id or "test-asynch-request-{}".format(
+        datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S"))
 
     if args.modules:
         REQUEST['modules'] = args.modules
@@ -352,8 +352,7 @@ if __name__ == "__main__":
     logging.info("Lat: {}".format(args.latitude))
     logging.info("Lng: {}".format(args.longitude))
     logging.info("Area: {}".format(args.area))
-    if args.run_id:
-        logging.info("Run Id: {}".format(args.run_id))
+    logging.info("Run Id: {}".format(REQUEST['run_id']))
     if args.modules:
         logging.info("Modules: {}".format(args.modules))
     logging.info("Reprojecting images?: %s", args.reproject_images)
@@ -411,12 +410,11 @@ if __name__ == "__main__":
         logging.error("Failed initiate run")
         sys.exit(1)
 
-    run_id = json.loads(response.content.decode())['run_id']
-    logging.info("Run id: {}".format(run_id))
+    logging.info("Run id: {}".format(REQUEST['run_id']))
     while True:
         time.sleep(5)
         logging.info("Checking status...")
-        url = "{}/api/v1/runs/{}/".format(args.root_url, run_id)
+        url = "{}/api/v1/runs/{}/".format(args.root_url, REQUEST['run_id'])
         response = requests.get(url, HEADERS)
         if response.status_code == 200:
             data = json.loads(response.content.decode())
@@ -426,7 +424,7 @@ if __name__ == "__main__":
             else:
                 logging.info("{} Complete".format(data['percent']))
 
-    url =  "{}/api/v1/runs/{}/output/".format(args.root_url, run_id)
+    url =  "{}/api/v1/runs/{}/output/".format(args.root_url, REQUEST['run_id'])
     response = requests.get(url, HEADERS)
     if response.status_code != 200:
         # TODO: add retry logic, since the run did succeed and complete
