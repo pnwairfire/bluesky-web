@@ -66,8 +66,7 @@ Check that service is running:
 
 ### Unit Tests
 
-    pip install -r requirements-test.txt
-    py.test
+    docker run --rm -ti -v $PWD:/usr/src/blueskyweb/ bluesky-web py.test
 
 ## Ad Hoc tests
 
