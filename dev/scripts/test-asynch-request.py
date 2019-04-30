@@ -287,13 +287,13 @@ def to_indented_json_string(data):
         data = json.loads(data)
     return json.dumps(data, indent=args.indent)
 
-def write_to_req_resp_file(args, run_id, title, url, req, resp):
+def write_to_req_resp_file(args, title, url, req, resp):
     req = to_indented_json_string(req)
     resp = to_indented_json_string(resp)
 
     logging.info("%s: %s", title, data)
     if args.write_req_resp_to_file:
-        filename = os.path.join(DEV_LOG_DIR, run_id + '.log')
+        filename = os.path.join(DEV_LOG_DIR, args.run_id + '.log')
         with open(filename, 'a') as f:
             f.write('-' * 80)
             f.write(title + ":\n")
@@ -301,22 +301,22 @@ def write_to_req_resp_file(args, run_id, title, url, req, resp):
             f.write(req + "\n")
             f.write(resp + "\n")
 
-def get(args, run_id, url, title, ignore_fail=False):
+def get(args, url, title, ignore_fail=False):
     response = requests.get(url, HEADERS)
     if not ignore_fail and response.status_code != 200:
         # TODO: add retry logic, since the run did succeed and complete
         logging.error("Failed to get %s", title)
         sys.exit(1)
-    write_to_req_resp_file(args, run_id, title,
+    write_to_req_resp_file(args, title,
         url + 'fuelbeds/', data, response.content)
     return response.status_code, json.loads(response.content.decode())
 
-def post(args, run_id, url, data, desc):
+def post(args, url, data, desc):
     response = requests.post(url, data=data, headers=HEADERS)
     if response.status_code != 200:
         logging.error("Failed at %s", desc.lower())
         sys.exit(1)
-    write_to_req_resp_file(args, REQUEST['run_id'], desc,
+    write_to_req_resp_file(args, desc,
         url + 'fuelbeds/', data, response.content)
     return  json.loads(response.content.decode())
 
@@ -383,8 +383,10 @@ if __name__ == "__main__":
             "smtp_port": smtp_port
         }
 
-    REQUEST['run_id'] = args.run_id or "test-asynch-request-{}".format(
-        datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S"))
+    if not args.run_id:
+        args.run_id = "test-asynch-request-{}".format(
+            datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S"))
+    REQUEST['run_id'] = args.run_id
 
     if args.modules:
         REQUEST['modules'] = args.modules
@@ -403,7 +405,7 @@ if __name__ == "__main__":
     logging.info("Lat: {}".format(args.latitude))
     logging.info("Lng: {}".format(args.longitude))
     logging.info("Area: {}".format(args.area))
-    logging.info("Run Id: {}".format(REQUEST['run_id']))
+    logging.info("Run Id: {}".format(args.run_id))
     if args.modules:
         logging.info("Modules: {}".format(args.modules))
     logging.info("Reprojecting images?: %s", args.reproject_images)
@@ -415,12 +417,12 @@ if __name__ == "__main__":
     query = {}
     if args.emissions or args.plumerise:
         #first get fuelbeds
-        data = post(args, REQUEST["run_id"], url + 'fuelbeds/', data, "Looking up fuelbeds to run %s",
+        data = post(args, url + 'fuelbeds/', data, "Looking up fuelbeds to run %s",
             'emissions' if args.emissions else 'plumerise')
 
         if args.plumerise:
             # next, for plumerise run, get emissions
-            data = post(args, REQUEST["run_id"], url + 'emissions/', data, "Running emissions to run plumerise")
+            data = post(args, url + 'emissions/', data, "Running emissions to run plumerise")
             url += 'plumerise/{}/'.format(args.met_archive)
 
         else:
@@ -442,14 +444,14 @@ if __name__ == "__main__":
             data = json.dumps(data)
 
     url = '?'.join([url, urllib.parse.urlencode(query)])
-    data = post(args, REQUEST["run_id"], url, data, "Initiating Run")
+    data = post(args, url, data, "Initiating Run")
 
     logging.info("Run id: {}".format(REQUEST['run_id']))
     while True:
         time.sleep(5)
         logging.info("Checking status...")
         url = "{}/api/v1/runs/{}/".format(args.root_url, REQUEST['run_id'])
-        status_code, data = get(args, REQUEST["run_id"], url, "status", ignore_fail=True)
+        status_code, data = get(args, url, "status", ignore_fail=True)
         if status_code == 200:
             if data['complete']:
                 logging.info("Complete")
@@ -458,7 +460,7 @@ if __name__ == "__main__":
                 logging.info("{} Complete".format(data['percent']))
 
     url =  "{}/api/v1/runs/{}/output/".format(args.root_url, REQUEST['run_id'])
-    status_code, data = get(args, REQUEST["run_id"], url, "output")
+    status_code, data = get(args, url, "output")
 
     # TODO: log individual bits of information
     logging.info("Reponse: {}".format(json.dumps(data, indent=args.indent)))
