@@ -320,8 +320,7 @@ def post(args, url, data, desc):
         url + 'fuelbeds/', data, response.content)
     return  json.loads(response.content.decode())
 
-
-if __name__ == "__main__":
+def parse_args():
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EPILOG_STR)
 
@@ -339,6 +338,12 @@ if __name__ == "__main__":
             logging.error("Invalid value for '--hysplit_options': %s",
                 args.hysplit_options)
             sys.exit(1)
+
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_args()
 
     start_str = args.start.strftime(DT_STR)
     REQUEST['config']['dispersion']['start'] = start_str
