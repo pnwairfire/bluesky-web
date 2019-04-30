@@ -339,6 +339,10 @@ def parse_args():
                 args.hysplit_options)
             sys.exit(1)
 
+    if not args.run_id:
+        args.run_id = "test-asynch-request-{}".format(
+            datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S"))
+
     return args
 
 
@@ -388,9 +392,6 @@ if __name__ == "__main__":
             "smtp_port": smtp_port
         }
 
-    if not args.run_id:
-        args.run_id = "test-asynch-request-{}".format(
-            datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S"))
     REQUEST['run_id'] = args.run_id
 
     if args.modules:
