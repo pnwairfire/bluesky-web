@@ -313,11 +313,12 @@ def get(args, url, title, ignore_fail=False):
 
 def post(args, url, data, desc):
     response = requests.post(url, data=data, headers=HEADERS)
-    if response.status_code != 200:
-        logging.error("Failed at %s", desc.lower())
-        sys.exit(1)
     write_to_req_resp_file(args, desc,
         url + 'fuelbeds/', data, response.content)
+    if response.status_code != 200:
+        logging.error("Failed at %s", desc.lower())
+        logging.error("Failed at %s", response.content)
+        sys.exit(1)
     return  json.loads(response.content.decode())
 
 def parse_args():
