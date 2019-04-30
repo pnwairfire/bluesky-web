@@ -20,6 +20,7 @@ import afscripting as scripting
 
 
 DEV_LOG_DIR = os.path.abspath(os.path.join(sys.path[0], '..', 'logs', os.path.basename(sys.argv[0]))).strip('.py')
+os.makedirs(DEV_LOG_DIR, exist_ok=True)
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
 EPILOG_STR = """
@@ -290,29 +291,30 @@ def write_to_req_resp_file(args, run_id, title, url, req, resp):
     req = to_indented_json_string(req)
     resp = to_indented_json_string(resp)
 
-    logging.info("{}: {}", title, data)
+    logging.info("%s: %s", title, data)
     if args.write_req_resp_to_file:
-        with open(write_req_resp_to_file, 'w') as f:
+        filename = os.path.join(DEV_LOG_DIR, run_id + '.log')
+        with open(filename, 'w') as f:
             f.write('-' * 80)
             f.write(title + ":\n")
-            f.write(run_id + "\n")
             f.write(url + "\n")
             f.write(req + "\n")
             f.write(resp + "\n")
 
-def get(url, title, ignore_fail=False):
+def get(args, run_id, url, title, ignore_fail=False):
     response = requests.get(url, HEADERS)
     if not ignore_fail and response.status_code != 200:
         # TODO: add retry logic, since the run did succeed and complete
         logging.error("Failed to get %s", title)
         sys.exit(1)
-
-    return json.loads(response.content.decode())
+    write_to_req_resp_file(args, run_id, title,
+        url + 'fuelbeds/', data, response.content)
+    return response.status_code, json.loads(response.content.decode())
 
 def post(args, run_id, url, data, desc):
     response = requests.post(url, data=data, headers=HEADERS)
     if response.status_code != 200:
-        logging.error("Failed to %s", desc)
+        logging.error("Failed at %s", desc.lower())
         sys.exit(1)
     write_to_req_resp_file(args, REQUEST['run_id'], desc,
         url + 'fuelbeds/', data, response.content)
@@ -440,7 +442,7 @@ if __name__ == "__main__":
             data = json.dumps(data)
 
     url = '?'.join([url, urllib.parse.urlencode(query)])
-    data = post(args, REQUEST["run_id"], url, data=data, "Initiating Run")
+    data = post(args, REQUEST["run_id"], url, data, "Initiating Run")
 
     logging.info("Run id: {}".format(REQUEST['run_id']))
     while True:
