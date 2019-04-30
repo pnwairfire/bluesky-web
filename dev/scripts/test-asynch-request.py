@@ -343,12 +343,21 @@ def parse_args():
         args.run_id = "test-asynch-request-{}".format(
             datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S"))
 
+    args.root_url = args.root_url.rstrip('/')
+
+    logging.info("Lat: {}".format(args.latitude))
+    logging.info("Lng: {}".format(args.longitude))
+    logging.info("Area: {}".format(args.area))
+    logging.info("Run Id: {}".format(args.run_id))
+    if args.modules:
+        logging.info("Modules: {}".format(args.modules))
+    logging.info("Reprojecting images?: %s", args.reproject_images)
+    logging.info("Num hours: {}".format(args.num_hours))
+
     return args
 
 
-if __name__ == "__main__":
-    args = parse_args()
-
+def create_initial_request(args):
     start_str = args.start.strftime(DT_STR)
     REQUEST['config']['dispersion']['start'] = start_str
     REQUEST['config']['dispersion']['num_hours'] = args.num_hours
@@ -356,6 +365,11 @@ if __name__ == "__main__":
         args.start + datetime.timedelta(hours=-7)).strftime(DT_STR)
     local_end_str = (
         args.start + datetime.timedelta(hours=args.num_hours-7)).strftime(DT_STR)
+
+    logging.info("UTC start: {}".format(start_str))
+    logging.info("Local start: {}".format(local_start_str))
+    logging.info("Local end: {}".format(local_end_str))
+
     for i in range(2):
         REQUEST['fire_information'][i]['growth'][0]['start'] = local_start_str
         REQUEST['fire_information'][i]['growth'][0]['end'] = local_end_str
@@ -402,22 +416,15 @@ if __name__ == "__main__":
             "REPROJECT_IMAGES": "True"
         }
 
-    args.root_url = args.root_url.rstrip('/')
-
-    logging.info("UTC start: {}".format(start_str))
-    logging.info("Num hours: {}".format(args.num_hours))
-    logging.info("Local start: {}".format(local_start_str))
-    logging.info("Local end: {}".format(local_end_str))
-    logging.info("Lat: {}".format(args.latitude))
-    logging.info("Lng: {}".format(args.longitude))
-    logging.info("Area: {}".format(args.area))
-    logging.info("Run Id: {}".format(args.run_id))
-    if args.modules:
-        logging.info("Modules: {}".format(args.modules))
-    logging.info("Reprojecting images?: %s", args.reproject_images)
+    return json.dumps(REQUEST)
 
 
-    data = json.dumps(REQUEST)
+if __name__ == "__main__":
+    args = parse_args()
+
+    data = create_initial_request(args)
+
+
     url = "{}/api/v1/run/".format(args.root_url)
 
     query = {}
