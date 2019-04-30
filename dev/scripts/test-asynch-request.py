@@ -449,9 +449,8 @@ if __name__ == "__main__":
         time.sleep(5)
         logging.info("Checking status...")
         url = "{}/api/v1/runs/{}/".format(args.root_url, REQUEST['run_id'])
-        response = get(url, "status", ignore_fail=True)
-        if response.status_code == 200:
-            data = json.loads(response.content.decode())
+        status_code, data = get(args, REQUEST["run_id"], url, "status", ignore_fail=True)
+        if status_code == 200:
             if data['complete']:
                 logging.info("Complete")
                 break
@@ -459,7 +458,7 @@ if __name__ == "__main__":
                 logging.info("{} Complete".format(data['percent']))
 
     url =  "{}/api/v1/runs/{}/output/".format(args.root_url, REQUEST['run_id'])
-    data = get(url, "output")
+    status_code, data = get(args, REQUEST["run_id"], url, "output")
 
     # TODO: log individual bits of information
     logging.info("Reponse: {}".format(json.dumps(data, indent=args.indent)))
