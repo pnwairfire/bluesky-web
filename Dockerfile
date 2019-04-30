@@ -13,7 +13,7 @@ RUN pip install \
     docker==2.4.2 \
     ipify==1.0.0
 
-RUN pip install pytest
+RUN pip install pytest ipython
 
 COPY generate-ssl-cert.sh /usr/local/bin/
 RUN /usr/local/bin/generate-ssl-cert.sh /etc/ssl/ client

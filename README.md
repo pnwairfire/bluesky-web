@@ -58,7 +58,9 @@ Check that service is running:
     cd /path/to/airfire-bluesky-web
     find ./dev/logs/ -name *.log -exec tail -f "$file" {} +
 
+### dockerized ipython session
 
+    docker run --rm -ti -v $PWD:/usr/src/blueskyweb/ bluesky-web ipython
 
 
 
@@ -66,7 +68,7 @@ Check that service is running:
 
 ### Unit Tests
 
-    docker run --rm -ti -v $PWD:/usr/src/blueskyweb/ bluesky-web py.test
+    docker run --rm -ti -v $PWD:/usr/src/blueskyweb/ bluesky-web py.test test
 
 ## Ad Hoc tests
 
