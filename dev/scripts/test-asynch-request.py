@@ -424,9 +424,7 @@ if __name__ == "__main__":
 
     data = create_initial_request(args)
 
-
     url = "{}/api/v1/run/".format(args.root_url)
-
     query = {}
     if args.emissions or args.plumerise:
         #first get fuelbeds
