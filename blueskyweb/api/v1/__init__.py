@@ -21,8 +21,7 @@ class RequestHandlerBase(tornado.web.RequestHandler):
             elif val in ('false', 'no', 'n', '0'):
                 val = False
             else:
-                raise tornado.web.HTTPError(status_code=400,
-                    log_message="Invalid boolean value '{}' "
+                self._raise_error(400, "Invalid boolean value '{}' "
                     "for query arg {}".format(orig_val, key))
         return val
 
@@ -32,8 +31,8 @@ class RequestHandlerBase(tornado.web.RequestHandler):
             try:
                 return value_type(val)
             except ValueError as e:
-                raise tornado.web.HTTPError(status_code=400,
-                    log_message="Invalid {} value '{}' for query arg {}".format(
+                raise self._raise_error(400,
+                    "Invalid {} value '{}' for query arg {}".format(
                     'integer' if value_type is int else 'float', val, key))
         return default
 
@@ -49,6 +48,6 @@ class RequestHandlerBase(tornado.web.RequestHandler):
     ##
 
     def _raise_error(self, status, msg):
+        self.set_status(status, msg)
         self.write({"error": msg})
-        self.set_status(status)
         raise tornado.web.Finish()

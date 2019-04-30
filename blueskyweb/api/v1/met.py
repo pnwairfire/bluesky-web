@@ -38,7 +38,7 @@ class DomainInfo(RequestHandlerBase):
     def get(self, domain_id=None):
         if domain_id:
             if domain_id not in met.DOMAINS:
-                self.set_status(404, "Domain does not exist")
+                self._raise_error(404, "Domain does not exist")
             else:
                 self.write({'domain': self._marshall(domain_id)})
         else:
@@ -97,7 +97,7 @@ class MetArchivesInfo(MetArchiveBaseHander):
                     self.write({"archive": await self._marshall(archive_group, identifier)})
                     break
             else:
-                self.set_status(404, "Archive does not exist")
+                self._raise_error(404, "Archive does not exist")
 
 
 class MetArchiveAvailability(MetArchiveBaseHander):
@@ -109,8 +109,7 @@ class MetArchiveAvailability(MetArchiveBaseHander):
         # archive_id and date will always be defined
         m = self.DATE_MATCHER.match(date_str)
         if not m:
-            raise tornado.web.HTTPError(status_code=400,
-                log_message="Invalid date: {}".format(date_str))
+            self._raise_error(400, "Invalid date: {}".format(date_str))
         date_obj = datetime.date(int(m.group('year')), int(m.group('month')),
             int(m.group('day')))
 
@@ -119,8 +118,7 @@ class MetArchiveAvailability(MetArchiveBaseHander):
                 archive_id, date_obj, self.get_date_range())
             self.write(data)
         except met.InvalidArchiveError:
-            raise tornado.web.HTTPError(status_code=404,
-                log_message="Archive does not exist")
+            self._raise_error(404, "Archive does not exist")
 
     DEFAUL_DATE_RANGE = 3
 
@@ -131,10 +129,10 @@ class MetArchiveAvailability(MetArchiveBaseHander):
             date_range = int(date_range)
         except ValueError as e:
             msg = "Invalid value for date_range: '{}'".format(date_range)
-            raise tornado.web.HTTPError(status_code=400, log_message=msg)
+            self._raise_error(400, msg)
 
         if date_range < 1:
             msg = "date_range must be greater than or equal to 1"
-            raise tornado.web.HTTPError(status_code=400, log_message=msg)
+            self._raise_error(400, msg)
 
         return date_range

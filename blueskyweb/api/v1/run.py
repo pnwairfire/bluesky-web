@@ -143,9 +143,8 @@ class RunExecuter(RequestHandlerBase):
                 else:
                     await self._run_in_process(data)
 
-        except tornado.web.HTTPError as e:
+        except tornado.web.Finish as e:
             # this was intentionally raised; re-raise it
-            self.write({'error': str(e)})
             raise
 
         except Exception as e:
@@ -312,7 +311,7 @@ class RunExecuter(RequestHandlerBase):
             met_root_dir = await met_archives_db.get_root_dir(self._archive_id)
         except met.UnavailableArchiveError as e:
             msg = "Archive unavailable: {}".format(self._archive_id)
-            raise tornado.web.HTTPError(status_code=404, log_message=msg)
+            self._raise_error(404, msg)
 
         data['config']['findmetdata'] = {
             "met_root_dir": met_root_dir,
@@ -536,8 +535,7 @@ class RunStatus(RunStatusBase):
         # TODO: implement using data form mongodb
         run = await self.settings['mongo_db'].find_run(run_id)
         if not run:
-            self.set_status(404, "Run doesn't exist")
-            self.write({"error": "Run doesn't exist"})
+            self._raise_error(404, "Run doesn't exist")
         else:
             await self.process(run)
             self.write(run)
@@ -572,11 +570,11 @@ class RunOutput(RequestHandlerBase):
         # TODO: implement using data form mongodb
         run = await self.settings['mongo_db'].find_run(run_id)
         if not run:
-            self.set_status(404, "Run doesn't exist")
-            self.write({"error": "Run doesn't exist"})
+            self._raise_error(404, "Run doesn't exist")
+
         elif not run.get('output_url'):
-            self.set_status(404, "Run output doesn't exist")
-            self.write({"error": "Run output doesn't exist"})
+            self._raise_error(404, "Run output doesn't exist")
+
         else:
             if 'dispersion' in run['modules']:
                 #if output['config']['dispersion'].get('model') != 'vsmoke'):
@@ -691,13 +689,13 @@ class RunOutput(RequestHandlerBase):
         tornado.log.gen_log.debug('Looking for output in %s', output_location)
         if not exists_func(output_location):
             msg = "Output location doesn't exist: {}".format(output_location)
-            raise tornado.web.HTTPError(status_code=404, log_message=msg)
+            self._raise_error(404, msg)
 
         # use join instead of os.path.join in case output_location is a remote url
         output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
         if not exists_func(output_json_file):
             msg = "Output file doesn't exist: {}".format(output_json_file)
-            raise tornado.web.HTTPError(status_code=404, log_message=msg)
+            self._raise_error(404, msg)
 
         with open_func(output_json_file) as f:
             try:
@@ -708,5 +706,5 @@ class RunOutput(RequestHandlerBase):
                 # TODO: set fields here, using , etc.
             except:
                 msg = "Failed to open output file: {}".format(output_json_file)
-                raise tornado.web.HTTPError(status_code=500, log_message=msg)
+                self._raise_error(500, msg)
 
