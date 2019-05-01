@@ -47,6 +47,9 @@ echo "  docker-compose YAML file: $yaml_file"
 docker-compose -p bluesky-web -f dev/docker-compose.yml down --remove-orphans
 docker-compose -p bluesky-web -f $yaml_file down --remove-orphans
 if [ "$rebuild" = true ] ; then
+    sudo rm dev/data/rabbitmq/.erlang.cookie
+    find . -name __pycache__ -exec sudo rm -r {} \;
+    find . -name '.pytest_cache' -exec sudo rm -r {} \;
     docker build -t bluesky-web .
     docker build -t bluesky-web-nginx -f Dockerfile-nginx .
     docker build -t bluesky-web-mongo -f Dockerfile-mongo .
