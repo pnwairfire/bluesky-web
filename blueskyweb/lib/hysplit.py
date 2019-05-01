@@ -181,13 +181,6 @@ class HysplitConfigurator(object):
                         sw['lng'] + new_lng_diff),
             }
         }
-        if 'latitude' in self._location and 'longitude' in self._location:
-            self._latitude = self._location['latitude']
-            self._longitude = self._location['longitude']
-        elif 'geojson' in self._location:
-            coordinate = get_centroid(self._location['geojson'])
-            self._latitude = coordinate[1]
-            self._longitude = coordinate[0]
 
     def _get_central_lat_lng(self):
         if len(self._input_data['fire_information']) > 1:
