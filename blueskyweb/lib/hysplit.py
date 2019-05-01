@@ -4,7 +4,9 @@ from geoutils.geojson import get_centroid
 
 class ErrorMessages(object):
     SINGLE_FIRE_ONLY = "grid_size option only supported for single fire"
-    INVALID_FIRE_LOCATION_INFO = "Fire growth data must contain lat and lng or geojson data"
+    NO_GROWTH_INFO = "grid_size option requires fire growth data"
+    INVALID_FIRE_LOCATION_INFO = ("grid_size option requires fire growth"
+        " data containing lat and lng or geojson data")
     NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify NUMPAR along with"
         " dispersion_speed or number_of_particles.")
     GRID_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify 'grid',"
@@ -194,8 +196,14 @@ class HysplitConfigurator(object):
             self._request_handler._raise_error(400,
                 ErrorMessages.SINGLE_FIRE_ONLY)
 
+        fire = self._input_data['fire_information'][0]
+
+        if not fire.get('growth'):
+            self._request_handler._raise_error(400,
+                ErrorMessages.NO_GROWTH_INFO)
+
         centroids = []
-        for g in self._input_data['fire_information'][0]['growth']:
+        for g in fire['growth']:
             loc = g.get('location', {})
             if set(['latitude','longitude']).issubset(set(loc.keys())):
                 centroids.append((loc['latitude'], loc['longitude']))
@@ -214,6 +222,6 @@ class HysplitConfigurator(object):
                 "coordinates": [ [e[1], e[0]] for e in centroids ]
             }
             coords = get_centroid(multi_point)
-            return (coords[1], coords[1])
+            return (coords[1], coords[0])
         else:
             return centroids[0]

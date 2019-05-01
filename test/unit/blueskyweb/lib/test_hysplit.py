@@ -190,12 +190,15 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
                     "location": {
                         "geojson": {
                             "type": "Polygon",
+                            # centroid 37, 84
                             "coordinates": [
-                                [-84.0, 37.0],
-                                [],
-                                [],
-                                [],
-                                []
+                                [
+                                    [-85.0, 38.0],
+                                    [-85.0, 36.0],
+                                    [-83.0, 36.0],
+                                    [-83.0, 38.0],
+                                    [-85.0, 38.0]
+                                ]
                             ]
                         }
                     }
@@ -220,13 +223,62 @@ class TestHysplitConfiguratorGetCentralLatLng(object):
 
     LAT_LNG = {
         "location": {
+            # centroid (31, -64)
             "latitude": 31.0,
             "longitude": -64.0
         }
     }
 
+    LAT_LNG_2 = {
+        "location": {
+            # centroid (31, -64)
+            "latitude": 33.0,
+            "longitude": -67.0
+        }
+    }
+
+    MULTI_POINT = {
+        "location": {
+            "geojson": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    # centroid (34, -83)
+                    [-82, 33],
+                    [-84, 35]
+                ]
+            }
+        }
+    }
+
+    POLYGON = {
+        "location": {
+            "geojson": {
+                "type": "Polygon",
+                # centroid (37, -84)
+                "coordinates": [
+                    [
+                        [-85.0, 38.0],
+                        [-85.0, 36.0],
+                        [-83.0, 36.0],
+                        [-83.0, 38.0],
+                        [-85.0, 38.0] # last coord not required by geoutils.get_centroid
+                    ],
+                    # this one is ignored in centroid calc, since it's a hole
+                    [
+                        [-84.0, 37.0],
+                        [-84.0, 36.2],
+                        [-83.5, 36.2],
+                        [-83.5, 37.0]
+                    ]
+                ]
+            }
+        }
+    }
+
+
     def setup(self):
-        self.input_data = {
+        input_data = {
+            "config": {"dispersion": {}},
             "fire_information": [
                 {
                     "growth": []
@@ -238,54 +290,62 @@ class TestHysplitConfiguratorGetCentralLatLng(object):
             input_data, ARCHIVE_INFO)
 
     def test_multiple_fires(self):
-        self.hycon.input_data["fire_information"].append({"growth":[]})
+        self.hycon._input_data["fire_information"].append({"growth":[]})
         with pytest.raises(MockHTTPError) as e:
-            hycon._get_central_lat_lng()
+            self.hycon._get_central_lat_lng()
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.SINGLE_FIRE_ONLY
 
     def test_missing_location_info(self):
-        # missing location
+        # missing growth info
         with pytest.raises(MockHTTPError) as e:
-            hycon._get_central_lat_lng()
+            self.hycon._get_central_lat_lng()
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.NO_GROWTH_INFO
+
+        # missing locaton
+        self.hycon._input_data["fire_information"][0]["growth"].append({"sdf": 3})
+        with pytest.raises(MockHTTPError) as e:
+            self.hycon._get_central_lat_lng()
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.INVALID_FIRE_LOCATION_INFO
 
         # missing lat and lng
-        self.hycon.input_data["fire_information"][0]["growth"]["location"] = {}
+        self.hycon._input_data["fire_information"][0]["growth"][0] = {"location": {}}
         with pytest.raises(MockHTTPError) as e:
-            hycon._get_central_lat_lng()
+            self.hycon._get_central_lat_lng()
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.INVALID_FIRE_LOCATION_INFO
 
         # missing longitude
-        self.hycon.input_data["fire_information"][0]["growth"]["location"]["latitude"] = 45.1
+        self.hycon._input_data["fire_information"][0]["growth"][0]["location"]["latitude"] = 45.1
         with pytest.raises(MockHTTPError) as e:
-            hycon._get_central_lat_lng()
+            self.hycon._get_central_lat_lng()
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.INVALID_FIRE_LOCATION_INFO
 
 
     def test_lat_lng(self):
-        pass
+        self.hycon._input_data["fire_information"][0]["growth"].append(self.LAT_LNG)
+        assert self.hycon._get_central_lat_lng() == (31, -64)
 
     def test_multi_point(self):
-        pass
+        self.hycon._input_data["fire_information"][0]["growth"].append(self.MULTI_POINT)
+        assert self.hycon._get_central_lat_lng() == (34, -83)
 
     def test_polygon(self):
-        pass
+        self.hycon._input_data["fire_information"][0]["growth"].append(self.POLYGON)
+        assert self.hycon._get_central_lat_lng() == (37, -84)
 
     def test_lat_lng_and_polygon(self):
-        pass
+        self.hycon._input_data["fire_information"][0]["growth"].append(self.LAT_LNG)
+        self.hycon._input_data["fire_information"][0]["growth"].append(self.POLYGON)
+        assert self.hycon._get_central_lat_lng() == (34, -74)
 
     def test_two_lat_lngs(self):
-        pass
-
-    def test_two_polygons(self):
-        pass
-
-    def test_(self):
-        pass
+        self.hycon._input_data["fire_information"][0]["growth"].append(self.LAT_LNG)
+        self.hycon._input_data["fire_information"][0]["growth"].append(self.LAT_LNG_2)
+        assert self.hycon._get_central_lat_lng() == (32, -65.5)
 
 
 class TestHysplitConfiguratorConfigureGrid(object):
