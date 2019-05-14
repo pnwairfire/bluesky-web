@@ -16,8 +16,6 @@ import ipify
 import tornado.web
 import tornado.log
 
-from bluesky.datetimeutils import parse_utc_offset
-
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import (
     run_bluesky, BlueSkyRunner, prune_for_plumerise, process_runtime
@@ -429,28 +427,11 @@ class RunExecuter(RequestHandlerBase):
         bkml_con["SmokeDispersionKMLOutput"] = bkml_con.get("SmokeDispersionKMLOutput", {})
         bkml_con["SmokeDispersionKMLOutput"]["INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS"] = "False"
         bkml_con["DispersionImages"] = bkml_con.get("DispersionImages", {})
-        if not bkml_con["DispersionImages"].get('DAILY_IMAGES_UTC_OFFSETS'):
-            bkml_con["DispersionImages"]["DAILY_IMAGES_UTC_OFFSETS"] = (
-                await self._get_utc_offsets(data))
-        tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
-        # TODO: set anything else?
-
-    async def _get_utc_offsets(self, data):
         # we want daily images produced for all timezones in which fires
         # are located
-        try:
-            utc_offsets = set([0])
-            for f in data['fire_information']:
-                for g in f.get('growth', []):
-                    o = parse_utc_offset(g.get('location', {}).get(utc_offset))
-                    if o is not None:
-                        utc_offsets.add(0)
-        except:
-            utc_offsets = set([0])
-
-        return list(utc_offsets)
-
-
+        bkml_con["DispersionImages"]["DAILY_IMAGES_UTC_OFFSETS"] = 'auto'
+        tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
+        # TODO: set anything else?
 
     ## Export
 
