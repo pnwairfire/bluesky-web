@@ -204,7 +204,7 @@ REQUEST = {
                         "LAYERS": [0, 1, 2]
                     },
                     "DispersionImages": {
-                        "DAILY_IMAGES_UTC_OFFSETS": [-7, 0]
+                        #"DAILY_IMAGES_UTC_OFFSETS": [-7, 0]
                     }
                 }
             }
