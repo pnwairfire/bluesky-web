@@ -429,7 +429,7 @@ class RunExecuter(RequestHandlerBase):
         bkml_con["DispersionImages"] = bkml_con.get("DispersionImages", {})
         # we want daily images produced for all timezones in which fires
         # are located
-        if bkml_con["DispersionImages"].get("DAILY_IMAGES_UTC_OFFSETS"):
+        if not bkml_con["DispersionImages"].get("DAILY_IMAGES_UTC_OFFSETS"):
             bkml_con["DispersionImages"]["DAILY_IMAGES_UTC_OFFSETS"] = 'auto'
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
