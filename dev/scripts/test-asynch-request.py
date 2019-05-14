@@ -174,7 +174,7 @@ OPTIONAL_ARGS = [
         'action': "store_true"
     },
     {
-        'long': "--daily-image-utc-offset",
+        'long': "--daily-images-utc-offsets",
         'help': "comma separated list of utc offset for daily images"
     },
     {
@@ -432,9 +432,9 @@ def create_initial_request(args):
         REQUEST['config']['visualization']["hysplit"]["blueskykml_config"]["DispersionImages"] = {
             "REPROJECT_IMAGES": "True"
         }
-    if args.daily_image_utc_offset:
+    if args.daily_images_utc_offsets:
         REQUEST['config']['visualization']["hysplit"]["blueskykml_config"]["DispersionImages"] = {
-            "DAILY_IMAGES_UTC_OFFSETS": args.daily_image_utc_offset.split(',')
+            "DAILY_IMAGES_UTC_OFFSETS": args.daily_images_utc_offsets.split(',')
         }
 
 
