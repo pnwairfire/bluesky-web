@@ -303,6 +303,15 @@ def write_to_req_resp_file(args, title, url, req, resp):
             f.write(req + "\n")
             f.write(resp + "\n")
 
+
+def load_response_body(response):
+    body = response.content.decode()
+    try:
+        return json.loads(body)
+    except Exception:
+        logging.error("Failed to load response:  %s", body)
+        raise
+
 def get(args, url, title, ignore_fail=False):
     response = requests.get(url, HEADERS)
     if not ignore_fail and response.status_code != 200:
@@ -311,7 +320,8 @@ def get(args, url, title, ignore_fail=False):
         sys.exit(1)
     write_to_req_resp_file(args, title,
         url + 'fuelbeds/', data, response.content)
-    return response.status_code, json.loads(response.content.decode())
+
+    return response.status_code, load_response_body(response)
 
 def post(args, url, data, desc):
     response = requests.post(url, data=data, headers=HEADERS)
@@ -321,7 +331,7 @@ def post(args, url, data, desc):
         logging.error("Failed at %s", desc.lower())
         logging.error("Failed at %s", response.content)
         sys.exit(1)
-    return  json.loads(response.content.decode())
+    return load_response_body(response)
 
 def parse_args():
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
