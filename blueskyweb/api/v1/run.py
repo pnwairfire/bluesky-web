@@ -427,10 +427,9 @@ class RunExecuter(RequestHandlerBase):
         bkml_con["SmokeDispersionKMLOutput"] = bkml_con.get("SmokeDispersionKMLOutput", {})
         bkml_con["SmokeDispersionKMLOutput"]["INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS"] = "False"
         bkml_con["DispersionImages"] = bkml_con.get("DispersionImages", {})
-        # TODO: once the PGv3 front end code is updated to read daily image
-        #   urls from the run output api response (rather than hard code
-        #   UTC+0000), set DAILY_IMAGES_UTC_OFFSETS to 'auto'
-        bkml_con["DispersionImages"]["DAILY_IMAGES_UTC_OFFSETS"] = [0]
+        # we want daily images produced for all timezones in which fires
+        # are located
+        bkml_con["DispersionImages"]["DAILY_IMAGES_UTC_OFFSETS"] = 'auto'
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
