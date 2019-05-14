@@ -281,18 +281,20 @@ HEADERS = {
 }
 
 def to_indented_json_string(data):
-    if hasattr(data, 'lower'):
-        if hasattr(data, 'decode'):
-            data = data.decode()
-        data = json.loads(data)
-    return json.dumps(data, indent=args.indent)
+    try:
+        if hasattr(data, 'lower'):
+            if hasattr(data, 'decode'):
+                data = data.decode()
+            data = json.loads(data)
+        return json.dumps(data, indent=args.indent)
+    except:
+        return data
 
 def write_to_req_resp_file(args, title, url, req, resp):
-    req = to_indented_json_string(req)
-    resp = to_indented_json_string(resp)
-
     logging.info("%s: %s", title, data)
     if args.write_req_resp_to_file:
+        req = to_indented_json_string(req)
+        resp = to_indented_json_string(resp)
         filename = os.path.join(DEV_LOG_DIR, args.run_id + '.log')
         with open(filename, 'a') as f:
             f.write('-' * 80)
