@@ -219,8 +219,8 @@ MET_ROOT_DIRS = {
     "national_3-km": "/data/Met/NAM/3km/ARL/",
     "pacific_northwest_1.33-km": "/data/Met/PNW/1.33km/ARL/",
     "pacific_northwest_4-km": "/data/Met/PNW/4km/ARL/",
-    "ca-nv_2-km": "/data/Met/CANSAC/2km/ARL/",
-    "ca-nv_6-km": "/data/Met/CANSAC/6km/ARL/"
+    "ca-nv_1.33-km": "/data/Met/CANSAC/1.33km/ARL/",
+    "ca-nv_4-km": "/data/Met/CANSAC/4km/ARL/"
 }
 DT_STR = '%Y-%m-%dT%H:%M:%S'
 def get_input(args):

@@ -1,6 +1,6 @@
 Initiate plumerise:
 
-    curl "https://www.blueskywebhost.com/bluesky-web-test/api/v1/run/plumerise/DRI6km/" \
+    curl "https://www.blueskywebhost.com/bluesky-web-test/api/v1/run/plumerise/NAM84/" \
         -H 'Content-Type: application/json' -d '{
             "fire_information": [
                 {

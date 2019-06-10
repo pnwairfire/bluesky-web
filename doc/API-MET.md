@@ -99,19 +99,19 @@ This API returns information about a specific domain with ARL data
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/domains/DRI6km/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/domains/DRI4km/" | python -m json.tool
     {
         "domain": {
-            "id": "DRI6km",
-            "resolution_km": 6,
+            "id": "DRI4km",
+            "resolution_km": 4,
             "boundary": {
-                "ne": {
-                    "lat": 44.6,
-                    "lng": -107.0
-                },
                 "sw": {
-                    "lat": 28.7,
-                    "lng": -128.5
+                    "lng": -128.5,
+                    "lat": 28.8
+                },
+                "ne": {
+                    "lng": -109.5,
+                    "lat": 44.8
                 }
             }
         }
