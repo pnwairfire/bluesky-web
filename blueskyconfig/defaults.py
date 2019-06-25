@@ -206,12 +206,16 @@ DEFAULTS = {
         },
         "Alaska12km": {
             "grid": {
-                "spacing": 12,
+                "spacing": 12, # 0.08
                 "projection": "LCC",
                 "boundary": {
                     "sw": {"lng": -178.6, "lat": 40.6},
                     "ne": {"lng": -98, "lat": 66.3}
                 },
+                # "boundary": {
+                #     "sw": {"lng": -174.5, "lat": 50.0},
+                #     "ne": {"lng": -135.5, "lat": 75.0}
+                # },
                 "grid_size_options": {
                     "1.0": "xy(km): 8900 x 2000",
                     "0.75": "xy(km): 6700 x 1500",
@@ -219,7 +223,7 @@ DEFAULTS = {
                     "0.25": "xy(km): 2200 x 500"
                 }
             },
-            "arl_index_file": None, # TODO: set correctly
+            "arl_index_file": 'AK12km_ARL_index.csv',
             "time_step": 1
         },
         "NWS-06Z-1km-2018-CA-NV": {
