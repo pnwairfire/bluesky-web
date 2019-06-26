@@ -427,6 +427,20 @@ class RunExecuter(RequestHandlerBase):
         bkml_con["SmokeDispersionKMLOutput"] = bkml_con.get("SmokeDispersionKMLOutput", {})
         bkml_con["SmokeDispersionKMLOutput"]["INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS"] = "False"
         bkml_con["DispersionImages"] = bkml_con.get("DispersionImages", {})
+        bkml_con["GrayColorBar"] = {
+            "DEFINE_RGB": "true",
+            "DATA_LEVELS": "0 1 12 35 55 150 250 350 500 2000",
+            "RED": " 0 200 175 150 125 100 75 50 25",
+            "GREEN": "0 200 175 150 125 100 75 50 25",
+            "BLUE": "0 200 175 150 125 100 75 50 25",
+            "IMAGE_OPACITY_FACTOR": "0.7"
+        }
+        bkml_con["DispersionGridOutput"] = {
+            "HOURLY_COLORS": "GrayColorBar,RedColorBar",
+            "THREE_HOUR_COLORS": "GrayColorBar,RedColorBar",
+            "DAILY_COLORS": "GrayColorBar,RedColorBar"
+        }
+
         # we want daily images produced for all timezones in which fires
         # are located
         if not bkml_con["DispersionImages"].get("DAILY_IMAGES_UTC_OFFSETS"):
