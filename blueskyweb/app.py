@@ -26,6 +26,12 @@ from .api.v1.met import (
     MetArchiveAvailability as MetArchiveAvailabilityV1
 )
 
+from .api.v4_1.met import (
+    DomainInfo as DomainInfoV4_1,
+    MetArchivesInfo as MetArchivesInfoV4_1,
+    MetArchiveAvailability as MetArchiveAvailabilityV4_1
+)
+
 DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
 def configure_logging(**settings):
     log_level = settings.get('log_level') or logging.WARNING
@@ -66,6 +72,11 @@ def get_routes(path_prefix):
     )
     routes = [
         (r"/api/ping/?", Ping),
+
+        ##
+        ## V1
+        ##
+
         # Getting information about met domains
         (r"/api/v1/met/domains/?", DomainInfoV1),
         (r"/api/v1/met/domains/([^/]+)/?", DomainInfoV1),
@@ -93,7 +104,23 @@ def get_routes(path_prefix):
             RunsInfoV1),
         (r"/api/v1/runs/([^/]+)/?", RunStatusV1),
         (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
-        (r"/api/v1/runs?/([^/]+)/output/?", RunOutputV1)
+        (r"/api/v1/runs?/([^/]+)/output/?", RunOutputV1),
+
+        ##
+        ## V4.1
+        ##
+
+        # Getting information about met domains
+        (r"/api/v4.1/met/domains/?", DomainInfoV4_1),
+        (r"/api/v4.1/met/domains/([^/]+)/?", DomainInfoV4_1),
+
+        # Getting information about all met data archives
+        (r"/api/v4.1/met/archives/?", MetArchivesInfoV4_1),
+        # Getting information about specific met archive or
+        # collection ('standard', 'special', 'fast', etc.)
+        (r"/api/v4.1/met/archives/([^/]+)/?", MetArchivesInfoV4_1),
+        # Checking specific date avaialbility
+        (r"/api/v4.1/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailabilityV4_1),
     ]
     if path_prefix:
         path_prefix = path_prefix.strip('/')
