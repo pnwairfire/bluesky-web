@@ -101,7 +101,7 @@ class RunExecuter(RequestHandlerBase):
     async def post(self, mode=None, archive_id=None):
         self._mode = mode
         self._archive_id = archive_id
-        self._archive_info = met.get_archive_info(archive_id)
+        self._archive_info = met.db.get_archive_info(archive_id)
 
         if not self.request.body:
             self._raise_error(400, 'empty post data')
@@ -306,10 +306,10 @@ class RunExecuter(RequestHandlerBase):
     async def _configure_findmetdata(self, data):
         tornado.log.gen_log.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
-        met_archives_db = met.MetArchiveDB(self.settings['mongodb_url'])
+        met_archives_db = met.db.MetArchiveDB(self.settings['mongodb_url'])
         try:
             met_root_dir = await met_archives_db.get_root_dir(self._archive_id)
-        except met.UnavailableArchiveError as e:
+        except met.db.UnavailableArchiveError as e:
             msg = "Archive unavailable: {}".format(self._archive_id)
             self._raise_error(404, msg)
 
@@ -328,7 +328,7 @@ class RunExecuter(RequestHandlerBase):
         tornado.log.gen_log.debug('Configuring localmet')
         data['config'] = data.get('config', {})
         data['config']['localmet'] = {
-            "time_step": met._archive_info['time_step']
+            "time_step": met.db._archive_info['time_step']
         }
 
     ## Plumerise

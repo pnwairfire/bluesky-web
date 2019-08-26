@@ -22,7 +22,7 @@ KM_PER_DEG_LAT = 111
 class DomainInfo(RequestHandlerBase):
 
     def _marshall(self, domain_id):
-        grid_config = met.DOMAINS[domain_id]['grid']
+        grid_config = met.db.DOMAINS[domain_id]['grid']
         r = {
             "id": domain_id,
             "boundary": grid_config['boundary'],
@@ -37,12 +37,12 @@ class DomainInfo(RequestHandlerBase):
 
     def get(self, domain_id=None):
         if domain_id:
-            if domain_id not in met.DOMAINS:
+            if domain_id not in met.db.DOMAINS:
                 self._raise_error(404, "Domain does not exist")
             else:
                 self.write({'domain': self._marshall(domain_id)})
         else:
-            self.write({'domains': [self._marshall(d) for d in met.DOMAINS]})
+            self.write({'domains': [self._marshall(d) for d in met.db.DOMAINS]})
 
 
 ##
@@ -55,7 +55,7 @@ class MetArchiveBaseHander(RequestHandlerBase):
 
     def __init__(self, *args, **kwargs):
         super(MetArchiveBaseHander, self).__init__(*args, **kwargs)
-        self.met_archives_db = met.MetArchiveDB(self.settings['mongodb_url'])
+        self.met_archives_db = met.db.MetArchiveDB(self.settings['mongodb_url'])
 
 class MetArchivesInfo(MetArchiveBaseHander):
 
@@ -117,7 +117,7 @@ class MetArchiveAvailability(MetArchiveBaseHander):
             data = await self.met_archives_db.check_availability(
                 archive_id, date_obj, self.get_date_range())
             self.write(data)
-        except met.InvalidArchiveError:
+        except met.db.InvalidArchiveError:
             self._raise_error(404, "Archive does not exist")
 
     DEFAUL_DATE_RANGE = 3

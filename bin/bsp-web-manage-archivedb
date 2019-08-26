@@ -108,11 +108,11 @@ def parse_args():
 async def get_root_dirs(db, args):
     tornado.log.gen_log.info('Getting root dirs')
     root_dirs = {}
-    for t in met.ARCHIVES:
-        for a in met.ARCHIVES[t]:
+    for t in met.db.ARCHIVES:
+        for a in met.db.ARCHIVES[t]:
             try:
                 root_dirs[a] = await db.get_root_dir(a)
-            except met.UnavailableArchiveError as e:
+            except met.db.UnavailableArchiveError as e:
                 pass
     return root_dirs
 
@@ -139,16 +139,16 @@ async def clear_all(db, args):
 
 async def main():
     args = parse_args()
-    db = met.MetArchiveDB(args.mongodb_url)
+    db = met.db.MetArchiveDB(args.mongodb_url)
 
     try:
         data = await globals()[args.action.replace('-','_')](db, args)
 
-    except met.InvalidArchiveError:
+    except met.db.InvalidArchiveError:
         sys.stdout.write("*** Invalid archive: {}\n".format(args.archive_id))
         sys.exit(1)
 
-    except met.ArchiveNotDefinedError:
+    except met.db.ArchiveNotDefinedError:
         sys.stdout.write("*** Specify an archive\n")
         sys.exit(1)
 
