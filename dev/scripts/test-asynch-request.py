@@ -49,12 +49,12 @@ Full run (ingestiont through visualization)
   $ {script_name} \\
         -r https://www.blueskywebhost.com/bluesky-web-test/ \\
         --log-level=DEBUG -s `date -d"-1 day" +%Y-%m-%dT00:00:00` -n 12 \\
-        --met-archive ca-nv_6-km
+        --met-archive ca-nv_4-km
 
   $ {script_name} \\
         -r https://www.blueskywebhost.com/bluesky-web/ \\
         --log-level=DEBUG -s `date -d"-1 day" +%Y-%m-%dT00:00:00` -n 12 \\
-        --met-archive ca-nv_6-km
+        --met-archive ca-nv_4-km
 
 (On unix, use `date -v-1d +%Y-%m-%dT00:00:00`.)
 
@@ -143,8 +143,8 @@ OPTIONAL_ARGS = [
     },
     {
         'long': "--met-archive",
-        'help': "met archive; default 'ca-nv_6-km'",
-        'default': 'ca-nv_6-km'
+        'help': "met archive; default 'ca-nv_4-km'",
+        'default': 'ca-nv_4-km'
     },
     {
         'long': "--hysplit-options",
