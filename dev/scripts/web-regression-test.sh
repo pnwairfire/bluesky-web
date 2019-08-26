@@ -46,10 +46,10 @@ print_response() {
 
 
 # Note: this test does not include dispersion related apis, i.e.
-#   - /api/v1/run/dispersion/
-#   - /api/v1/run/all/
-#   - /api/v1/run/RUN_ID/status/
-#   - /api/v1/run/RUN_ID/output/
+#   - /api/v[1|4.1]/run/dispersion/
+#   - /api/v[1|4.1]/run/all/
+#   - /api/v[1|4.1]/run/RUN_ID/status/
+#   - /api/v[1|4.1]/run/RUN_ID/output/
 
 GET_URLS=(
     $ROOT_URL/api/ping
@@ -70,6 +70,10 @@ GET_URLS=(
     $ROOT_URL/api/v1/met/archives/$ARCHIVE/
     $ROOT_URL/api/v1/met/archives/$ARCHIVE/$DATE
     $ROOT_URL/api/v1/met/archives/$ARCHIVE/$DATE/
+    $ROOT_URL/api/v4_1/met/archives/$ARCHIVE
+    $ROOT_URL/api/v4_1/met/archives/$ARCHIVE/
+    $ROOT_URL/api/v4_1/met/archives/$ARCHIVE/$DATE
+    $ROOT_URL/api/v4_1/met/archives/$ARCHIVE/$DATE/
 )
 WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 for i in "${GET_URLS[@]}"
