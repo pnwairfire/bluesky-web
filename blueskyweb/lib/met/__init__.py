@@ -1,3 +1,8 @@
+"""blueskyweb.lib.met"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+
 from . import db
 
 # The above import supports calling met.db after importing the met

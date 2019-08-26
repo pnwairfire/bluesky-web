@@ -1,3 +1,8 @@
+"""blueskyweb.lib.hysplit"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+
 import copy
 import blueskyconfig
 from geoutils.geojson import get_centroid
