@@ -72,7 +72,8 @@ def run_bluesky(input_data, **settings):
     if hasattr(input_data, 'lower'):
         input_data = json.loads(input_data)
 
-    return BlueSkyRunner(input_data, db=db, **settings).run()
+    t = BlueSkyRunner(input_data, db=db, **settings).start()
+    t.join() # block until it completes
 
 
 ##
@@ -112,7 +113,7 @@ class configure_logging:
         root_logger.removeHandler(self.log_file_handler)
 
 
-class BlueSkyRunner(object):
+class BlueSkyRunner(threading.Thread):
 
     def __init__(self, input_data, output_stream=None, db=None, **settings):
         """Constructor
@@ -131,10 +132,12 @@ class BlueSkyRunner(object):
         otherwise, we'll mount to host machines /tmp/, since we'll just
         read it here and then forget about it.
         """
+        super().__init__()
         self.input_data = input_data
         self.output_stream = output_stream
         self.db = db
         self.settings = settings
+        self.exception = None
 
     def run(self):
         self.input_data['run_id'] = (self.input_data.get('run_id')
@@ -202,7 +205,9 @@ class BlueSkyRunner(object):
             #tornado.log.gen_log.debug(traceback.format_exc())
             self._record_run(RunStatuses.Failed,
                 error={"message": str(e)})
-            raise BlueSkyJobError(str(e))
+            # store exception rather than raise it so
+            # that main thread can act on it
+            self.exception = BlueSkyJobError(str(e))
 
 
     def _run_bsp_modules(self):  # TODO: rename

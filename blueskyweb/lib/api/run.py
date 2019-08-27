@@ -297,8 +297,15 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
 
     async def _run_in_process(self, data):
         try:
-            # will call self.write
-            output = BlueSkyRunner(data, output_stream=self).run()
+            # Runs bluesky in a separate thread so that run configurations
+            # don't overwrite each other. (Bluesky manages configuration
+            # with a singleton that stores config data in thread local)
+            # BlueSkyRunner will call self.write.
+            t = BlueSkyRunner(data, output_stream=self).start()
+            # block until it completes so that we can raise exception
+            t.join()
+            if t.exception:
+                raise t.exception
 
         except Exception as e:
             tornado.log.gen_log.debug(traceback.format_exc())
