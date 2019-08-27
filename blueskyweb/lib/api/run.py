@@ -296,6 +296,9 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
         self.write({"run_id": data['run_id']})
 
     async def _run_in_process(self, data):
+        # We need the outer try block to handle any exception raised
+        # before the bluesky thread is started. If an exception is
+        # encountered in the seperate thread, it's handling
         try:
             # Runs bluesky in a separate thread so that run configurations
             # don't overwrite each other. (Bluesky manages configuration
