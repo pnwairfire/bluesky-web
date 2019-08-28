@@ -107,6 +107,14 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
     def fires_key(self):
         pass
 
+    def _pre_process(self, data):
+        """Hook for derived class to process request input data before
+        anything else.  e.g. v1 can marshal the data to the bluesky v4.1
+        data structure.
+        """
+        pass
+
+
     ##
     ## Main interface
     ##
@@ -125,6 +133,8 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
         if self.fires_key not in data:
             self._raise_error(400, "'{}' not specified".format(self.fires_key))
             return
+
+        self._pre_process(data)
 
         # TODO: should no configuration be allowed at all?  or only some? if
         #  any restrictions, check here or check in specific _configure_*

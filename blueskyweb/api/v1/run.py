@@ -5,6 +5,8 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import tornado.web
 
+from bluesky.marshal import Blueskyv4_0To4_1
+
 from blueskyweb.lib.api.run import (
     RunExecuterBase, RunStatus, RunOutput, RunsInfo
 )
@@ -17,3 +19,7 @@ class RunExecuter(RunExecuterBase):
     @property
     def fires_key(self):
         return "fire_information"
+
+    def _pre_process(self, data):
+        fires = data.pop('fire_information')
+        data['fires'] = Blueskyv4_0To4_1().marshal(fires)
