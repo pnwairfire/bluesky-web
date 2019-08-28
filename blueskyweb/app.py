@@ -70,6 +70,12 @@ def get_routes(path_prefix):
         RunOutput as RunOutputV1,
         RunsInfo as RunsInfoV1
     )
+    from .api.v4_1.run import (
+        RunExecuter as RunExecuterV4_1,
+        RunStatus as RunStatusV4_1,
+        RunOutput as RunOutputV4_1,
+        RunsInfo as RunsInfoV4_1
+    )
     routes = [
         (r"/api/ping/?", Ping),
 
@@ -121,6 +127,23 @@ def get_routes(path_prefix):
         (r"/api/v4.1/met/archives/([^/]+)/?", MetArchivesInfoV4_1),
         # Checking specific date avaialbility
         (r"/api/v4.1/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailabilityV4_1),
+
+        # Initiating runs
+        (r"/api/v4.1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV4_1),
+        (r"/api/v4.1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuterV4_1),
+        # Getting information about runs
+        # Note: The following paths are supported for backwards compatibility:
+        #       - /api/v1/run/<guid>/status/
+        #       - /api/v1/run/<guid>/output/
+        #     the current paths are:
+        #       - /api/v1/runs/<guid>/
+        #       - /api/v1/runs/<guid>/output/
+        (r"/api/v4.1/runs/?", RunsInfoV4_1),
+        (r"/api/v4.1/runs/({})/?".format('|'.join(RunStatuses.statuses)),
+            RunsInfoV4_1),
+        (r"/api/v4.1/runs/([^/]+)/?", RunStatusV4_1),
+        (r"/api/v4.1/run/([^/]+)/status/?", RunStatusV4_1),
+        (r"/api/v4.1/runs?/([^/]+)/output/?", RunOutputV4_1),
     ]
     if path_prefix:
         path_prefix = path_prefix.strip('/')
