@@ -65,13 +65,13 @@ def get_routes(path_prefix):
     #    os.environ["MONGODB_URL"] = settings['mongodb_url']
     # before blueskyworker.tasks is imported in .api.v1.run
     from .api.v1.run import (
-        RunExecuter as RunExecuterV1,
+        RunExecute as RunExecuteV1,
         RunStatus as RunStatusV1,
         RunOutput as RunOutputV1,
         RunsInfo as RunsInfoV1
     )
     from .api.v4_1.run import (
-        RunExecuter as RunExecuterV4_1,
+        RunExecute as RunExecuteV4_1,
         RunStatus as RunStatusV4_1,
         RunOutput as RunOutputV4_1,
         RunsInfo as RunsInfoV4_1
@@ -96,8 +96,8 @@ def get_routes(path_prefix):
         (r"/api/v1/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailabilityV1),
 
         # Initiating runs
-        (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV1),
-        (r"/api/v1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuterV1),
+        (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuteV1),
+        (r"/api/v1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuteV1),
         # Getting information about runs
         # Note: The following paths are supported for backwards compatibility:
         #       - /api/v1/run/<guid>/status/
@@ -129,8 +129,8 @@ def get_routes(path_prefix):
         (r"/api/v4.1/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailabilityV4_1),
 
         # Initiating runs
-        (r"/api/v4.1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuterV4_1),
-        (r"/api/v4.1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuterV4_1),
+        (r"/api/v4.1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuteV4_1),
+        (r"/api/v4.1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuteV4_1),
         # Getting information about runs
         # Note: The following paths are supported for backwards compatibility:
         #       - /api/v1/run/<guid>/status/

@@ -6,10 +6,10 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import tornado.web
 
 from blueskyweb.lib.api.run import (
-    RunExecuterBase, RunStatus, RunOutput, RunsInfo
+    RunExecuteBase, RunStatus, RunOutput, RunsInfo
 )
 
-class RunExecuter(RunExecuterBase):
+class RunExecute(RunExecuteBase):
     @tornado.web.asynchronous
     async def post(self, mode=None, archive_id=None):
         super().post(mode=mode, archive_id=archive_id)

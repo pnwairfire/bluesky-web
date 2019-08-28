@@ -96,7 +96,7 @@ def is_same_host(run):
 ### API Handlers
 ###
 
-class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
+class RunExecuteBase(RequestHandlerBase, metaclass=abc.ABCMeta):
 
     ##
     ## Abstract methods to be implemebed by derived classes
