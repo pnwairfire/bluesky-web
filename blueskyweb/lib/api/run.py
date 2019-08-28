@@ -129,7 +129,11 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
             self._raise_error(400, 'empty post data')
             return
 
-        data = json.loads(self.request.body.decode())
+        try:
+            data = json.loads(self.request.body.decode())
+        except json.JSONDecodeError as e:
+            self._raise_error(400, 'Invalid JSON post data')
+
         if self.fires_key not in data:
             self._raise_error(400, "'{}' not specified".format(self.fires_key))
             return
