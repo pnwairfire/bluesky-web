@@ -174,13 +174,17 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
         except Exception as e:
             # IF exceptions aren't caught, the traceback is returned as
             # the response body
-            tornado.log.gen_log.debug(traceback.format_exc())
-            tornado.log.gen_log.error('Exception: %s', e)
-            self.set_status(500)
+            self.return_500(e)
 
     ##
     ## Helpers
     ##
+
+    def return_500(self, e, skip_traceback=False):
+        if not skip_traceback:
+            tornado.log.gen_log.debug(traceback.format_exc())
+        tornado.log.gen_log.error('Exception: %s', e)
+        self.set_status(500)
 
     RUN_ID_SUFFIX_REMOVER = re.compile('-(plumerise|dispersion)$')
 
@@ -316,15 +320,13 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
             # BlueSkyRunner will call self.write.
             t = BlueSkyRunner(data, output_stream=self)
             t.start()
-            # block until it completes so that we can raise exception
+            # block until it completes so that we can return 500 if necessary
             t.join()
             if t.exception:
-                raise t.exception
+                self.return_500(t.exception, skip_traceback=True)
 
         except Exception as e:
-            tornado.log.gen_log.debug(traceback.format_exc())
-            tornado.log.gen_log.error('Exception: %s', e)
-            self.set_status(500)
+            self.return_500(t.exception)
 
     ##
     ## Configuration
