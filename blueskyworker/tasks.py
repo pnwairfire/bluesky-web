@@ -209,6 +209,8 @@ class BlueSkyRunner(threading.Thread):
     def _run_bsp_modules(self):  # TODO: rename
         fires_manager = models.fires.FiresManager()
         modules = self.input_data.pop('modules')
+        config = self.input_data.pop('config')
+        Config().merge(config)
         fires_manager.load(self.input_data)
 
         # Note that, once the run completes, this runtime will be
