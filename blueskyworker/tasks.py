@@ -5,6 +5,7 @@ import re
 import os
 import ssl
 import threading
+import traceback
 import uuid
 
 import ipify
@@ -197,12 +198,12 @@ class BlueSkyRunner(threading.Thread):
                 self._record_run(status, **data)
 
         except Exception as e:
-            #tornado.log.gen_log.debug(traceback.format_exc())
+            self.exception = BlueSkyJobError(str(e))
+            tornado.log.gen_log.debug(traceback.format_exc())
             self._record_run(RunStatuses.Failed,
                 error={"message": str(e)})
             # store exception rather than raise it so
             # that main thread can act on it
-            self.exception = BlueSkyJobError(str(e))
 
 
     def _run_bsp_modules(self):  # TODO: rename
