@@ -66,7 +66,8 @@ def run_bluesky(input_data, **settings):
     if hasattr(input_data, 'lower'):
         input_data = json.loads(input_data)
 
-    t = BlueSkyRunner(input_data, db=db, **settings).start()
+    t = BlueSkyRunner(input_data, db=db, **settings)
+    t.start()
     t.join() # block until it completes
 
 

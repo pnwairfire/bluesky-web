@@ -304,7 +304,8 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
             # don't overwrite each other. (Bluesky manages configuration
             # with a singleton that stores config data in thread local)
             # BlueSkyRunner will call self.write.
-            t = BlueSkyRunner(data, output_stream=self).start()
+            t = BlueSkyRunner(data, output_stream=self)
+            t.start()
             # block until it completes so that we can raise exception
             t.join()
             if t.exception:
