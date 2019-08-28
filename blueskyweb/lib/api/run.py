@@ -199,7 +199,7 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
 
         # This is really just for PGv3 runs
         if self.RUN_ID_SUFFIX_REMOVER.search(data['run_id']):
-            for f in data["fire_information"]:
+            for f in data["fires"]:
                 f['event_of'] = f.get('event_of', {})
                 if not f['event_of'].get('name'):
                     name = 'Scenario Id {}'.format(
@@ -228,7 +228,7 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
 
     def _plumerise_modules(self, data):
         # just look at first growth object of first fire
-        if 'timeprofile' in data['fire_information'][0]['growth'][0]:
+        if 'timeprofile' in data['fires'][0]['growth'][0]:
             return self.PLUMERISE_MODULES
         else:
             return ['timeprofiling'] + self.PLUMERISE_MODULES
@@ -518,7 +518,7 @@ class RunExecuterBase(RequestHandlerBase, metaclass=abc.ABCMeta):
 class RunStatusBase(RequestHandlerBase):
 
     VERBOSE_FIELDS = ('output_dir', 'modules', 'server', 'export',
-        'fire_information')
+        'fires')
     AVERAGE_RUN_TIME_IN_SECONDS = 360 # 6 minutes
 
     async def process(self, run):
@@ -651,12 +651,12 @@ class RunOutput(RequestHandlerBase):
 
     def _get_plumerise(self, run):
         version_info = run.get('version_info') or {}
-        run_info = run if 'fire_information' in run else self._load_output(run)
-        fire_information = run_info['fire_information']
+        run_info = run if 'fires' in run else self._load_output(run)
+        fires = run_info['fires']
         runtime_info = process_runtime(run_info.get('runtime'))
 
         self.write(dict(run_id=run['run_id'],
-            fire_information=fire_information,
+            fires=fires,
             runtime=runtime_info,
             version_info=version_info))
 

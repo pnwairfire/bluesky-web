@@ -188,13 +188,13 @@ class HysplitConfigurator(object):
         }
 
     def _get_central_lat_lng(self):
-        if len(self._input_data['fire_information']) > 1:
+        if len(self._input_data['fires']) > 1:
             # input data could possibly specifu multiple fires at
             # the same location, but we won't bother trying to accept that
             self._request_handler._raise_error(400,
                 ErrorMessages.SINGLE_FIRE_ONLY)
 
-        fire = self._input_data['fire_information'][0]
+        fire = self._input_data['fires'][0]
 
         if not fire.get('growth'):
             self._request_handler._raise_error(400,

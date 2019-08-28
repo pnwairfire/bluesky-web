@@ -243,7 +243,7 @@ class BlueSkyRunner(threading.Thread):
                 elif m == 'plumerising':
                     # It's not a dispersion run, so this must be a
                     # plumerise run
-                    data['fire_information'] = prune_for_plumerise(
+                    data['fires'] = prune_for_plumerise(
                         fires_manager.fires)
 
                 self._record_run(RunStatuses.CompletedModule, module=m, **data)
