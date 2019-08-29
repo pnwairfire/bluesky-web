@@ -18,7 +18,7 @@ import tornado.log
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import process_runtime
 from blueskyweb.lib import met
-from blueskyweb.lib.runs.execute import BlueSkyRunExecuter
+from blueskyweb.lib.runs.execute import BlueSkyRunExecutor
 from blueskyweb.lib.runs.output import BlueSkyRunOutput
 from . import RequestHandlerBase
 
@@ -104,9 +104,9 @@ class RunExecute(RequestHandlerBase, metaclass=abc.ABCMeta):
 
         self._pre_process(data)
 
-        executer = BlueSkyRunExecuter(api_version, mode, archive_id,
+        executor = BlueSkyRunExecutor(api_version, mode, archive_id,
             self._raise_error, self.write, self.settings)
-        await executer.execute(data,
+        await executor.execute(data,
             run_asynchronously=self.get_query_argument(
                 '_a', default=None) is not None)
 

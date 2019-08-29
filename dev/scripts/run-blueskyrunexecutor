@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
 from blueskyconfig.defaults import DEFAULTS
 
 _NOW = datetime.datetime.utcnow()
-RUN_ID = 'blueskyrunexecuter-' + _NOW.strftime('%Y%m%dT%H%M%S')
+RUN_ID = 'BlueSkyRunExecutor-' + _NOW.strftime('%Y%m%dT%H%M%S')
 INPUT = {
     "run_id": RUN_ID,
     "config": {
@@ -306,12 +306,12 @@ def handle_error(status, msg, exception=None):
         sys.exit(1)
 
 async def execute(data, args):
-    from blueskyweb.lib.runs.execute import BlueSkyRunExecuter
+    from blueskyweb.lib.runs.execute import BlueSkyRunExecutor
     s = io.StringIO()
     logging.debug('About to run')
-    executer = BlueSkyRunExecuter(args.api_version, 'all', args.met_archive,
+    executor = BlueSkyRunExecutor(args.api_version, 'all', args.met_archive,
         handle_error, s.write, {})
-    await executer.execute(data, run_asynchronously=args.run_asynchronously)
+    await executor.execute(data, run_asynchronously=args.run_asynchronously)
     return json.loads(s.getvalue())
 
 async def main(args):

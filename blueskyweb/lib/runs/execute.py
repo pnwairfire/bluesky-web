@@ -23,7 +23,7 @@ from blueskyworker.tasks import (
 )
 
 __all__ = [
-    "RunExecuter"
+    "BlueSkyRunExecutor"
 ]
 
 def pre_process_v1(data, handle_error):
@@ -38,7 +38,7 @@ PRE_PROCESSORS = {
 }
 
 
-class BlueSkyRunExecuter(object):
+class BlueSkyRunExecutor(object):
 
     def __init__(self, api_version, mode, archive_id, handle_error_func,
             write_func, settings):
