@@ -144,8 +144,8 @@ class BlueSkyRunExecuter(object):
     ]
 
     def _plumerise_modules(self, data):
-        # just look at first growth object of first fire
-        if 'timeprofile' in data['fires'][0]['growth'][0]:
+        # just look at first active area of first fire
+        if 'timeprofile' in data['fires'][0]['activity'][0]['active_areas'][0]:
             return self.PLUMERISE_MODULES
         else:
             return ['timeprofiling'] + self.PLUMERISE_MODULES
