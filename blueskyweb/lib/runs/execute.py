@@ -41,13 +41,14 @@ PRE_PROCESSORS = {
 class BlueSkyRunExecuter(object):
 
     def __init__(self, api_version, mode, archive_id, handle_error_func,
-            write_func):
+            write_func, settings):
         self.api_version = api_version
         self.mode = mode
         self.archive_id = archive_id # may be None
         self.archive_info = met.db.get_archive_info(archive_id)
         self.handle_error = handle_error_func
         self.write = write_func
+        self.settings = settings
 
     async def execute(self, data, run_asynchronously=False):
         # TODO: should no configuration be allowed at all?  or only some? if

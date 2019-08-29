@@ -105,7 +105,7 @@ class RunExecute(RequestHandlerBase, metaclass=abc.ABCMeta):
         self._pre_process(data)
 
         executer = BlueSkyRunExecuter(api_version, mode, archive_id,
-            self._raise_error, self.write)
+            self._raise_error, self.write, self.settings)
         await executer.execute(data,
             run_asynchronously=self.get_query_argument(
                 '_a', default=None) is not None)
