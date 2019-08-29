@@ -56,7 +56,7 @@ class BlueSkyRunExecuter(object):
         #  methods, below
 
         if self.api_version in PRE_PROCESSORS:
-            PRE_PROCESSORS(data, self.handle_error)
+            PRE_PROCESSORS[self.api_version](data, self.handle_error)
 
         if 'fires' not in data:
             self.handle_error(400, "'{}' not specified".format(self.fires_key))
