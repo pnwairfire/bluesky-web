@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
 #   and other python pacakges installed in your local (non-docker)
 #   python env
 from blueskyconfig.defaults import DEFAULTS
+from blueskyworker import tasks
 
 _NOW = datetime.datetime.utcnow()
 RUN_ID = 'BlueSkyRunExecutor-' + _NOW.strftime('%Y%m%dT%H%M%S')
