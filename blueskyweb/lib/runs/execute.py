@@ -26,15 +26,14 @@ __all__ = [
 
 class BlueSkyRunExecuter(object):
 
-    def __init__(self, mode, archive_id, get_query_argument_func, handle_error_func, write_func):
+    def __init__(self, mode, archive_id, handle_error_func, write_func):
         self.mode = mode
         self.archive_id = archive_id # may be None
         self.archive_info = met.db.get_archive_info(archive_id)
-        self.get_query_argument = get_query_argument_func
         self.handle_error = handle_error_func
         self.write = write_func
 
-    async def execute(self, data):
+    async def execute(self, data, run_asynchronously=False):
         # TODO: should no configuration be allowed at all?  or only some? if
         #  any restrictions, check here or check in specific _configure_*
         #  methods, below
@@ -61,7 +60,7 @@ class BlueSkyRunExecuter(object):
             else:
                 await self._configure_emissions(data)
                 # fuelbeds or emissions request
-                if self.get_query_argument('_a', default=None) is not None:
+                if run_asynchronously:
                     await self._run_asynchronously(data)
                 else:
                     await self._run_in_process(data)
