@@ -149,7 +149,7 @@ Run in docker. e.g.:
     -s 2014-05-30T00:00:00 -n 12 \\
     -a 500 --lat 45.12 --lng -120 \\
     --utc-offset -06:00 \\
-    --met-archive ca-nv_6-km
+    --met-archive pacific_northwest_4-km
 
 """.format(script_name=sys.argv[0])
 
@@ -205,8 +205,8 @@ OPTIONAL_ARGS = [
     },
     {
         'long': "--met-archive",
-        'help': "met archive; default 'ca-nv_6-km'",
-        'default': 'ca-nv_6-km'
+        'help': "met archive; default 'pacific_northwest_4-km'",
+        'default': 'pacific_northwest_4-km'
     },
     {
         'long': "--indent",
