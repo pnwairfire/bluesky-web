@@ -214,7 +214,7 @@ OPTIONAL_ARGS = [
         "type": int
     },
     {
-        'long': 'run-asynchronously'
+        'long': '--run-asynchronously',
         'action': 'store_true'
     }
 ]
