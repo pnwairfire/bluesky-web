@@ -26,8 +26,10 @@ __all__ = [
 
 class BlueSkyRunExecuter(object):
 
-    def __init__(self, mode, get_query_argument_func, handle_error_func, write_func):
+    def __init__(self, mode, archive_id, get_query_argument_func, handle_error_func, write_func):
         self.mode = mode
+        self.archive_id = archive_id # may be None
+        self.archive_info = met.db.get_archive_info(archive_id)
         self.get_query_argument = get_query_argument_func
         self.handle_error = handle_error_func
         self.write = write_func
@@ -141,9 +143,9 @@ class BlueSkyRunExecuter(object):
 
         if self.mode in ('dispersion', 'all'):
             dispersion_modules = (self.MET_DISPERSION_MODULES
-                if self._archive_id else self.METLESS_DISPERSION_MODULES)
+                if self.archive_id else self.METLESS_DISPERSION_MODULES)
             if self.mode == 'all':
-                if self._archive_id:
+                if self.archive_id:
                     _set(self.FUELBEDS_MODULES +
                         self.EMISSIONS_MODULES +
                         self._plumerise_modules(data) +
@@ -182,7 +184,7 @@ class BlueSkyRunExecuter(object):
     async def _run_asynchronously(self, data):
         await self._check_for_existing_run_id(data['run_id'])
 
-        queue_name = self._archive_id or 'no-met'
+        queue_name = self.archive_id or 'no-met'
         if self.mode == 'plumerise':
             queue_name += '-plumerise'
 
@@ -241,16 +243,16 @@ class BlueSkyRunExecuter(object):
         data['config'] = data.get('config', {})
         met_archives_db = met.db.MetArchiveDB(self.settings['mongodb_url'])
         try:
-            met_root_dir = await met_archives_db.get_root_dir(self._archive_id)
+            met_root_dir = await met_archives_db.get_root_dir(self.archive_id)
         except met.db.UnavailableArchiveError as e:
-            msg = "Archive unavailable: {}".format(self._archive_id)
+            msg = "Archive unavailable: {}".format(self.archive_id)
             self.handle_error(404, msg)
 
         data['config']['findmetdata'] = {
             "met_root_dir": met_root_dir,
             "arl": {
                 "index_filename_pattern":
-                    self._archive_info['arl_index_file'],
+                    self.archive_info['arl_index_file'],
                 "fewer_arl_files": True
             }
         }
@@ -328,12 +330,12 @@ class BlueSkyRunExecuter(object):
         tornado.log.gen_log.debug("Working dir: %s",
             data['config']['dispersion']['working_dir'])
 
-        if not self._archive_id:
+        if not self.archive_id:
             data['config']['dispersion']['model'] = 'vsmoke'
 
         if data['config']['dispersion'].get('model') in ('hysplit', None):
             configurator = hysplit.HysplitConfigurator(self, data,
-                self._archive_info)
+                self.archive_info)
             data['config']['dispersion']['hysplit'] = configurator.config
 
 
@@ -393,7 +395,7 @@ class BlueSkyRunExecuter(object):
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'])
 
-        extras = ["dispersion", "visualization"] if self._archive_id else ["dispersion"]
+        extras = ["dispersion", "visualization"] if self.archive_id else ["dispersion"]
         data['config']['export'] = {
             "modes": ["localsave"],
             "extra_exports": extras,

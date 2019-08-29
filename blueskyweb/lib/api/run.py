@@ -93,9 +93,6 @@ class RunExecuteBase(RequestHandlerBase, metaclass=abc.ABCMeta):
 
     @tornado.web.asynchronous
     async def post(self, mode=None, archive_id=None):
-        self._archive_id = archive_id
-        self._archive_info = met.db.get_archive_info(archive_id)
-
         if not self.request.body:
             self._raise_error(400, 'empty post data')
             return
@@ -111,8 +108,8 @@ class RunExecuteBase(RequestHandlerBase, metaclass=abc.ABCMeta):
 
         self._pre_process(data)
 
-        executer = BlueSkyRunExecuter(mode, self.get_query_argument,
-            self._raise_error, self.write)
+        executer = BlueSkyRunExecuter(mode, archive_id,
+            self.get_query_argument, self._raise_error, self.write)
         await executer.execute(data)
 
 
