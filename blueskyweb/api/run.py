@@ -1,4 +1,4 @@
-"""blueskyweb.lib.api.run"""
+"""blueskyweb.api.run"""
 
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
@@ -68,7 +68,7 @@ def is_same_host(run):
 ### API Handlers
 ###
 
-class RunExecuteBase(RequestHandlerBase, metaclass=abc.ABCMeta):
+class RunExecute(RequestHandlerBase, metaclass=abc.ABCMeta):
 
     ##
     ## Abstract methods to be implemebed by derived classes
@@ -92,7 +92,7 @@ class RunExecuteBase(RequestHandlerBase, metaclass=abc.ABCMeta):
     ##
 
     @tornado.web.asynchronous
-    async def post(self, mode=None, archive_id=None):
+    async def post(self, api_version, mode=None, archive_id=None):
         if not self.request.body:
             self._raise_error(400, 'empty post data')
             return
@@ -102,14 +102,10 @@ class RunExecuteBase(RequestHandlerBase, metaclass=abc.ABCMeta):
         except json.JSONDecodeError as e:
             self._raise_error(400, 'Invalid JSON post data')
 
-        if self.fires_key not in data:
-            self._raise_error(400, "'{}' not specified".format(self.fires_key))
-            return
-
         self._pre_process(data)
 
-        executer = BlueSkyRunExecuter(mode, archive_id, self._raise_error,
-            self.write)
+        executer = BlueSkyRunExecuter(api_version, mode, archive_id,
+            self._raise_error, self.write)
         await executer.execute(data,
             run_asynchronously=self.get_query_argument(
                 '_a', default=None) is not None)
@@ -186,7 +182,7 @@ class RunStatusBase(RequestHandlerBase):
 class RunStatus(RunStatusBase):
 
     @tornado.web.asynchronous
-    async def get(self, run_id):
+    async def get(self, api_version, run_id):
         # TODO: implement using data form mongodb
         run = await self.settings['mongo_db'].find_run(run_id)
         if not run:
@@ -199,7 +195,7 @@ class RunStatus(RunStatusBase):
 class RunsInfo(RunStatusBase):
 
     @tornado.web.asynchronous
-    async def get(self, status=None):
+    async def get(self, api_version, status=None):
         # default limit to 10, and cap it at 25
         limit = min(int(self.get_query_argument('limit', 10)), 25)
         offset = int(self.get_query_argument('offset', 0))
@@ -221,7 +217,7 @@ class RunsInfo(RunStatusBase):
 class RunOutput(RequestHandlerBase):
 
     @tornado.web.asynchronous
-    async def get(self, run_id):
+    async def get(self, api_version, run_id):
         # TODO: implement using data form mongodb
         run = await self.settings['mongo_db'].find_run(run_id)
         if not run:

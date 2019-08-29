@@ -20,17 +20,7 @@ from blueskymongo.client import BlueSkyWebDB, RunStatuses
 # and have dispatcher try to dynamically import and run the
 # appropriate hander, returning 404 if not implemented
 from .api.ping import Ping
-from .api.v1.met import (
-    DomainInfo as DomainInfoV1,
-    MetArchivesInfo as MetArchivesInfoV1,
-    MetArchiveAvailability as MetArchiveAvailabilityV1
-)
-
-from .api.v4_1.met import (
-    DomainInfo as DomainInfoV4_1,
-    MetArchivesInfo as MetArchivesInfoV4_1,
-    MetArchiveAvailability as MetArchiveAvailabilityV4_1
-)
+from .api.met import DomainInfo, MetArchivesInfo, MetArchiveAvailability
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
 def configure_logging(**settings):
@@ -64,86 +54,39 @@ def get_routes(path_prefix):
     # We need to import inline so that MONGDB_URL env var is set
     #    os.environ["MONGODB_URL"] = settings['mongodb_url']
     # before blueskyworker.tasks is imported in .api.v1.run
-    from .api.v1.run import (
-        RunExecute as RunExecuteV1,
-        RunStatus as RunStatusV1,
-        RunOutput as RunOutputV1,
-        RunsInfo as RunsInfoV1
-    )
-    from .api.v4_1.run import (
-        RunExecute as RunExecuteV4_1,
-        RunStatus as RunStatusV4_1,
-        RunOutput as RunOutputV4_1,
-        RunsInfo as RunsInfoV4_1
-    )
+    from .api.run import RunExecute, RunStatus, RunOutput, RunsInfo
+    from .api.run import RunExecute, RunStatus, RunOutput, RunsInfo
     routes = [
         (r"/api/ping/?", Ping),
 
-        ##
-        ## V1
-        ##
-
         # Getting information about met domains
-        (r"/api/v1/met/domains/?", DomainInfoV1),
-        (r"/api/v1/met/domains/([^/]+)/?", DomainInfoV1),
+        (r"/api/v(1|4.1)/met/domains/?", DomainInfo),
+        (r"/api/v(1|4.1)/met/domains/([^/]+)/?", DomainInfo),
 
         # Getting information about all met data archives
-        (r"/api/v1/met/archives/?", MetArchivesInfoV1),
+        (r"/api/v(1|4.1)/met/archives/?", MetArchivesInfo),
         # Getting information about specific met archive or
         # collection ('standard', 'special', 'fast', etc.)
-        (r"/api/v1/met/archives/([^/]+)/?", MetArchivesInfoV1),
+        (r"/api/v(1|4.1)/met/archives/([^/]+)/?", MetArchivesInfo),
         # Checking specific date avaialbility
-        (r"/api/v1/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailabilityV1),
+        (r"/api/v(1|4.1)/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailability),
 
         # Initiating runs
-        (r"/api/v1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuteV1),
-        (r"/api/v1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuteV1),
+        (r"/api/v(1|4.1)/run/(fuelbeds|emissions|dispersion|all)/?", RunExecute),
+        (r"/api/v(1|4.1)/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecute),
         # Getting information about runs
         # Note: The following paths are supported for backwards compatibility:
-        #       - /api/v1/run/<guid>/status/
-        #       - /api/v1/run/<guid>/output/
+        #       - /api/v(1|4.1)/run/<guid>/status/
+        #       - /api/v(1|4.1)/run/<guid>/output/
         #     the current paths are:
-        #       - /api/v1/runs/<guid>/
-        #       - /api/v1/runs/<guid>/output/
-        (r"/api/v1/runs/?", RunsInfoV1),
-        (r"/api/v1/runs/({})/?".format('|'.join(RunStatuses.statuses)),
-            RunsInfoV1),
-        (r"/api/v1/runs/([^/]+)/?", RunStatusV1),
-        (r"/api/v1/run/([^/]+)/status/?", RunStatusV1),
-        (r"/api/v1/runs?/([^/]+)/output/?", RunOutputV1),
-
-        ##
-        ## V4.1
-        ##
-
-        # Getting information about met domains
-        (r"/api/v4.1/met/domains/?", DomainInfoV4_1),
-        (r"/api/v4.1/met/domains/([^/]+)/?", DomainInfoV4_1),
-
-        # Getting information about all met data archives
-        (r"/api/v4.1/met/archives/?", MetArchivesInfoV4_1),
-        # Getting information about specific met archive or
-        # collection ('standard', 'special', 'fast', etc.)
-        (r"/api/v4.1/met/archives/([^/]+)/?", MetArchivesInfoV4_1),
-        # Checking specific date avaialbility
-        (r"/api/v4.1/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailabilityV4_1),
-
-        # Initiating runs
-        (r"/api/v4.1/run/(fuelbeds|emissions|dispersion|all)/?", RunExecuteV4_1),
-        (r"/api/v4.1/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecuteV4_1),
-        # Getting information about runs
-        # Note: The following paths are supported for backwards compatibility:
-        #       - /api/v1/run/<guid>/status/
-        #       - /api/v1/run/<guid>/output/
-        #     the current paths are:
-        #       - /api/v1/runs/<guid>/
-        #       - /api/v1/runs/<guid>/output/
-        (r"/api/v4.1/runs/?", RunsInfoV4_1),
-        (r"/api/v4.1/runs/({})/?".format('|'.join(RunStatuses.statuses)),
-            RunsInfoV4_1),
-        (r"/api/v4.1/runs/([^/]+)/?", RunStatusV4_1),
-        (r"/api/v4.1/run/([^/]+)/status/?", RunStatusV4_1),
-        (r"/api/v4.1/runs?/([^/]+)/output/?", RunOutputV4_1),
+        #       - /api/v(1|4.1)/runs/<guid>/
+        #       - /api/v(1|4.1)/runs/<guid>/output/
+        (r"/api/v(1|4.1)/runs/?", RunsInfo),
+        (r"/api/v(1|4.1)/runs/({})/?".format('|'.join(RunStatuses.statuses)),
+            RunsInfo),
+        (r"/api/v(1|4.1)/runs/([^/]+)/?", RunStatus),
+        (r"/api/v(1|4.1)/run/([^/]+)/status/?", RunStatus),
+        (r"/api/v(1|4.1)/runs?/([^/]+)/output/?", RunOutput),
     ]
     if path_prefix:
         path_prefix = path_prefix.strip('/')

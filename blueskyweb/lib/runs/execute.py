@@ -14,6 +14,8 @@ import traceback
 import tornado.log
 import tornado.web
 
+from bluesky.marshal import Blueskyv4_0To4_1
+
 from blueskymongo.client import RunStatuses
 from blueskyweb.lib import met, hysplit
 from blueskyworker.tasks import (
@@ -24,9 +26,23 @@ __all__ = [
     "RunExecuter"
 ]
 
+def pre_process_v1(data, handle_error):
+    if 'fire_information' not in data:
+        handle_error(400, "'fire_information' not specified")
+
+    fires = data.pop('fire_information')
+    data['fires'] = Blueskyv4_0To4_1().marshal(fires)
+
+PRE_PROCESSORS = {
+    '1': pre_process_v1
+}
+
+
 class BlueSkyRunExecuter(object):
 
-    def __init__(self, mode, archive_id, handle_error_func, write_func):
+    def __init__(self, api_version, mode, archive_id, handle_error_func,
+            write_func):
+        self.api_version = api_version
         self.mode = mode
         self.archive_id = archive_id # may be None
         self.archive_info = met.db.get_archive_info(archive_id)
@@ -37,6 +53,13 @@ class BlueSkyRunExecuter(object):
         # TODO: should no configuration be allowed at all?  or only some? if
         #  any restrictions, check here or check in specific _configure_*
         #  methods, below
+
+        if self.api_version in PRE_PROCESSORS:
+            PRE_PROCESSORS(data, self.handle_error)
+
+        if 'fires' not in data:
+            self.handle_error(400, "'{}' not specified".format(self.fires_key))
+            return
 
         self._set_run_id_and_name(data)
 

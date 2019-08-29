@@ -300,7 +300,7 @@ async def execute_mode(mode, data, args):
     from blueskyweb.lib.runs.execute import BlueSkyRunExecuter
     s = io.StringIO()
     logging.debug('About to run %s', mode)
-    executer = BlueSkyRunExecuter(mode, args.met_archive,
+    executer = BlueSkyRunExecuter(args.api_version, mode, args.met_archive,
         handle_error, s.write)
     await executer.execute(data, run_asynchronously=args.run_asynchronously)
     return json.loads(s.getvalue())
