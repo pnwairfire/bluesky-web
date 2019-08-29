@@ -224,11 +224,10 @@ class BlueSkyRunner(threading.Thread):
 
         for m in modules:
             try:
-                # TODO: if hysplit dispersion, start thread that periodically
-                #   tails log and records status; then join thread when call
-                #   to run completes
-                tornado.log.gen_log.info('Running %s %s',
-                    self.input_data['run_id'], m)
+                # TODO: figure out why the following, which used to cause no
+                # problem, now raises KeyError for 'run_id'
+                # tornado.log.gen_log.info('Running %s %s',
+                #     self.input_data['run_id'], m)
                 fires_manager.modules = [m]
                 self._record_run(RunStatuses.StartingModule, module=m)
 
