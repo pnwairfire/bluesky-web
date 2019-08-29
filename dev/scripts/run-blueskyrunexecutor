@@ -140,7 +140,9 @@ Run in docker. e.g.:
     -v $HOME/Met:/data/Met/ \\
     -v $PWD/docker-data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
-    bluesky-web {script_name} --log-level=DEBUG -v 1
+    bluesky-web {script_name} --log-level=DEBUG -v 1 \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
+    fuelbeds
 
  $ docker run --rm -ti \\
     -v $PWD:/usr/src/blueskyweb/ \\
@@ -148,10 +150,12 @@ Run in docker. e.g.:
     -v $PWD/docker-data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 4.1 \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
     -s 2014-05-30T00:00:00 -n 12 \\
     -a 500 --lat 45.12 --lng -120 \\
     --utc-offset -06:00 \\
-    --met-archive pacific_northwest_4-km
+    --met-archive pacific_northwest_4-km \\
+    fuelbeds consumption emissions
 
 """.format(script_name=sys.argv[0])
 
@@ -167,6 +171,13 @@ REQUIRED_ARGS = [
 ]
 
 OPTIONAL_ARGS = [
+    {
+        'short': '-m',
+        'long': '--mongodb-url',
+        'help': ('url to connect to mongodb for arl '
+            'indexes and bsp job queues'),
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb"
+    },
     {
         'short': '-s',
         'long': '--start',
@@ -310,8 +321,12 @@ async def execute(data, args):
     from blueskyweb.lib.runs.execute import BlueSkyRunExecutor, ExecuteMode
     s = io.StringIO()
     logging.debug('About to run')
+
+    settings = {
+        "mongo_db": tasks.BlueSkyWebDB(args.mongodb_url)
+    }
     executor = BlueSkyRunExecutor(args.api_version, 'all', args.met_archive,
-        handle_error, s.write, {})
+        handle_error, s.write, settings)
     await executor.execute(data, execute_mode=ExecuteMode.IN_PROCESS)
     return json.loads(s.getvalue())
 
