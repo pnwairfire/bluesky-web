@@ -12,6 +12,7 @@ import json
 import logging
 import os
 import sys
+import traceback
 import uuid
 
 import afscripting as scripting
@@ -219,6 +220,13 @@ OPTIONAL_ARGS = [
     }
 ]
 
+POSITIONAL_ARGS = [
+    {
+        'long': 'modules',
+        'nargs': '*'
+    }
+]
+
 
 def parse_args():
     parser = scripting.args.ArgumentParser()
@@ -226,6 +234,7 @@ def parse_args():
     parser.formatter_class = scripting.args.RawTextHelpFormatter
     scripting.args.add_arguments(parser, OPTIONAL_ARGS)
     scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
+    scripting.args.add_arguments(parser, POSITIONAL_ARGS)
     # Use afscripting to add logging options to the parser object,
     # but we'll configure logging oureselves
     scripting.args.add_logging_options(parser)
@@ -286,29 +295,28 @@ def get_input(args):
         INPUT['fires'][0]['activity'][0]['active_areas'][0]["specified_points"][0]["area"] = args.area
         INPUT['fires'][0]['activity'][0]['active_areas'][0]["utc_offset"] = args.utc_offset
 
+    INPUT['modules'] = args.modules
     return INPUT
 
-async def execute_mode(mode, data, args):
-    def handle_error(status, msg, exception=None):
-        logging.error('Failed in %s', mode)
-        logging.error('Error message: %s', msg)
-        if exception:
-            tornado.log.gen_log.debug(traceback.format_exc())
-            logging.error('Excepton: %s', exception)
-            sys.exit(1)
+def handle_error(status, msg, exception=None):
+    logging.error('Failed: %s', msg)
+    if exception:
+        tornado.log.gen_log.debug(traceback.format_exc())
+        logging.error('Excepton: %s', exception)
+        sys.exit(1)
 
+async def execute(data, args):
     from blueskyweb.lib.runs.execute import BlueSkyRunExecuter
     s = io.StringIO()
-    logging.debug('About to run %s', mode)
-    executer = BlueSkyRunExecuter(args.api_version, mode, args.met_archive,
-        handle_error, s.write)
+    logging.debug('About to run')
+    executer = BlueSkyRunExecuter(args.api_version, 'all', args.met_archive,
+        handle_error, s.write, {})
     await executer.execute(data, run_asynchronously=args.run_asynchronously)
     return json.loads(s.getvalue())
 
 async def main(args):
     input = get_input(args)
-    data = await execute_mode('fuelbeds', INPUT, args)
-    data = await execute_mode('emissions', data, args)
+    data = await execute(INPUT, args)
 
     logging.debug('About to dump to stdout')
     data = json.dumps(data, indent=args.indent)
