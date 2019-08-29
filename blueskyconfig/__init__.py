@@ -1,3 +1,8 @@
+"""blueskyconfig"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+
 import copy
 import json
 import os

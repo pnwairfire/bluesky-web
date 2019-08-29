@@ -1,3 +1,8 @@
+"""blueskyworker.monitor"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+
 import os
 import subprocess
 import time

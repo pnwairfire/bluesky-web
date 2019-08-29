@@ -1,3 +1,7 @@
+"""blueskyweb.lib.runs.output"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 ##
 ## Utilities for working with remote output

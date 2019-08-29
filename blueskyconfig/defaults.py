@@ -1,3 +1,8 @@
+"""blueskyconfig.defaults"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+
 DEFAULTS = {
     # Note: domain grid information provided by Susan and STI.
     #  Bounding box info can also be determined by running chk_arl
