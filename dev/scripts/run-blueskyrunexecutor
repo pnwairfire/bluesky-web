@@ -306,12 +306,12 @@ def handle_error(status, msg, exception=None):
         sys.exit(1)
 
 async def execute(data, args):
-    from blueskyweb.lib.runs.execute import BlueSkyRunExecutor
+    from blueskyweb.lib.runs.execute import BlueSkyRunExecutor, ExecuteMode
     s = io.StringIO()
     logging.debug('About to run')
     executor = BlueSkyRunExecutor(args.api_version, 'all', args.met_archive,
         handle_error, s.write, {})
-    await executor.execute(data, run_asynchronously=args.run_asynchronously)
+    await executor.execute(data, execute_mode=ExecuteMode.IN_PROCESS)
     return json.loads(s.getvalue())
 
 async def main(args):

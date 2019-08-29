@@ -18,7 +18,7 @@ import tornado.log
 from blueskymongo.client import RunStatuses
 from blueskyworker.tasks import process_runtime
 from blueskyweb.lib import met
-from blueskyweb.lib.runs.execute import BlueSkyRunExecutor
+from blueskyweb.lib.runs.execute import BlueSkyRunExecutor, ExecuteMode
 from blueskyweb.lib.runs.output import BlueSkyRunOutput
 from . import RequestHandlerBase
 
@@ -106,9 +106,14 @@ class RunExecute(RequestHandlerBase, metaclass=abc.ABCMeta):
 
         executor = BlueSkyRunExecutor(api_version, mode, archive_id,
             self._raise_error, self.write, self.settings)
-        await executor.execute(data,
-            run_asynchronously=self.get_query_argument(
-                '_a', default=None) is not None)
+        # The default is for fuelbeds and emissions to be run in process and
+        # all other modes asynchronously.  Allow fuelbeds and emissions to
+        # be run asynchronously, but never allow other modes to be run in
+        # process.
+        execute_mode = (ExecuteMode.ASYNC if (self.get_query_argument(
+            '_a', default=None) is not None) else None)
+        await executor.execute(data, execute_mode=execute_mode)
+
 
 
 

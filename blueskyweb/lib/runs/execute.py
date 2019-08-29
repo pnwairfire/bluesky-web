@@ -23,7 +23,8 @@ from blueskyworker.tasks import (
 )
 
 __all__ = [
-    "BlueSkyRunExecutor"
+    "BlueSkyRunExecutor",
+    "ExecuteMode"
 ]
 
 def pre_process_v1(data, handle_error):
@@ -37,6 +38,9 @@ PRE_PROCESSORS = {
     '1': pre_process_v1
 }
 
+class ExecuteMode(object):
+    IN_PROCESS = 1
+    ASYNC = 2
 
 class BlueSkyRunExecutor(object):
 
@@ -50,7 +54,7 @@ class BlueSkyRunExecutor(object):
         self.write = write_func
         self.settings = settings
 
-    async def execute(self, data, run_asynchronously=False):
+    async def execute(self, data, execute_mode=None):
         # TODO: should no configuration be allowed at all?  or only some? if
         #  any restrictions, check here or check in specific _configure_*
         #  methods, below
@@ -79,15 +83,21 @@ class BlueSkyRunExecutor(object):
 
                 # TODO: configure anything else (e.g. setting archive_id where
                 #  appropriate)
-                await self._run_asynchronously(data)
+
+                # This should only ever use _run_in_process in dev ad hoc
+                # testing; otherwise, if should always be run asynchronously
+                f = (self._run_in_process
+                    if execute_mode == ExecuteMode.IN_PROCESS
+                    else self._run_asynchronously)
+                await f(data)
 
             else:
                 await self._configure_emissions(data)
-                # fuelbeds or emissions request
-                if run_asynchronously:
-                    await self._run_asynchronously(data)
-                else:
-                    await self._run_in_process(data)
+
+                # fuelbeds or emissions request; default is to run in process
+                f = (self._run_asynchronously
+                    if execute_mode == ExecuteMode.ASYNC
+                    else self._run_in_process)
 
         except tornado.web.Finish as e:
             # this was intentionally raised; re-raise it
