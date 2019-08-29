@@ -101,7 +101,7 @@ class BlueSkyRunExecuter(object):
                     f['event_of']['name'] = name
 
     FUELBEDS_MODULES = [
-        'ingestion', 'fuelbeds'
+        'fuelbeds'
     ]
     EMISSIONS_MODULES = [
         'consumption', 'emissions'
