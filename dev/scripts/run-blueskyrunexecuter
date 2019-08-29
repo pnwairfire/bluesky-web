@@ -288,26 +288,27 @@ def get_input(args):
 
     return INPUT
 
-def execute_mode(mode, data, args):
+async def execute_mode(mode, data, args):
     def handle_error(status, msg, exception=None):
         logging.error('Failed in %s', mode)
         logging.error('Error message: %s', msg)
         if exception:
             tornado.log.gen_log.debug(traceback.format_exc())
             logging.error('Excepton: %s', exception)
+            sys.exit(1)
 
     from blueskyweb.lib.runs.execute import BlueSkyRunExecuter
     s = io.StringIO()
     logging.debug('About to run %s', mode)
     executer = BlueSkyRunExecuter(mode, args.met_archive,
-            handle_error, s.write)
+        handle_error, s.write)
     await executer.execute(data, run_asynchronously=args.run_asynchronously)
     return json.loads(s.getvalue())
 
 async def main(args):
     input = get_input(args)
-    data = execute('fuelbeds', INPUT, args)
-    data = execute('emissions', data, args)
+    data = await execute_mode('fuelbeds', INPUT, args)
+    data = await execute_mode('emissions', data, args)
 
     logging.debug('About to dump to stdout')
     data = json.dumps(data, indent=args.indent)
