@@ -259,7 +259,7 @@ def parse_args():
     scripting.args.add_logging_options(parser)
     args = parser.parse_args()
     args.log_message_format = (args.log_message_format
-        or "%(asctime)s %(levelname)s %(filename)s#%(funcName)s: %(message)s")
+        or "%(threadName)-0s %(asctime)s %(levelname)s %(filename)s#%(funcName)s: %(message)s")
     from blueskyweb.app import configure_logging
     configure_logging(**args.__dict__)
     return args
