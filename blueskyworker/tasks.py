@@ -143,6 +143,9 @@ class BlueSkyRunner(threading.Thread):
     def run(self):
         self.input_data['run_id'] = (self.input_data.get('run_id')
             or str(uuid.uuid1()).replace('-',''))
+        # self.input_data will be set to an empty dict when ingested by
+        # FiresManager, so record run_id
+        self.run_id = self.input_data['run_id']
         if not self.output_stream:
             self._set_output_params()
             self._set_output_url()
@@ -157,7 +160,7 @@ class BlueSkyRunner(threading.Thread):
         self.output_dir = os.path.abspath(os.path.join(
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'],
-            self.input_data['run_id']))
+            self.run_id))
         os.makedirs(self.output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
         tornado.log.gen_log.debug('Output dir: %s', self.output_dir)
         self.output_json_filename = os.path.join(
@@ -171,7 +174,7 @@ class BlueSkyRunner(threading.Thread):
             if self.settings.get('output_url_port') else '')
         prefix = (self.settings.get('output_url_path_prefix') or '').strip('/')
         self.output_url = "{}://{}{}/{}/{}".format(
-            scheme, HOSTNAME, port_str, prefix, self.input_data['run_id'])
+            scheme, HOSTNAME, port_str, prefix, self.run_id)
 
     ##
     ## Execution
@@ -229,10 +232,8 @@ class BlueSkyRunner(threading.Thread):
 
         for m in modules:
             try:
-                # TODO: figure out why the following, which used to cause no
-                # problem, now raises KeyError for 'run_id'
-                # tornado.log.gen_log.info('Running %s %s',
-                #     self.input_data['run_id'], m)
+                tornado.log.gen_log.info('Running %s %s',
+                    self.run_id, m)
                 fires_manager.modules = [m]
                 self._record_run(RunStatuses.StartingModule, module=m)
 
@@ -288,7 +289,7 @@ class BlueSkyRunner(threading.Thread):
     def _record_run(self, status, module=None, log=None, stdout=None,
             status_message=None, **data):
         if self.db:
-            self.db.record_run(self.input_data['run_id'], status,
+            self.db.record_run(self.run_id, status,
                 module=module, log=log, stdout=stdout,
                 status_message=status_message, **data)
 
