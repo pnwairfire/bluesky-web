@@ -151,11 +151,14 @@ Run in docker. e.g.:
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 4.1 \\
     --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
-    -s 2014-05-30T00:00:00 -n 12 \\
+    -s 2019-07-26T00:00:00 -n 12 \\
     -a 500 --lat 45.12 --lng -120 \\
     --utc-offset -06:00 \\
     --met-archive pacific_northwest_4-km \\
-    fuelbeds consumption emissions
+    -o out.json \\
+    fuelbeds consumption emissions \\
+    timeprofile findmetdata localmet plumerise \\
+    dispersion visualization
 
 """.format(script_name=sys.argv[0])
 
