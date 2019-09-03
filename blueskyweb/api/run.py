@@ -68,24 +68,7 @@ def is_same_host(run):
 ### API Handlers
 ###
 
-class RunExecute(RequestHandlerBase, metaclass=abc.ABCMeta):
-
-    ##
-    ## Abstract methods to be implemebed by derived classes
-    ##
-
-    @property
-    @abc.abstractmethod
-    def fires_key(self):
-        pass
-
-    def _pre_process(self, data):
-        """Hook for derived class to process request input data before
-        anything else.  e.g. v1 can marshal the data to the bluesky v4.1
-        data structure.
-        """
-        pass
-
+class RunExecute(RequestHandlerBase):
 
     ##
     ## Main interface
@@ -101,8 +84,6 @@ class RunExecute(RequestHandlerBase, metaclass=abc.ABCMeta):
             data = json.loads(self.request.body.decode())
         except json.JSONDecodeError as e:
             self._raise_error(400, 'Invalid JSON post data')
-
-        self._pre_process(data)
 
         executor = BlueSkyRunExecutor(api_version, mode, archive_id,
             self._raise_error, self.write, self.settings)
