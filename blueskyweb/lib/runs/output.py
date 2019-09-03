@@ -60,9 +60,9 @@ class BlueskyProcessorBase(object, metaclass=abc.ABCMeta):
         pass
 
 
-class BlueskyV1OutputProcessor(object):
+class BlueskyV1OutputProcessor(BlueskyProcessorBase):
 
-    def _process(self, data)
+    def _process(self, data):
         # covnerts data from v4.1 to v1 output structure
 
         if data.get('fires'):
@@ -126,9 +126,9 @@ class BlueskyV1OutputProcessor(object):
 
         return g
 
-class BlueskyV4_1OutputProcessor(object):
+class BlueskyV4_1OutputProcessor(BlueskyProcessorBase):
 
-    def _process(self, data)
+    def _process(self, data):
         # covnerts older output data from v1 to v4.1 output structure
         if data.get('fire_information'):
             data['fires'] = Blueskyv4_0To4_1().marshal(
@@ -136,12 +136,15 @@ class BlueskyV4_1OutputProcessor(object):
 
         return data
 
+OUTPUT_PROCESSORS = {
+    '1': BlueskyV1OutputProcessor,
+    '4.1': BlueskyV4_1OutputProcessor
+}
 
 def apply_output_processor(api_version, output_stream):
-    if api_version = '1':
-        return BlueskyV1OutputProcessor(output_stream)
-    elif api_version = '4.1':
-        return BlueskyV4_1OutputProcessor(output_stream)
+    if api_version in OUTPUT_PROCESSORS:
+        output_stream = OUTPUT_PROCESSORS[api_version](output_stream)
+
     return output_stream
 
 
