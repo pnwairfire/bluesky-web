@@ -25,7 +25,21 @@ sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
 #   and other python pacakges installed in your local (non-docker)
 #   python env
 from blueskyconfig.defaults import DEFAULTS
-from blueskyworker import tasks
+try:
+    from blueskyworker import tasks
+except ImportError as e:
+    print("""
+Run in docker:
+
+ $ docker run --rm -ti \\
+    -v $PWD:/usr/src/blueskyweb/ \\
+    -v $HOME/Met:/data/Met/ \\
+    -v $PWD/docker-data/output/:/data/bluesky/output/ \\
+    -w /usr/src/blueskyweb/ \\
+    bluesky-web {script_name} -h
+    """.format(script_name=sys.argv[0]))
+    exit(1)
+
 
 _NOW = datetime.datetime.utcnow()
 RUN_ID = 'BlueSkyRunExecutor-' + _NOW.strftime('%Y%m%dT%H%M%S')
