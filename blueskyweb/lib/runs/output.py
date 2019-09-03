@@ -52,7 +52,8 @@ class BlueskyProcessorBase(object, metaclass=abc.ABCMeta):
             data = json.loads(data)
 
         data = self._process(data)
-        self.output_stream.write(data)
+
+        self.output_stream.write(json.dumps(data))
 
 
     @abc.abstractmethod
@@ -103,7 +104,7 @@ class BlueskyV1OutputProcessor(BlueskyProcessorBase):
             g['location']['geojson'] = {
                 "type": "MultiPoint",
                 "coordinates": [
-                    [sp['lng'], s['lat']]
+                    [sp['lng'], sp['lat']]
                         for sp in aa['specified_points']
                 ]
             }
