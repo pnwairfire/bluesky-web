@@ -98,6 +98,7 @@ class BlueSkyRunExecutor(object):
                 f = (self._run_asynchronously
                     if execute_mode == ExecuteMode.ASYNC
                     else self._run_in_process)
+                await f(data)
 
         except tornado.web.Finish as e:
             # this was intentionally raised; re-raise it
