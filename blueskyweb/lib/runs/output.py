@@ -3,6 +3,11 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import abc
+
+from bluesky.marshal import Blueskyv4_0To4_1
+from bluesky.models import fires
+
 ##
 ## Utilities for working with remote output
 ##
@@ -32,12 +37,120 @@ def remote_exists(url):
 #     return "{}{}".format(get_output_root_url(run_id), url_root_dir)
 
 
+##
+## Post processing of for older version of API
+##
+
+class BlueskyProcessorBase(object, metaclass=abc.ABCMeta):
+
+    def __init__(self, output_stream):
+        self.output_stream = output_stream
+
+    def write(self, data):
+        if hasattr(data, 'lower'):
+            data = json.loads(data)
+
+        data = self._process(data)
+        self.output_stream.write(data)
+
+
+    @abc.abstractmethod
+    def _process(self, data):
+        pass
+
+
+class BlueskyV1OutputProcessor(object):
+
+    def _process(self, data)
+        # covnerts data from v4.1 to v1 output structure
+
+        if data.get('fires'):
+            data['fire_information'] = [
+                self.convert_fire(fires.Fire(f)) for f in data['fires']
+            ]
+
+        return data
+
+    def convert_fire(self, fire):
+        """Converts each location into a growth object
+
+        It's easier to just create a separate growth object out of
+        each active area, rather than group active areas by day
+        """
+        growth = []
+        for aa in fire.active_areas:
+            g = self.convert_active_area(aa)
+            if g:
+                growth.append(g)
+
+        if growth:
+            fire['growth'] = growth
+
+        return fire
+
+    def convert_active_area(self, aa):
+        g = {
+            "start": aa['start'],  # WILL BE FILLED IN
+            "end": aa['end'],  # WILL BE FILLED IN
+            "location": {
+                "ecoregion": aa['ecoregion'],
+                "utc_offset": aa['utc_offset']
+            }
+        }
+
+        if aa.get('specified_points'):
+            g['location']['geojson'] = {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [sp['lng'], s['lat']]
+                        for sp in aa['specified_points']
+                ]
+            }
+            g['location']['area'] = sum([sp['area']
+                for sp in aa['specified_points']])
+
+        elif aa.get('perimeter'):
+            g['location']['geojson'] = {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        aa['perimeter']['polygon']
+                    ]
+                ]
+            }
+            g['location']['area'] = aa['perimeter']['area']
+
+        else:
+            return None
+
+        return g
+
+class BlueskyV4_1OutputProcessor(object):
+
+    def _process(self, data)
+        # covnerts older output data from v1 to v4.1 output structure
+        if data.get('fire_information'):
+            data['fires'] = Blueskyv4_0To4_1().marshal(
+                data.pop('fire_information'))
+
+        return data
+
+
+def apply_output_processor(api_version, output_stream):
+    if api_version = '1':
+        return BlueskyV1OutputProcessor(output_stream)
+    elif api_version = '4.1':
+        return BlueskyV4_1OutputProcessor(output_stream)
+    return output_stream
+
+
+
 class BlueSkyRunOutput(object):
 
-    def __init__(self, run_info, handle_error_func, write_func):
+    def __init__(self, api_version, run_info, handle_error_func, output_stream):
         self.run_info = run_info
         self.handle_error = handle_error_func
-        self.write = write_func
+        self.output_stream = apply_output_processor(api_version, output_stream)
 
     def process(self):
         if 'dispersion' in run['modules']:
@@ -48,7 +161,7 @@ class BlueSkyRunOutput(object):
         else:
             # TODO: is returning raw input not ok?
             output = self._load_output(run)
-            self.write(output)
+            self.output_stream.write(output)
 
     ##
     ## Plumerise
@@ -66,7 +179,7 @@ class BlueSkyRunOutput(object):
         fires = run_info['fires']
         runtime_info = process_runtime(run_info.get('runtime'))
 
-        self.write(dict(run_id=run['run_id'],
+        self.output_stream.write(dict(run_id=run['run_id'],
             fires=fires,
             runtime=runtime_info,
             version_info=version_info))
@@ -106,7 +219,7 @@ class BlueSkyRunOutput(object):
 
         # TODO: list fire_*.csv if specified in output
 
-        self.write(r)
+        self.output_stream.write(r)
 
     def _parse_kmzs_info(self, r, section_info):
         kmz_info = section_info.get('kmzs', {})

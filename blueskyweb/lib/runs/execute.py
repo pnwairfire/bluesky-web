@@ -17,7 +17,7 @@ import tornado.web
 from bluesky.marshal import Blueskyv4_0To4_1
 
 from blueskymongo.client import RunStatuses
-from blueskyweb.lib import met, hysplit
+from blueskyweb.lib import met, hysplit, output
 from blueskyworker.tasks import (
     run_bluesky, BlueSkyRunner
 )
@@ -242,11 +242,13 @@ class BlueSkyRunExecutor(object):
         # before the bluesky thread is started. If an exception is
         # encountered in the seperate thread, it's handling
         try:
+            output_stream = output.apply_output_processor(self.api_version,
+                self.output_stream)
             # Runs bluesky in a separate thread so that run configurations
             # don't overwrite each other. (Bluesky manages configuration
             # with a singleton that stores config data in thread local)
             # BlueSkyRunner will call self.output_stream.write.
-            t = BlueSkyRunner(data, output_stream=self.output_stream)
+            t = BlueSkyRunner(data, output_stream=output_stream)
             t.start()
             # block until it thread completes so that self.output_stream.write
             # is called before the main thread exits and so that we can return

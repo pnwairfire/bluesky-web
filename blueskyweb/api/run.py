@@ -213,4 +213,4 @@ class RunOutput(RequestHandlerBase):
             self._raise_error(404, "Run output doesn't exist")
 
         else:
-            BlueSkyRunOutput(run, self._raise_error, self.write).process()
+            BlueSkyRunOutput(api_version, run, self._raise_error, self).process()
