@@ -26,7 +26,7 @@ os.makedirs(DEV_LOG_DIR, exist_ok=True)
 EPILOG_STR = """
 Running only through emissions
 
-  $ {script_name} --emissions \\
+  $ {script_name} -v 4.1 --emissions \\
         -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG
 
@@ -34,24 +34,24 @@ Running only through emissions
 
 Run through plumerise
 
-  $ {script_name} --plumerise \\
+  $ {script_name} -v 4.1 --plumerise \\
         -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG
 
 
 Full run (ingestiont through visualization)
 
-  $ {script_name} \\
+  $ {script_name} -v 4.1 \\
         -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG -s 2014-05-30T00:00:00 -n 12 \\
         --met-archive ca-nv_6-km
 
-  $ {script_name} \\
+  $ {script_name} -v 4.1 \\
         -r https://www.blueskywebhost.com/bluesky-web-test/ \\
         --log-level=DEBUG -s `date -d"-1 day" +%Y-%m-%dT00:00:00` -n 12 \\
         --met-archive ca-nv_4-km
 
-  $ {script_name} \\
+  $ {script_name} -v 4.1 \\
         -r https://www.blueskywebhost.com/bluesky-web/ \\
         --log-level=DEBUG -s `date -d"-1 day" +%Y-%m-%dT00:00:00` -n 12 \\
         --met-archive ca-nv_4-km
@@ -60,13 +60,170 @@ Full run (ingestiont through visualization)
 
  """.format(script_name=sys.argv[0])
 
+REQUEST = {
+    "config": {
+        "emissions": {
+            "species": ["PM2.5"]
+        },
+        "dispersion": {
+            "start": None,  # WILL BE FILLED IN
+            "num_hours": None,  # WILL BE FILLED IN
+            'hysplit': {
+                "VERTICAL_LEVELS": [100, 500, 1000]
+            }
+        },
+        'visualization': {
+            'hysplit': {
+                "blueskykml_config": {
+                    "DispersionGridInput": {
+                        "LAYERS": [0, 1, 2]
+                    },
+                    "DispersionImages": {
+                        #"DAILY_IMAGES_UTC_OFFSETS": [-7, 0]
+                    }
+                }
+            }
+        },
+        "export": {
+            "extra_exports": ["dispersion", "visualization", "extrafiles"]
+        }
+    }
+}
+
+FIRES_DATA = {
+    '1': {
+        "fire_information": [
+            {
+                "meta": {
+                    "vsmoke": {
+                        "ws": 12,
+                        "wd": 232
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
+                },
+                "id": "SF11C14225236095807750",
+                "type": "wildfire",
+                "fuel_type": "natural",
+                "growth": [
+                    {
+                        "start": None,  # WILL BE FILLED IN
+                        "end": None,  # WILL BE FILLED IN
+                        "location": {
+                            "area": None,  # WILL BE FILLED IN
+                            "ecoregion": "western",
+                            # 'latitude' & longitude or geojson WILL BE FILLED IN
+                            "utc_offset": None,  # WILL BE FILLED IN
+                        }
+                    }
+                ]
+            },
+            {
+                "meta": {
+                    "vsmoke": {
+                        "ws": 12,
+                        "wd": 232
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Activity Fire near Yosemite, CA"
+                },
+                "id": "ljo4tosghsjfdsdkf",
+                "type": "rx",
+                "fuel_type": "activity",
+                "growth": [
+                    {
+                        "start": None,  # WILL BE FILLED IN
+                        "end": None,  # WILL BE FILLED IN
+                        "location": {
+                            "area": None,  # WILL BE FILLED IN
+                            "ecoregion": "western",
+                            # 'latitude' & longitude or geojson WILL BE FILLED IN
+                            "utc_offset": None,  # WILL BE FILLED IN
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    '4.1': {
+        "fires": [
+            {
+                "meta": {
+                    "vsmoke": {
+                        "ws": 12,
+                        "wd": 232
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
+                },
+                "id": "SF11C14225236095807750",
+                "type": "wildfire",
+                "fuel_type": "natural",
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "start": None,  # WILL BE FILLED IN
+                                "end": None,  # WILL BE FILLED IN
+                                # specified_points or polygon WILL BE FILLED IN
+                                "ecoregion": "western",
+                                "utc_offset": None,  # WILL BE FILLED IN
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "meta": {
+                    "vsmoke": {
+                        "ws": 12,
+                        "wd": 232
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Activity Fire near Yosemite, CA"
+                },
+                "id": "ljo4tosghsjfdsdkf",
+                "type": "rx",
+                "fuel_type": "activity",
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "start": None,  # WILL BE FILLED IN
+                                "end": None,  # WILL BE FILLED IN
+                                "ecoregion": "western",
+                                "utc_offset": None,  # WILL BE FILLED IN
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
 REQUIRED_ARGS = [
     {
         'short': '-r',
         'long': '--root-url',
         'help': 'api root url ; default http://localhost:8887/bluesky-web/',
         'default': 'http://localhost:8887/bluesky-web/'
+    },
+    {
+        'short': '-v',
+        'long': '--api-version',
+        'help': "Must be one of the following: {}".format(
+            ', '.join(FIRES_DATA.keys()))
     }
+
 ]
 
 HYSPLIT_OPTIONS = {
@@ -189,91 +346,7 @@ OPTIONAL_ARGS = [
     }
 ]
 
-REQUEST = {
-    "config": {
-        "emissions": {
-            "species": ["PM2.5"]
-        },
-        "dispersion": {
-            "start": None,  # WILL BE FILLED IN
-            "num_hours": None,  # WILL BE FILLED IN
-            'hysplit': {
-                "VERTICAL_LEVELS": [100, 500, 1000]
-            }
-        },
-        'visualization': {
-            'hysplit': {
-                "blueskykml_config": {
-                    "DispersionGridInput": {
-                        "LAYERS": [0, 1, 2]
-                    },
-                    "DispersionImages": {
-                        #"DAILY_IMAGES_UTC_OFFSETS": [-7, 0]
-                    }
-                }
-            }
-        },
-        "export": {
-            "extra_exports": ["dispersion", "visualization", "extrafiles"]
-        }
-    },
-    "fire_information": [
-        {
-            "meta": {
-                "vsmoke": {
-                    "ws": 12,
-                    "wd": 232
-                }
-            },
-            "event_of": {
-                "id": "SF11E826544",
-                "name": "Natural Fire near Yosemite, CA"
-            },
-            "id": "SF11C14225236095807750",
-            "type": "wildfire",
-            "fuel_type": "natural",
-            "growth": [
-                {
-                    "start": None,  # WILL BE FILLED IN
-                    "end": None,  # WILL BE FILLED IN
-                    "location": {
-                        "area": None,  # WILL BE FILLED IN
-                        "ecoregion": "western",
-                        # 'latitude' & longitude or geojson WILL BE FILLED IN
-                        "utc_offset": None,  # WILL BE FILLED IN
-                    }
-                }
-            ]
-        },
-        {
-            "meta": {
-                "vsmoke": {
-                    "ws": 12,
-                    "wd": 232
-                }
-            },
-            "event_of": {
-                "id": "SF11E826544",
-                "name": "Activity Fire near Yosemite, CA"
-            },
-            "id": "ljo4tosghsjfdsdkf",
-            "type": "rx",
-            "fuel_type": "activity",
-            "growth": [
-                {
-                    "start": None,  # WILL BE FILLED IN
-                    "end": None,  # WILL BE FILLED IN
-                    "location": {
-                        "area": None,  # WILL BE FILLED IN
-                        "ecoregion": "western",
-                        # 'latitude' & longitude or geojson WILL BE FILLED IN
-                        "utc_offset": None,  # WILL BE FILLED IN
-                    }
-                }
-            ]
-        }
-    ]
-}
+
 
 WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 
@@ -387,30 +460,57 @@ def create_initial_request(args):
     logging.info("Local start: {}".format(local_start_str))
     logging.info("Local end: {}".format(local_end_str))
 
+    if args.api_version not in FIRES_DATA:
+        print('** ERROR - API version not supported: %s', args.api_version)
+        print('**    (choose from  %s)', ', '.join(FIRES_DATA.keys()))
+
+    REQUEST.update(FIRES_DATA[args.api_version])
+
     for i in range(2):
-        REQUEST['fire_information'][i]['growth'][0]['start'] = local_start_str
-        REQUEST['fire_information'][i]['growth'][0]['end'] = local_end_str
-        REQUEST['fire_information'][i]['growth'][0]['location']['area'] = args.area
         lat = args.latitude + ((i-0.5)/10.0)
-        if args.polygon:
-            REQUEST['fire_information'][i]['growth'][0]['location']['geojson'] = {
-                "type": "MultiPolygon",
-                "coordinates": [
-                    [
+        polygon =                         [
+            [args.longitude - 0.03, lat + 0.02],
+            [args.longitude + 0.03, lat + 0.02],
+            [args.longitude + 0.03, lat - 0.02],
+            [args.longitude - 0.03, lat - 0.02],
+            [args.longitude - 0.03, lat + 0.02]
+        ]
+        if args.api_version == '1':
+            REQUEST['fire_information'][i]['growth'][0]['start'] = local_start_str
+            REQUEST['fire_information'][i]['growth'][0]['end'] = local_end_str
+            REQUEST['fire_information'][i]['growth'][0]['location']['utc_offset'] = args.utc_offset
+            REQUEST['fire_information'][i]['growth'][0]['location']['area'] = args.area
+            if args.polygon:
+                REQUEST['fire_information'][i]['growth'][0]['location']['geojson'] = {
+                    "type": "MultiPolygon",
+                    "coordinates": [
                         [
-                            [args.longitude - 0.03, lat + 0.02],
-                            [args.longitude + 0.03, lat + 0.02],
-                            [args.longitude + 0.03, lat - 0.02],
-                            [args.longitude - 0.03, lat - 0.02],
-                            [args.longitude - 0.03, lat + 0.02]
+                            polygon
                         ]
                     ]
-                ]
-            }
+                }
+            else:
+                REQUEST['fire_information'][i]['growth'][0]['location']['latitude'] = lat
+                REQUEST['fire_information'][i]['growth'][0]['location']['longitude'] = args.longitude
+
         else:
-            REQUEST['fire_information'][i]['growth'][0]['location']['latitude'] = lat
-            REQUEST['fire_information'][i]['growth'][0]['location']['longitude'] = args.longitude
-        REQUEST['fire_information'][i]['growth'][0]['location']['utc_offset'] = args.utc_offset
+            REQUEST['fires'][i]['activity'][0]['active_areas'][0]["start"] = local_end_str
+            REQUEST['fires'][i]['activity'][0]['active_areas'][0]["end"] = local_end_str
+            REQUEST['fires'][i]['activity'][0]['active_areas'][0]["utc_offset"] = args.utc_offset
+            if args.polygon:
+                REQUEST['fires'][i]['activity'][0]['active_areas'][0]['polygon'] = {
+                    'perimeter': polygon,
+                    'area': args.area
+                }
+            else:
+                REQUEST['fires'][i]['activity'][0]['active_areas'][0]["specified_points"] = [
+                    {
+                        "lat": lat,
+                        "lng": args.longitude,
+                        "area": args.area,
+                    }
+                ]
+
 
     if args.smtp_server:
         smtp_server, smtp_port = args.smtp_server.split(':')
@@ -446,12 +546,13 @@ if __name__ == "__main__":
 
     data = create_initial_request(args)
 
-    url = "{}/api/v1/run/".format(args.root_url)
+    url = "{}/api/v{}/run/".format(args.root_url, args.api_version)
     query = {}
     if args.emissions or args.plumerise:
         #first get fuelbeds
-        data = post(args, url + 'fuelbeds/', data, "Looking up fuelbeds to run %s",
-            'emissions' if args.emissions else 'plumerise')
+        data = post(args, url + 'fuelbeds/', data,
+            "Looking up fuelbeds to run %s".format(
+            'emissions' if args.emissions else 'plumerise'))
 
         if args.plumerise:
             # next, for plumerise run, get emissions
@@ -483,7 +584,8 @@ if __name__ == "__main__":
     while True:
         time.sleep(5)
         logging.info("Checking status...")
-        url = "{}/api/v1/runs/{}/".format(args.root_url, REQUEST['run_id'])
+        url = "{}/api/v{}/runs/{}/".format(
+            args.root_url, args.api_version, REQUEST['run_id'])
         status_code, data = get(args, url, "status", ignore_fail=True)
         if status_code == 200:
             if data['complete']:
@@ -492,7 +594,8 @@ if __name__ == "__main__":
             else:
                 logging.info("{} Complete".format(data['percent']))
 
-    url =  "{}/api/v1/runs/{}/output/".format(args.root_url, REQUEST['run_id'])
+    url =  "{}/api/v{}/runs/{}/output/".format(
+        args.root_url, args.api_version, REQUEST['run_id'])
     status_code, data = get(args, url, "output")
 
     # TODO: log individual bits of information
