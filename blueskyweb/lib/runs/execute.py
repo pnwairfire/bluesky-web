@@ -248,7 +248,9 @@ class BlueSkyRunExecutor(object):
             # BlueSkyRunner will call self.output_stream.write.
             t = BlueSkyRunner(data, output_stream=self.output_stream)
             t.start()
-            # block until it completes so that we can return 500 if necessary
+            # block until it thread completes so that self.output_stream.write
+            # is called before the main thread exits and so that we can return
+            # 500 if necessary
             t.join()
             if t.exception:
                 self.handle_error(500, str(t.exception),
