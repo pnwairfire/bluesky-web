@@ -86,7 +86,7 @@ class RunExecute(RequestHandlerBase):
             self._raise_error(400, 'Invalid JSON post data')
 
         executor = BlueSkyRunExecutor(api_version, mode, archive_id,
-            self._raise_error, self.write, self.settings)
+            self._raise_error, self, self.settings)
         # The default is for fuelbeds and emissions to be run in process and
         # all other modes asynchronously.  Allow fuelbeds and emissions to
         # be run asynchronously, but never allow other modes to be run in

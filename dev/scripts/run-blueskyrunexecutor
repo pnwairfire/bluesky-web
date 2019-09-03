@@ -347,7 +347,7 @@ async def execute(data, args):
         "mongo_db": tasks.BlueSkyWebDB(args.mongodb_url)
     }
     executor = BlueSkyRunExecutor(args.api_version, 'all', args.met_archive,
-        handle_error, s.write, settings)
+        handle_error, s, settings)
     await executor.execute(data, execute_mode=ExecuteMode.IN_PROCESS)
     return json.loads(s.getvalue())
 

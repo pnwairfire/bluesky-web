@@ -45,13 +45,13 @@ class ExecuteMode(object):
 class BlueSkyRunExecutor(object):
 
     def __init__(self, api_version, mode, archive_id, handle_error_func,
-            write_func, settings):
+            output_stream, settings):
         self.api_version = api_version
         self.mode = mode
         self.archive_id = archive_id # may be None
         self.archive_info = met.db.get_archive_info(archive_id)
         self.handle_error = handle_error_func
-        self.write = write_func
+        self.output_stream = output_stream
         self.settings = settings
 
     async def execute(self, data, execute_mode=None):
@@ -230,11 +230,11 @@ class BlueSkyRunExecutor(object):
             data.get('run_id'))
         run_bluesky.apply_async(args=args, kwargs=settings, queue=queue_name)
         # TODO: specify callback in record_run, calling
-        #    self.write in callback, so we can handle failure?
+        #    self.output_stream.write in callback, so we can handle failure?
         self.settings['mongo_db'].record_run(data['run_id'],
             RunStatuses.Enqueued, queue=queue_name, modules=data["modules"],
             initiated_at=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
-        self.write({"run_id": data['run_id']})
+        self.output_stream.write({"run_id": data['run_id']})
 
     async def _run_in_process(self, data):
         # We need the outer try block to handle any exception raised
@@ -244,8 +244,8 @@ class BlueSkyRunExecutor(object):
             # Runs bluesky in a separate thread so that run configurations
             # don't overwrite each other. (Bluesky manages configuration
             # with a singleton that stores config data in thread local)
-            # BlueSkyRunner will call self.write.
-            t = BlueSkyRunner(data, output_stream=self)
+            # BlueSkyRunner will call self.output_stream.write.
+            t = BlueSkyRunner(data, output_stream=self.output_stream)
             t.start()
             # block until it completes so that we can return 500 if necessary
             t.join()
