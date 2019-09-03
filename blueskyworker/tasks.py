@@ -141,16 +141,26 @@ class BlueSkyRunner(threading.Thread):
         self.exception = None
 
     def run(self):
-        self.input_data['run_id'] = (self.input_data.get('run_id')
-            or str(uuid.uuid1()).replace('-',''))
-        # self.input_data will be set to an empty dict when ingested by
-        # FiresManager, so record run_id
-        self.run_id = self.input_data['run_id']
-        if not self.output_stream:
-            self._set_output_params()
-            self._set_output_url()
+        try:
+            self.input_data['run_id'] = (self.input_data.get('run_id')
+                or str(uuid.uuid1()).replace('-',''))
+            # self.input_data will be set to an empty dict when ingested by
+            # FiresManager, so record run_id
+            self.run_id = self.input_data['run_id']
+            if not self.output_stream:
+                self._set_output_params()
+                self._set_output_url()
 
-        return self._run_bsp()
+            return self._run_bsp()
+
+        except Exception as e:
+            self.exception = BlueSkyJobError(str(e))
+            tornado.log.gen_log.debug(traceback.format_exc())
+            self._record_run(RunStatuses.Failed,
+                error={"message": str(e)})
+            # store exception rather than raise it so
+            # that main thread can act on it
+
 
     ##
     ## Setup
@@ -184,34 +194,26 @@ class BlueSkyRunner(threading.Thread):
         """Runs bluesky in-process, running each module individually for
         finer granularity in status logging.
         """
-        try:
-            if self.output_stream:
-                return self._run_bsp_modules()
+        if self.output_stream:
+            return self._run_bsp_modules()
 
-            else:
-                with configure_logging(self.output_log_filename, **self.settings) as foo:
-                    error = self._run_bsp_modules()
+        else:
+            with configure_logging(self.output_log_filename, **self.settings) as foo:
+                error = self._run_bsp_modules()
 
-                data = {
-                    'output_url': self.output_url,
-                    'output_dir': self.output_dir,
-                    'percent_complete': 100
-                }
-                status = RunStatuses.Completed
+            data = {
+                'output_url': self.output_url,
+                'output_dir': self.output_dir,
+                'percent_complete': 100
+            }
+            status = RunStatuses.Completed
 
-                if error:
-                    data['error'] = error
-                    status = RunStatuses.Failed
+            if error:
+                data['error'] = error
+                status = RunStatuses.Failed
 
-                self._record_run(status, **data)
+            self._record_run(status, **data)
 
-        except Exception as e:
-            self.exception = BlueSkyJobError(str(e))
-            tornado.log.gen_log.debug(traceback.format_exc())
-            self._record_run(RunStatuses.Failed,
-                error={"message": str(e)})
-            # store exception rather than raise it so
-            # that main thread can act on it
 
 
     def _run_bsp_modules(self):  # TODO: rename
