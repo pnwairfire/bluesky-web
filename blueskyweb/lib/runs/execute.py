@@ -17,7 +17,8 @@ import tornado.web
 from bluesky.marshal import Blueskyv4_0To4_1
 
 from blueskymongo.client import RunStatuses
-from blueskyweb.lib import met, hysplit, output
+from blueskyweb.lib import met, hysplit
+from blueskyweb.lib.runs import output
 from blueskyworker.tasks import (
     run_bluesky, BlueSkyRunner
 )

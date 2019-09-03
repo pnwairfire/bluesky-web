@@ -4,6 +4,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import abc
+import json
 
 from bluesky.marshal import Blueskyv4_0To4_1
 from bluesky.models import fires
