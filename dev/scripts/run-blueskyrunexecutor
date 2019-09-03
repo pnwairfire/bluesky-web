@@ -321,8 +321,8 @@ def get_input(args):
         INPUT['fire_information'][0]['growth'][0]['location']['longitude'] = args.lng
         INPUT['fire_information'][0]['growth'][0]['location']['utc_offset'] = args.utc_offset
     else:
-        INPUT['fires'][0]['activity'][0]['active_areas'][0]["start"] = local_end_str
-        INPUT['fires'][0]['activity'][0]['active_areas'][0]["end"] = args.num_hours
+        INPUT['fires'][0]['activity'][0]['active_areas'][0]["start"] = local_start_str
+        INPUT['fires'][0]['activity'][0]['active_areas'][0]["end"] = local_end_str
         INPUT['fires'][0]['activity'][0]['active_areas'][0]["specified_points"][0]["lat"] = args.lat
         INPUT['fires'][0]['activity'][0]['active_areas'][0]["specified_points"][0]["lng"] = args.lng
         INPUT['fires'][0]['activity'][0]['active_areas'][0]["specified_points"][0]["area"] = args.area
