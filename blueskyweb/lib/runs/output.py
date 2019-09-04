@@ -68,7 +68,7 @@ class BlueskyV1OutputProcessor(BlueskyProcessorBase):
 
         if data.get('fires'):
             data['fire_information'] = [
-                self.convert_fire(fires.Fire(f)) for f in data['fires']
+                self.convert_fire(fires.Fire(f)) for f in data.pop('fires')
             ]
 
         return data
