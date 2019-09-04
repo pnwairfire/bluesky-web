@@ -142,7 +142,7 @@ services:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
     - RABBITMQ_URL=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q no-met-plumerise,ca-nv_4-km-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise
+    command: celery -Q no-met-plumerise,ca-nv_4-km-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise,pacific_northwest_4-km-plumerise
       -c 5 -A blueskyworker.tasks worker
       -l INFO -f /var/log/blueskyworker/bluesky-web-worker-plumerise.log
   worker:
