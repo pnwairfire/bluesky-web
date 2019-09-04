@@ -141,9 +141,6 @@ class BlueSkyRunExecutor(object):
     EMISSIONS_MODULES = [
         'consumption', 'emissions'
     ]
-    PLUMERISE_MODULES = [
-        'plumerising', 'extrafiles'
-    ]
     # TODO: for dispersion requests, instead of running findmetdata, get
     #   met data from indexed met data in mongodb;  maybe fall back on
     #   running findmetdata if indexed data isn't there or if mongodb
@@ -155,12 +152,19 @@ class BlueSkyRunExecutor(object):
         'dispersion', 'export'
     ]
 
-    def _plumerise_modules(self, data):
+    def _plumerise_modules(self, data, exclude_extrafiles=False):
+        modules = []
+
         # just look at first active area of first fire
-        if 'timeprofile' in data['fires'][0]['activity'][0]['active_areas'][0]:
-            return self.PLUMERISE_MODULES
-        else:
-            return ['timeprofiling'] + self.PLUMERISE_MODULES
+        if 'timeprofile' not in data['fires'][0]['activity'][0]['active_areas'][0]:
+            modules.append('timeprofile')
+
+        modules.append('plumerise')
+
+        if not exclude_extrafiles:
+            modules.append('extrafiles')
+
+        return modules
 
     def _set_modules(self, data):
         def _set(default_modules):
@@ -183,7 +187,8 @@ class BlueSkyRunExecutor(object):
                 if self.archive_id:
                     _set(self.FUELBEDS_MODULES +
                         self.EMISSIONS_MODULES +
-                        self._plumerise_modules(data) +
+                        self._plumerise_modules(data, exclude_extrafiles=(
+                            'extrafiles' in dispersion_modules)) +
                         dispersion_modules)
                 else:
                     _set(self.FUELBEDS_MODULES +
