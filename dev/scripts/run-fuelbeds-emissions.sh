@@ -76,6 +76,8 @@ if [ $API_VERSION = 1 ]; then
                 "growth": [
                     {
                         '"$FUELBEDS_SECTION"'
+                        "start": "2019-08-29T00:00:00",
+                        "end": "2019-08-30T00:00:00",
                         "location": {
                             "geojson": {
                                 "type": "MultiPolygon",
@@ -117,6 +119,9 @@ elif [ $API_VERSION = 4.1 ]; then
                     {
                         "active_areas": [
                             {
+                                "start": "2019-08-29T00:00:00",
+                                "end": "2019-08-30T00:00:00",
+                                "utc_offset": "-09:00",
                                 "perimeter": {
                                     "polygon": [
                                         [-121.4522115, 47.4316976],
@@ -128,8 +133,7 @@ elif [ $API_VERSION = 4.1 ]; then
                                     '"$FUELBEDS_SECTION"'
                                     "area": 2398.94477979842
                                 },
-                                "ecoregion": "southern",
-                                "utc_offset": "-09:00"
+                                "ecoregion": "southern"
                             }
                         ]
                     }
