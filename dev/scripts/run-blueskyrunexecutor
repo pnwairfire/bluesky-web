@@ -136,46 +136,52 @@ Examples:
 Run fuelbeds in process:
 
  $ docker run --rm -ti \\
+    --network bluesky-web_default \\
+    --link bluesky-web-rabbitmq:rabbit \\
+    --link bluesky-web-mongo:mongo \\
     -v $PWD:/usr/src/blueskyweb/ \\
     -v $HOME/Met:/data/Met/ \\
     -v $PWD/docker-data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 1 \\
-    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@localhost:27887/blueskyweb \\
     fuelbeds
 
 Run fuelbeds asynchronously:
 
  $ docker run --rm -ti \\
+    --network bluesky-web_default \\
+    --link bluesky-web-rabbitmq:rabbit \\
+    --link bluesky-web-mongo:mongo \\
     -v $PWD:/usr/src/blueskyweb/ \\
     -v $HOME/Met:/data/Met/ \\
     -v $PWD/docker-data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 1 \\
     --run-asynchronously \\
-    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@localhost:27887/blueskyweb \\
-    --rabbitmq-url amqps://blueskyweb:blueskywebrabbitpassword@localhost:5887 \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
+    --rabbitmq-url amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671 \\
     fuelbeds
 
 Run fuelbeds though dispersion in process:
 
  $ docker run --rm -ti \\
+    --network bluesky-web_default \\
+    --link bluesky-web-rabbitmq:rabbit \\
+    --link bluesky-web-mongo:mongo \\
     -v $PWD:/usr/src/blueskyweb/ \\
     -v $HOME/Met:/data/Met/ \\
     -v $PWD/docker-data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 4.1 \\
-    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@localhost:27887/blueskyweb \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
     -s 2019-07-26T00:00:00 -n 12 \\
     -a 500 --lat 45.12 --lng -120 \\
-    --utc-offset -06:00 \\
     --met-archive pacific_northwest_4-km \\
-    -o out.json \\
     fuelbeds consumption emissions \\
     timeprofile findmetdata localmet plumerise \\
     dispersion visualization
 
-""".format(script_name=sys.argv[0])
+ """.format(script_name=sys.argv[0])
 
 
 
@@ -194,13 +200,13 @@ OPTIONAL_ARGS = [
         'long': '--mongodb-url',
         'help': ('url to connect to mongodb for arl '
             'indexes and bsp job queues'),
-        'default': "mongodb://blueskyweb:blueskywebmongopassword@localhost:27887/blueskyweb"
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb"
     },
     {
         'short': '-r',
         'long': '--rabbitmq-url',
         'help': 'url to connect to rabbitmq for enqueueing asynchronous runs',
-        'default': "amqps://blueskyweb:blueskywebrabbitpassword@localhost:5887"
+        'default': "amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671"
     },
     {
         'short': '-s',
@@ -367,25 +373,42 @@ def inline_imports():
         exit(1)
 
 
+class OutStream(object):
+    def __init__(self):
+        self.s = io.StringIO()
+
+    def write(self, val):
+        if not hasattr(val, 'lower'):
+            val = json.dumps(val)
+
+        self.s.write(val)
+
 async def execute(data, args):
     tasks, BlueSkyRunExecutor, ExecuteMode = inline_imports()
 
-    s = io.StringIO()
+    out_str = OutStream()
     logging.debug('About to run')
 
     settings = {
-        "mongo_db": tasks.BlueSkyWebDB(args.mongodb_url)
+        "mongodb_url": args.mongodb_url,
+        "mongo_db": tasks.BlueSkyWebDB(args.mongodb_url),
+        "output_root_dir": "/data/bluesky/output/",
+        'output_url_path_prefix': ''
     }
     executor = BlueSkyRunExecutor(args.api_version, 'all', args.met_archive,
-        handle_error, s, settings)
+        handle_error, out_str, settings)
     execute_mode = (ExecuteMode.ASYNC if args.run_asynchronously
         else ExecuteMode.IN_PROCESS)
     await executor.execute(data, execute_mode=execute_mode)
-    return json.loads(s.getvalue())
+    return json.loads(out_str.s.getvalue())
 
 async def main(args):
     input = get_input(args)
     data = await execute(INPUT, args)
+    if args.run_asynchronously:
+        # TODO: poll run status until it completes, and then
+        #  set 'data' to output
+        pass
 
     logging.debug('About to dump to stdout')
     data = json.dumps(data, indent=args.indent)
@@ -393,7 +416,7 @@ async def main(args):
         with open(args.output_file, 'w') as f:
             f.write(data)
     else:
-        sys.stdout.write(data)
+        sys.stdout.write(data + '\n')
 
 if __name__ == "__main__":
     args = parse_args()
@@ -401,6 +424,7 @@ if __name__ == "__main__":
         print("*** Error:  '-r'/'--rabbitmq-url' required when"
             " --run-asynchronously is used")
         sys.exit(1)
+
     os.environ["MONGODB_URL"] = args.mongodb_url
     os.environ["RABBITMQ_URL"] = args.rabbitmq_url
 
