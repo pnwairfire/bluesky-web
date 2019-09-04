@@ -30,8 +30,10 @@ class ErrorMessages(object):
 
 class HysplitConfigurator(object):
 
-    def __init__(self, request_handler, input_data, archive_info):
-        self._request_handler = request_handler
+    def __init__(self, hysplit_query_params, handle_error_func, input_data,
+            archive_info):
+        self._hysplit_query_params = hysplit_query_params
+        self._handle_error = handle_error_func
         self._input_data = input_data
         self._archive_info = archive_info
 
@@ -60,11 +62,11 @@ class HysplitConfigurator(object):
             if k in restrictions:
                 if 'max' in restrictions[k] and (
                         self._hysplit_config[k] > restrictions[k]['max']):
-                    self._request_handler._raise_error(400, "{} ({}) can't be greater than {} ".format(
+                    self._handle_error(400, "{} ({}) can't be greater than {} ".format(
                         k, self._hysplit_config[k], restrictions[k]['max']))
                 if 'min' in restrictions[k] and (
                         self._hysplit_config[k] < restrictions[k]['min']):
-                    self._request_handler._raise_error(400, "{} ({}) can't be less than {} ".format(
+                    self._handle_error(400, "{} ({}) can't be less than {} ".format(
                         k, self._hysplit_config[k], restrictions[k]['min']))
 
     def _process_options(self):
@@ -73,28 +75,28 @@ class HysplitConfigurator(object):
         in the input data, and translates them to hysplit config settings.
         """
         # get query_parameters
-        speed = self._request_handler.get_query_argument('dispersion_speed', None)
-        res = self._request_handler.get_query_argument('grid_resolution', None)
-        num_par = self._request_handler.get_query_argument('number_of_particles', None)
+        speed = self._hysplit_query_params.get('dispersion_speed')
+        res = self._hysplit_query_params.get('grid_resolution')
+        num_par = self._hysplit_query_params.get('number_of_particles')
 
         self._grid_resolution_factor = 1.0
         if any([k is not None for k in (speed, res, num_par)]):
             if (speed or num_par) and 'NUMPAR' in self._hysplit_config:
-                self._request_handler._raise_error(400, ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS)
+                self._handle_error(400, ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS)
 
             if (speed or res) and any([self._hysplit_config.get(k) for k in
                     ('grid', 'USER_DEFINED_GRID', 'compute_grid')]):
-                self._request_handler._raise_error(400, ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS)
+                self._handle_error(400, ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS)
 
             if speed is not None:
                 if res is not None or num_par is not None:
-                    self._request_handler._raise_error(400,
+                    self._handle_error(400,
                         ErrorMessages.DISPERSION_SPEED_CONFLICTS_WITH_OTHER_OPTIONS)
                 speed = speed.lower()
                 speed_options = blueskyconfig.get('hysplit_options',
                     'dispersion_speed')
                 if speed not in speed_options:
-                    self._request_handler._raise_error(400,
+                    self._handle_error(400,
                         ErrorMessages.INVALID_DISPERSION_SPEED.format(speed))
                 self._hysplit_config['NUMPAR'] = speed_options[speed]['numpar']
                 self._grid_resolution_factor = speed_options[speed]['grid_resolution_factor']
@@ -104,7 +106,7 @@ class HysplitConfigurator(object):
                     num_par_options = blueskyconfig.get('hysplit_options',
                         'number_of_particles')
                     if num_par not in num_par_options:
-                        self._request_handler._raise_error(400,
+                        self._handle_error(400,
                             ErrorMessages.INVALID_NUMBER_OF_PARTICLES.format(num_par))
                     self._hysplit_config['NUMPAR'] = num_par_options[num_par]
 
@@ -112,21 +114,21 @@ class HysplitConfigurator(object):
                     res_options = blueskyconfig.get('hysplit_options',
                         'grid_resolution')
                     if res not in res_options:
-                        self._request_handler._raise_error(400,
+                        self._handle_error(400,
                             ErrorMessages.INVALID_GRID_RESOLUTION.format(res))
                     self._grid_resolution_factor = res_options[res]
 
         else:
             if len([v for v in [k in self._hysplit_config for k in
                     ('grid', 'USER_DEFINED_GRID', 'compute_grid')] if v]) > 1:
-                self._request_handler._raise_error(400,
+                self._handle_error(400,
                     ErrorMessages.TOO_MANY_GRID_SPECIFICATIONS)
 
         self._grid_size_factor = 1.0
-        size = self._request_handler.get_float_arg('grid_size', default=None)
+        size = self._hysplit_query_params.get('grid_size')
         if size is not None:
             if size <= 0 or size > 1:
-                self._request_handler._raise_error(400,
+                self._handle_error(400,
                     "grid_size ({}) must be > 0 and <= 100".format(size))
             self._grid_size_factor = size
 
@@ -191,13 +193,13 @@ class HysplitConfigurator(object):
         if len(self._input_data['fires']) > 1:
             # input data could possibly specifu multiple fires at
             # the same location, but we won't bother trying to accept that
-            self._request_handler._raise_error(400,
+            self._handle_error(400,
                 ErrorMessages.SINGLE_FIRE_ONLY)
 
         fire = self._input_data['fires'][0]
 
         if not fire.get('growth'):
-            self._request_handler._raise_error(400,
+            self._handle_error(400,
                 ErrorMessages.NO_GROWTH_INFO)
 
         centroids = []
@@ -211,7 +213,7 @@ class HysplitConfigurator(object):
                 centroids.append((coords[1], coords[0]))
 
             else:
-                self._request_handler._raise_error(400,
+                self._handle_error(400,
                     ErrorMessages.INVALID_FIRE_LOCATION_INFO)
 
         if len(centroids) > 1:

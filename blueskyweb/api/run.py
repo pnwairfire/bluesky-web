@@ -85,8 +85,15 @@ class RunExecute(RequestHandlerBase):
         except json.JSONDecodeError as e:
             self._raise_error(400, 'Invalid JSON post data')
 
+        hysplit_query_params = {
+            'dispersion_speed': self._request_handler.get_query_argument('dispersion_speed', None),
+            'grid_resolution': self._request_handler.get_query_argument('grid_resolution', None),
+            'number_of_particles': self._request_handler.get_query_argument('number_of_particles', None),
+            'grid_size': self._request_handler.get_float_arg('grid_size', default=None)
+        }
+
         executor = BlueSkyRunExecutor(api_version, mode, archive_id,
-            self._raise_error, self, self.settings)
+            self._raise_error, self, self.settings, hysplit_query_params)
         # The default is for fuelbeds and emissions to be run in process and
         # all other modes asynchronously.  Allow fuelbeds and emissions to
         # be run asynchronously, but never allow other modes to be run in

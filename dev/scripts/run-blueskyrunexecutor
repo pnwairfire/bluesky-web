@@ -395,8 +395,11 @@ async def execute(data, args):
         "output_root_dir": "/data/bluesky/output/",
         'output_url_path_prefix': ''
     }
+    hysplit_query_params = {
+        # TODO: add script args to set these?
+    }
     executor = BlueSkyRunExecutor(args.api_version, 'all', args.met_archive,
-        handle_error, out_str, settings)
+        handle_error, out_str, settings, hysplit_query_params)
     execute_mode = (ExecuteMode.ASYNC if args.run_asynchronously
         else ExecuteMode.IN_PROCESS)
     await executor.execute(data, execute_mode=execute_mode)

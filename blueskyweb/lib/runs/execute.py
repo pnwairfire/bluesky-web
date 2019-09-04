@@ -46,7 +46,7 @@ class ExecuteMode(object):
 class BlueSkyRunExecutor(object):
 
     def __init__(self, api_version, mode, archive_id, handle_error_func,
-            output_stream, settings):
+            output_stream, settings, hysplit_query_params):
         self.api_version = api_version
         self.mode = mode
         self.archive_id = archive_id # may be None
@@ -54,6 +54,7 @@ class BlueSkyRunExecutor(object):
         self.handle_error = handle_error_func
         self.output_stream = output_stream
         self.settings = settings
+        self.hysplit_query_params = hysplit_query_params
 
     async def execute(self, data, execute_mode=None):
         # TODO: should no configuration be allowed at all?  or only some? if
@@ -378,8 +379,9 @@ class BlueSkyRunExecutor(object):
             data['config']['dispersion']['model'] = 'vsmoke'
 
         if data['config']['dispersion'].get('model') in ('hysplit', None):
-            configurator = hysplit.HysplitConfigurator(self, data,
-                self.archive_info)
+            configurator = hysplit.HysplitConfigurator(
+                self.hysplit_query_params, self.handle_error,
+                data, self.archive_info)
             data['config']['dispersion']['hysplit'] = configurator.config
 
 
