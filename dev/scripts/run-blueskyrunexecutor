@@ -349,7 +349,7 @@ def handle_error(status, msg, exception=None):
     if exception:
         tornado.log.gen_log.debug(traceback.format_exc())
         logging.error('Excepton: %s', exception)
-        sys.exit(1)
+    sys.exit(1)
 
 
 def inline_imports():
