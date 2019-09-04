@@ -51,8 +51,10 @@ DEFAULT_SETTINGS = {
 }
 
 def get_routes(path_prefix):
-    # We need to import inline so that MONGDB_URL env var is set
+    # We need to import inline so that MONGDB_URL and RABBITMQ_URL env vars
+    # are set:
     #    os.environ["MONGODB_URL"] = settings['mongodb_url']
+    #    os.environ["RABBITMQ_URL"] = settings['rabbitmq_url']
     # before blueskyworker.tasks is imported in .api.v1.run
     from .api.run import RunExecute, RunStatus, RunOutput, RunsInfo
     from .api.run import RunExecute, RunStatus, RunOutput, RunsInfo
