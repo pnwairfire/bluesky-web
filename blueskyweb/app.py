@@ -15,7 +15,7 @@ from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
 # TODO: use path args for version and api module. ex:
 #  routes = [
-#    ('/api/<api_version:[^/]+>/<api_module:[^/]+>/'), Dispatcher
+#    ('/api/v<api_version:[^/]+>/<api_module:[^/]+>/'), Dispatcher
 #  ]
 # and have dispatcher try to dynamically import and run the
 # appropriate hander, returning 404 if not implemented
