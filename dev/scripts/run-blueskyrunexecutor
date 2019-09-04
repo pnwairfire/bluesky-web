@@ -199,8 +199,8 @@ OPTIONAL_ARGS = [
     {
         'short': '-r',
         'long': '--rabbitmq-url',
-        'help': ('url to connect to rabbitmq for enqueueing asynchronous runs'),
-        'default': "amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5887"
+        'help': 'url to connect to rabbitmq for enqueueing asynchronous runs',
+        'default': "amqps://blueskyweb:blueskywebrabbitpassword@localhost:5887"
     },
     {
         'short': '-s',
