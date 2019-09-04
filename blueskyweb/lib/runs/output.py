@@ -161,7 +161,7 @@ class BlueSkyRunOutput(object):
         if 'dispersion' in run['modules']:
             #if output['config']['dispersion'].get('model') != 'vsmoke'):
             self._get_dispersion(run)
-        elif 'plumerising' in run['modules']:
+        elif 'plumerise' in run['modules']:
             self._get_plumerise(run)
         else:
             # TODO: is returning raw input not ok?

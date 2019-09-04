@@ -52,12 +52,12 @@ Run in docker. e.g.:
 """.format(script_name=sys.argv[0])
 
 MODES = {
-    'normal':['ingestion', 'fuelbeds'],
-    'double-fuelbeds': ['ingestion', 'fuelbeds', 'fuelbeds'],
-    'invalid-input': ['ingestion', 'fuelbeds', 'emissions'],
-    'invalid-module':['ingestion', 'fuelbeds', 'emissionssdf'],
-    'dispersion':['ingestion', 'fuelbeds', 'consumption', 'emissions',
-        'timeprofiling', 'plumerising', 'findmetdata', 'dispersion']
+    'normal':['fuelbeds'],
+    'double-fuelbeds': ['fuelbeds', 'fuelbeds'],
+    'invalid-input': ['fuelbeds', 'emissions'],
+    'invalid-module':['fuelbeds', 'emissionssdf'],
+    'dispersion':['fuelbeds', 'consumption', 'emissions',
+        'timeprofile', 'plumerise', 'findmetdata', 'dispersion']
 }
 
 REQUIRED_ARGS = [

@@ -193,8 +193,8 @@ class BlueSkyRunExecutor(object):
                 else:
                     _set(self.FUELBEDS_MODULES +
                         self.EMISSIONS_MODULES +
-                        # vsmoke needs timeprofiling but not plumerise
-                        ['timeprofiling'] +
+                        # vsmoke needs timeprofile but not plumerise
+                        ['timeprofile'] +
                         dispersion_modules)
             else:
                 _set(dispersion_modules)
@@ -312,14 +312,14 @@ class BlueSkyRunExecutor(object):
 
     ## Plumerise
 
-    async def _configure_plumerising(self, data):
-        tornado.log.gen_log.debug('Configuring plumerising')
+    async def _configure_plumerise(self, data):
+        tornado.log.gen_log.debug('Configuring plumerise')
         data['config'] = data.get('config', {})
         working_dir = os.path.join(
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'],
             '{run_id}', 'plumerise')
-        data['config']['plumerising'] = {
+        data['config']['plumerise'] = {
             "model": "feps",
             "feps": {
                 "working_dir": working_dir

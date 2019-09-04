@@ -1,8 +1,8 @@
 ## Plumerise
 
-This API runs bluesky timeprofiling and plumerise modules.  (The
+This API runs bluesky timeprofile and plumerise modules.  (The
 bluesky web service runs FEPS plumerise which, unlike SEV plumerise,
-requires timeprofiling data.)
+requires timeprofile data.)
 
 ### Request
 

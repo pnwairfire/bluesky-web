@@ -247,7 +247,7 @@ class BlueSkyRunner(threading.Thread):
                     # It's a dispersion run
                     if m == 'export':
                         data['export'] = fires_manager.meta['export']
-                elif m == 'plumerising':
+                elif m == 'plumerise':
                     # It's not a dispersion run, so this must be a
                     # plumerise run
                     data['fires'] = prune_for_plumerise(
