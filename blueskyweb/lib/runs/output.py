@@ -92,11 +92,11 @@ class BlueskyV1OutputProcessor(BlueskyProcessorBase):
 
     def convert_active_area(self, aa):
         g = {
-            "start": aa['start'],  # WILL BE FILLED IN
-            "end": aa['end'],  # WILL BE FILLED IN
+            "start": aa.get('start'),  # WILL BE FILLED IN
+            "end": aa.get('end'),  # WILL BE FILLED IN
             "location": {
-                "ecoregion": aa['ecoregion'],
-                "utc_offset": aa['utc_offset']
+                "ecoregion": aa.get('ecoregion'),
+                "utc_offset": aa.get('utc_offset')
             }
         }
 
