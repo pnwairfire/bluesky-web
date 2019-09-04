@@ -25,20 +25,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
 #   and other python pacakges installed in your local (non-docker)
 #   python env
 from blueskyconfig.defaults import DEFAULTS
-try:
-    from blueskyworker import tasks
-except ImportError as e:
-    print("""
-Run in docker:
-
- $ docker run --rm -ti \\
-    -v $PWD:/usr/src/blueskyweb/ \\
-    -v $HOME/Met:/data/Met/ \\
-    -v $PWD/docker-data/output/:/data/bluesky/output/ \\
-    -w /usr/src/blueskyweb/ \\
-    bluesky-web {script_name} -h
-    """.format(script_name=sys.argv[0]))
-    exit(1)
 
 
 _NOW = datetime.datetime.utcnow()
@@ -147,7 +133,7 @@ FIRES_DATA = {
 EPILOG_STR = """
 Examples:
 
-Run in docker. e.g.:
+Run fuelbeds in process:
 
  $ docker run --rm -ti \\
     -v $PWD:/usr/src/blueskyweb/ \\
@@ -155,8 +141,23 @@ Run in docker. e.g.:
     -v $PWD/docker-data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 1 \\
-    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@localhost:27887/blueskyweb \\
     fuelbeds
+
+Run fuelbeds asynchronously:
+
+ $ docker run --rm -ti \\
+    -v $PWD:/usr/src/blueskyweb/ \\
+    -v $HOME/Met:/data/Met/ \\
+    -v $PWD/docker-data/output/:/data/bluesky/output/ \\
+    -w /usr/src/blueskyweb/ \\
+    bluesky-web {script_name} --log-level=DEBUG -v 1 \\
+    --run-asynchronously \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@localhost:27887/blueskyweb \\
+    --rabbitmq-url amqps://blueskyweb:blueskywebrabbitpassword@localhost:5887 \\
+    fuelbeds
+
+Run fuelbeds though dispersion in process:
 
  $ docker run --rm -ti \\
     -v $PWD:/usr/src/blueskyweb/ \\
@@ -164,7 +165,7 @@ Run in docker. e.g.:
     -v $PWD/docker-data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 4.1 \\
-    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@localhost:27887/blueskyweb \\
     -s 2019-07-26T00:00:00 -n 12 \\
     -a 500 --lat 45.12 --lng -120 \\
     --utc-offset -06:00 \\
@@ -193,7 +194,13 @@ OPTIONAL_ARGS = [
         'long': '--mongodb-url',
         'help': ('url to connect to mongodb for arl '
             'indexes and bsp job queues'),
-        'default': "mongodb://blueskyweb:blueskywebmongopassword@localhost:27018/blueskyweb"
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@localhost:27887/blueskyweb"
+    },
+    {
+        'short': '-r',
+        'long': '--rabbitmq-url',
+        'help': ('url to connect to rabbitmq for enqueueing asynchronous runs'),
+        'default': "amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5887"
     },
     {
         'short': '-s',
@@ -338,8 +345,31 @@ def handle_error(status, msg, exception=None):
         logging.error('Excepton: %s', exception)
         sys.exit(1)
 
+
+def inline_imports():
+    # We need to import inline after MONGDB_URL and RABBITMQ_URL env vars
+    # are set.
+    try:
+        from blueskyworker import tasks
+        from blueskyweb.lib.runs.execute import BlueSkyRunExecutor, ExecuteMode
+        return tasks, BlueSkyRunExecutor, ExecuteMode
+    except ImportError as e:
+        print("""
+    Run in docker:
+
+     $ docker run --rm -ti \\
+        -v $PWD:/usr/src/blueskyweb/ \\
+        -v $HOME/Met:/data/Met/ \\
+        -v $PWD/docker-data/output/:/data/bluesky/output/ \\
+        -w /usr/src/blueskyweb/ \\
+        bluesky-web {script_name} -h
+        """.format(script_name=sys.argv[0]))
+        exit(1)
+
+
 async def execute(data, args):
-    from blueskyweb.lib.runs.execute import BlueSkyRunExecutor, ExecuteMode
+    tasks, BlueSkyRunExecutor, ExecuteMode = inline_imports()
+
     s = io.StringIO()
     logging.debug('About to run')
 
@@ -348,7 +378,9 @@ async def execute(data, args):
     }
     executor = BlueSkyRunExecutor(args.api_version, 'all', args.met_archive,
         handle_error, s, settings)
-    await executor.execute(data, execute_mode=ExecuteMode.IN_PROCESS)
+    execute_mode = (ExecuteMode.ASYNC if args.run_asynchronously
+        else ExecuteMode.IN_PROCESS)
+    await executor.execute(data, execute_mode=execute_mode)
     return json.loads(s.getvalue())
 
 async def main(args):
@@ -365,6 +397,12 @@ async def main(args):
 
 if __name__ == "__main__":
     args = parse_args()
+    if args.run_asynchronously and not args.rabbitmq_url:
+        print("*** Error:  '-r'/'--rabbitmq-url' required when"
+            " --run-asynchronously is used")
+        sys.exit(1)
+    os.environ["MONGODB_URL"] = args.mongodb_url
+    os.environ["RABBITMQ_URL"] = args.rabbitmq_url
 
     from functools import partial
     main = partial(main, args=args)
