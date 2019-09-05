@@ -316,14 +316,23 @@ def prune_for_plumerise(fire_info):
 def prune_fire_for_plumerise(f):
     return {
         "id": f.get('id'),
-        "growth": [prune_growth_for_plumerise(g) for g in f.get('growth', [])]
+        "activity": [prune_activity_for_plumerise(a) for a in f.get('activity', [])]
     }
 
-def prune_growth_for_plumerise(g):
-    new_g = slice_dict(g, {'start', 'end', 'location', 'plumerise'})
-    new_g['location'] = slice_dict(new_g['location'],
-        {'latitude', 'utc_offset', 'longitude', 'area', 'geojson'})
-    return new_g
+def prune_activity_for_plumerise(a):
+    new_a = {
+        'active_areas': []
+    }
+
+    for aa in a.active_areas:
+        new_aa = slice_dict(aa, {'start', 'end', 'utc_offset', 'plumerise'})
+        if aa.get('specified_points'):
+            new_aa['specified_points'] = [slice_dict(sp, {'lat', 'lng', 'area'})
+                for sp in aa['specified_points']]
+        elif aa.get(perimeter):
+            new_aa['perimeter'] = slice_dict(aa['perimeter'], {'polygon', 'area'})
+        new_a['active_areas'].append(new_aa)
+    return new_a
 
 def slice_dict(d, whitelist):
     return {k: d[k] for k in d.keys() & whitelist}
