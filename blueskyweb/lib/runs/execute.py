@@ -15,6 +15,7 @@ import tornado.log
 import tornado.web
 
 from bluesky.marshal import Blueskyv4_0To4_1
+from bluesky.models import fires
 
 from blueskymongo.client import RunStatuses
 from blueskyweb.lib import met, hysplit
@@ -339,15 +340,35 @@ class BlueSkyRunExecutor(object):
         )
         data['config']['extrafiles'] = {
             "dest_dir": dest_dir,
-            "sets": ["firescsvs", "emissionscsv"],
+            "sets": ["firescsvs"],
             "firescsvs": {
                 "fire_locations_filename": "fire_locations.csv",
                 "fire_events_filename": "fire_events.csv"
-            },
-            "emissionscsv": {
+            }
+
+        }
+        # only write emissions csv if emissions is one of the modules to run
+        # or if fire data includes emissions
+        if self._include_emissionscsv(data):
+            data['config']['extrafiles']["sets"].append("emissionscsv")
+            data['config']['extrafiles']["emissionscsv"] = {
                 "filename": "fire_emissions.csv"
             }
-        }
+
+    def _include_emissionscsv(self, data):
+        if 'emissions' in data['modules']:
+            return True
+
+        locations_defined = False
+        for f in data['fires']:
+            for loc in fires.Fire(f).locations:
+                locations_defined = True
+                if not loc.get('fuelbeds') or any(
+                        [not fb.get('emissions') for fb in loc['fuelbeds']]):
+                    return False
+
+        # there are fire locations defined, and all have emissions data
+        return locations_defined
 
     ## Dispersion
 
