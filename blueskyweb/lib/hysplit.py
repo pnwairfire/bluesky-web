@@ -4,14 +4,19 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import copy
-import blueskyconfig
+
+from bluesky import locationutils
+from bluesky.models import fires
 from geoutils.geojson import get_centroid
+
+import blueskyconfig
 
 class ErrorMessages(object):
     SINGLE_FIRE_ONLY = "grid_size option only supported for single fire"
-    NO_GROWTH_INFO = "grid_size option requires fire growth data"
-    INVALID_FIRE_LOCATION_INFO = ("grid_size option requires fire growth"
-        " data containing lat and lng or geojson data")
+    NO_ACTIVITY_INFO = "grid_size option requires fire activity data"
+    INVALID_FIRE_LOCATION_INFO = ("grid_size option requires fire activity"
+        " data containing a) specified points with lat and lng or b) "
+        " perimeter with polygon data")
     NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify NUMPAR along with"
         " dispersion_speed or number_of_particles.")
     GRID_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify 'grid',"
@@ -196,23 +201,25 @@ class HysplitConfigurator(object):
             self._handle_error(400,
                 ErrorMessages.SINGLE_FIRE_ONLY)
 
-        fire = self._input_data['fires'][0]
+        fire = fires.Fire(self._input_data['fires'][0])
 
-        if not fire.get('growth'):
+        try:
+            locations = fire.locations
+        except ValueError as e:
+            # fire.locations includes validation of the location data
             self._handle_error(400,
-                ErrorMessages.NO_GROWTH_INFO)
+                ErrorMessages.INVALID_FIRE_LOCATION_INFO)
+
+        if not locations:
+            self._handle_error(400,
+                ErrorMessages.NO_ACTIVITY_INFO)
 
         centroids = []
-        for g in fire['growth']:
-            loc = g.get('location', {})
-            if set(['latitude','longitude']).issubset(set(loc.keys())):
-                centroids.append((loc['latitude'], loc['longitude']))
-
-            elif 'geojson' in loc:
-                coords = get_centroid(loc['geojson']) # returns lng, lat
-                centroids.append((coords[1], coords[0]))
-
-            else:
+        for loc in locations:
+            try:
+                latlng = locationutils.LatLng(loc)
+                centroids.append((latlng.latitude, latlng.longitude))
+            except Exception as e:
                 self._handle_error(400,
                     ErrorMessages.INVALID_FIRE_LOCATION_INFO)
 
