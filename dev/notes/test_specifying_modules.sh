@@ -23,3 +23,9 @@ curl -D - "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/?_m=fuelbed
 # some other requests
 curl -D - "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/?_m=fuelbeds" -H 'Content-Type: application/json' -d ' { "fire_information": [], "modules":["timeprofiling"]}'
 curl -D - "http://$BLUESKY_API_HOSTNAME/api/v1/run/dispersion/DRI2km/?_m=fuelbeds" -H 'Content-Type: application/json' -d ' { "fire_information": [], "modules":["consumption", "sdfsdf", "timeprofiling"]}'
+
+
+
+##
+## TODO: Add v4.1 requests
+##
