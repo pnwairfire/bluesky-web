@@ -86,10 +86,10 @@ class RunExecute(RequestHandlerBase):
             self._raise_error(400, 'Invalid JSON post data')
 
         hysplit_query_params = {
-            'dispersion_speed': self._request_handler.get_query_argument('dispersion_speed', None),
-            'grid_resolution': self._request_handler.get_query_argument('grid_resolution', None),
-            'number_of_particles': self._request_handler.get_query_argument('number_of_particles', None),
-            'grid_size': self._request_handler.get_float_arg('grid_size', default=None)
+            'dispersion_speed': self.get_query_argument('dispersion_speed', None),
+            'grid_resolution': self.get_query_argument('grid_resolution', None),
+            'number_of_particles': self.get_query_argument('number_of_particles', None),
+            'grid_size': self.get_float_arg('grid_size', default=None)
         }
 
         executor = BlueSkyRunExecutor(api_version, mode, archive_id,
