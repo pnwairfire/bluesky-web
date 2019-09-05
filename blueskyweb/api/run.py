@@ -16,7 +16,6 @@ import tornado.web
 import tornado.log
 
 from blueskymongo.client import RunStatuses
-from blueskyworker.tasks import process_runtime
 from blueskyweb.lib import met
 from blueskyweb.lib.runs.execute import BlueSkyRunExecutor, ExecuteMode
 from blueskyweb.lib.runs.output import BlueSkyRunOutput

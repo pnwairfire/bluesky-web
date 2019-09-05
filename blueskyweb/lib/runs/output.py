@@ -9,6 +9,8 @@ import json
 from bluesky.marshal import Blueskyv4_0To4_1
 from bluesky.models import fires
 
+from blueskyworker.tasks import process_runtime
+
 ##
 ## Utilities for working with remote output
 ##
