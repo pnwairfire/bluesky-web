@@ -9,6 +9,7 @@ import time
 import threading
 
 import tornado.log
+from bluesky.config import Config
 
 from blueskymongo.client import RunStatuses
 
@@ -16,14 +17,14 @@ class HysplitMonitor(threading.Thread):
     """Monitor thread that scrapes hysplit MESSAGE files to determine
     how many hours are complete
     """
-    def __init__(self, m, fires_manager, record_run_func):
+    def __init__(self, m, config, fires_manager, record_run_func):
         super(HysplitMonitor, self).__init__()
+        # configuration needs to be set in each thread
+        Config().set(config)
         self.m = m
         self.fires_manager = fires_manager
-        self.start_hour = self.fires_manager.get_config_value(
-            'dispersion', 'start')
-        self.num_hours = self.fires_manager.get_config_value(
-            'dispersion', 'num_hours')
+        self.start_hour = Config().get('dispersion', 'start')
+        self.num_hours = Config().get('dispersion', 'num_hours')
 
         self.record_run_func = record_run_func
         self.terminate = False
@@ -33,7 +34,7 @@ class HysplitMonitor(threading.Thread):
     def message_file_name(self):
         if self._message_file_name is None:
             # this code will run again if no message files are found
-            working_dir = self.fires_manager.get_config_value(
+            working_dir = Config().get(
                 'dispersion', 'working_dir')
             mp1 = os.path.join(working_dir, 'MESSAGE')
             if os.path.exists(mp1):
@@ -88,7 +89,8 @@ class monitor_run(object):
         tornado.log.gen_log.info("Entering monitor_run context manager")
         if self._is_hysplit():
             tornado.log.gen_log.info("Starting thread to monitor hysplit")
-            self.thread = HysplitMonitor(self.m, self.fires_manager, self.record_run_func)
+            self.thread = HysplitMonitor(self.m, Config().get(),
+                self.fires_manager, self.record_run_func)
             self.thread.start()
 
     def __exit__(self, e_type, value, tb):
@@ -99,7 +101,6 @@ class monitor_run(object):
 
     def _is_hysplit(self):
         if self.m =='dispersion':
-            model = self.fires_manager.get_config_value(
-                'dispersion', 'model', default='hysplit')
+            model = Config().get('dispersion', 'model')
             return model == 'hysplit'
         return False
