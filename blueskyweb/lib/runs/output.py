@@ -90,6 +90,7 @@ class BlueskyV1OutputProcessor(BlueskyProcessorBase):
         if growth:
             fire['growth'] = growth
 
+        fire.pop('activity', None)
         return fire
 
     def convert_active_area(self, aa):
