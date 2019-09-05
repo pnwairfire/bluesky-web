@@ -494,7 +494,7 @@ def create_initial_request(args):
                 REQUEST['fire_information'][i]['growth'][0]['location']['longitude'] = args.longitude
 
         else:
-            REQUEST['fires'][i]['activity'][0]['active_areas'][0]["start"] = local_end_str
+            REQUEST['fires'][i]['activity'][0]['active_areas'][0]["start"] = local_start_str
             REQUEST['fires'][i]['activity'][0]['active_areas'][0]["end"] = local_end_str
             REQUEST['fires'][i]['activity'][0]['active_areas'][0]["utc_offset"] = args.utc_offset
             if args.polygon:
