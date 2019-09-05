@@ -5,11 +5,53 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import abc
 import json
+import os
 
+import ipify
+import tornado.log
 from bluesky.marshal import Blueskyv4_0To4_1
 from bluesky.models import fires
 
 from blueskyworker.tasks import process_runtime
+
+try:
+    IP_ADDRESS = ipify.get_ip()
+except:
+    # IP_ADDRESS is only used to see if worker is running on
+    # same machine as web server.  If ipify fails, we'll just
+    # resort to loading all output as if from remote server
+    IP_ADDRESS = None
+
+
+# PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
+# def is_same_host(web_request_host):
+#     """Checks to see if the output is local to the web service
+#
+#     If they are local, the run status and output APIS can carry out their
+#     checks more efficiently and quickly.
+#
+#     This function is a complete hack, but it works, at least some of the time.
+#     (And when it fails, it should only result in false negatives, which
+#     don't affect the correctness of the calling APIs - it just means they
+#     don't take advantage of working with local files.)
+#     """
+#     # first check if same hostname
+#     try:
+#         web_service_host = socket.gethostbyaddr(socket.gethostname())[0]
+#     except:
+#         web_service_host = PORT_IN_HOSTNAME_MATCHER.sub('', web_request_host)
+#
+#     output_hostname = "" # TODO: Get hostname from mongodb
+#     if output_hostname == web_service_host:
+#         return True
+#
+#     # TODO: determine ip address of upload host and web service host and
+#     #   check if ip addresses match
+#
+#     return False
+
+def is_same_host(run):
+    return run['server']['ip'] == IP_ADDRESS
 
 ##
 ## Utilities for working with remote output
