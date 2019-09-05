@@ -76,7 +76,7 @@ These can be run outside of docker. See the helpstrings for
 the following two scripts for examples
 
     ./dev/scripts/web-regression-test.sh
-    ./dev/scripts/test-asynch-request.py -h
+    ./dev/scripts/test-async-request.py -h
 
 
 
