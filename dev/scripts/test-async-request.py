@@ -401,6 +401,8 @@ def get(args, url, title, ignore_fail=False):
     return response.status_code, load_response_body(response)
 
 def post(args, url, data, desc):
+    if not hasattr(data, 'lower'):
+        data = json.dumps(data)
     response = requests.post(url, data=data, headers=HEADERS)
     write_to_req_resp_file(args, desc,
         url + 'fuelbeds/', data, response.content)
