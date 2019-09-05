@@ -38,11 +38,13 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
     def test_multiple_fire_objects(self):
         input_data = {
             "config": {"dispersion": {}},
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 37.0,
-                    "longitude": -89.0}}]},
-                {"growth": [{"location": {"latitude": 32.0,
-                    "longitude": -112.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 37.0, "lng": -89.0, "area": 10}],
+                    "ecoregion": "western","utc_offset": '-05:00'}]}]},
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 32.0, "lng": -112.0, "area": 15}],
+                    "ecoregion": "western","utc_offset": '-06:00'}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -55,15 +57,18 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
     def test_missing_lat(self):
         input_data = {
             "config": {"dispersion": {}},
-            "fire_information": [
-                {"growth": [{"location": {
-                    "longitude": -89.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lng": -89.0, "area": 10}],
+                    "ecoregion": "western","utc_offset": '-05:00'}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
             {}, handle_error, input_data, ARCHIVE_INFO)
         with pytest.raises(MockHTTPError) as e:
             hycon._configure_hysplit_reduced_grid()
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.INVALID_FIRE_LOCATION_INFO
 
     def test_not_reduced(self):
         """This tests the case where the grid is not reduced - it
@@ -71,9 +76,10 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
         """
         input_data = {
             "config": {"dispersion": {}},
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 37.0,
-                    "longitude": -89.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 37.0, "lng": -89.0, "area": 10}],
+                    "ecoregion": "western","utc_offset": '-05:00'}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -96,9 +102,10 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
         """
         input_data = {
             "config": {"dispersion": {}},
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 37.0,
-                    "longitude": -84.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 37.0, "lng": -84.0, "area": 10}],
+                    "ecoregion": "western","utc_offset": '-05:00'}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -122,9 +129,10 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
         """
         input_data = {
             "config": {"dispersion": {}},
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 37.0,
-                    "longitude": -94.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 37.0, "lng": -94.0, "area": 10}],
+                    "ecoregion": "western","utc_offset": '-05:00'}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -148,9 +156,10 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
         """
         input_data = {
             "config": {"dispersion": {}},
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}],
+                    "ecoregion": "western","utc_offset": '-05:00'}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -174,23 +183,20 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
         """
         input_data = {
             "config": {"dispersion": {}},
-            "fire_information": [{
-                "growth": [{
-                    "location": {
-                        "geojson": {
-                            "type": "Polygon",
-                            # centroid 37, 84
-                            "coordinates": [
-                                [
-                                    [-85.0, 38.0],
-                                    [-85.0, 36.0],
-                                    [-83.0, 36.0],
-                                    [-83.0, 38.0],
-                                    [-85.0, 38.0]
-                                ]
+            "fires": [{
+                "activity": [{
+                    "active_areas": [{
+                        "perimeter": {
+                            "area": 10,
+                            "polygon": [
+                                [-85.0, 38.0],
+                                [-85.0, 36.0],
+                                [-83.0, 36.0],
+                                [-83.0, 38.0],
+                                [-85.0, 38.0]
                             ]
                         }
-                    }
+                    }]
                 }]
             }]
         }
@@ -210,57 +216,35 @@ class TestHysplitConfiguratorConfigureReducedGrid(object):
 
 class TestHysplitConfiguratorGetCentralLatLng(object):
 
-    LAT_LNG = {
-        "location": {
+    SPECIFIED_POINTS_A = {
+        "specified_points": [{
             # centroid (31, -64)
-            "latitude": 31.0,
-            "longitude": -64.0
-        }
+            "lat": 31.0,
+            "lng": -64.0,
+            "area": 200
+        }]
     }
 
-    LAT_LNG_2 = {
-        "location": {
-            # centroid (31, -64)
-            "latitude": 33.0,
-            "longitude": -67.0
-        }
+    SPECIFIED_POINTS_B = {
+        "specified_points": [{
+            # centroid (31, -67)
+            "lat": 33.0,
+            "lng": -67.0,
+            "area": 100
+        }]
     }
 
-    MULTI_POINT = {
-        "location": {
-            "geojson": {
-                "type": "MultiPoint",
-                "coordinates": [
-                    # centroid (34, -83)
-                    [-82, 33],
-                    [-84, 35]
-                ]
-            }
-        }
-    }
-
-    POLYGON = {
-        "location": {
-            "geojson": {
-                "type": "Polygon",
-                # centroid (37, -84)
-                "coordinates": [
-                    [
-                        [-85.0, 38.0],
-                        [-85.0, 36.0],
-                        [-83.0, 36.0],
-                        [-83.0, 38.0],
-                        [-85.0, 38.0] # last coord not required by geoutils.get_centroid
-                    ],
-                    # this one is ignored in centroid calc, since it's a hole
-                    [
-                        [-84.0, 37.0],
-                        [-84.0, 36.2],
-                        [-83.5, 36.2],
-                        [-83.5, 37.0]
-                    ]
-                ]
-            }
+    PERIMETER = {
+        "perimeter": {
+            "area": 150,
+            # centroid (37, -84)
+            "polygon": [
+                [-85.0, 38.0],
+                [-85.0, 36.0],
+                [-83.0, 36.0],
+                [-83.0, 38.0],
+                [-85.0, 38.0] # last coord not required by geoutils.get_centroid
+            ]
         }
     }
 
@@ -268,17 +252,18 @@ class TestHysplitConfiguratorGetCentralLatLng(object):
     def setup(self):
         input_data = {
             "config": {"dispersion": {}},
-            "fire_information": [
-                {
-                    "growth": []
-                }
-            ]
+            "fires": [{
+                "activity": [{
+                    "active_areas": []
+                }]
+            }]
         }
+        self.active_areas = input_data["fires"][0]["activity"][0]["active_areas"]
         self.hycon = hysplit.HysplitConfigurator(
             {}, handle_error, input_data, ARCHIVE_INFO)
 
     def test_multiple_fires(self):
-        self.hycon._input_data["fire_information"].append({"growth":[]})
+        self.hycon._input_data["fires"].append({"activity":[]})
         with pytest.raises(MockHTTPError) as e:
             self.hycon._get_central_lat_lng()
         assert e.value.status_code == 400
@@ -289,24 +274,24 @@ class TestHysplitConfiguratorGetCentralLatLng(object):
         with pytest.raises(MockHTTPError) as e:
             self.hycon._get_central_lat_lng()
         assert e.value.status_code == 400
-        assert e.value.msg == hysplit.ErrorMessages.NO_GROWTH_INFO
+        assert e.value.msg == hysplit.ErrorMessages.NO_ACTIVITY_INFO
 
-        # missing locaton
-        self.hycon._input_data["fire_information"][0]["growth"].append({"sdf": 3})
+        # missing specified points and perimeter info
+        self.active_areas.append({"sdf": 3})
         with pytest.raises(MockHTTPError) as e:
             self.hycon._get_central_lat_lng()
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.INVALID_FIRE_LOCATION_INFO
 
-        # missing lat and lng
-        self.hycon._input_data["fire_information"][0]["growth"][0] = {"location": {}}
+        # specified point is missing lat and lng
+        self.active_areas[0] = {"specified_points": [{}]}
         with pytest.raises(MockHTTPError) as e:
             self.hycon._get_central_lat_lng()
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.INVALID_FIRE_LOCATION_INFO
 
         # missing longitude
-        self.hycon._input_data["fire_information"][0]["growth"][0]["location"]["latitude"] = 45.1
+        self.active_areas[0]["specified_points"][0] = {"lat": 45.1, "area": 1000}
         with pytest.raises(MockHTTPError) as e:
             self.hycon._get_central_lat_lng()
         assert e.value.status_code == 400
@@ -314,25 +299,21 @@ class TestHysplitConfiguratorGetCentralLatLng(object):
 
 
     def test_lat_lng(self):
-        self.hycon._input_data["fire_information"][0]["growth"].append(self.LAT_LNG)
+        self.active_areas.append(self.SPECIFIED_POINTS_A)
         assert self.hycon._get_central_lat_lng() == (31, -64)
 
-    def test_multi_point(self):
-        self.hycon._input_data["fire_information"][0]["growth"].append(self.MULTI_POINT)
-        assert self.hycon._get_central_lat_lng() == (34, -83)
-
-    def test_polygon(self):
-        self.hycon._input_data["fire_information"][0]["growth"].append(self.POLYGON)
+    def test_perimeter(self):
+        self.active_areas.append(self.PERIMETER)
         assert self.hycon._get_central_lat_lng() == (37, -84)
 
-    def test_lat_lng_and_polygon(self):
-        self.hycon._input_data["fire_information"][0]["growth"].append(self.LAT_LNG)
-        self.hycon._input_data["fire_information"][0]["growth"].append(self.POLYGON)
+    def test_lat_lng_and_perimeter(self):
+        self.active_areas.append(self.SPECIFIED_POINTS_A)
+        self.active_areas.append(self.PERIMETER)
         assert self.hycon._get_central_lat_lng() == (34, -74)
 
     def test_two_lat_lngs(self):
-        self.hycon._input_data["fire_information"][0]["growth"].append(self.LAT_LNG)
-        self.hycon._input_data["fire_information"][0]["growth"].append(self.LAT_LNG_2)
+        self.active_areas.append(self.SPECIFIED_POINTS_A)
+        self.active_areas.append(self.SPECIFIED_POINTS_B)
         assert self.hycon._get_central_lat_lng() == (32, -65.5)
 
 
@@ -369,9 +350,9 @@ class TestHysplitConfiguratorConfigureGrid(object):
                     },
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         with pytest.raises(MockHTTPError) as e:
@@ -398,9 +379,9 @@ class TestHysplitConfiguratorConfigureGrid(object):
                     }
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -434,9 +415,9 @@ class TestHysplitConfiguratorConfigureGrid(object):
                     }
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -455,7 +436,7 @@ class TestHysplitConfiguratorConfigureGrid(object):
         for k in expected_params:
             assert hycon._hysplit_config[k] == expected_params[k]
 
-    def test_user_defined_grid(self):
+    def test_compute_grid(self):
         input_data = {
             "config": {
                 "dispersion": {
@@ -464,9 +445,9 @@ class TestHysplitConfiguratorConfigureGrid(object):
                     }
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -483,9 +464,9 @@ class TestHysplitConfiguratorConfigureGrid(object):
                     }
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -505,9 +486,9 @@ class TestHysplitOptions(object):
                     "hysplit": {}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -541,9 +522,9 @@ class TestHysplitOptions(object):
                     "hysplit": {}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         archive_info = copy.deepcopy(ARCHIVE_INFO)
@@ -580,9 +561,9 @@ class TestHysplitOptions(object):
                     "hysplit": {}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
 
@@ -614,9 +595,9 @@ class TestHysplitOptions(object):
                     "hysplit": {'NUMPAR': 4000}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
 
@@ -641,9 +622,9 @@ class TestHysplitOptions(object):
                     "hysplit": {}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
 
@@ -677,9 +658,9 @@ class TestHysplitOptions(object):
                     }
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
 
@@ -706,9 +687,9 @@ class TestHysplitOptions(object):
                     "hysplit": {}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -743,9 +724,9 @@ class TestHysplitOptions(object):
                     "hysplit": {}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -781,9 +762,9 @@ class TestHysplitOptions(object):
                     "hysplit": {}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -818,9 +799,9 @@ class TestHysplitOptions(object):
                     "hysplit": {"NUMPAR": 4500}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -854,9 +835,9 @@ class TestHysplitOptions(object):
                     "hysplit": {"NUMPAR": 4500}
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -900,9 +881,9 @@ class TestHysplitOptions(object):
                     }
                 }
             },
-            "fire_information": [
-                {"growth": [{"location": {"latitude": 31.0,
-                    "longitude": -64.0}}]}
+            "fires": [
+                {"activity": [{"active_areas": [{
+                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
