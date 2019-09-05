@@ -2,8 +2,8 @@
 
 This API runs bluesky through ingestion and fuelbeds.
 It requires posted JSON with three possible top level keys -
-'fire_information', and 'config', and 'modules'. The
-'fire_information' key is required, and it lists the one or
+'fires', and 'config', and 'modules'. The
+'fires' key is required, and it lists the one or
 more fires to process. The 'config' key is
 optional, and it specifies configuration data and other control
 parameters.  The 'modules' is also optional, and is used to
@@ -11,12 +11,12 @@ specify a subset of the modules normally run by this API.
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/run/fuelbeds/
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/fuelbeds/
  - method: POST
  - post data:
 
     {
-        "fire_information": [ ... ],
+        "fires": [ ... ],
         "config": { ... },
         "modules": [ ... ]
     }
@@ -29,13 +29,13 @@ for more information about required and optional post data
 In handling this request, blueskyweb will run bluesky in realtime, and the
 bluesky results will be in the API response.  The response data will be the
 modified version of the request data.  It will include the
-"fire_information" key, the "config" key (if specified), a "processing"
+"fires" key, the "config" key (if specified), a "processing"
 key that includes information from the modules that processed the data, and
 a "summary" key.
 
     {
         "config": { ... },
-        "fire_information": [ ... ],
+        "fires": [ ... ],
         "modules": [ ... ],
         "processing": [ ... ],
         "run_id": "<RUN_ID>",
@@ -46,34 +46,30 @@ a "summary" key.
 
 An example with fire location data specified as a geojson
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/fuelbeds/" -H 'Content-Type: application/json' -d '
-    {
-        "fire_information": [
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/fuelbeds/" -H 'Content-Type: application/json' -d '{
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA",
-                "growth": [
+                "activity": [
                     {
-                        "location": {
-                            "geojson": {
-                                "type": "MultiPolygon",
-                                "coordinates": [
-                                    [
-                                        [
-                                            [-121.4522115, 47.4316976],
-                                            [-121.3990506, 47.4316976],
-                                            [-121.3990506, 47.4099293],
-                                            [-121.4522115, 47.4099293],
-                                            [-121.4522115, 47.4316976]
-                                        ]
-                                    ]
-                                ]
-                            },
-                            "area": 200,
-                            "ecoregion": "southern",
-                            "utc_offset": "-09:00"
-                        }
+                        "active_areas": [
+                            {
+                                "perimeter": {
+                                    "polygon": [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ],
+                                    "area": 200
+                                },
+                                "ecoregion": "southern",
+                                "utc_offset": "-09:00"
+                            }
+                        ]
                     }
                 ]
             }
@@ -83,25 +79,30 @@ An example with fire location data specified as a geojson
 Another exmaple, this time running only the fuelbeds
 modules, and with fire location data specified as lat + lng + size.
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/fuelbeds/" -H 'Content-Type: application/json' -d '
-    {
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/fuelbeds/" -H 'Content-Type: application/json' -d '{
         "modules": ["fuelbeds"],
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of": {
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "growth": [
+                "activity": [
                     {
-                        "location": {
-                            "latitude": 47.4316976,
-                            "longitude": -121.3990506,
-                            "area": 200,
-                            "utc_offset": "-09:00",
-                            "ecoregion": "southern"
-                        }
+                        "active_areas": [
+                            {
+                                "specified_points": [
+                                    {
+                                        "lat": 47.4316976,
+                                        "lng": -121.3990506,
+                                        "area": 200
+                                    }
+                                ],
+                                "utc_offset": "-09:00",
+                                "ecoregion": "southern"
+                            }
+                        ]
                     }
                 ]
             }
@@ -116,8 +117,8 @@ modules, and with fire location data specified as lat + lng + size.
 
 This API runs bluesky through consumption and emissions.
 It requires posted JSON with three possible top level keys -
-'fire_information', and 'config', and 'modules'. The
-'fire_information' key is required, and it lists the one or
+'fires', and 'config', and 'modules'. The
+'fires' key is required, and it lists the one or
 more fires to process. The 'config' key is
 optional, and it specifies configuration data and other control
 parameters.  The 'modules' key is also optional, and is used to
@@ -125,12 +126,12 @@ specify a subset of the modules normally run by this API.
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/run/emissions/
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/emissions/
  - method: POST
  - post data:
 
         {
-            "fire_information": [ ... ],
+            "fires": [ ... ],
             "config": { ... },
             "modules": [ ... ]
         }
@@ -143,13 +144,13 @@ for more information about required and optional post data
 In handling this request, blueskyweb will run bluesky in realtime, and the
 bluesky results will be in the API response.  The response data will be the
 modified version of the request data.  It will include the
-"fire_information" key, the "config" key (if specified), a "processing"
+"fires" key, the "config" key (if specified), a "processing"
 key that includes information from the modules that processed the data, and
 a "summary" key.
 
     {
         "config": { ... },
-        "fire_information": [ ... ],
+        "fires": [ ... ],
         "modules": [ ... ],
         "processing": [ ... ],
         "run_id": "<RUN_ID>",
@@ -161,36 +162,35 @@ a "summary" key.
 An example with fire location data specified as geojson
 
     $ echo '{
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA",
-                "growth": [
+                "activity": [
                     {
-                        "location": {
-                            "geojson": {
-                                "type": "MultiPolygon",
-                                "coordinates": [
-                                    [
-                                        [
-                                            [-121.4522115, 47.4316976],
-                                            [-121.3990506, 47.4316976],
-                                            [-121.3990506, 47.4099293],
-                                            [-121.4522115, 47.4099293],
-                                            [-121.4522115, 47.4316976]
-                                        ]
-                                    ]
-                                ]
-                            },
-                            "area": 200,
-                            "ecoregion": "southern",
-                            "utc_offset": "-09:00"
-                        },
-                        "fuelbeds": [
+                        "active_areas": [
                             {
-                                "fccs_id": "9",
-                                "pct": 100.0
+                                "start": "2019-08-24T17:00:00",
+                                "end": "2010-08-25T17:00:00",
+                                "perimeter": {
+                                    "polygon": [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ],
+                                    "area": 200,
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "9",
+                                            "pct": 100.0
+                                        }
+                                    ]
+                                },
+                                "ecoregion": "southern",
+                                "utc_offset": "-09:00"
                             }
                         ]
                     }
@@ -199,7 +199,7 @@ An example with fire location data specified as geojson
         ]
     }' > dev/data/emissions-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/emissions/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/emissions-input.json | python -m json.tool | less
 
@@ -209,26 +209,34 @@ modules, and with fire location data specified as lat + lng + size.
 
     $ echo '{
         "modules": ["consumption"],
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of": {
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "growth": [
+                "activity": [
                     {
-                        "location": {
-                            "latitude": 47.4316976,
-                            "longitude": -121.3990506,
-                            "area": 200,
-                            "utc_offset": "-09:00",
-                            "ecoregion": "southern"
-                        },
-                        "fuelbeds": [
+                        "active_areas": [
                             {
-                                "fccs_id": "9",
-                                "pct": 100.0
+                                "start": "2019-08-24T17:00:00",
+                                "end": "2010-08-25T17:00:00",
+                                "specified_points": [
+                                    {
+                                        "lat": 47.4316976,
+                                        "lng": -121.3990506,
+                                        "area": 200,
+                                        "fuelbeds": [
+                                            {
+                                                "fccs_id": "9",
+                                                "pct": 100.0
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "utc_offset": "-09:00",
+                                "ecoregion": "southern"
                             }
                         ]
                     }
@@ -237,7 +245,6 @@ modules, and with fire location data specified as lat + lng + size.
         ]
     }' > dev/data/consumption-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/emissions/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/emissions/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/consumption-input.json | python -m json.tool | less
-
