@@ -161,14 +161,14 @@ class BlueSkyRunOutput(object):
         self.output_stream = apply_output_processor(api_version, output_stream)
 
     def process(self):
-        if 'dispersion' in run['modules']:
+        if 'dispersion' in self.run_info['modules']:
             #if output['config']['dispersion'].get('model') != 'vsmoke'):
-            self._get_dispersion(run)
-        elif 'plumerise' in run['modules']:
-            self._get_plumerise(run)
+            self._get_dispersion(self.run_info)
+        elif 'plumerise' in self.run_info['modules']:
+            self._get_plumerise(self.run_info)
         else:
             # TODO: is returning raw input not ok?
-            output = self._load_output(run)
+            output = self._load_output(self.run_info)
             self.output_stream.write(output)
 
     ##
