@@ -4,7 +4,7 @@ This API returns information about all domains with ARL data
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/met/domains/
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/met/domains/
  - method: GET
 
 ### Response
@@ -14,6 +14,12 @@ This API returns information about all domains with ARL data
             {
                 "id": "<domain_id>",
                 "resolution_km": <km>,
+                "grid_size_options": {
+                    "1.0": "xy(km): <dist km> x <dist km>",
+                    "0.50": "xy(km): <dist km> x <dist km>",
+                    "0.75": "xy(km): <dist km> x <dist km>",
+                    "0.25": "xy(km): <dist km> x <dist km>"
+                },
                 "boundary": {
                     "ne": {
                         "lat": <lat>,
@@ -31,38 +37,30 @@ This API returns information about all domains with ARL data
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/domains/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/domains/" | python -m json.tool
     {
         "domains": [
             {
-                "id": "NAM3km",
-                "resolution_km": 3,
+                "resolution_km": 1.33,
+                "grid_size_options": {
+                    "0.75": "xy(km): 1000 x 500",
+                    "0.25": "xy(km): 300 x 200",
+                    "0.50": "xy(km): 600 x 300",
+                    "1.0": "xy(km): 1300 x 600"
+                },
                 "boundary": {
                     "ne": {
-                        "lat": 48,
-                        "lng": -61
+                        "lat": 49.4,
+                        "lng": -114.6
                     },
                     "sw": {
-                        "lat": 21,
-                        "lng": -122.7
+                        "lat": 41.5,
+                        "lng": -126
                     }
-                }
+                },
+                "id": "PNW1.33km"
             },
-            ...,
-            {
-                "id": "NWS-06Z-1km-2018-CA-NV",
-                "resolution_km": 1,
-                "boundary": {
-                    "ne": {
-                        "lat": 44.4,
-                        "lng": -121
-                    },
-                    "sw": {
-                        "lat": 39.5,
-                        "lng": -125.3
-                    }
-                }
-            }
+            ...
         ]
     }
 
@@ -75,7 +73,7 @@ This API returns information about a specific domain with ARL data
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/met/domains/<domain_id>/
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/met/domains/<domain_id>/
  - method: GET
 
 ### Response
@@ -84,6 +82,12 @@ This API returns information about a specific domain with ARL data
         "domain": {
             "id": "<domain_id>",
             "resolution_km": <km>,
+            "grid_size_options": {
+                "1.0": "xy(km): <dist km> x <dist km>",
+                "0.50": "xy(km): <dist km> x <dist km>",
+                "0.75": "xy(km): <dist km> x <dist km>",
+                "0.25": "xy(km): <dist km> x <dist km>"
+            },
             "boundary": {
                 "ne": {
                     "lat": <lat>,
@@ -99,19 +103,25 @@ This API returns information about a specific domain with ARL data
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/domains/DRI4km/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/domains/DRI4km/" | python -m json.tool
     {
         "domain": {
             "id": "DRI4km",
-            "resolution_km": 4,
+            "resolution_km": 2,
+            "grid_size_options": {
+                "1.0": "xy(km): 1100 x 800",
+                "0.50": "xy(km): 600 x 400",
+                "0.75": "xy(km): 900 x 600",
+                "0.25": "xy(km): 300 x 200"
+            },
             "boundary": {
                 "sw": {
-                    "lng": -128.5,
-                    "lat": 28.8
+                    "lat": 28.8,
+                    "lng": -128.5
                 },
                 "ne": {
-                    "lng": -109.5,
-                    "lat": 44.8
+                    "lat": 44.8,
+                    "lng": -109.5
                 }
             }
         }
@@ -126,7 +136,7 @@ This API returns the dates for which a specific domain has ARL data
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/met/archives/[<archive_type>/]
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/met/archives/[<archive_type>/]
  - method: GET
  - optional query args:
   - available (bool) -- filter by availability
@@ -173,7 +183,7 @@ This API returns the dates for which a specific domain has ARL data
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/" | python -m json.tool
     {
         "archives": [
             {
@@ -212,7 +222,7 @@ This API returns the dates for which a specific domain has ARL data
         ]
     }
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/special/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/special/" | python -m json.tool
     {
         "archives": [
             {
@@ -243,7 +253,7 @@ This API returns the dates for which a specific domain has ARL data
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/met/archives/<archive_id>
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/met/archives/<archive_id>
  - method: GET
 
 ### Response
@@ -254,26 +264,48 @@ This API returns the dates for which a specific domain has ARL data
             "id": "<archive_id>",
             "group": "<special|standard|fast>",
             "domain_id": "<domain_id>",
-            "begin": "<YYYY-MM-DD>",
-            "end": "<YYYY-MM-DD>",
-            "title": "<archive_title>"
+            "begin": "<YYYY-MM-DDTHH:MM:SS>",
+            "end": "<YYYY-MM-DDTHH:MM:SS>",
+            "title": "<archive_title>",
+            "availability": [
+                {
+                    "first_hour": "<YYYY-MM-DDTHH:MM:SS>",
+                    "last_hour": "<YYYY-MM-DDTHH:MM:SS>"
+                },
+                ...
+            ],
+            "latest_forecast": "<YYYY-MM-DDTHH:MM:SS>"
         }
     }
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/national_12-km/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/national_12-km/" | python -m json.tool
     {
         "archive": {
-            "id": "national_12-km",
             "group": "standard",
+            "id": "national_12-km",
             "domain_id": "NAM84",
-            "begin": "2015-08-05",
-            "end": "2016-10-05",
-            "title": "National 12-km"
+            "begin": "2015-08-05T00:00:00",
+            "end": "2018-11-11T12:00:00",
+            "title": "National 12-km",
+            "availability": [
+                {
+                    "first_hour": "2015-08-05T00:00:00",
+                    "last_hour": "2015-08-08T12:00:00"
+                },
+                {
+                    "first_hour": "2016-10-03T00:00:00",
+                    "last_hour": "2016-10-06T12:00:00"
+                },
+                {
+                    "first_hour": "2018-11-07T00:00:00",
+                    "last_hour": "2018-11-11T12:00:00"
+                }
+            ],
+            "latest_forecast": "2018-11-08T00:00:00"
         }
     }
-
 
 
 
@@ -288,7 +320,7 @@ date range
 
 ### Request
 
- - url:  $BLUESKY_API_ROOT_URL/api/v1/met/archives/<archive_id>/<date>/
+ - url:  $BLUESKY_API_ROOT_URL/api/v4.1/met/archives/<archive_id>/<date>/
  - method: GET
  - optional query args: 'date_range'
 
@@ -306,7 +338,7 @@ date range
 
 #### Date available
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
     {
         "alternatives": [
             "2014-05-29",
@@ -316,7 +348,7 @@ date range
         "available": true
     }
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/ca-nv_6-km/2014-05-30/?date_range=1" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/ca-nv_6-km/2014-05-30/?date_range=1" | python -m json.tool
     {
         "alternatives": [
             "2014-05-29",
@@ -327,7 +359,7 @@ date range
 
 #### Date not available, with alternatives
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
     {
         "alternatives": [
             "2014-05-29",
@@ -338,7 +370,7 @@ date range
 
 #### Date not available, no alternatives
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
     {
         "alternatives": [],
         "available": false
