@@ -141,7 +141,7 @@ Run fuelbeds in process:
     --link bluesky-web-mongo:mongo \\
     -v $PWD:/usr/src/blueskyweb/ \\
     -v $HOME/Met:/data/Met/ \\
-    -v $PWD/docker-data/output/:/data/bluesky/output/ \\
+    -v $PWD/dev/data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 1 \\
     fuelbeds
@@ -154,7 +154,7 @@ Run fuelbeds asynchronously:
     --link bluesky-web-mongo:mongo \\
     -v $PWD:/usr/src/blueskyweb/ \\
     -v $HOME/Met:/data/Met/ \\
-    -v $PWD/docker-data/output/:/data/bluesky/output/ \\
+    -v $PWD/dev/data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 1 \\
     --run-asynchronously \\
@@ -170,7 +170,7 @@ Run fuelbeds though dispersion in process:
     --link bluesky-web-mongo:mongo \\
     -v $PWD:/usr/src/blueskyweb/ \\
     -v $HOME/Met:/data/Met/ \\
-    -v $PWD/docker-data/output/:/data/bluesky/output/ \\
+    -v $PWD/dev/data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
     bluesky-web {script_name} --log-level=DEBUG -v 4.1 \\
     --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
@@ -366,7 +366,7 @@ def inline_imports():
      $ docker run --rm -ti \\
         -v $PWD:/usr/src/blueskyweb/ \\
         -v $HOME/Met:/data/Met/ \\
-        -v $PWD/docker-data/output/:/data/bluesky/output/ \\
+        -v $PWD/dev/data/output/:/data/bluesky/output/ \\
         -w /usr/src/blueskyweb/ \\
         bluesky-web {script_name} -h
         """.format(script_name=sys.argv[0]))
