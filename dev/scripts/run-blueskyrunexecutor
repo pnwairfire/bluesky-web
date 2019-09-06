@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-"""For adhoc testing BlueSkyRunner class.
+"""For adhoc testing BlueSkyRunExecutor class.
 """
 
 __author__ = "Joel Dubowy"
