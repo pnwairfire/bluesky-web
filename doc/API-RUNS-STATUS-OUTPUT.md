@@ -1,30 +1,44 @@
 
-## GET /api/v1/runs/<guid>
+## GET /api/v4.1/runs/<guid>
 
 This API returns the status of a specific dispersion run
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/runs/<guid> (/api/v1/run/<guid>/status is also supported for backwards compatibility)
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/runs/<guid> (/api/v4.1/run/<guid>/status is also supported for backwards compatibility)
  - method: GET
 
 ### Response
 
     {
+        "run_id": "<run_id>",
+        "initiated_at": "<ts>",
         "percent": <float>,
+        "complete": <boolean>,
         "queue": {
             "name": "<queue_name>",
             "position": <int>
         },
-        "initiated_at": "<ts>",
-        "complete": <boolean>,
         "status": {
             "ts": "<ts>",
             "status": "<str>",
             "stdout": "<last_line_in_stdout>",
             "log": "<last_line_in_log_file>"
         },
-        "run_id": "<run_id>"
+        "runtime": {
+            "start": "<YYYY-mm-ddTHH:MM:SSZ>",
+            "end": "<YYYY-mm-ddTHH:MM:SSZ>"
+        },
+        "version_info": {
+            "bluesky_version": "<bluesky_version",
+            "<module_name>": {
+                "version": "<module_version>",
+                "<dependency_package>": "<package_version>",
+                ...
+            },
+            ...
+        },
+        "output_url": "<url>"
     }
 
 Note:
@@ -33,64 +47,100 @@ Note:
 
 ### Example:
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/abc123/"
 
 An enqueued run:
 
     {
+        "run_id": "e239a018-77ac-11e7-92f9-3c15c2c6639e",
+        "initiated_at": "2019-09-05T21:15:30Z",
         "percent": 0,
-        "queue": {
-            "name": "dri",
-            "position": 2
-        },
-        "initiated_at": "2017-08-02T18:09:27Z",
         "complete": false,
-        "status": {
-            "ts": "2017-08-02T18:09:27Z",
-            "status": "enqueued"
+        "queue": {
+            "name": "ca-nv_6-km",
+            "position": 1
         },
-        "run_id": "e239a018-77ac-11e7-92f9-3c15c2c6639e"
+        "status": {
+            "status": "enqueued",
+            "ts": "2019-09-05T21:15:30.834634Z"
+        }
     }
 
 A run in progress:
 
     {
-        "percent": 50,
-        "initiated_at": "2017-08-02T18:05:22Z",
+        "run_id": "test-asynch-request-20190905T211135",
+        "initiated_at": "2019-09-05T21:11:35Z",
+        "percent": 2,
         "complete": false,
         "status": {
-            "ts": "2017-08-02T18:05:45Z",
-            "stdout": "Warning 1: No UNIDATA NC_GLOBAL:Conventions attribute\n",
-            "status": "running",
-            "log": "2017-08-02 18:05:44,923 DEBUG: Creating three hour (RedColorBar) concentration plot 23 of 24 \n"
+            "ts": "2019-09-05T21:11:36.106921Z",
+            "status": "starting_module",
+            "module": "dispersion"
         },
-        "run_id": "271b36a6-77ad-11e7-807e-3c15c2c6639e"
+        "runtime": {
+            "start": "2019-09-05T21:11:35Z",
+            "end": null
+        }
     }
 
 A completed run:
+
     {
+        "run_id": "79216046-d01c-11e9-b4ad-0242c0a8c007",
+        "initiated_at": "2019-09-05T20:33:52Z",
         "percent": 100,
-        "initiated_at": "2017-08-02T16:57:04Z",
+        "complete": true,
         "status": {
-            "ts": "2017-08-02T16:57:46Z",
-            "status": "completed"
+            "ts": "2019-09-05T20:34:16.425537Z",
+            "status": "completed",
+            "perc": 100
         },
-        "run_id": "9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
-        "output_url": "http://localhost:8886/bluesky-web-output/9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
-        "complete": true
+        "runtime": {
+            "start": "2019-09-05T20:33:52Z",
+            "end": "2019-09-05T20:34:16Z"
+        },
+        "version_info": {
+            "consumption": {
+                "version": "0.1.0",
+                "consume_version": "5.0.2"
+            },
+            "bluesky_version": "4.1.14",
+            "dispersion": {
+                "version": "0.1.0",
+                "vsmoke_version": "0.1.0"
+            },
+            "emissions": {
+                "version": "0.1.0",
+                "consume_version": "5.0.2",
+                "emitcalc_version": "2.0.1",
+                "eflookup_version": "3.1.2"
+            },
+            "export": {
+                "version": "0.1.0"
+            },
+            "fuelbeds": {
+                "version": "0.1.0",
+                "fccsmap_version": "2.1.0"
+            },
+            "timeprofile": {
+                "version": "0.1.1",
+                "timeprofile_version": "1.0.0"
+            }
+        },
+        "output_url": "http://localhost:8886/bluesky-web-output/79216046-d01c-11e9-b4ad-0242c0a8c007"
     }
 
 
 
 
-
-## GET /api/v1/runs/[<status>/]
+## GET /api/v4.1/runs/[<status>/]
 
 This API returns the status of multiple runs
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/runs/[<status>/]
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/runs/[<status>/]
  - optional query args:
   - limit (int)
   - offset (int)
@@ -100,22 +150,40 @@ This API returns the status of multiple runs
 ### Response
 
     {
+        "total": 114,
+        "limit": 10,
+        "offset": 0,
+        "count": 10,
         "runs": [
             {
+                "run_id": "<run_id>",
+                "initiated_at": "<ts>",
                 "percent": <float>,
+                "complete": <boolean>,
                 "queue": {
                     "name": "<queue_name>",
                     "position": <int>
                 },
-                "initiated_at": "<ts>",
-                "complete": <boolean>,
                 "status": {
                     "ts": "<ts>",
                     "status": "<str>",
                     "stdout": "<last_line_in_stdout>",
                     "log": "<last_line_in_log_file>"
                 },
-                "run_id": "<run_id>"
+                "runtime": {
+                    "start": "<YYYY-mm-ddTHH:MM:SSZ>",
+                    "end": "<YYYY-mm-ddTHH:MM:SSZ>"
+                },
+                "version_info": {
+                    "bluesky_version": "<bluesky_version",
+                    "<module_name>": {
+                        "version": "<module_version>",
+                        "<dependency_package>": "<package_version>",
+                        ...
+                    },
+                    ...
+                },
+                "output_url": "<url>"
             },
             ...
         ]
@@ -127,85 +195,101 @@ See notes under status API response, above
 
 All statuses, with limit and offset
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/?limit=3&offset=1" |python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/?limit=2&offset=1" |python -m json.tool
+
 
     {
+        "limit": 2,
+        "count": 2,
+        "total": 114,
+        "offset": 1,
         "runs": [
             {
-                "percent": 0,
-                "queue": {
-                    "name": "dri",
-                    "position": 2
+                "percent": 100,
+                "version_info": {
+                    "bluesky_version": "4.1.14",
+                    "emissions": {
+                        "eflookup_version": "3.1.2",
+                        "version": "0.1.0",
+                        "consume_version": "5.0.2",
+                        "emitcalc_version": "2.0.1"
+                    },
+                    ...
                 },
-                "initiated_at": "2017-08-02T18:09:27Z",
-                "complete": false,
+                "output_url": "http://localhost:8886/bluesky-web-output/test-asynch-request-20190905T211505",
+                "initiated_at": "2019-09-05T21:15:05Z",
+                "run_id": "test-asynch-request-20190905T211505",
+                "complete": true,
                 "status": {
-                    "ts": "2017-08-02T18:09:27Z",
-                    "status": "enqueued"
+                    "status": "completed",
+                    "perc": 100,
+                    "ts": "2019-09-05T21:20:05.605901Z"
                 },
-                "run_id": "e239a018-77ac-11e7-92f9-3c15c2c6639e"
-            },
-            {
-                "percent": 50,
-                "initiated_at": "2017-08-02T18:05:22Z",
-                "complete": false,
-                "status": {
-                    "ts": "2017-08-02T18:05:45Z",
-                    "stdout": "Warning 1: No UNIDATA NC_GLOBAL:Conventions attribute\n",
-                    "status": "running",
-                    "log": "2017-08-02 18:05:44,923 DEBUG: Creating three hour (RedColorBar) concentration plot 23 of 24 \n"
-                },
-                "run_id": "271b36a6-77ad-11e7-807e-3c15c2c6639e"
+                "runtime": {
+                    "start": "2019-09-05T21:15:05Z",
+                    "end": "2019-09-05T21:20:05Z"
+                }
             },
             {
                 "percent": 100,
-                "initiated_at": "2017-08-02T16:57:04Z",
-                "status": {
-                    "ts": "2017-08-02T16:57:46Z",
-                    "status": "completed"
+                "version_info": {
+                    ...
                 },
-                "run_id": "9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
-                "output_url": "http://localhost:8886/bluesky-web-output/9c3ca370-77a3-11e7-adb5-3c15c2c6639e",
-                "complete": true
+                "output_url": "http://localhost:8886/bluesky-web-output/test-asynch-request-20190905T211459",
+                "initiated_at": "2019-09-05T21:14:59Z",
+                "run_id": "test-asynch-request-20190905T211459",
+                "complete": true,
+                "status": {
+                    "status": "completed",
+                    "perc": 100,
+                    "ts": "2019-09-05T21:20:03.207871Z"
+                },
+                "runtime": {
+                    "start": "2019-09-05T21:15:00Z",
+                    "end": "2019-09-05T21:20:03Z"
+                }
             }
         ]
     }
+
 
 Only enqueued runs
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/enqueued" |python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/enqueued" |python -m json.tool
 
     {
+        "total": 1,
+        "limit": 10,
         "runs": [
             {
+                "run_id": "e239a018-77ac-11e7-92f9-3c15c2c6639e",
+                "initiated_at": "2019-09-05T21:15:30Z",
                 "percent": 0,
-                "queue": {
-                    "name": "dri",
-                    "position": 2
-                },
-                "initiated_at": "2017-08-02T18:09:27Z",
                 "complete": false,
-                "status": {
-                    "ts": "2017-08-02T18:09:27Z",
-                    "status": "enqueued"
+                "queue": {
+                    "name": "ca-nv_6-km",
+                    "position": 1
                 },
-                "run_id": "e239a018-77ac-11e7-92f9-3c15c2c6639e"
+                "status": {
+                    "status": "enqueued",
+                    "ts": "2019-09-05T21:15:30.834634Z"
+                }
             }
-        ]
+        ],
+        "offset": 0,
+        "count": 1
     }
 
 
 
 
-
-
-## GET /api/v1/runs/<guid>/output
+## GET /api/v4.1/runs/<guid>/output
 
 This API returns the output location for a specific run
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/runs/<guid>/output (/api/v1/run/<guid>/output is also supported for backwards compatibility)
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/runs/<guid>/output (/api/v4.1/run/<guid>/output is also supported for backwards compatibility)
  - method: GET
 
 ### Response
@@ -216,179 +300,97 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
 
 #### Plumerise run output
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123/output"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/8915adc2-d026-11e9-878c-0242c0a8d006/output"
 
-    {
-      "run_id": "9617845e-6c10-11e7-ace3-3c15c2c6639e",
-      "fire_information": [
-        {
-          "id": "96de73a2",
-          "growth": [
-            {
-              "start": "2014-05-29T17:00:00",
-              "plumerise": {
-                "2014-05-29T17:00:00": {
-                  "heights": [
-                    33.01197995675946,
-                    34.662578954597436,
-                    36.31317795243541,
-                    37.963776950273385,
-                    39.61437594811135,
-                    41.26497494594933,
-                    42.9155739437873,
-                    44.566172941625275,
-                    46.21677193946324,
-                    47.86737093730122,
-                    49.51796993513919,
-                    51.168568932977166,
-                    52.81916793081514,
-                    54.469766928653115,
-                    56.12036592649109,
-                    57.77096492432906,
-                    59.42156392216703,
-                    61.072162920005006,
-                    62.72276191784297,
-                    64.37336091568095,
-                    66.02395991351892
-                  ],
-                  "emission_fractions": [
-                    0.05, 0.05, 0.05, 0.05, 0.05,
-                    0.05, 0.05, 0.05, 0.05, 0.05,
-                    0.05, 0.05, 0.05, 0.05, 0.05,
-                    0.05, 0.05, 0.05, 0.05, 0.05
-                  ],
-                  "smolder_fraction": 0.0
-                },
-                ...
-                "2014-05-30T16:00:00": {
-                  "heights": [
-                    33.01197995675946,
-                    34.662578954597436,
-                    36.31317795243541,
-                    37.963776950273385,
-                    39.61437594811135,
-                    41.26497494594933,
-                    42.9155739437873,
-                    44.566172941625275,
-                    46.21677193946324,
-                    47.86737093730122,
-                    49.51796993513919,
-                    51.168568932977166,
-                    52.81916793081514,
-                    54.469766928653115,
-                    56.12036592649109,
-                    57.77096492432906,
-                    59.42156392216703,
-                    61.072162920005006,
-                    62.72276191784297,
-                    64.37336091568095,
-                    66.02395991351892
-                  ],
-                  "emission_fractions": [
-                    0.05, 0.05, 0.05, 0.05, 0.05,
-                    0.05, 0.05, 0.05, 0.05, 0.05,
-                    0.05, 0.05, 0.05, 0.05, 0.05,
-                    0.05, 0.05, 0.05, 0.05, 0.05
-                  ],
-                  "smolder_fraction": 0.0
-                }
-              },
-              "location": {
-                "longitude": -119.7615805,
-                "utc_offset": "-07:00",
-                "area": 10000,
-                "latitude": 37.909644,
-                "ecoregion": "western"
-              },
-              "end": "2014-05-30T17:00:00"
-            }
-          ],
-          "fuel_type": "natural",
-          "type": "wildfire"
-        }
-      ]
-    }
+    ...TODO: Fill in example...
+
 
 
 #### Dispersion run output
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/runs/abc123/output"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/test-asynch-request-20190905T211302/output"
 
     {
-        "netCDF": "dispersion-visualization/hysplit_conc.nc",
-        "kmzs": {
-            "fire": "dispersion-visualization/fire_locations.kmz",
-            "smoke": "dispersion-visualization/smoke_dispersion.kmz"
-        },
+        "root_url": "http://localhost:8886/bluesky-web-output/test-asynch-request-20190905T211302",
         "images": {
-            "1000m": {
-                "three_hour": {
-                    "RedColorBar": {
-                        "legend": "1000m_colorbar_three_hour.png",
-                        "directory": "images/1000m/three_hour/RedColorBar",
-                        "other_images": [],
-                        "series": [
-                            "1000m_three_hour_201405300100.png",
-                            ...,
-                            "1000m_three_hour_201405301000.png"
-                        ]
-                    }
-                },
-                "hourly": {
-                    "RedColorBar": {
-                        "legend": "1000m_colorbar_hourly.png",
-                        "directory": "images/1000m/hourly/RedColorBar",
-                        "other_images": [],
-                        "series": [
-                            "1000m_hourly_201405300000.png",
-                            ...,
-                            "1000m_hourly_201405301100.png"
-                        ]
-                    }
-                },
+            "100m": {
                 "daily_maximum": {
                     "UTC+0000": {
                         "RedColorBar": {
-                            "legend": "1000m_colorbar_daily_maximum_UTC+0000.png",
-                            "directory": "images/1000m/daily_maximum/UTC+0000/RedColorBar",
                             "other_images": [
-                                "1000m_daily_maximum_20140530_UTC+0000.png"
+                                "100m_daily_maximum_20140530_UTC+0000.png"
                             ],
-                            "series": []
-                        }
+                            "series": [],
+                            "directory": "images/100m/daily_maximum/UTC+0000/RedColorBar",
+                            "legend": "100m_colorbar_daily_maximum_UTC+0000.png"
+                        },
+                        ...
+                    },
+                    ...
+                },
+                "three_hour": {
+                    "RedColorBar": {
+                        "other_images": [],
+                        "series": [
+                            "100m_three_hour_201405300100.png",
+                            ...,
+                            "100m_three_hour_201405301000.png"
+                        ],
+                        "directory": "images/100m/three_hour/RedColorBar",
+                        "legend": "100m_colorbar_three_hour.png"
+                    },
+                    ...
+                },
+                "hourly": {
+                    "RedColorBar": {
+                        "other_images": [],
+                        "series": [
+                            "100m_hourly_201405300000.png",
+                            ...
+                            "100m_hourly_201405301100.png"
+                        ],
+                        "directory": "images/100m/hourly/RedColorBar",
+                        "legend": "100m_colorbar_hourly.png"
                     },
                     ...
                 },
                 "daily_average": {
                     "UTC+0000": {
                         "RedColorBar": {
-                            "legend": "1000m_colorbar_daily_average_UTC+0000.png",
-                            "directory": "images/1000m/daily_average/UTC+0000/RedColorBar",
                             "other_images": [
-                                "1000m_daily_average_20140530_UTC+0000.png"
+                                "100m_daily_average_20140530_UTC+0000.png"
                             ],
-                            "series": []
-                        }
+                            "series": [],
+                            "directory": "images/100m/daily_average/UTC+0000/RedColorBar",
+                            "legend": "100m_colorbar_daily_average_UTC+0000.png"
+                        },
+                        ...
                     },
-                    "UTC-0700": {
-                        "RedColorBar": {
-                            "legend": "1000m_colorbar_daily_average_UTC-0700.png",
-                            "directory": "images/1000m/daily_average/UTC-0700/RedColorBar",
-                            "other_images": [
-                                "1000m_daily_average_20140529_UTC-0700.png",
-                                "1000m_daily_average_20140530_UTC-0700.png"
-                            ],
-                            "series": []
-                        }
-                    }
+                    ...
                 }
-            },
-            "100m": {
-                ...
             },
             "500m": {
                 ...
+            },
+            "1000m": {
+                ...
             }
         },
-        "root_url": "http://localhost:8886/bluesky-web-output/abc123"
+        "version_info": {
+            "bluesky_version": "4.1.14",
+            "fuelbeds": {
+                "version": "0.1.0",
+                "fccsmap_version": "2.1.0"
+            },
+            ...
+        },
+        "kmzs": {
+            "fire": "extras-d2d2a91a-d9ef-4ed7-9cec-e3f41fde6507/fire_locations.kmz",
+            "smoke": "extras-d2d2a91a-d9ef-4ed7-9cec-e3f41fde6507/smoke_dispersion.kmz"
+        },
+        "netCDF": "extras-d2d2a91a-d9ef-4ed7-9cec-e3f41fde6507/hysplit_conc.nc",
+        "runtime": {
+            "start": "2019-09-05T21:13:02Z",
+            "end": "2019-09-05T21:17:47Z"
+        }
     }

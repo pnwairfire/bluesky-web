@@ -1,25 +1,25 @@
 ## Plumerise
 
-This API runs bluesky timeprofiling and plumerise modules.  (The
+This API runs bluesky timeprofile and plumerise modules.  (The
 bluesky web service runs FEPS plumerise which, unlike SEV plumerise,
-requires timeprofiling data.)
+requires timeprofile data.)
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/run/plumerise/<archive_type>/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/plumerise/<archive_type>/" \
  - method: POST
  - post data:
 
     {
-        "fire_information": [ ... ],
+        "fires": [ ... ],
         "config": { ... },
         "modules": [ ... ]
     }
 
 Like the fuelbeds and emissions APIS, the plumerise API requires
 posted JSON with three possible top level keys -
-'fire_information', and 'config', and 'modules'. The
-'fire_information' key is required, and it lists the one or
+'fires', and 'config', and 'modules'. The
+'fires' key is required, and it lists the one or
 more fires to process. The 'config' key is
 optional, and it specifies configuration data and other control
 parameters.  The 'modules' key is also optional, and is used to
@@ -41,38 +41,45 @@ status and output API requests (described below).
 
 ### Examples
 
-An example with fire location data specified as geojson
+An example with fire location data specified as a single point
 
     $ echo '{
-        "fire_information": [
+        "fires": [
             {
-                "growth": [
+                "activity": [
                     {
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        "consumption": {
-                            "summary": {
-                                "smoldering": 21712.600892425173,
-                                "flaming": 40988.711969791053,
-                                "residual": 13823.389194227209
+                        "active_areas": [
+                            {
+                                "start": "2015-11-24T17:00:00",
+                                "end": "2015-11-25T17:00:00",
+                                "utc_offset": "-07:00",
+                                "specified_points": [
+                                    {
+                                        "area": 10000,
+                                        "ecoregion": "western",
+                                        "lat": 37.909644,
+                                        "lng": -119.7615805,
+                                        "consumption": {
+                                            "summary": {
+                                                "smoldering": 21712.600892425173,
+                                                "flaming": 40988.711969791053,
+                                                "residual": 13823.389194227209
+                                            }
+                                        }
+                                    }
+                                ],
+                                "ecoregion": "western"
                             }
-                        },
-                        "location": {
-                            "area": 10000,
-                            "ecoregion": "western",
-                            "latitude": 37.909644,
-                            "longitude": -119.7615805,
-                            "utc_offset": "-07:00"
-                        }
+                        ]
                     }
                 ]
             }
         ]
     }' > dev/data/plumerise-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/plumerise/ca-nv_6-km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/plumerise/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
-        -d @dev/data/plumerise-input.json | python -m json.tool
+        -d @dev/data/plumerise-input.json
 
 
 
@@ -87,20 +94,20 @@ which is currently the only such model supported).
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/run/dispersion/<archive_type>/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/<archive_type>/" \
  - method: POST
  - post data:
 
     {
-        "fire_information": [ ... ],
+        "fires": [ ... ],
         "config": { ... },
         "modules": [ ... ]
     }
 
 Like with the plumerise API, this API requires posted JSON with three
-possible top level keys - 'fire_information', 'config', and 'modules.
-The 'fire_information' key is required, and must contain
-growth time windows with consumption, emissions, and plumerise data
+possible top level keys - 'fires', 'config', and 'modules.
+The 'fires' key is required, and must contain
+activity time windows with consumption, emissions, and plumerise data
 for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
 and num_hours.  The 'modules' key is optional.
@@ -124,7 +131,7 @@ The following is a simple example that runs dispersion for only
 one hour.
 
     $ echo '{
-        "fire_information": [
+        "fires": [
             {
                 "event_of": {
                     "id": "SF11E826544",
@@ -132,91 +139,103 @@ one hour.
                 },
                 "id": "SF11C14225236095807750",
                 "type": "wildfire",
-                "growth": [
+                "activity": [
                     {
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        "location": {
-                            "area": 10000,
-                            "ecoregion": "western",
-                            "latitude": 37.909644,
-                            "longitude": -119.7615805,
-                            "utc_offset": "-07:00"
-                        },
-                        "heat": {
-                            "summary": {
-                                "total": 3901187352927.508,
-                                "residual": 1312164844326.5745,
-                                "flaming": 1395852418045.9065,
-                                "smoldering": 1193170090555.0266
-                            }
-                        },
-                        "consumption": {
-                            "summary": {
-                                "smoldering": 21712.600892425173,
-                                "flaming": 40988.711969791053,
-                                "residual": 13823.389194227209
-                            }
-                        },
-                        "fuelbeds": [
+                        "active_areas": [
                             {
-                                "fccs_id": "49",
-                                "pct": 50.0,
-                                "emissions": {
-                                    "flaming": {
-                                        "PM2.5": [3002.3815120047017005]
+                                "start": "2014-05-29T17:00:00",
+                                "end": "2014-05-30T17:00:00",
+                                "utc_offset": "-07:00",
+                                "ecoregion": "western",
+                                "specified_points": [{
+                                    "area": 10000,
+                                    "lat": 37.909644,
+                                    "lng": -119.7615805,
+                                    "heat": {
+                                        "summary": {
+                                            "total": 3901187352927.508,
+                                            "residual": 1312164844326.5745,
+                                            "flaming": 1395852418045.9065,
+                                            "smoldering": 1193170090555.0266
+                                        }
                                     },
-                                    "residual": {
-                                        "PM2.5": [4002.621500211796271]
+                                    "consumption": {
+                                        "summary": {
+                                            "smoldering": 21712.600892425173,
+                                            "flaming": 40988.711969791053,
+                                            "residual": 13823.389194227209
+                                        }
                                     },
-                                    "smoldering": {
-                                        "PM2.5": [623.424985839975172]
+                                    "emissions": {
+                                        "summary": {
+                                            "PM2.5": 7604.0
+                                        }
+                                    },
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "49",
+                                            "pct": 50.0,
+                                            "emissions": {
+                                                "flaming": {
+                                                    "PM2.5": [3002.0]
+                                                },
+                                                "residual": {
+                                                    "PM2.5": [4002.0]
+                                                },
+                                                "smoldering": {
+                                                    "PM2.5": [600.0]
+                                                },
+                                                "total": {
+                                                    "PM2.5": [7604.0]
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "plumerise": {
+                                        "2014-05-29T17:00:00": {
+                                            "emission_fractions": [
+                                                0.05, 0.05, 0.05, 0.05, 0.05,
+                                                0.05, 0.05, 0.05, 0.05, 0.05,
+                                                0.05, 0.05, 0.05, 0.05, 0.05,
+                                                0.05, 0.05, 0.05, 0.05, 0.05
+                                            ],
+                                            "heights": [
+                                                3999.906231,
+                                                18808.46359175,
+                                                33617.0209525,
+                                                48425.57831325001,
+                                                63234.135674000005,
+                                                78042.69303475,
+                                                92851.25039550001,
+                                                107659.80775625001,
+                                                122468.36511700001,
+                                                137276.92247775002,
+                                                152085.4798385,
+                                                166894.03719925001,
+                                                181702.59456000003,
+                                                196511.15192075,
+                                                211319.70928150002,
+                                                226128.26664225,
+                                                240936.82400300002,
+                                                255745.38136375003,
+                                                270553.9387245,
+                                                285362.49608525,
+                                                300171.053446
+                                            ],
+                                            "smolder_fraction": 0.05
+                                        }
+                                    }
+                                }],
+                                "timeprofile": {
+                                    "2014-05-29T17:00:00": {
+                                        "area_fraction": 0.42643923240938175,
+                                        "flaming": 0.42643923240938175,
+                                        "residual": 0.42643923240938175,
+                                        "smoldering": 0.42643923240938175
                                     }
                                 }
                             }
-                        ],
-                        "timeprofile": {
-                            "2014-05-29T17:00:00": {
-                                "area_fraction": 0.42643923240938175,
-                                "flaming": 0.42643923240938175,
-                                "residual": 0.42643923240938175,
-                                "smoldering": 0.42643923240938175
-                            }
-                        },
-                        "plumerise": {
-                            "2014-05-29T17:00:00": {
-                                "emission_fractions": [
-                                    0.05, 0.05, 0.05, 0.05, 0.05,
-                                    0.05, 0.05, 0.05, 0.05, 0.05,
-                                    0.05, 0.05, 0.05, 0.05, 0.05,
-                                    0.05, 0.05, 0.05, 0.05, 0.05
-                                ],
-                                "heights": [
-                                    3999.906231,
-                                    18808.46359175,
-                                    33617.0209525,
-                                    48425.57831325001,
-                                    63234.135674000005,
-                                    78042.69303475,
-                                    92851.25039550001,
-                                    107659.80775625001,
-                                    122468.36511700001,
-                                    137276.92247775002,
-                                    152085.4798385,
-                                    166894.03719925001,
-                                    181702.59456000003,
-                                    196511.15192075,
-                                    211319.70928150002,
-                                    226128.26664225,
-                                    240936.82400300002,
-                                    255745.38136375003,
-                                    270553.9387245,
-                                    285362.49608525,
-                                    300171.053446
-                                ],
-                                "smolder_fraction": 0.05
-                            }
-                        }
+                        ]
                     }
                 ]
             }
@@ -229,7 +248,7 @@ one hour.
         }
     }' > dev/data/dispersion-hysplit-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/ca-nv_6-km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-hysplit-input.json | python -m json.tool
 
@@ -240,8 +259,8 @@ number of fuelbeds passed into consume. Since consume is called
 on each fuelbed separately, the arrays of consumption
 and emissions data will all be of length 1.
 
-Note that the growth start and end timestamps are local time, whereas the
-dispersion start time is in UTC.
+Note that the active area start and end timestamps are local time,
+whereas the dispersion start time is in UTC.
 
 
 ### Extra hysplit parameters
@@ -253,7 +272,7 @@ however, override any of these.  For example:
 
 
     $  echo '{
-        "fire_information": [
+        "fires": [
             .... same as previous example ....
         ],
         "config": {
@@ -299,7 +318,7 @@ however, override any of these.  For example:
         }
     }' > dev/data/dispersion-hysplit-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/ca-nv_6-km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-hysplit-input.json | python -m json.tool
 
@@ -351,9 +370,9 @@ grid is centered around the fire as much as possible without spilling
 outside of the default met.
 
 Note that grid_size is only supported for requests containing a single
-fire at a single lat/lng (e.g. not fires with multiple growth windows
-at different locations, and not fires with location defined as
-a polygon).
+fire with a single specified point (e.g. not fires with multiple activity
+windows, multiple active areas, or multiple specified points, and not fires
+with only perimeter polygon data).
 
 ### Conflicting options:
 
@@ -382,12 +401,12 @@ require emissions data.
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/run/all/<archive_type>/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/all/<archive_type>/" \
  - method: POST
  - post data:
 
     {
-        "fire_information": [ ... ],
+        "fires": [ ... ],
         "config": { ... },
         "modules": [ ... ]
     }
@@ -416,36 +435,43 @@ status and output API requests (described below).
                 ]
             },
             "dispersion": {
-                "num_hours": 24,
+                "num_hours": 1,
                 "start": "2014-05-30T00:00:00"
             }
         },
-        "fire_information": [
+        "fires": [
             {
+                "id": "SF11C14225236095807750",
+                "type": "wildfire",
                 "event_of": {
                     "id": "SF11E826544",
                     "name": "Natural Fire near Yosemite, CA"
                 },
-                "growth": [
+                "activity": [
                     {
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        "location": {
-                            "area": 10000,
-                            "ecoregion": "western",
-                            "latitude": 37.909644,
-                            "longitude": -119.7615805,
-                            "utc_offset": "-07:00"
-                        }
+                        "active_areas": [
+                            {
+                                "start": "2014-05-29T17:00:00",
+                                "end": "2014-05-30T17:00:00",
+                                "utc_offset": "-07:00",
+                                "ecoregion": "western",
+                                "specified_points": [
+                                    {
+                                        "area": 10000,
+                                        "lat": 37.909644,
+                                        "lng": -119.7615805
+                                    }
+                                ],
+                                "ecoregion": "western"
+                            }
+                        ]
                     }
-                ],
-                "id": "SF11C14225236095807750",
-                "type": "wildfire"
+                ]
             }
         ]
     }' > dev/data/all-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/ca-nv_6-km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/all/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/all-input.json | python -m json.tool
 
@@ -464,20 +490,20 @@ only such model supported).
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/run/dispersion/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/" \
  - method: POST
  - post data:
 
     {
-        "fire_information": [ ... ],
+        "fires": [ ... ],
         "config": { ... },
         "modules": [ ... ]
     }
 
 Again, this API requires posted JSON with three
-possible top level keys - 'fire_information', 'config', and 'modules'.
-The 'fire_information' key is required, and must contain emissions data,
-consumption data, growth time windows, and vsmoke meta fields (wind
+possible top level keys - 'fires', 'config', and 'modules'.
+The 'fires' key is required, and must contain emissions data,
+consumption data, activity time windows, and vsmoke meta fields (wind
 speed and wind direction) for each fire. The 'config' key is also
 required, to specify, at the very least, dispersion start time
 and num_hours. The 'modules' key is optional.
@@ -501,7 +527,7 @@ Unlike the hysplit request, above, this API requires both emissions
 and consumption data.
 
     $ echo '{
-        "fire_information": [
+        "fires": [
             {
                 "meta": {
                     "vsmoke": {
@@ -510,57 +536,66 @@ and consumption data.
                     }
                 },
                 "type": "wildfire",
-                "growth": [
+                "activity": [
                     {
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        "location": {
-                            "area": 10000,
-                            "ecoregion": "western",
-                            "latitude": 37.909644,
-                            "longitude": -119.7615805,
-                            "utc_offset": "-07:00"
-                        },
-                        "heat": {
-                            "summary": {
-                                "total": 3901187352927.508,
-                                "residual": 1312164844326.5745,
-                                "flaming": 1395852418045.9065,
-                                "smoldering": 1193170090555.0266
-                            }
-                        },
-                        "consumption": {
-                            "summary": {
-                                "smoldering": 21712.600892425173,
-                                "flaming": 40988.711969791053,
-                                "residual": 13823.389194227209
-                            }
-                        },
-                        "fuelbeds": [
+                        "active_areas": [
                             {
-                                "fccs_id": "49",
-                                "pct": 50.0,
-                                "emissions": {
-                                    "flaming": {
-                                        "PM2.5": [3000.3815120047017005]
+                                "start": "2014-05-29T17:00:00",
+                                "end": "2014-05-30T17:00:00",
+                                "utc_offset": "-07:00",
+                                "ecoregion": "western",
+                                "specified_points": [{
+                                    "area": 10000,
+                                    "lat": 37.909644,
+                                    "lng": -119.7615805,
+                                    "heat": {
+                                        "summary": {
+                                            "total": 3901187352927.508,
+                                            "residual": 1312164844326.5745,
+                                            "flaming": 1395852418045.9065,
+                                            "smoldering": 1193170090555.0266
+                                        }
                                     },
-                                    "residual": {
-                                        "PM2.5": [4200.621500211796271]
+                                    "consumption": {
+                                        "summary": {
+                                            "smoldering": 21712.600892425173,
+                                            "flaming": 40988.711969791053,
+                                            "residual": 13823.389194227209
+                                        }
                                     },
-                                    "smoldering": {
-                                        "PM2.5": [634.424985839975172]
+                                    "emissions": {
+                                        "summary": {
+                                            "PM2.5": 947.8303518313371
+                                        }
+                                    },
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "49",
+                                            "pct": 50.0,
+                                            "emissions": {
+                                                "flaming": {
+                                                    "PM2.5": [3002.3815120047017005]
+                                                },
+                                                "residual": {
+                                                    "PM2.5": [4002.621500211796271]
+                                                },
+                                                "smoldering": {
+                                                    "PM2.5": [623.424985839975172]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }],
+                                "timeprofile": {
+                                    "2014-05-29T17:00:00": {
+                                        "area_fraction": 0.42643923240938175,
+                                        "flaming": 0.42643923240938175,
+                                        "residual": 0.42643923240938175,
+                                        "smoldering": 0.42643923240938175
                                     }
                                 }
                             }
-                        ],
-                        "timeprofile": {
-                            "2014-05-29T17:00:00": {
-                                "area_fraction": 0.42643923240938175,
-                                "flaming": 0.42643923240938175,
-                                "residual": 0.42643923240938175,
-                                "smoldering": 0.42643923240938175
-                            }
-                        }
+                        ]
                     }
                 ]
             }
@@ -574,7 +609,7 @@ and consumption data.
         }
     }'  > dev/data/dispersion-vsmoke-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-vsmoke-input.json | python -m json.tool
 
@@ -587,8 +622,8 @@ for vsmoke.  The consumption data just needs to be categorized by
 categorized by phase (flaming, residual, smoldering) at the inner-most
 level.
 
-Note that the growth start and end timestamps are local time, whereas the
-dispersion start time is in UTC.
+Note that the active area start and end timestamps are local time,
+whereas the dispersion start time is in UTC.
 
 
 
@@ -602,12 +637,12 @@ consumption and emissions data.
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v1/run/all/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/all/" \
  - method: POST
  - post data:
 
     {
-        "fire_information": [ ... ],
+        "fires": [ ... ],
         "config": { ... },
         "modules": [ ... ]
     }
@@ -628,7 +663,7 @@ status and output API requests (described below).
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v1/run/all/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/all/" -H 'Content-Type: application/json' -d '
     {
         "config": {
             "emissions": {
@@ -642,7 +677,7 @@ status and output API requests (described below).
                 "model": "vsmoke"
             }
         },
-        "fire_information": [
+        "fires": [
             {
                 "meta": {
                     "vsmoke": {
@@ -650,26 +685,32 @@ status and output API requests (described below).
                         "ws": 12
                     }
                 },
+                "id": "SF11C14225236095807750",
+                "type": "wildfire",
                 "event_of": {
                     "id": "SF11E826544",
                     "name": "Natural Fire near Yosemite, CA"
                 },
-                "growth": [
+                "activity": [
                     {
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        "pct": 100.0,
-                        "location": {
-                            "area": 10000,
-                            "ecoregion": "western",
-                            "latitude": 37.909644,
-                            "longitude": -119.7615805,
-                            "utc_offset": "-07:00"
-                        }
+                        "active_areas": [
+                            {
+                                "start": "2014-05-29T17:00:00",
+                                "end": "2014-05-30T17:00:00",
+                                "utc_offset": "-07:00",
+                                "ecoregion": "western",
+                                "specified_points": [
+                                    {
+                                        "area": 10000,
+                                        "lat": 37.909644,
+                                        "lng": -119.7615805
+                                    }
+                                ],
+                                "ecoregion": "western"
+                            }
+                        ]
                     }
-                ],
-                "id": "SF11C14225236095807750",
-                "type": "wildfire"
+                ]
             }
         ]
     }' | python -m json.tool

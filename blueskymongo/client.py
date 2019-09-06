@@ -1,3 +1,8 @@
+"""blueskymongo.client"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+
 import datetime
 import ssl
 from urllib.parse import urlparse

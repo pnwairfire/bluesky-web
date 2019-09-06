@@ -1,0 +1,164 @@
+#! /usr/bin/env python3
+
+"""For adhoc testing BlueSkyRunner class.
+"""
+
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2017, AirFire, PNW, USFS"
+
+import datetime
+import io
+import json
+import logging
+import os
+import sys
+import traceback
+import uuid
+
+import afscripting as scripting
+
+sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
+
+# Note: tornado, blueskyweb.app.configure_logging and
+#   from blueskyworker.tasks are imported inline so that
+#   the you can run this script with `-h` without needing tornado
+#   and other python pacakges installed in your local (non-docker)
+#   python env
+
+
+DOCKER_RUN_STR = """docker run --rm -ti \\
+    --network bluesky-web_default \\
+    --link bluesky-web-mongo:mongo \\
+    -v $PWD:/usr/src/blueskyweb/ \\
+    -v $PWD/dev/data/output/:/data/bluesky/output/ \\
+    -w /usr/src/blueskyweb/ \\
+    bluesky-web"""
+
+# Note: the trailing space seems to be the only way to add an extra trailing line
+EPILOG_STR = """
+Examples:
+
+ $ {docker_run} {script_name} --log-level=DEBUG \\
+    -r 908234-23484jdwr980-234234 -v 1
+
+""".format(docker_run=DOCKER_RUN_STR, script_name=sys.argv[0])
+
+
+
+REQUIRED_ARGS = [
+    {
+        'short': '-r',
+        'long': '--run-id',
+        "help": "id of existing run"
+    },
+    {
+        'short': '-v',
+        'long': '--api-version',
+        'help': "1 or 4.1"
+    }
+]
+
+OPTIONAL_ARGS = [
+    {
+        'short': '-m',
+        'long': '--mongodb-url',
+        'help': ('url to connect to mongodb for arl '
+            'indexes and bsp job queues'),
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb"
+    },
+    {
+        'long': "--indent",
+        "help": "json indentation",
+        "type": int
+    },
+    {
+        'short': '-o',
+        'long': '--output-file'
+    }
+]
+
+POSITIONAL_ARGS = []
+
+
+def parse_args():
+    parser = scripting.args.ArgumentParser()
+    parser.epilog = EPILOG_STR
+    parser.formatter_class = scripting.args.RawTextHelpFormatter
+    scripting.args.add_arguments(parser, OPTIONAL_ARGS)
+    scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
+    scripting.args.add_arguments(parser, POSITIONAL_ARGS)
+    # Use afscripting to add logging options to the parser object,
+    # but we'll configure logging oureselves
+    scripting.args.add_logging_options(parser)
+    args = parser.parse_args()
+    args.log_message_format = (args.log_message_format
+        or "%(threadName)-0s %(asctime)s %(levelname)s %(filename)s#%(funcName)s: %(message)s")
+    from blueskyweb.app import configure_logging
+    configure_logging(**args.__dict__)
+    return args
+
+def handle_error(status, msg, exception=None):
+    logging.error('Failed: %s', msg)
+    if exception:
+        tornado.log.gen_log.debug(traceback.format_exc())
+        logging.error('Excepton: %s', exception)
+    sys.exit(1)
+
+
+class import_error_handler(object):
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, e_type, value, tb):
+        if e_type == ImportError:
+            print("""
+Run in docker:
+
+ $ {docker_run} {script_name} -h
+""".format(docker_run=DOCKER_RUN_STR, script_name=sys.argv[0]))
+            exit(1)
+
+class OutStream(object):
+    def __init__(self):
+        self.s = io.StringIO()
+
+    def write(self, val):
+        if not hasattr(val, 'lower'):
+            val = json.dumps(val)
+
+        self.s.write(val)
+
+async def get_output(args):
+    from blueskyweb.lib.runs.output import BlueSkyRunOutput
+    from blueskyworker.tasks import BlueSkyWebDB
+
+    out_str = OutStream()
+    mongo_db = BlueSkyWebDB(args.mongodb_url)
+
+    await BlueSkyRunOutput(args.api_version, mongo_db,
+        handle_error, out_str).process(args.run_id)
+
+    return json.loads(out_str.s.getvalue())
+
+async def main(args):
+    data = await get_output(args)
+
+    logging.debug('About to dump to stdout')
+    data = json.dumps(data, indent=args.indent)
+    if args.output_file:
+        with open(args.output_file, 'w') as f:
+            f.write(data)
+    else:
+        sys.stdout.write(data + '\n')
+
+if __name__ == "__main__":
+    with import_error_handler() as i:
+        args = parse_args()
+
+        os.environ["MONGODB_URL"] = args.mongodb_url
+
+        from functools import partial
+        main = partial(main, args=args)
+        import tornado.ioloop
+        tornado.ioloop.IOLoop.instance().run_sync(main)

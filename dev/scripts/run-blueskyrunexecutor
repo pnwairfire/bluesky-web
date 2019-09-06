@@ -1,0 +1,437 @@
+#! /usr/bin/env python3
+
+"""For adhoc testing BlueSkyRunExecutor class.
+"""
+
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2017, AirFire, PNW, USFS"
+
+import datetime
+import io
+import json
+import logging
+import os
+import sys
+import traceback
+import uuid
+
+import afscripting as scripting
+
+sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
+
+# Note: tornado, blueskyweb.app.configure_logging and
+#   from blueskyworker.tasks are imported inline so that
+#   the you can run this script with `-h` without needing tornado
+#   and other python pacakges installed in your local (non-docker)
+#   python env
+from blueskyconfig.defaults import DEFAULTS
+
+
+_NOW = datetime.datetime.utcnow()
+RUN_ID = 'BlueSkyRunExecutor-' + _NOW.strftime('%Y%m%dT%H%M%S')
+INPUT = {
+    "run_id": RUN_ID,
+    "config": {
+        "emissions": {
+            "species": ["PM2.5"]
+        },
+        "findmetdata": {
+            "arl": {
+                "fewer_arl_files": True,
+                "index_filename_pattern": None,  # WILL BE FILLED IN
+            },
+            "met_root_dir": None  # WILL BE FILLED IN
+        },
+        "dispersion": {
+            "start": None,  # WILL BE FILLED IN
+            "num_hours": None,  # WILL BE FILLED IN
+            "output_dir": "/data/bluesky/output/{}/output".format(RUN_ID),
+            "working_dir": "/data/bluesky/output/{}/working".format(RUN_ID),
+            'hysplit': {
+                "DELT": 0.0,
+                "INITD": 0,
+                "KHMAX": 72,
+                "MAXPAR": 1000000000,
+                "MPI": True,
+                "NCPUS": 2,
+                "NINIT": 0,
+                "NUMPAR": 1000,
+                "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
+                "VERTICAL_LEVELS": [
+                    100
+                ],
+                "grid": None,  # WILL BE FILLED IN
+            }
+        },
+        "export": {
+            "extra_exports": ["dispersion", "visualization", "extrafiles"]
+        }
+    }
+}
+
+FIRES_DATA = {
+    '1': {
+        "fire_information": [
+            {
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
+                },
+                "id": "SF11C14225236095807750",
+                "type": "wildfire",
+                "fuel_type": "natural",
+                "growth": [
+                    {
+                        "start": None,  # WILL BE FILLED IN
+                        "end": None,  # WILL BE FILLED IN
+                        "location": {
+                            "area": None,  # WILL BE FILLED IN
+                            "ecoregion": "western",
+                            "latitude": None,  # WILL BE FILLED IN
+                            "longitude": None,  # WILL BE FILLED IN
+                            "utc_offset": None,  # WILL BE FILLED IN
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    '4.1': {
+        "fires": [
+            {
+                "id": "SF11C14225236095807750",
+                "event_id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "start": None,  # WILL BE FILLED IN
+                                "end": None,  # WILL BE FILLED IN
+                                "specified_points": [
+                                    {
+                                        "lat": None,  # WILL BE FILLED IN
+                                        "lng": None,  # WILL BE FILLED IN
+                                        "area": None,  # WILL BE FILLED IN
+                                    }
+                                ],
+                                "ecoregion": "western",
+                                "utc_offset": None,  # WILL BE FILLED IN
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+
+
+
+# Note: the trailing space seems to be the only way to add an extra trailing line
+EPILOG_STR = """
+Examples:
+
+Run fuelbeds in process:
+
+ $ docker run --rm -ti \\
+    --network bluesky-web_default \\
+    --link bluesky-web-rabbitmq:rabbit \\
+    --link bluesky-web-mongo:mongo \\
+    -v $PWD:/usr/src/blueskyweb/ \\
+    -v $HOME/Met:/data/Met/ \\
+    -v $PWD/dev/data/output/:/data/bluesky/output/ \\
+    -w /usr/src/blueskyweb/ \\
+    bluesky-web {script_name} --log-level=DEBUG -v 1 \\
+    fuelbeds
+
+Run fuelbeds asynchronously:
+
+ $ docker run --rm -ti \\
+    --network bluesky-web_default \\
+    --link bluesky-web-rabbitmq:rabbit \\
+    --link bluesky-web-mongo:mongo \\
+    -v $PWD:/usr/src/blueskyweb/ \\
+    -v $HOME/Met:/data/Met/ \\
+    -v $PWD/dev/data/output/:/data/bluesky/output/ \\
+    -w /usr/src/blueskyweb/ \\
+    bluesky-web {script_name} --log-level=DEBUG -v 1 \\
+    --run-asynchronously \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
+    --rabbitmq-url amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671 \\
+    fuelbeds
+
+Run fuelbeds though dispersion in process:
+
+ $ docker run --rm -ti \\
+    --network bluesky-web_default \\
+    --link bluesky-web-rabbitmq:rabbit \\
+    --link bluesky-web-mongo:mongo \\
+    -v $PWD:/usr/src/blueskyweb/ \\
+    -v $HOME/Met:/data/Met/ \\
+    -v $PWD/dev/data/output/:/data/bluesky/output/ \\
+    -w /usr/src/blueskyweb/ \\
+    bluesky-web {script_name} --log-level=DEBUG -v 4.1 \\
+    --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
+    -s 2019-07-26T00:00:00 -n 12 \\
+    -a 500 --lat 45.12 --lng -120 \\
+    --met-archive pacific_northwest_4-km \\
+    fuelbeds consumption emissions \\
+    timeprofile findmetdata localmet plumerise \\
+    dispersion visualization
+
+ """.format(script_name=sys.argv[0])
+
+
+
+REQUIRED_ARGS = [
+    {
+        'short': '-v',
+        'long': '--api-version',
+        'help': "Must be one of the following: {}".format(
+            ', '.join(FIRES_DATA.keys()))
+    }
+]
+
+OPTIONAL_ARGS = [
+    {
+        'short': '-m',
+        'long': '--mongodb-url',
+        'help': ('url to connect to mongodb for arl '
+            'indexes and bsp job queues'),
+        'default': "mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb"
+    },
+    {
+        'short': '-r',
+        'long': '--rabbitmq-url',
+        'help': 'url to connect to rabbitmq for enqueueing asynchronous runs',
+        'default': "amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671"
+    },
+    {
+        'short': '-s',
+        'long': '--start',
+        'help': "UTC start time of hysplit run; e.g. '2015-08-15T00:00:00'",
+        'action': scripting.args.ParseDatetimeAction,
+        'default': datetime.datetime(_NOW.year, _NOW.month, _NOW.day)
+    },
+    {
+        'short': '-n',
+        'long': '--num-hours',
+        'help': 'number of hours in hysplit run',
+        "type": int,
+        'default': 12
+    },
+    {
+        'short': '-a',
+        'long': '--area',
+        'help': 'area of fire, in acres; default 10000',
+        "type": float,
+        'default': 10000.0
+    },
+    {
+        'long': "--lat",
+        'help': 'latitude of fire location; default: 37.909644',
+        'default':  37.909644,
+        'type': float
+    },
+    {
+        'long': "--lng",
+        'help': 'longitude of fire location; default: -119.7615805',
+        'default': -119.7615805,
+        'type': float
+    },
+    {
+        'long': "--utc-offset",
+        'help': 'utc offest of fire location; default: "-07:00"',
+        'default': '-07:00'
+    },
+    {
+        'long': "--met-archive",
+        'help': "met archive; default 'pacific_northwest_4-km'",
+        'default': 'pacific_northwest_4-km'
+    },
+    {
+        'long': "--indent",
+        "help": "json indentation",
+        "type": int
+    },
+    {
+        'long': '--run-asynchronously',
+        'action': 'store_true'
+    },
+    {
+        'short': '-o',
+        'long': '--output-file'
+    }
+]
+
+POSITIONAL_ARGS = [
+    {
+        'long': 'modules',
+        'nargs': '*'
+    }
+]
+
+
+def parse_args():
+    parser = scripting.args.ArgumentParser()
+    parser.epilog = EPILOG_STR
+    parser.formatter_class = scripting.args.RawTextHelpFormatter
+    scripting.args.add_arguments(parser, OPTIONAL_ARGS)
+    scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
+    scripting.args.add_arguments(parser, POSITIONAL_ARGS)
+    # Use afscripting to add logging options to the parser object,
+    # but we'll configure logging oureselves
+    scripting.args.add_logging_options(parser)
+    args = parser.parse_args()
+    args.log_message_format = (args.log_message_format
+        or "%(threadName)-0s %(asctime)s %(levelname)s %(filename)s#%(funcName)s: %(message)s")
+    from blueskyweb.app import configure_logging
+    configure_logging(**args.__dict__)
+    return args
+
+MET_ROOT_DIRS = {
+    "national_12-km": "/data/Met/NAM/12km/ARL/",
+    "national_3-km": "/data/Met/NAM/3km/ARL/",
+    "pacific_northwest_1.33-km": "/data/Met/PNW/1.33km/ARL/",
+    "pacific_northwest_4-km": "/data/Met/PNW/4km/ARL/",
+    "ca-nv_1.33-km": "/data/Met/CANSAC/1.33km/ARL/",
+    "ca-nv_4-km": "/data/Met/CANSAC/4km/ARL/"
+}
+DT_STR = '%Y-%m-%dT%H:%M:%S'
+def get_input(args):
+    archive = (DEFAULTS['archives']['standard'].get(args.met_archive)
+        or DEFAULTS['archives']['fast'].get(args.met_archive)
+        or DEFAULTS['archives']['special'].get(args.met_archive))
+    if not archive or args.met_archive not in MET_ROOT_DIRS:
+        print('** ERROR - Archive not supported: %s', args.met_archive)
+        print('**    (choose from  %s)', ', '.join(list(MET_ROOT_DIRS.keys())))
+
+    domain = DEFAULTS['domains'][archive['domain_id']]
+    INPUT['config']['findmetdata']['arl']['index_filename_pattern'] = domain['arl_index_file']
+    INPUT['config']['findmetdata']['met_root_dir'] = MET_ROOT_DIRS[args.met_archive]
+
+    start_str = args.start.strftime(DT_STR)
+    INPUT['config']['dispersion']['start'] = start_str
+    INPUT['config']['dispersion']['num_hours'] = args.num_hours
+    INPUT['config']['dispersion']['hysplit']['grid'] = domain['grid']
+    local_start_str = (
+        args.start + datetime.timedelta(hours=-7)).strftime(DT_STR)
+    local_end_str = (
+        args.start + datetime.timedelta(hours=args.num_hours-7)).strftime(DT_STR)
+
+    if args.api_version not in FIRES_DATA:
+        print('** ERROR - API version not supported: %s', args.api_version)
+        print('**    (choose from  %s)', ', '.join(FIRES_DATA.keys()))
+
+    INPUT.update(FIRES_DATA[args.api_version])
+    if args.api_version == '1':
+        INPUT['fire_information'][0]['growth'][0]['start'] = local_start_str
+        INPUT['fire_information'][0]['growth'][0]['end'] = local_end_str
+        INPUT['fire_information'][0]['growth'][0]['location']['area'] = args.area
+        INPUT['fire_information'][0]['growth'][0]['location']['latitude'] = args.lat
+        INPUT['fire_information'][0]['growth'][0]['location']['longitude'] = args.lng
+        INPUT['fire_information'][0]['growth'][0]['location']['utc_offset'] = args.utc_offset
+    else:
+        INPUT['fires'][0]['activity'][0]['active_areas'][0]["start"] = local_start_str
+        INPUT['fires'][0]['activity'][0]['active_areas'][0]["end"] = local_end_str
+        INPUT['fires'][0]['activity'][0]['active_areas'][0]["specified_points"][0]["lat"] = args.lat
+        INPUT['fires'][0]['activity'][0]['active_areas'][0]["specified_points"][0]["lng"] = args.lng
+        INPUT['fires'][0]['activity'][0]['active_areas'][0]["specified_points"][0]["area"] = args.area
+        INPUT['fires'][0]['activity'][0]['active_areas'][0]["utc_offset"] = args.utc_offset
+
+    INPUT['modules'] = args.modules
+    return INPUT
+
+def handle_error(status, msg, exception=None):
+    logging.error('Failed: %s', msg)
+    if exception:
+        tornado.log.gen_log.debug(traceback.format_exc())
+        logging.error('Excepton: %s', exception)
+    sys.exit(1)
+
+
+def inline_imports():
+    # We need to import inline after MONGDB_URL and RABBITMQ_URL env vars
+    # are set.
+    try:
+        from blueskyworker import tasks
+        from blueskyweb.lib.runs.execute import BlueSkyRunExecutor, ExecuteMode
+        return tasks, BlueSkyRunExecutor, ExecuteMode
+    except ImportError as e:
+        print("""
+    Run in docker:
+
+     $ docker run --rm -ti \\
+        -v $PWD:/usr/src/blueskyweb/ \\
+        -v $HOME/Met:/data/Met/ \\
+        -v $PWD/dev/data/output/:/data/bluesky/output/ \\
+        -w /usr/src/blueskyweb/ \\
+        bluesky-web {script_name} -h
+        """.format(script_name=sys.argv[0]))
+        exit(1)
+
+
+class OutStream(object):
+    def __init__(self):
+        self.s = io.StringIO()
+
+    def write(self, val):
+        if not hasattr(val, 'lower'):
+            val = json.dumps(val)
+
+        self.s.write(val)
+
+async def execute(data, args):
+    tasks, BlueSkyRunExecutor, ExecuteMode = inline_imports()
+
+    out_str = OutStream()
+    logging.debug('About to run')
+
+    settings = {
+        "mongodb_url": args.mongodb_url,
+        "mongo_db": tasks.BlueSkyWebDB(args.mongodb_url),
+        "output_root_dir": "/data/bluesky/output/",
+        'output_url_path_prefix': ''
+    }
+    hysplit_query_params = {
+        # TODO: add script args to set these?
+    }
+    executor = BlueSkyRunExecutor(args.api_version, 'all', args.met_archive,
+        handle_error, out_str, settings, hysplit_query_params)
+    execute_mode = (ExecuteMode.ASYNC if args.run_asynchronously
+        else ExecuteMode.IN_PROCESS)
+    await executor.execute(data, execute_mode=execute_mode)
+    return json.loads(out_str.s.getvalue())
+
+async def main(args):
+    input = get_input(args)
+    data = await execute(INPUT, args)
+    if args.run_asynchronously:
+        # TODO: poll run status until it completes, and then
+        #  set 'data' to output
+        pass
+
+    logging.debug('About to dump to stdout')
+    data = json.dumps(data, indent=args.indent)
+    if args.output_file:
+        with open(args.output_file, 'w') as f:
+            f.write(data)
+    else:
+        sys.stdout.write(data + '\n')
+
+if __name__ == "__main__":
+    args = parse_args()
+    if args.run_asynchronously and not args.rabbitmq_url:
+        print("*** Error:  '-r'/'--rabbitmq-url' required when"
+            " --run-asynchronously is used")
+        sys.exit(1)
+
+    os.environ["MONGODB_URL"] = args.mongodb_url
+    os.environ["RABBITMQ_URL"] = args.rabbitmq_url
+
+    from functools import partial
+    main = partial(main, args=args)
+    import tornado.ioloop
+    tornado.ioloop.IOLoop.instance().run_sync(main)

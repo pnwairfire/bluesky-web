@@ -1,20 +1,33 @@
 Initiate plumerise:
 
-    curl "https://www.blueskywebhost.com/bluesky-web-test/api/v1/run/plumerise/NAM84/" \
+    curl "https://www.blueskywebhost.com/bluesky-web-test/api/v4.1/run/plumerise/NAM84/" \
         -H 'Content-Type: application/json' -d '{
-            "fire_information": [
+            "fires": [
                 {
-                    "growth": [
+                    "id": "SF11C14225236095807750",
+                    "type": "natural"
+                    "event_of": {
+                        "id": "SF11E826544",
+                        "name": "Natural Fire near Yosemite, CA"
+                    },
+                    "activity": [
                         {
-                            "start": "2017-07-18T17:00:00",
-                            "end": "2017-07-19T17:00:00",
-                            "location": {
-                                "area": 10000,
-                                "ecoregion": "western",
-                                "latitude": 37.909644,
-                                "longitude": -119.7615805,
-                                "utc_offset": "-07:00"
-                            }
+                            "active_areas": [
+                                {
+                                    "start": "2017-07-18T17:00:00",
+                                    "end": "2017-07-19T17:00:00",
+                                    "utc_offset": "-07:00",
+                                    "specified_points": [
+                                        {
+                                            "area": 10000,
+                                            "ecoregion": "western",
+                                            "lat": 37.909644,
+                                            "lng": -119.7615805
+                                        }
+                                    ],
+                                    "ecoregion": "western"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -23,8 +36,8 @@ Initiate plumerise:
 
 Check status:
 
-    curl "https://www.blueskywebhost.com/bluesky-web-test/api/v1/runs/$RUN_ID/"
+    curl "https://www.blueskywebhost.com/bluesky-web-test/api/v4.1/runs/$RUN_ID/"
 
 Get output:
 
-    curl https://www.blueskywebhost.com/bluesky-web-test/api/v1/runs/$RUN_ID/output
+    curl https://www.blueskywebhost.com/bluesky-web-test/api/v4.1/runs/$RUN_ID/output

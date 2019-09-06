@@ -76,7 +76,7 @@ These can be run outside of docker. See the helpstrings for
 the following two scripts for examples
 
     ./dev/scripts/web-regression-test.sh
-    ./dev/scripts/test-asynch-request.py -h
+    ./dev/scripts/test-async-request.py -h
 
 
 
@@ -178,4 +178,4 @@ run query on command line
 
 or just load api
 
-    https://www.blueskywebhost.com/bluesky-web/api/v1/runs/enqueued/
+    https://www.blueskywebhost.com/bluesky-web/api/v4.1/runs/enqueued/

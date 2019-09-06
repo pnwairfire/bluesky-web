@@ -1,18 +1,17 @@
+"""blueskyworker.tasks"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+
 import datetime
-import getpass
-import glob
 import json
 import logging
 import re
 import os
 import ssl
-import subprocess
-import tarfile
 import threading
-import time
+import traceback
 import uuid
-from io import BytesIO
-from urllib.parse import urlparse
 
 import ipify
 import tornado.log
@@ -20,8 +19,11 @@ from celery import Celery
 from bluesky import (
     exceptions, models, __version__ as bluesky_version
 )
+from bluesky.config import Config
 
 from blueskymongo.client import BlueSkyWebDB, RunStatuses
+
+from .monitor import monitor_run
 
 # mongodb used for recording run information, status, etc.
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
@@ -70,7 +72,9 @@ def run_bluesky(input_data, **settings):
     if hasattr(input_data, 'lower'):
         input_data = json.loads(input_data)
 
-    return BlueSkyRunner(input_data, db=db, **settings).run()
+    t = BlueSkyRunner(input_data, db=db, **settings)
+    t.start()
+    t.join() # block until it completes
 
 
 ##
@@ -110,100 +114,7 @@ class configure_logging:
         root_logger.removeHandler(self.log_file_handler)
 
 
-class HysplitMonitor(threading.Thread):
-    """Monitor thread that scrapes hysplit MESSAGE files to determine
-    how many hours are complete
-    """
-    def __init__(self, m, fires_manager, record_run_func):
-        super(HysplitMonitor, self).__init__()
-        self.m = m
-        self.fires_manager = fires_manager
-        self.start_hour = self.fires_manager.get_config_value(
-            'dispersion', 'start')
-        self.num_hours = self.fires_manager.get_config_value(
-            'dispersion', 'num_hours')
-
-        self.record_run_func = record_run_func
-        self.terminate = False
-        self._message_file_name = None
-
-    @property
-    def message_file_name(self):
-        if self._message_file_name is None:
-            # this code will run again if no message files are found
-            working_dir = self.fires_manager.get_config_value(
-                'dispersion', 'working_dir')
-            mp1 = os.path.join(working_dir, 'MESSAGE')
-            if os.path.exists(mp1):
-                self._message_file_name = mp1
-            else:
-                mpN = os.path.join(working_dir, 'MESSAGE.001')
-                if os.path.exists(mpN):
-                    self._message_file_name = mpN
-
-        return self._message_file_name
-
-    def run(self):
-        while not self.terminate:
-            self.check_progress()
-            time.sleep(5)
-
-    def check_progress(self):
-        percent_complete = 2
-        if self.message_file_name:
-            try:
-                # estimate percent complete based on slowest of
-                # all hysplit processes
-                current_hour = self.get_current_hour()
-                # we want percent_complete to be between 3 and 90
-                percent_complete = int((90 * (current_hour / self.num_hours)) + 2)
-            except Exception as e:
-                tornado.log.gen_log.info("Failed to check progress: %s", e)
-
-        # else, leave at 2
-        tornado.log.gen_log.info("Run %s hysplit %d complete",
-            self.fires_manager.run_id, percent_complete)
-
-        self.record_run_func(RunStatuses.RunningModule, module=self.m,
-            percent_complete=percent_complete)
-
-    def get_current_hour(self):
-        output_lines = [l for l in subprocess.check_output(
-            ["grep", "output", self.message_file_name]).decode().split('\n') if l]
-        return len(output_lines)
-
-
-class monitor_run(object):
-
-    def __init__(self, m, fires_manager, record_run_func):
-        tornado.log.gen_log.info("Constructing monitor_run context manager")
-        self.m = m
-        self.fires_manager = fires_manager
-        self.record_run_func = record_run_func
-        self.thread = None
-
-    def __enter__(self):
-        tornado.log.gen_log.info("Entering monitor_run context manager")
-        if self._is_hysplit():
-            tornado.log.gen_log.info("Starting thread to monitor hysplit")
-            self.thread = HysplitMonitor(self.m, self.fires_manager, self.record_run_func)
-            self.thread.start()
-
-    def __exit__(self, e_type, value, tb):
-        if self.thread:
-            self.thread.terminate = True
-            tornado.log.gen_log.info("joining hysplit monitoring thread")
-            self.thread.join()
-
-    def _is_hysplit(self):
-        if self.m =='dispersion':
-            model = self.fires_manager.get_config_value(
-                'dispersion', 'model', default='hysplit')
-            return model == 'hysplit'
-        return False
-
-
-class BlueSkyRunner(object):
+class BlueSkyRunner(threading.Thread):
 
     def __init__(self, input_data, output_stream=None, db=None, **settings):
         """Constructor
@@ -222,19 +133,34 @@ class BlueSkyRunner(object):
         otherwise, we'll mount to host machines /tmp/, since we'll just
         read it here and then forget about it.
         """
+        super().__init__()
         self.input_data = input_data
         self.output_stream = output_stream
         self.db = db
         self.settings = settings
+        self.exception = None
 
     def run(self):
-        self.input_data['run_id'] = (self.input_data.get('run_id')
-            or str(uuid.uuid1()).replace('-',''))
-        if not self.output_stream:
-            self._set_output_params()
-            self._set_output_url()
+        try:
+            self.input_data['run_id'] = (self.input_data.get('run_id')
+                or str(uuid.uuid1()).replace('-',''))
+            # self.input_data will be set to an empty dict when ingested by
+            # FiresManager, so record run_id
+            self.run_id = self.input_data['run_id']
+            if not self.output_stream:
+                self._set_output_params()
+                self._set_output_url()
 
-        return self._run_bsp()
+            return self._run_bsp()
+
+        except Exception as e:
+            self.exception = BlueSkyJobError(str(e))
+            tornado.log.gen_log.debug(traceback.format_exc())
+            self._record_run(RunStatuses.Failed,
+                error={"message": str(e)})
+            # store exception rather than raise it so
+            # that main thread can act on it
+
 
     ##
     ## Setup
@@ -244,7 +170,7 @@ class BlueSkyRunner(object):
         self.output_dir = os.path.abspath(os.path.join(
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'],
-            self.input_data['run_id']))
+            self.run_id))
         os.makedirs(self.output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
         tornado.log.gen_log.debug('Output dir: %s', self.output_dir)
         self.output_json_filename = os.path.join(
@@ -258,7 +184,7 @@ class BlueSkyRunner(object):
             if self.settings.get('output_url_port') else '')
         prefix = (self.settings.get('output_url_path_prefix') or '').strip('/')
         self.output_url = "{}://{}{}/{}/{}".format(
-            scheme, HOSTNAME, port_str, prefix, self.input_data['run_id'])
+            scheme, HOSTNAME, port_str, prefix, self.run_id)
 
     ##
     ## Execution
@@ -268,37 +194,33 @@ class BlueSkyRunner(object):
         """Runs bluesky in-process, running each module individually for
         finer granularity in status logging.
         """
-        try:
-            if self.output_stream:
-                return self._run_bsp_modules()
+        if self.output_stream:
+            return self._run_bsp_modules()
 
-            else:
-                with configure_logging(self.output_log_filename, **self.settings) as foo:
-                    error = self._run_bsp_modules()
+        else:
+            with configure_logging(self.output_log_filename, **self.settings) as foo:
+                error = self._run_bsp_modules()
 
-                data = {
-                    'output_url': self.output_url,
-                    'output_dir': self.output_dir,
-                    'percent_complete': 100
-                }
-                status = RunStatuses.Completed
+            data = {
+                'output_url': self.output_url,
+                'output_dir': self.output_dir,
+                'percent_complete': 100
+            }
+            status = RunStatuses.Completed
 
-                if error:
-                    data['error'] = error
-                    status = RunStatuses.Failed
+            if error:
+                data['error'] = error
+                status = RunStatuses.Failed
 
-                self._record_run(status, **data)
+            self._record_run(status, **data)
 
-        except Exception as e:
-            #tornado.log.gen_log.debug(traceback.format_exc())
-            self._record_run(RunStatuses.Failed,
-                error={"message": str(e)})
-            raise BlueSkyJobError(str(e))
 
 
     def _run_bsp_modules(self):  # TODO: rename
         fires_manager = models.fires.FiresManager()
         modules = self.input_data.pop('modules')
+        config = self.input_data.pop('config')
+        Config().set(config)
         fires_manager.load(self.input_data)
 
         # Note that, once the run completes, this runtime will be
@@ -312,11 +234,8 @@ class BlueSkyRunner(object):
 
         for m in modules:
             try:
-                # TODO: if hysplit dispersion, start thread that periodically
-                #   tails log and records status; then join thread when call
-                #   to run completes
                 tornado.log.gen_log.info('Running %s %s',
-                    self.input_data['run_id'], m)
+                    self.run_id, m)
                 fires_manager.modules = [m]
                 self._record_run(RunStatuses.StartingModule, module=m)
 
@@ -328,10 +247,10 @@ class BlueSkyRunner(object):
                     # It's a dispersion run
                     if m == 'export':
                         data['export'] = fires_manager.meta['export']
-                elif m == 'plumerising':
+                elif m == 'plumerise':
                     # It's not a dispersion run, so this must be a
                     # plumerise run
-                    data['fire_information'] = prune_for_plumerise(
+                    data['fires'] = prune_for_plumerise(
                         fires_manager.fires)
 
                 self._record_run(RunStatuses.CompletedModule, module=m, **data)
@@ -372,7 +291,7 @@ class BlueSkyRunner(object):
     def _record_run(self, status, module=None, log=None, stdout=None,
             status_message=None, **data):
         if self.db:
-            self.db.record_run(self.input_data['run_id'], status,
+            self.db.record_run(self.run_id, status,
                 module=module, log=log, stdout=stdout,
                 status_message=status_message, **data)
 
@@ -397,14 +316,26 @@ def prune_for_plumerise(fire_info):
 def prune_fire_for_plumerise(f):
     return {
         "id": f.get('id'),
-        "growth": [prune_growth_for_plumerise(g) for g in f.get('growth', [])]
+        "activity": [prune_activity_for_plumerise(a) for a in f.get('activity', [])]
     }
 
-def prune_growth_for_plumerise(g):
-    new_g = slice_dict(g, {'start', 'end', 'location', 'plumerise'})
-    new_g['location'] = slice_dict(new_g['location'],
-        {'latitude', 'utc_offset', 'longitude', 'area', 'geojson'})
-    return new_g
+def prune_activity_for_plumerise(a):
+    new_a = {
+        'active_areas': []
+    }
+
+    for aa in a.active_areas:
+        new_aa = slice_dict(aa, {'start', 'end', 'utc_offset'})
+        if aa.get('specified_points'):
+            new_aa['specified_points'] = [
+                slice_dict(sp, {'lat', 'lng', 'area', 'plumerise'})
+                    for sp in aa['specified_points']
+            ]
+        elif aa.get(perimeter):
+            new_aa['perimeter'] = slice_dict(aa['perimeter'],
+                {'polygon', 'area', 'plumerise'})
+        new_a['active_areas'].append(new_aa)
+    return new_a
 
 def slice_dict(d, whitelist):
     return {k: d[k] for k in d.keys() & whitelist}

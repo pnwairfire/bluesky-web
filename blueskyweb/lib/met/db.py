@@ -1,4 +1,4 @@
-"""blueskyweb.lib.domain
+"""blueskyweb.lib.met.db
 
 Notes:
  - the arlindexer works in terms of 'domains', but bluesky web

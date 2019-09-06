@@ -1,4 +1,8 @@
-"""blueskyweb.api.v1.domain"""
+"""blueskyweb.api.met
+
+Notes:
+ - API version is ignored by the met APIs
+"""
 
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
@@ -22,7 +26,7 @@ KM_PER_DEG_LAT = 111
 class DomainInfo(RequestHandlerBase):
 
     def _marshall(self, domain_id):
-        grid_config = met.DOMAINS[domain_id]['grid']
+        grid_config = met.db.DOMAINS[domain_id]['grid']
         r = {
             "id": domain_id,
             "boundary": grid_config['boundary'],
@@ -35,14 +39,14 @@ class DomainInfo(RequestHandlerBase):
             r['resolution_km'] *= KM_PER_DEG_LAT
         return r
 
-    def get(self, domain_id=None):
+    def get(self, api_version, domain_id=None):
         if domain_id:
-            if domain_id not in met.DOMAINS:
+            if domain_id not in met.db.DOMAINS:
                 self._raise_error(404, "Domain does not exist")
             else:
                 self.write({'domain': self._marshall(domain_id)})
         else:
-            self.write({'domains': [self._marshall(d) for d in met.DOMAINS]})
+            self.write({'domains': [self._marshall(d) for d in met.db.DOMAINS]})
 
 
 ##
@@ -55,7 +59,7 @@ class MetArchiveBaseHander(RequestHandlerBase):
 
     def __init__(self, *args, **kwargs):
         super(MetArchiveBaseHander, self).__init__(*args, **kwargs)
-        self.met_archives_db = met.MetArchiveDB(self.settings['mongodb_url'])
+        self.met_archives_db = met.db.MetArchiveDB(self.settings['mongodb_url'])
 
 class MetArchivesInfo(MetArchiveBaseHander):
 
@@ -76,7 +80,7 @@ class MetArchivesInfo(MetArchiveBaseHander):
                 archives = [a for a in archives if not a['begin'] or not a['end']]
         self.write({"archives": archives})
 
-    async def get(self, identifier=None):
+    async def get(self, api_version, identifier=None):
         if not identifier:
             # Note: 'await' expressions in comprehensions are not supported
             archives = []
@@ -105,7 +109,7 @@ class MetArchiveAvailability(MetArchiveBaseHander):
     DATE_MATCHER = re.compile(
         '^(?P<year>[0-9]{4})-?(?P<month>[0-9]{2})-?(?P<day>[0-9]{2})$')
 
-    async def get(self, archive_id=None, date_str=None):
+    async def get(self, api_version, archive_id=None, date_str=None):
         # archive_id and date will always be defined
         m = self.DATE_MATCHER.match(date_str)
         if not m:
@@ -117,7 +121,7 @@ class MetArchiveAvailability(MetArchiveBaseHander):
             data = await self.met_archives_db.check_availability(
                 archive_id, date_obj, self.get_date_range())
             self.write(data)
-        except met.InvalidArchiveError:
+        except met.db.InvalidArchiveError:
             self._raise_error(404, "Archive does not exist")
 
     DEFAUL_DATE_RANGE = 3
