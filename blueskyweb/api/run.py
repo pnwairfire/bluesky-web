@@ -167,12 +167,6 @@ class RunOutput(RequestHandlerBase):
     @tornado.web.asynchronous
     async def get(self, api_version, run_id):
         # TODO: implement using data form mongodb
-        run = await self.settings['mongo_db'].find_run(run_id)
-        if not run:
-            self._raise_error(404, "Run doesn't exist")
 
-        elif not run.get('output_url'):
-            self._raise_error(404, "Run output doesn't exist")
-
-        else:
-            BlueSkyRunOutput(api_version, run, self._raise_error, self).process()
+        await BlueSkyRunOutput(api_version, self.settings['mongo_db'],
+            self._raise_error, self).process(run_id)

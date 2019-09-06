@@ -197,12 +197,20 @@ def apply_output_processor(api_version, output_stream):
 
 class BlueSkyRunOutput(object):
 
-    def __init__(self, api_version, run_info, handle_error_func, output_stream):
-        self.run_info = run_info
+    def __init__(self, api_version, mongo_db, handle_error_func,
+            output_stream):
+        self.mongo_db = mongo_db
         self.handle_error = handle_error_func
         self.output_stream = apply_output_processor(api_version, output_stream)
 
-    def process(self):
+    async def process(self, run_id):
+        self.run_info = await self.mongo_db.find_run(run_id)
+        if not self.run_info:
+            self.handle_error(404, "Run doesn't exist")
+
+        elif not self.run_info.get('output_url'):
+            self.handle_error(404, "Run output doesn't exist")
+
         if 'dispersion' in self.run_info['modules']:
             #if output['config']['dispersion'].get('model') != 'vsmoke'):
             self._get_dispersion(self.run_info)
