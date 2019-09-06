@@ -125,9 +125,10 @@ class BlueskyV1OutputProcessor(BlueskyProcessorBase):
         """
         growth = []
         for aa in fire.active_areas:
-            g = self.convert_active_area(aa)
-            if g:
-                growth.append(g)
+            for loc in aa.locations:
+                g = self.convert_location(aa, loc)
+                if g:
+                    growth.append(g)
 
         if growth:
             fire['growth'] = growth
@@ -135,40 +136,31 @@ class BlueskyV1OutputProcessor(BlueskyProcessorBase):
         fire.pop('activity', None)
         return fire
 
-    def convert_active_area(self, aa):
+    def convert_location(self, aa, loc):
         g = {
-            "start": aa.get('start'),  # WILL BE FILLED IN
-            "end": aa.get('end'),  # WILL BE FILLED IN
             "location": {
                 "ecoregion": aa.get('ecoregion'),
-                "utc_offset": aa.get('utc_offset')
+                "utc_offset": aa.get('utc_offset'),
+                "area": loc.pop('area')
             }
         }
 
-        if aa.get('specified_points'):
-            g['location']['geojson'] = {
-                "type": "MultiPoint",
-                "coordinates": [
-                    [sp['lng'], sp['lat']]
-                        for sp in aa['specified_points']
-                ]
-            }
-            g['location']['area'] = sum([sp['area']
-                for sp in aa['specified_points']])
+        if loc.get('lat') and loc.get('lng'):
+            g['location']['latitude'] = loc.pop('lat')
+            g['location']['longitude'] = loc.pop('lng')
 
-        elif aa.get('perimeter'):
+        elif loc.get('polygon'):
             g['location']['geojson'] = {
                 "type": "MultiPolygon",
-                "coordinates": [
-                    [
-                        aa['perimeter']['polygon']
-                    ]
-                ]
+                "coordinates": [[loc.pop('polygon')]]
             }
-            g['location']['area'] = aa['perimeter']['area']
 
         else:
             return None
+
+        g.update(**loc)
+        g.update(**{k:v for k, v in aa.items() if k not in
+            ('ecoregion','utc_offset', 'specified_points', 'perimeter')})
 
         return g
 
