@@ -437,7 +437,15 @@ def parse_args():
             sys.exit(1)
 
     if not args.run_id:
-        args.run_id = "test-asynch-request-{}".format(
+        if args.emissions:
+            mode = 'emissions'
+        elif args.plumerise:
+            mode = 'plumerise'
+        elif args.modules:
+            mode = 'custom-module'
+        else:
+            mode = 'dispersion'
+        args.run_id = "test-asynch-request-{}-{}".format(mode,
             datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S"))
 
     args.root_url = args.root_url.rstrip('/')
