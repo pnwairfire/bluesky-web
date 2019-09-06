@@ -343,6 +343,11 @@ OPTIONAL_ARGS = [
         'long': '--write-req-resp-to-file',
         'help': 'write the request and response to file',
         'action': 'store_true'
+    },
+    {
+        'short': '-o',
+        'long': '--output-file',
+        'help': 'write final output to file'
     }
 ]
 
@@ -601,6 +606,12 @@ if __name__ == "__main__":
     status_code, data = get(args, url, "output")
 
     # TODO: log individual bits of information
-    logging.info("Reponse: {}".format(json.dumps(data, indent=args.indent)))
+    data_str = json.dumps(data, indent=args.indent)
     logging.info("Root Url: %s", data.get('root_url', 'N/A'))
 
+    if args.output_file:
+        with open(args.output_file, 'w') as f:
+            f.write(data_str)
+        logging.info("Reponse written to file: {}".format(args.output_file))
+    else:
+        logging.info("Reponse: {}".format(data_str))
