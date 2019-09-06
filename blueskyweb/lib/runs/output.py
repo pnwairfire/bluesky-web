@@ -324,13 +324,13 @@ class BlueSkyRunOutput(object):
         tornado.log.gen_log.debug('Looking for output in %s', output_location)
         if not exists_func(output_location):
             msg = "Output location doesn't exist: {}".format(output_location)
-            self._raise_error(404, msg)
+            self.handle_error(404, msg)
 
         # use join instead of os.path.join in case output_location is a remote url
         output_json_file = '/'.join([output_location.rstrip('/'), 'output.json'])
         if not exists_func(output_json_file):
             msg = "Output file doesn't exist: {}".format(output_json_file)
-            self._raise_error(404, msg)
+            self.handle_error(404, msg)
 
         with open_func(output_json_file) as f:
             try:
@@ -341,5 +341,5 @@ class BlueSkyRunOutput(object):
                 # TODO: set fields here, using , etc.
             except:
                 msg = "Failed to open output file: {}".format(output_json_file)
-                self._raise_error(500, msg)
+                self.handle_error(500, msg)
 
