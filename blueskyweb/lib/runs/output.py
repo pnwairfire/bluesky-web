@@ -3,7 +3,6 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-import abc
 import json
 import os
 
@@ -12,7 +11,7 @@ import tornado.log
 from bluesky.marshal import Blueskyv4_0To4_1
 from bluesky.models import fires
 
-from blueskyworker.tasks import process_runtime
+from blueskyworker.tasks import process_runtime, apply_output_processor
 
 try:
     IP_ADDRESS = ipify.get_ip()
@@ -80,110 +79,6 @@ def remote_exists(url):
 
 # def get_output_url(run_id):
 #     return "{}{}".format(get_output_root_url(run_id), url_root_dir)
-
-
-##
-## Post processing of for older version of API
-##
-
-class BlueskyProcessorBase(object, metaclass=abc.ABCMeta):
-
-    def __init__(self, output_stream):
-        self.output_stream = output_stream
-
-    def write(self, data):
-        if hasattr(data, 'lower'):
-            data = json.loads(data)
-
-        data = self._process(data)
-
-        self.output_stream.write(data)
-
-
-    @abc.abstractmethod
-    def _process(self, data):
-        pass
-
-
-class BlueskyV1OutputProcessor(BlueskyProcessorBase):
-
-    def _process(self, data):
-        # covnerts data from v4.1 to v1 output structure
-
-        if data.get('fires'):
-            data['fire_information'] = [
-                self.convert_fire(fires.Fire(f)) for f in data.pop('fires')
-            ]
-
-        return data
-
-    def convert_fire(self, fire):
-        """Converts each location into a growth object
-
-        It's easier to just create a separate growth object out of
-        each active area, rather than group active areas by day
-        """
-        growth = []
-        for aa in fire.active_areas:
-            for loc in aa.locations:
-                g = self.convert_location(aa, loc)
-                if g:
-                    growth.append(g)
-
-        if growth:
-            fire['growth'] = growth
-
-        fire.pop('activity', None)
-        return fire
-
-    def convert_location(self, aa, loc):
-        g = {
-            "location": {
-                "ecoregion": aa.get('ecoregion'),
-                "utc_offset": aa.get('utc_offset'),
-                "area": loc.pop('area')
-            }
-        }
-
-        if loc.get('lat') and loc.get('lng'):
-            g['location']['latitude'] = loc.pop('lat')
-            g['location']['longitude'] = loc.pop('lng')
-
-        elif loc.get('polygon'):
-            g['location']['geojson'] = {
-                "type": "MultiPolygon",
-                "coordinates": [[loc.pop('polygon')]]
-            }
-
-        else:
-            return None
-
-        g.update(**loc)
-        g.update(**{k:v for k, v in aa.items() if k not in
-            ('ecoregion','utc_offset', 'specified_points', 'perimeter')})
-
-        return g
-
-class BlueskyV4_1OutputProcessor(BlueskyProcessorBase):
-
-    def _process(self, data):
-        # covnerts older output data from v1 to v4.1 output structure
-        if data.get('fire_information'):
-            data['fires'] = Blueskyv4_0To4_1().marshal(
-                data.pop('fire_information'))
-
-        return data
-
-OUTPUT_PROCESSORS = {
-    '1': BlueskyV1OutputProcessor,
-    '4.1': BlueskyV4_1OutputProcessor
-}
-
-def apply_output_processor(api_version, output_stream):
-    if api_version in OUTPUT_PROCESSORS:
-        output_stream = OUTPUT_PROCESSORS[api_version](output_stream)
-
-    return output_stream
 
 
 

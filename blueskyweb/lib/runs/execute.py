@@ -21,7 +21,7 @@ from blueskymongo.client import RunStatuses
 from blueskyweb.lib import met, hysplit
 from blueskyweb.lib.runs import output
 from blueskyworker.tasks import (
-    run_bluesky, BlueSkyRunner
+    run_bluesky, BlueSkyRunner, apply_output_processor, OUTPUT_PROCESSORS
 )
 
 __all__ = [
@@ -231,7 +231,7 @@ class BlueSkyRunExecutor(object):
             queue_name += '-plumerise'
 
         #tornado.log.gen_log.debug('input: %s', data)
-        args = (data, ) # has to be a tuple
+        args = (data, self.api_version)
 
         # TODO: figure out how to enqueue without blocking
         settings = {k:v for k, v in self.settings.items() if k != 'mongo_db'}
@@ -250,7 +250,7 @@ class BlueSkyRunExecutor(object):
         # before the bluesky thread is started. If an exception is
         # encountered in the seperate thread, it's handling
         try:
-            output_stream = output.apply_output_processor(self.api_version,
+            output_stream = apply_output_processor(self.api_version,
                 self.output_stream)
             # Runs bluesky in a separate thread so that run configurations
             # don't overwrite each other. (Bluesky manages configuration

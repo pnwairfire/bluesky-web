@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import abc
 import datetime
 import json
 import logging
@@ -56,7 +57,7 @@ class BlueSkyJobError(RuntimeError):
     pass
 
 @app.task
-def run_bluesky(input_data, **settings):
+def run_bluesky(input_data, api_version, **settings):
     """
     args:
      - input_data -- bsp input data
@@ -72,7 +73,10 @@ def run_bluesky(input_data, **settings):
     if hasattr(input_data, 'lower'):
         input_data = json.loads(input_data)
 
-    t = BlueSkyRunner(input_data, db=db, **settings)
+    output_processor = OUTPUT_PROCESSORS.get(api_version)
+
+    t = BlueSkyRunner(input_data, db=db, output_processor=output_processor,
+        **settings)
     t.start()
     t.join() # block until it completes
 
@@ -116,7 +120,8 @@ class configure_logging:
 
 class BlueSkyRunner(threading.Thread):
 
-    def __init__(self, input_data, output_stream=None, db=None, **settings):
+    def __init__(self, input_data, output_stream=None, db=None,
+            output_processor=None, **settings):
         """Constructor
         args:
          - input_data -- bsp input data
@@ -137,6 +142,7 @@ class BlueSkyRunner(threading.Thread):
         self.input_data = input_data
         self.output_stream = output_stream
         self.db = db
+        self.output_processor = output_processor
         self.settings = settings
         self.exception = None
 
@@ -279,8 +285,15 @@ class BlueSkyRunner(threading.Thread):
 
         if self.output_stream:
             return fires_manager.dumps(self.output_stream)
+
         else:
-            fires_manager.dumps(output_file=self.output_json_filename)
+            if self.output_processor:
+                output_writer = OutputFileWriter(self.output_json_filename)
+                self.output_processor(output_writer).write(
+                    fires_manager.dump())
+            else:
+                fires_manager.dumps(output_file=self.output_json_filename)
+
             return fires_manager.error
 
 
@@ -366,3 +379,118 @@ def process_version_info(processing_info):
         v[p['module'].split('.')[-1]] = {k: p[k] for k in p if k.endswith('version') }
 
     return v
+
+
+##
+## Post processing to marshal between bluesky
+##
+
+class BlueskyProcessorBase(object, metaclass=abc.ABCMeta):
+
+    def __init__(self, output_stream):
+        self.output_stream = output_stream
+
+    def write(self, data):
+        if hasattr(data, 'lower'):
+            data = json.loads(data)
+
+        data = self._process(data)
+
+        self.output_stream.write(data)
+
+
+    @abc.abstractmethod
+    def _process(self, data):
+        pass
+
+
+class BlueskyV1OutputProcessor(BlueskyProcessorBase):
+
+    def _process(self, data):
+        # covnerts data from v4.1 to v1 output structure
+
+        if data.get('fires'):
+            data['fire_information'] = [
+                self.convert_fire(models.fires.Fire(f)) for f in data.pop('fires')
+            ]
+
+        return data
+
+    def convert_fire(self, fire):
+        """Converts each location into a growth object
+
+        It's easier to just create a separate growth object out of
+        each active area, rather than group active areas by day
+        """
+        growth = []
+        for aa in fire.active_areas:
+            for loc in aa.locations:
+                g = self.convert_location(aa, loc)
+                if g:
+                    growth.append(g)
+
+        if growth:
+            fire['growth'] = growth
+
+        fire.pop('activity', None)
+        return fire
+
+    def convert_location(self, aa, loc):
+        g = {
+            "location": {
+                "ecoregion": aa.get('ecoregion'),
+                "utc_offset": aa.get('utc_offset'),
+                "area": loc.pop('area')
+            }
+        }
+
+        if loc.get('lat') and loc.get('lng'):
+            g['location']['latitude'] = loc.pop('lat')
+            g['location']['longitude'] = loc.pop('lng')
+
+        elif loc.get('polygon'):
+            g['location']['geojson'] = {
+                "type": "MultiPolygon",
+                "coordinates": [[loc.pop('polygon')]]
+            }
+
+        else:
+            return None
+
+        g.update(**loc)
+        g.update(**{k:v for k, v in aa.items() if k not in
+            ('ecoregion','utc_offset', 'specified_points', 'perimeter')})
+
+        return g
+
+class BlueskyV4_1OutputProcessor(BlueskyProcessorBase):
+
+    def _process(self, data):
+        # covnerts older output data from v1 to v4.1 output structure
+        if data.get('fire_information'):
+            data['fires'] = Blueskyv4_0To4_1().marshal(
+                data.pop('fire_information'))
+
+        return data
+
+OUTPUT_PROCESSORS = {
+    '1': BlueskyV1OutputProcessor,
+    '4.1': BlueskyV4_1OutputProcessor
+}
+
+def apply_output_processor(api_version, output_stream):
+    if api_version in OUTPUT_PROCESSORS:
+        output_stream = OUTPUT_PROCESSORS[api_version](output_stream)
+
+    return output_stream
+
+
+class OutputFileWriter(object):
+
+    def __init__(self, output_json_filename):
+        self.output_json_filename = output_json_filename
+
+    def write(self, data):
+        json_data = json.dumps(data, sort_keys=True, cls=models.fires.FireEncoder)
+        with open(self.output_json_filename, 'w') as f:
+            f.write(json_data)
