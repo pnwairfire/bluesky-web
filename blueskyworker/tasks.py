@@ -414,6 +414,9 @@ class BlueskyV1OutputProcessor(BlueskyProcessorBase):
                 self.convert_fire(models.fires.Fire(f)) for f in data.pop('fires')
             ]
 
+        if data.get('run_config'):
+            data['config'] = data.pop('run_config')
+
         return data
 
     def convert_fire(self, fire):
@@ -470,6 +473,9 @@ class BlueskyV4_1OutputProcessor(BlueskyProcessorBase):
         if data.get('fire_information'):
             data['fires'] = Blueskyv4_0To4_1().marshal(
                 data.pop('fire_information'))
+
+        if data.get('config'):
+            data['run_config'] = data.pop('config')
 
         return data
 
