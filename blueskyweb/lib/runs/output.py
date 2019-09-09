@@ -97,7 +97,7 @@ class BlueskyProcessorBase(object, metaclass=abc.ABCMeta):
 
         data = self._process(data)
 
-        self.output_stream.write(json.dumps(data))
+        self.output_stream.write(data)
 
 
     @abc.abstractmethod
