@@ -3,9 +3,22 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import json
+
 import tornado.web
 
 class RequestHandlerBase(tornado.web.RequestHandler):
+
+    def write(self, val):
+        """Overrides super's write in order to sort keys
+        """
+        if hasattr(val, 'keys'):
+            val = json.dumps(val, sort_keys=True)
+            # we need to explicitly set content type to application/json,
+            # because calling super's write with a string value will result
+            # in it being set to text
+            self.set_header('Content-Type', 'application/json')
+        super().write(val)
 
     ##
     ## Query Arg parsing
