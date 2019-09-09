@@ -178,7 +178,7 @@ Run fuelbeds though dispersion in process:
     -a 500 --lat 45.12 --lng -120 \\
     --met-archive pacific_northwest_4-km \\
     fuelbeds consumption emissions \\
-    timeprofile findmetdata localmet plumerise \\
+    timeprofile findmetdata plumerise \\
     dispersion visualization
 
  """.format(script_name=sys.argv[0])
