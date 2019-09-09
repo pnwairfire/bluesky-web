@@ -19,8 +19,9 @@ class HysplitMonitor(threading.Thread):
     """
     def __init__(self, m, config, fires_manager, record_run_func):
         super(HysplitMonitor, self).__init__()
-        # configuration needs to be set in each thread
-        Config().set(config)
+        # configuration needs to be set in each thread; record it here
+        # and set it in 'run', once thread has started
+        self.config = config
         self.m = m
         self.fires_manager = fires_manager
         self.start_hour = Config().get('dispersion', 'start')
@@ -47,6 +48,7 @@ class HysplitMonitor(threading.Thread):
         return self._message_file_name
 
     def run(self):
+        Config().set(self.config)
         while not self.terminate:
             self.check_progress()
             time.sleep(5)
