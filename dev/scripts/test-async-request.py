@@ -79,6 +79,7 @@ REQUEST = {
                         "LAYERS": [0, 1, 2]
                     },
                     "DispersionImages": {
+                        "REPROJECT_IMAGES": "True"
                         #"DAILY_IMAGES_UTC_OFFSETS": [-7, 0]
                     }
                 }
