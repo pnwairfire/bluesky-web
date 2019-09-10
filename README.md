@@ -144,7 +144,7 @@ And on worker servers, e.g. judy
 
 ## APIs
 
-See [APIs](doc/API.md)
+See the [API documentation](doc/README.md)
 
 
 
