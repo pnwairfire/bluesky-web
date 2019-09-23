@@ -76,7 +76,7 @@ class BlueSkyRunExecutor(object):
 
             # TODO: check data['modules'] specifically for 'localmet',
             # 'dispersion', 'visualization' (and 'export'?)
-            #tornado.log.gen_log.debug("BSP input data: %s", json.dumps(data))
+            tornado.log.gen_log.debug("BSP input data: %s", json.dumps(data))
             if self.mode not in ('fuelbeds', 'emissions'):
                 # plumerise or dispersion (Hysplit or VSMOKE) request
                 for m in data['modules']:
