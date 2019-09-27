@@ -74,34 +74,9 @@ class BlueSkyRunExecutor(object):
         try:
             self._set_modules(data)
 
-            # TODO: check data['modules'] specifically for 'localmet',
-            # 'dispersion', 'visualization' (and 'export'?)
-            tornado.log.gen_log.debug("BSP input data: %s", json.dumps(data))
-            if self.mode not in ('fuelbeds', 'emissions'):
-                # plumerise or dispersion (Hysplit or VSMOKE) request
-                for m in data['modules']:
-                    f = getattr(self, '_configure_{}'.format(m), None)
-                    if f:
-                        await f(data)
+            f = await self._configure_and_get_run_func(data, execute_mode)
 
-                # TODO: configure anything else (e.g. setting archive_id where
-                #  appropriate)
-
-                # This should only ever use _run_in_process in dev ad hoc
-                # testing; otherwise, if should always be run asynchronously
-                f = (self._run_in_process
-                    if execute_mode == ExecuteMode.IN_PROCESS
-                    else self._run_asynchronously)
-                await f(data)
-
-            else:
-                await self._configure_emissions(data)
-
-                # fuelbeds or emissions request; default is to run in process
-                f = (self._run_asynchronously
-                    if execute_mode == ExecuteMode.ASYNC
-                    else self._run_in_process)
-                await f(data)
+            await f(data)
 
         except tornado.web.Finish as e:
             # this was intentionally raised; re-raise it
@@ -116,6 +91,34 @@ class BlueSkyRunExecutor(object):
     ##
     ## Helpers
     ##
+
+    async def _configure_and_get_run_func(self, data, execute_mode):
+        # TODO: check data['modules'] specifically for 'localmet',
+        # 'dispersion', 'visualization' (and 'export'?)
+        if self.mode not in ('fuelbeds', 'emissions'):
+            # plumerise or dispersion (Hysplit or VSMOKE) request
+            for m in data['modules']:
+                f = getattr(self, '_configure_{}'.format(m), None)
+                if f:
+                    await f(data)
+
+            # TODO: configure anything else (e.g. setting archive_id where
+            #  appropriate)
+
+            # This should only ever use _run_in_process in dev ad hoc
+            # testing; otherwise, if should always be run asynchronously
+            return (self._run_in_process
+                if execute_mode == ExecuteMode.IN_PROCESS
+                else self._run_asynchronously)
+
+        else:
+            await self._configure_emissions(data)
+
+            # fuelbeds or emissions request; default is to run in process
+            return (self._run_asynchronously
+                if execute_mode == ExecuteMode.ASYNC
+                else self._run_in_process)
+
 
     RUN_ID_SUFFIX_REMOVER = re.compile('-(plumerise|dispersion)$')
 
