@@ -35,8 +35,10 @@ class RunExecute(RequestHandlerBase):
             self._raise_error(400, 'empty post data')
             return
 
+        request_body = self.request.body.decode()
+        tornado.log.gen_log.debug("Execute API request data: %s", request_body)
         try:
-            data = json.loads(self.request.body.decode())
+            data = json.loads(request_body)
         except json.JSONDecodeError as e:
             self._raise_error(400, 'Invalid JSON post data')
 
@@ -57,6 +59,11 @@ class RunExecute(RequestHandlerBase):
             '_a', default=None) is not None) else None)
         await executor.execute(data, execute_mode=execute_mode)
 
+    def write(self, val):
+        """Overrides super's write in order log response data
+        """
+        tornado.log.gen_log.debug("Execute API response data: %s", val)
+        super().write(val)
 
 
 
