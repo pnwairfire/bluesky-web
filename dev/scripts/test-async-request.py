@@ -47,12 +47,7 @@ Full run (ingestiont through visualization)
         --met-archive ca-nv_6-km
 
   $ {script_name} -v 4.1 \\
-        -r https://www.blueskywebhost.com/bluesky-web-test/ \\
-        --log-level=DEBUG -s `date -d"-1 day" +%Y-%m-%dT00:00:00` -n 12 \\
-        --met-archive ca-nv_4-km
-
-  $ {script_name} -v 4.1 \\
-        -r https://www.blueskywebhost.com/bluesky-web/ \\
+        -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG -s `date -d"-1 day" +%Y-%m-%dT00:00:00` -n 12 \\
         --met-archive ca-nv_4-km
 
