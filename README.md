@@ -167,15 +167,3 @@ run query on command line
         --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
         blueskyweb --eval 'db.met_files.findOne()'
 
-
-
-
-## Checking on Production System
-
-    docker run --rm -ti bluesky-web ./bin/bsp-web-manage-runs-db \
-        -m mongodb://blueskyweb:blueskywebmongopassword@db.blueskywebhost.com:27886/ \
-        -a get-runs  --status enqueud
-
-or just load api
-
-    https://www.blueskywebhost.com/bluesky-web/api/v4.1/runs/enqueued/
