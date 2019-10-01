@@ -278,6 +278,10 @@ OPTIONAL_ARGS = [
         'help': 'SMTP server; ex. localhost:25'
     },
     {
+        'long': '--email-recipient',
+        'help': 'email address to send output to'
+    },
+    {
         'long': "--latitude",
         'help': 'latitude of fire location; default: 37.909644',
         'default':  37.909644,
@@ -524,10 +528,14 @@ def create_initial_request(args):
 
 
     if args.smtp_server:
+        if not args.email_recipient:
+            logging.error("Specify --email-recipient along with --smtp-server", title)
+            sys.exit(1)
+
         smtp_server, smtp_port = args.smtp_server.split(':')
         REQUEST['config']['export']['modes'] = ["email"]
         REQUEST['config']['export']["email"] = {
-            "recipients": ["foo@bar.com"],
+            "recipients": [args.email_recipient],
             "sender": "bluesky@blueskywebhost.com",
             "subject": "BSP output",
             "smtp_server": smtp_server,
