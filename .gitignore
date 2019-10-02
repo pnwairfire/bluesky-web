@@ -10,3 +10,5 @@ db/
 dev/data/
 dev-private/
 dev/ssl/
+fabfile.py
+deploy-all-envs
