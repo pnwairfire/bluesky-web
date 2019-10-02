@@ -82,66 +82,6 @@ the following two scripts for examples
 
 
 
-## Fabric
-
-To see list tasks:
-
-    fab -l
-
-To see documentation for a specific task, use the '-d' option. E.g.:
-
-    fab -d deploy
-
-### Test Environment
-
-First time:
-
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A deploy
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A start
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A configure_web_apache_proxy
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A configure_output_web_apache_proxy
-
-Subsequent deployments:
-
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A deploy
-
-(Note that the deploy tasks takes care of restarting the docker containers.)
-
-Check status
-
-    FABRIC_USER=$USER BLUESKY_WEB_ENV=test fab -A check_status
-
-### Production Environment
-
-Same as test env, but substitude 'production' for 'test' in each
-command.
-
-### All envs
-
-    ./deploy-all-envs
-
-
-
-
-## Manually checking deployment
-
-Check processes and look at files installed on web service server,
-e.g. haze
-
-    ssh server1 docker ps -a |grep bluesky-web-test
-    ssh server1 cat /etc/docker-compose/bluesky-web-test/docker-compose.yml
-    ssh server1 cat /etc/bluesky-web/test/config.json
-
-And on worker servers, e.g. judy
-
-    ssh server2 docker ps -a |grep bluesky-web-test
-    ssh server2 cat /etc/docker-compose/bluesky-web-test/docker-compose.yml
-    ssh server2 cat /etc/bluesky-web/test/config.json
-    ssh server2 cat /etc/bluesky-web/test/ofelia/config.ini
-
-
-
-
 ## APIs
 
 See the [API documentation](doc/README.md)
