@@ -9,3 +9,4 @@ db/
 .cache/
 dev/data/
 dev-private/
+dev/ssl/
