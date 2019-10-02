@@ -31,7 +31,7 @@ REQUIRED_ARGS = [
 OPTIONAL_ARGS = [
     {
         'long': '--path-prefix',
-        'help': "Url root path prefix to apply to all routes; e.g. '/outlooks'"
+        'help': "Url root path prefix to apply to all routes; e.g. '/bluesky-web'"
     },
     {
         'short': '-p',
