@@ -7,8 +7,6 @@ that can be started by simply running ```bsp-web```.
 
 
 
-
-
 ## External Dependencies
 
 ### mongodb
@@ -21,7 +19,6 @@ You just need to provide the url of one that is running.
 
 Docker is required to run the bluesky web system - mongodb,
 api web service, output web service, bsp workers, and ofelia.
-
 
 
 
@@ -64,6 +61,7 @@ Check that service is running:
 
 
 
+
 ## Tests
 
 ### Unit Tests
@@ -77,7 +75,6 @@ the following two scripts for examples
 
     ./dev/scripts/web-regression-test.sh
     ./dev/scripts/test-async-request.py -h
-
 
 
 
