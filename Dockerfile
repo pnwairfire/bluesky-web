@@ -15,8 +15,16 @@ RUN pip install \
 
 RUN pip install pytest ipython
 
+
+ARG COUNTRY
+ARG STATE
+ARG CITY
+ARG ORGANIZATION
+
 COPY generate-ssl-cert.sh /usr/local/bin/
-RUN /usr/local/bin/generate-ssl-cert.sh /etc/ssl/ client
+RUN /usr/local/bin/generate-ssl-cert.sh \
+    -r /etc/ssl/ -n client -c $COUNTRY -s $STATE \
+    -l $CITY -o $ORGANIZATION -u BlueSkyWeb
 
 COPY blueskyconfig /usr/src/blueskyweb/blueskyconfig
 COPY blueskymongo /usr/src/blueskyweb/blueskymongo

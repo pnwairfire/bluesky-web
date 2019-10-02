@@ -6,7 +6,14 @@ RUN apk update && \
     apk add --no-cache openssl && \
     rm -rf /var/cache/apk/*
 
+ARG COUNTRY
+ARG STATE
+ARG CITY
+ARG ORGANIZATION
+
 COPY generate-ssl-cert.sh /usr/local/bin/
-RUN /usr/local/bin/generate-ssl-cert.sh /etc/ssl/ rabbitmq
+RUN /usr/local/bin/generate-ssl-cert.sh \
+    -r /etc/ssl/ -n rabbitmq -c $COUNTRY -s $STATE \
+    -l $CITY -o $ORGANIZATION -u BlueSkyWeb
 
 COPY rabbitmq.conf /etc/rabbitmq/
