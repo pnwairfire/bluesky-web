@@ -90,6 +90,8 @@ done
 ## V1 fuelbeds & emissions
 ##
 
+## Fuelbeds
+
 echo -n "Testing $ROOT_URL/api/v1/run/fuelbeds/ ... "
 echo -n "$ROOT_URL/api/v1/run/fuelbeds/ - " >> $OUTPUT_FILE
 response=$(curl "$ROOT_URL/api/v1/run/fuelbeds/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
@@ -136,6 +138,8 @@ print_response $response
 #echo $next_request
 rm $OUTPUT_FILE-t
 
+
+## Emissions
 
 echo -n "Testing $ROOT_URL/api/v1/run/emissions/ ... "
 echo -n "$ROOT_URL/api/v1/run/emissions/ - " >> $OUTPUT_FILE
@@ -193,9 +197,64 @@ print_response $response
 rm $OUTPUT_FILE-t
 
 
+## Fuelbeds + Emissions
+
+echo -n "Testing $ROOT_URL/api/v1/run/emissions/ (+ fuelbeds) ... "
+echo -n "$ROOT_URL/api/v1/run/emissions/ (+ fuelbeds) - " >> $OUTPUT_FILE
+# TODO: figure out how to feed next_response back tino
+#cmd='curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '"'"'$next_request'"'"' -o "$OUTPUT_FILE-t"'
+#response=$(eval "$cmd")
+response=$(curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
+        "config": {
+            "emissions": {
+                "efs": "feps",
+                "species": ["PM2.5"]
+            }
+        },
+        "modules": ["fuelbeds", "consumption", "emissions"],
+        "fire_information": [
+            {
+                "event_of": {
+                    "name": "Natural Fire near Snoqualmie Pass, WA",
+                    "id": "SF11E826544"
+                },
+                "growth": [
+                    {
+                        "location": {
+                            "geojson": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00",
+                            "area": 2398.94477979842
+                        }
+                    }
+                ]
+            }
+        ]
+    }' -o "$OUTPUT_FILE-t")
+cat $OUTPUT_FILE-t >> $OUTPUT_FILE
+echo "" >> $OUTPUT_FILE
+print_response $response
+rm $OUTPUT_FILE-t
+
+
 ##
 ## V4.1 Fuelbeds & emissions
 ##
+
+## Fuelbeds
 
 echo -n "Testing $ROOT_URL/api/v4.1/run/fuelbeds/ ... "
 echo -n "$ROOT_URL/api/v4.1/run/fuelbeds/ - " >> $OUTPUT_FILE
@@ -234,6 +293,8 @@ print_response $response
 #echo $next_request
 rm $OUTPUT_FILE-t
 
+
+## Emissions
 
 echo -n "Testing $ROOT_URL/api/v4.1/run/emissions/ ... "
 echo -n "$ROOT_URL/api/v4.1/run/emissions/ - " >> $OUTPUT_FILE
@@ -285,6 +346,57 @@ cat $OUTPUT_FILE-t >> $OUTPUT_FILE
 echo "" >> $OUTPUT_FILE
 print_response $response
 rm $OUTPUT_FILE-t
+
+
+## Fuelbeds + Emissions
+
+echo -n "Testing $ROOT_URL/api/v4.1/run/emissions/ (+ fuelbeds) ... "
+echo -n "$ROOT_URL/api/v4.1/run/emissions/ (+ fuelbeds) - " >> $OUTPUT_FILE
+# TODO: figure out how to feed next_response back tino
+#cmd='curl "$ROOT_URL/api/v4.1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '"'"'$next_request'"'"' -o "$OUTPUT_FILE-t"'
+#response=$(eval "$cmd")
+response=$(curl "$ROOT_URL/api/v4.1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
+        "config": {
+            "emissions": {
+                "efs": "feps",
+                "species": ["PM2.5"]
+            }
+        },
+        "modules": ["fuelbeds", "consumption", "emissions"],
+        "fires": [
+            {
+                "id": "SF11C14225236095807750",
+                "event_id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "perimeter": {
+                                    "polygon": [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ],
+                                    "area": 2398.94477979842
+                                },
+                                "ecoregion": "southern",
+                                "utc_offset": "-09:00"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }' -o "$OUTPUT_FILE-t")
+cat $OUTPUT_FILE-t >> $OUTPUT_FILE
+echo "" >> $OUTPUT_FILE
+print_response $response
+rm $OUTPUT_FILE-t
+
+
 
 
 # to post data in a file

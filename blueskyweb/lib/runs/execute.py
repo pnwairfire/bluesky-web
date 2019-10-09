@@ -143,22 +143,26 @@ class BlueSkyRunExecutor(object):
                         self.RUN_ID_SUFFIX_REMOVER.sub('', data['run_id']))
                     f['event_of']['name'] = name
 
-    FUELBEDS_MODULES = [
-        'fuelbeds'
-    ]
-    EMISSIONS_MODULES = [
-        'consumption', 'emissions'
-    ]
-    # TODO: for dispersion requests, instead of running findmetdata, get
-    #   met data from indexed met data in mongodb;  maybe fall back on
-    #   running findmetdata if indexed data isn't there or if mongodb
-    #   query fails
-    MET_DISPERSION_MODULES = [
-        'findmetdata', 'extrafiles', 'dispersion', 'visualization', 'export'
-    ]
-    METLESS_DISPERSION_MODULES = [
-        'dispersion', 'export'
-    ]
+    MODULES = {
+        'fuelbeds': {
+            'default': ['fuelbeds']
+        },
+        'emissions': {
+            'default': ['consumption', 'emissions'],
+            'other_allowed': ['fuelbeds']
+        },
+        # TODO: for dispersion requests, instead of running findmetdata, get
+        #   met data from indexed met data in mongodb;  maybe fall back on
+        #   running findmetdata if indexed data isn't there or if mongodb
+        #   query fails
+        'met_dispersion': {
+            'default': ['findmetdata', 'extrafiles',
+                'dispersion', 'visualization', 'export']
+        },
+        'metless_dispersion': {
+            'default': ['dispersion', 'export']
+        },
+    }
 
     def _plumerise_modules(self, data, exclude_extrafiles=False):
         modules = []
@@ -175,10 +179,11 @@ class BlueSkyRunExecutor(object):
         return modules
 
     def _set_modules(self, data):
-        def _set(default_modules):
+        def _set(default_modules, other_allowed=None):
+            other_allowed  = other_allowed or []
             if "modules" in data:  #data.get('modules'):
                 invalid_modules = set(data['modules']).difference(
-                    default_modules)
+                    default_modules + other_allowed)
                 if invalid_modules:
                     self.handle_error(400, "invalid module(s) for {} "
                         "request: {}".format(self.mode, ','.join(invalid_modules)))
@@ -189,18 +194,18 @@ class BlueSkyRunExecutor(object):
 
 
         if self.mode in ('dispersion', 'all'):
-            dispersion_modules = (self.MET_DISPERSION_MODULES
-                if self.archive_id else self.METLESS_DISPERSION_MODULES)
+            dispersion_modules = (self.MODULES['met_dispersion']['default']
+                if self.archive_id else self.MODULES['metless_dispersion']['default'])
             if self.mode == 'all':
                 if self.archive_id:
-                    _set(self.FUELBEDS_MODULES +
-                        self.EMISSIONS_MODULES +
+                    _set(self.MODULES['fuelbeds']['default'] +
+                        self.MODULES['emissions']['default'] +
                         self._plumerise_modules(data, exclude_extrafiles=(
                             'extrafiles' in dispersion_modules)) +
                         dispersion_modules)
                 else:
-                    _set(self.FUELBEDS_MODULES +
-                        self.EMISSIONS_MODULES +
+                    _set(self.MODULES['fuelbeds']['default'] +
+                        self.MODULES['emissions']['default'] +
                         # vsmoke needs timeprofile but not plumerise
                         ['timeprofile'] +
                         dispersion_modules)
@@ -208,10 +213,9 @@ class BlueSkyRunExecutor(object):
                 _set(dispersion_modules)
         elif self.mode == 'plumerise':
             _set(self._plumerise_modules(data))
-        elif self.mode == 'emissions':
-            _set(self.EMISSIONS_MODULES)
-        elif self.mode == 'fuelbeds':
-            _set(self.FUELBEDS_MODULES)
+        elif self.mode in ('fuelbeds', 'emissions'):
+            _set(self.MODULES[self.mode]['default'],
+                self.MODULES[self.mode].get('other_allowed'))
         # There are no other possibilities for self.mode
 
         tornado.log.gen_log.debug("Modules be run: {}".format(', '.join(data['modules'])))

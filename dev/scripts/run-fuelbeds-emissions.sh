@@ -25,7 +25,7 @@ if [ "$show_help" = true ] ; then
     echo "   -h/--help        - show this help message"
     echo "   -u/--root-url    - root url of "
     echo "   -v/--api-version -  1 or 4.1"
-    echo "   -m/--mode        - fuelbeds or emissons"
+    echo "   -m/--mode        - 'fuelbeds', 'emissons', or 'both'"
     echo ""
     echo "Usage:"
     echo "   $0 -v 4.1 -m fuelbeds"
@@ -39,8 +39,8 @@ if [ ! $API_VERSION ]; then
     exit 1
 fi
 
-if [ "$MODE" != "fuelbeds" ] && [ "$MODE" != "emissions" ]; then
-    echo "ERROR: Specify -m / --mode as 'fuelbeds' for 'emissions'"
+if [ "$MODE" != "fuelbeds" ] && [ "$MODE" != "emissions" ] && [ "$MODE" != "both" ]; then
+    echo "ERROR: Specify -m / --mode as 'fuelbeds', 'emissions', or 'both'"
     exit 1
 fi
 
@@ -58,6 +58,12 @@ if [ "$MODE" == "emissions" ]; then
     FUELBEDS_SECTION='"fuelbeds": [{"fccs_id": "52","pct": 100.0}],'
 fi
 
+MODULES_SECTION=
+if [ "$MODE" == "both" ]; then
+    # using a different fccs id that what's actually at the location
+    MODULES_SECTION='"modules": ["fuelbeds","consumption","emissions"],'
+fi
+
 POST_DATA=
 if [ $API_VERSION = 1 ]; then
     POST_DATA='{
@@ -67,6 +73,7 @@ if [ $API_VERSION = 1 ]; then
                 "species": ["PM2.5"]
             }
         },
+        '"$MODULES_SECTION"'
         "fire_information": [
             {
                 "event_of": {
@@ -110,6 +117,7 @@ elif [ $API_VERSION = 4.1 ]; then
                 "species": ["PM2.5"]
             }
         },
+        '"$MODULES_SECTION"'
         "fires": [
             {
                 "id": "SF11C14225236095807750",
@@ -143,6 +151,12 @@ elif [ $API_VERSION = 4.1 ]; then
     }'
 fi
 
-URL="$ROOT_URL/api/v$API_VERSION/run/$MODE/"
+MODE_PATH_STRING=emissions
+if [ "$MODE" == "fuelbeds" ]; then
+    # using a different fccs id that what's actually at the location
+    MODE_PATH_STRING=fuelbeds
+fi
+
+URL="$ROOT_URL/api/v$API_VERSION/run/$MODE_PATH_STRING/"
 
 curl "$URL" --silent  -H "Content-Type: application/json" -d "$POST_DATA"
