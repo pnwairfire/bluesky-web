@@ -101,6 +101,8 @@ response=$(curl "$ROOT_URL/api/v1/run/fuelbeds/" --write-out "$WRITE_OUT_PATTERN
                 "name": "Natural Fire near Snoqualmie Pass, WA",
                 "growth": [
                     {
+                        "start": "2019-08-29T00:00:00",
+                        "end": "2019-08-30T00:00:00",
                         "location": {
                             "geojson": {
                                 "type": "MultiPolygon",
@@ -166,6 +168,8 @@ response=$(curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTER
                                 "pct": 100.0
                             }
                         ],
+                        "start": "2019-08-29T00:00:00",
+                        "end": "2019-08-30T00:00:00",
                         "location": {
                             "geojson": {
                                 "type": "MultiPolygon",
@@ -219,6 +223,8 @@ response=$(curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTER
                 },
                 "growth": [
                     {
+                        "start": "2019-08-29T00:00:00",
+                        "end": "2019-08-30T00:00:00",
                         "location": {
                             "geojson": {
                                 "type": "MultiPolygon",
@@ -267,6 +273,8 @@ response=$(curl "$ROOT_URL/api/v4.1/run/fuelbeds/" --write-out "$WRITE_OUT_PATTE
                     {
                         "active_areas": [
                             {
+                                "start": "2019-08-29T00:00:00",
+                                "end": "2019-08-30T00:00:00",
                                 "perimeter": {
                                     "polygon": [
                                         [-121.4522115, 47.4316976],
@@ -316,6 +324,8 @@ response=$(curl "$ROOT_URL/api/v4.1/run/emissions/" --write-out "$WRITE_OUT_PATT
                     {
                         "active_areas": [
                             {
+                                "start": "2019-08-29T00:00:00",
+                                "end": "2019-08-30T00:00:00",
                                 "perimeter": {
                                     "polygon": [
                                         [-121.4522115, 47.4316976],
@@ -371,6 +381,8 @@ response=$(curl "$ROOT_URL/api/v4.1/run/emissions/" --write-out "$WRITE_OUT_PATT
                     {
                         "active_areas": [
                             {
+                                "start": "2019-08-29T00:00:00",
+                                "end": "2019-08-30T00:00:00",
                                 "perimeter": {
                                     "polygon": [
                                         [-121.4522115, 47.4316976],
