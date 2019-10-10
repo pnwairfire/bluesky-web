@@ -9,10 +9,20 @@ import tornado.web
 
 class RequestHandlerBase(tornado.web.RequestHandler):
 
+    VERBOSE_FIELDS = (
+        # The following list excludes "fires", "summary",
+        # "run_id", and "bluesky_versoin"
+        "counts", "processing", "run_config",
+        "runtime", "today", "version_info",
+    )
+
     def write(self, val):
         """Overrides super's write in order to sort keys
         """
         if hasattr(val, 'keys'):
+            if not self.get_boolean_arg('verbose'):
+                for k in self.VERBOSE_FIELDS:
+                    val.pop(k, None)
             val = json.dumps(val, sort_keys=True)
             # we need to explicitly set content type to application/json,
             # because calling super's write with a string value will result
