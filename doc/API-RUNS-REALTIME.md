@@ -246,8 +246,8 @@ lat + lng + size.
                 ]
             }
         ]
-    }' > dev/data/consumption-input.json
+    }' > dev/data/fuelbeds-through-emissions-input.json
 
     $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/emissions/" \
         -H 'Content-Type: application/json' \
-        -d @dev/data/consumption-input.json | python -m json.tool | less
+        -d @dev/data/fuelbeds-through-emissions-input.json | python -m json.tool | less
