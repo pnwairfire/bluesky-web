@@ -2,14 +2,26 @@
 
 ## Request
 
+The general request structure for each API listed below is the following:
+
+      {
+            "fires": [ ... ],
+            "config": { ... },
+            "modules": [ ... ]
+        }
+
+See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
+as well as the examples listed for each API, below, for more information
+about required and optional post data.
 
 
 ## Response
 
 In handling each requests for each API listed below, blueskyweb will run
 bluesky in realtime, and the bluesky results will be in the API response.
-The response data will be the modified version of the request data, minus the "config" key.  If 'verbose=true' is specifed in the query string, then
-the reponse will be of the following structure:
+The response data will be a modified version of the request fires data, minus
+the "config" key, and with other keys added.  If 'verbose=true' is specifed
+in the query string, then the reponse will be of the following structure:
 
     {
         "bluesky_version": "4.1.14",
@@ -41,6 +53,8 @@ Otherwise, if 'verbose=true' is not specified, the response will
 contain only 'fires', 'summary', 'run_id',  and 'bluesky_version'.
 
 
+
+
 # APIs
 
 ## Fuelbeds
@@ -55,15 +69,7 @@ specifies configuration data and other control parameters.
 
  - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/fuelbeds/
  - method: POST
- - post data:
-
-    {
-        "fires": [ ... ],
-        "config": { ... }
-    }
-
-See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
-for more information about required and optional post data
+ - post data: (see the General Information > Request section above, as well as the examples below)
 
 ### Examples
 
@@ -118,16 +124,7 @@ specify a subset of the modules normally run by this API.
 
  - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/emissions/
  - method: POST
- - post data:
-
-        {
-            "fires": [ ... ],
-            "config": { ... },
-            "modules": [ ... ]
-        }
-
-See [BlueSky Pipeline](https://github.com/pnwairfire/bluesky/blob/v2.7.2/README.md)
-for more information about required and optional post data
+ - post data: (see the General Information > Request section above, as well as the examples below)
 
 ### Examples
 
