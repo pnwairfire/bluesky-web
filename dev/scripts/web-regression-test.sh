@@ -21,13 +21,13 @@ else
     OUTPUT_FILE=/dev/null
 fi
 
-echo "Testing $ROOT_URL"
-echo "Domain: $DOMAIN"
-echo "Archive: $ARCHIVE"
-echo "Date: $DATE"
-echo "Outputing to $OUTPUT_FILE"
-
 echo -n "" > $OUTPUT_FILE
+
+echo "Testing $ROOT_URL" | tee -a $OUTPUT_FILE
+echo "Domain: $DOMAIN" | tee -a $OUTPUT_FILE
+echo "Archive: $ARCHIVE" | tee -a $OUTPUT_FILE
+echo "Date: $DATE" | tee -a $OUTPUT_FILE
+echo "Outputing to $OUTPUT_FILE" | tee -a $OUTPUT_FILE
 
 
 RED='\033[0;31m'
@@ -76,8 +76,7 @@ GET_URLS=(
 WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 for i in "${GET_URLS[@]}"
   do
-    echo -n "Testing $i ... "
-    echo -n "$i - " >> $OUTPUT_FILE
+    echo -n "Testing $i ... " | tee -a $OUTPUT_FILE
     response=$(curl "$i" --write-out "$WRITE_OUT_PATTERN" --silent -o "$OUTPUT_FILE-t")
     cat $OUTPUT_FILE-t >> $OUTPUT_FILE
     echo "" >> $OUTPUT_FILE
@@ -92,8 +91,8 @@ done
 
 ## Fuelbeds
 
-echo -n "Testing $ROOT_URL/api/v1/run/fuelbeds/ ... "
-echo -n "$ROOT_URL/api/v1/run/fuelbeds/ - " >> $OUTPUT_FILE
+echo '--------------------------------------------------' >> $OUTPUT_FILE
+echo -n "Testing $ROOT_URL/api/v1/run/fuelbeds/ ... " | tee -a $OUTPUT_FILE
 response=$(curl "$ROOT_URL/api/v1/run/fuelbeds/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
         "fire_information": [
             {
@@ -141,8 +140,8 @@ rm $OUTPUT_FILE-t
 
 ## Emissions
 
-echo -n "Testing $ROOT_URL/api/v1/run/emissions/ ... "
-echo -n "$ROOT_URL/api/v1/run/emissions/ - " >> $OUTPUT_FILE
+echo '--------------------------------------------------' >> $OUTPUT_FILE
+echo -n "Testing $ROOT_URL/api/v1/run/emissions/ ... " | tee -a $OUTPUT_FILE
 # TODO: figure out how to feed next_response back tino
 #cmd='curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '"'"'$next_request'"'"' -o "$OUTPUT_FILE-t"'
 #response=$(eval "$cmd")
@@ -199,8 +198,8 @@ rm $OUTPUT_FILE-t
 
 ## Fuelbeds + Emissions
 
-echo -n "Testing $ROOT_URL/api/v1/run/emissions/ (+ fuelbeds) ... "
-echo -n "$ROOT_URL/api/v1/run/emissions/ (+ fuelbeds) - " >> $OUTPUT_FILE
+echo '--------------------------------------------------' >> $OUTPUT_FILE
+echo -n "Testing $ROOT_URL/api/v1/run/emissions/ (+ fuelbeds) ... " | tee -a $OUTPUT_FILE
 # TODO: figure out how to feed next_response back tino
 #cmd='curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '"'"'$next_request'"'"' -o "$OUTPUT_FILE-t"'
 #response=$(eval "$cmd")
@@ -256,8 +255,8 @@ rm $OUTPUT_FILE-t
 
 ## Fuelbeds
 
-echo -n "Testing $ROOT_URL/api/v4.1/run/fuelbeds/ ... "
-echo -n "$ROOT_URL/api/v4.1/run/fuelbeds/ - " >> $OUTPUT_FILE
+echo '--------------------------------------------------' >> $OUTPUT_FILE
+echo -n "Testing $ROOT_URL/api/v4.1/run/fuelbeds/ ... " | tee -a $OUTPUT_FILE
 response=$(curl "$ROOT_URL/api/v4.1/run/fuelbeds/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
         "fires": [
             {
@@ -296,8 +295,8 @@ rm $OUTPUT_FILE-t
 
 ## Emissions
 
-echo -n "Testing $ROOT_URL/api/v4.1/run/emissions/ ... "
-echo -n "$ROOT_URL/api/v4.1/run/emissions/ - " >> $OUTPUT_FILE
+echo '--------------------------------------------------' >> $OUTPUT_FILE
+echo -n "Testing $ROOT_URL/api/v4.1/run/emissions/ ... " | tee -a $OUTPUT_FILE
 # TODO: figure out how to feed next_response back tino
 #cmd='curl "$ROOT_URL/api/v4.1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '"'"'$next_request'"'"' -o "$OUTPUT_FILE-t"'
 #response=$(eval "$cmd")
@@ -350,8 +349,8 @@ rm $OUTPUT_FILE-t
 
 ## Fuelbeds + Emissions
 
-echo -n "Testing $ROOT_URL/api/v4.1/run/emissions/ (+ fuelbeds) ... "
-echo -n "$ROOT_URL/api/v4.1/run/emissions/ (+ fuelbeds) - " >> $OUTPUT_FILE
+echo '--------------------------------------------------' >> $OUTPUT_FILE
+echo -n "Testing $ROOT_URL/api/v4.1/run/emissions/ (+ fuelbeds) ... " | tee -a $OUTPUT_FILE
 # TODO: figure out how to feed next_response back tino
 #cmd='curl "$ROOT_URL/api/v4.1/run/emissions/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '"'"'$next_request'"'"' -o "$OUTPUT_FILE-t"'
 #response=$(eval "$cmd")
