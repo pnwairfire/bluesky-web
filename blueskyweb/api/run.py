@@ -61,11 +61,14 @@ class RunExecute(RequestHandlerBase):
 
     def write(self, val):
         """Overrides super's write in order log response data
+        and check for errors
         """
         if isinstance(val, dict) and 'error' in val:
             # TODO: raise error and don't return enture bluesky output
             #  (i.e. val) in API response?
             #    self._raise_error(400, val['error'].get('message'))
+            # TODO: make sure it is in deed a client request error;
+            #    otherwise return 500
             self.set_status(400, val['error'].get('message'))
 
         tornado.log.gen_log.debug("Execute API response data: %s", val)
