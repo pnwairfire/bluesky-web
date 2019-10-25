@@ -331,17 +331,9 @@ DEFAULTS = {
                 "title": "CA/NV 1.33-km",
                 "domain_id": "DRI1.33km"
             },
-            "ca-nv_2-km": {
-                "title": "CA/NV 2-km",
-                "domain_id": "DRI2km"
-            },
             "ca-nv_4-km": {
                 "title": "CA/NV 4-km",
                 "domain_id": "DRI4km"
-            },
-            "ca-nv_6-km": {
-                "title": "CA/NV 6-km",
-                "domain_id": "DRI6km"
             },
             "AZ-NM_1.8-km": {
                 "title": "AZ/NM 1.8-km",
