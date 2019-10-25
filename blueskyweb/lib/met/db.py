@@ -65,6 +65,19 @@ def validate_archive_id(archive_id):
         raise InvalidArchiveError(archive_id)
 
 
+def apply_min_max(min_max_func, a, b):
+    """Applies min or max if both a and b are not None.
+
+    If only one of the inputs is defined, returns that value;
+    Returns None if neither is defined.
+    """
+    if a is not None and b is not None:
+        return min_max_func(a, b)
+    else:
+        # if both are None, it jsut returns None
+        return a if a is not None else b
+
+
 class MetArchiveDB(object):
     """Wraps interaction with met archive index mongodb
 
@@ -117,13 +130,16 @@ class MetArchiveDB(object):
             # Note what we're calling 'begin' here is called 'start'
             # in the arl index db
             if e['domain'] in r:
-                # This should never happen, since dates collection
-                # is already aggregated across all servers
-                r[e['domain']]['begin'] = min(
-                    r[e['domain']]['begin'], e['start'])
-                r[e['domain']]['end'] = min(
-                    r[e['domain']]['end'], e['end'])
-                r[e['domain']]['latest_forecast'] = min(
+                # This *should* never happen, since dates collection
+                # is already aggregated across all servers. However,
+                # it is getting hit, perhaps due to a race condition
+                # on db saves.
+                # TODO: figure out how this situation is happening
+                r[e['domain']]['begin'] = apply_min_max(
+                    min, r[e['domain']]['begin'], e['start'])
+                r[e['domain']]['end'] = apply_min_max(
+                    max, r[e['domain']]['end'], e['end'])
+                r[e['domain']]['latest_forecast'] = apply_min_max(max,
                     r[e['domain']]['latest_forecast'], e['latest_forecast'])
                 r[e['domain']]['availability'] = self._merge_availability_windows(
                     r[e['domain']]['availability'], e.get('availability', []))
