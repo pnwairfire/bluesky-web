@@ -43,8 +43,8 @@ Full run (ingestiont through visualization)
 
   $ {script_name} -v 4.1 \\
         -r http://localhost:8887/bluesky-web/ \\
-        --log-level=DEBUG -s 2014-05-30T00:00:00 -n 12 \\
-        --met-archive ca-nv_6-km
+        --log-level=DEBUG -s 2019-06-11T00:00:00 -n 12 \\
+        --met-archive ca-nv_4-km
 
   $ {script_name} -v 4.1 \\
         -r http://localhost:8887/bluesky-web/ \\
