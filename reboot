@@ -2,6 +2,7 @@
 
 show_help=false
 rebuild=false
+clear_data=false
 yaml_file=dev/docker-compose.yml
 shut_down=false
 
@@ -10,6 +11,7 @@ while [ -n "$1" ]; do # while loop starts
     -h) show_help=true && shift ;;
     --help) show_help=true && shift ;;
     --rebuild) rebuild=true && shift ;;
+    --clear-data) clear_data=true && shift ;;
     --yaml-file) yaml_file="$2" && shift && shift ;;
     --shut-down) shut_down=true && shift ;;
     *) echo "Option $1 not recognized" && exit 1 ;;
@@ -21,12 +23,13 @@ if [ "$show_help" = true ] ; then
     echo "Options:"
     echo "   -h/--help     - show this help message"
     echo "   --rebuild     - rebuild docker images"
+    echo "   --clear-data  - delete mongodb, rabbitmq, and output data"
     echo "   --yaml-file   - default: dev/docker-compose-dev.yml"
     echo "   --shut-down   - don't restart"
     echo ""
     echo "Usage:"
     echo "   $0"
-    echo "   $0 --yaml-file dev/docker-compose.yml --rebuild"
+    echo "   $0 --yaml-file dev/docker-compose.yml --rebuild --clear-data"
     echo "   $0 --shut-down"
     echo ""
     exit 0
@@ -40,6 +43,7 @@ fi
 
 echo "Options"
 echo "  Rebuild docker images: $rebuild"
+echo "  Clear data: $clear_data"
 echo "  docker-compose YAML file: $yaml_file"
 
 # call `down` on all known yaml files, in case previously used yaml file
@@ -60,6 +64,9 @@ if [ "$rebuild" = true ] ; then
     docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .\
         --build-arg COUNTRY=US --build-arg STATE=WA \
         --build-arg CITY=Seattle --build-arg ORGANIZATION=FooBar
+fi
+if [ "$clear_data" = true ] ; then
+    sudo rm -r dev/data/*
 fi
 if [ "$shut_down" = false ] ; then
     mkdir -p ./dev/logs/mongodb/ ./dev/logs/web/ \
