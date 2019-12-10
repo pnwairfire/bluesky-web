@@ -7,6 +7,7 @@ import json
 import os
 
 import ipify
+import requests
 import tornado.log
 from bluesky.marshal import Blueskyv4_0To4_1
 from bluesky.models import fires
