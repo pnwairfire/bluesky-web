@@ -144,24 +144,24 @@ class BlueSkyRunOutput(object):
         # TODO: refine what runtime info is returned
         r['runtime'] = process_runtime(run_info.get('runtime'))
 
-        export_info = run_info['export']
+        export_info = run_info.get('export')
+        if export_info:
+            vis_info = export_info['localsave'].get('visualization')
+            if vis_info:
+                # images
+                self._parse_images(r, vis_info)
 
-        vis_info = export_info['localsave'].get('visualization')
-        if vis_info:
-            # images
-            self._parse_images(r, vis_info)
+                # kmzs
+                self._parse_kmzs_info(r, vis_info)
 
-            # kmzs
-            self._parse_kmzs_info(r, vis_info)
+            disp_info = export_info['localsave'].get('dispersion')
+            if disp_info:
+                r.update(**{
+                    k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
+                    for k in ('netCDF', 'netCDFs') if k.lower() in disp_info})
 
-        disp_info = export_info['localsave'].get('dispersion')
-        if disp_info:
-            r.update(**{
-                k: '{}/{}'.format(disp_info['sub_directory'], disp_info[k.lower()])
-                for k in ('netCDF', 'netCDFs') if k.lower() in disp_info})
-
-            # kmzs (vsmoke dispersion produces kmzs)
-            self._parse_kmzs_info(r, disp_info)
+                # kmzs (vsmoke dispersion produces kmzs)
+                self._parse_kmzs_info(r, disp_info)
 
         # TODO: list fire_*.csv if specified in output
 
