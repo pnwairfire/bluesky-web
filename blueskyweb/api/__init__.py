@@ -72,7 +72,7 @@ class RequestHandlerBase(tornado.web.RequestHandler):
 
     def _raise_error(self, status, msg, exception=None):
         self.set_status(status, msg)
-        self.write({"error": msg})
+        self.write({"error": {"message": msg}})
         if exception:
             tornado.log.gen_log.error('Exception: %s', exception)
         raise tornado.web.Finish()
