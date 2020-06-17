@@ -299,6 +299,24 @@ DEFAULTS = {
            "arl_index_file": "arl12hrindex.csv",
            "time_step": 1
        },
+        "FW06Z": {
+            "grid": {
+                "spacing": 1,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lng": -114.3270, "lat": 34.7379},
+                    "ne": {"lng": -110.0459, "lat": 39.1575}
+                },
+                "grid_size_options": {
+                    "1.0": "xy(km): 500 x 500",
+                    "0.75": "xy(km): 430 x 430",
+                    "0.50": "xy(km): 350 x 350",
+                    "0.25": "xy(km): 250 x 250",
+                }
+            },
+            "arl_index_file": "FW06Z-1km_arlindex.csv",
+            "time_step": 1
+       }
     },
     "archives": {
         "fast": {
@@ -349,6 +367,10 @@ DEFAULTS = {
             }
         },
         "special": {
+            "FW06Z_1km": {
+                "title": "Fire Weather 1.27km (Northern Arizona)",
+                "domain_id": "FW06Z"
+            },
             "ca-nv_2km-sep-2015": {
                 "title": "Rough Fire",
                 "domain_id": "DRI2km"
