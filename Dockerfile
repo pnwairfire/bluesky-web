@@ -1,17 +1,13 @@
-FROM pnwairfire/bluesky:v4.1.31
+FROM pnwairfire/bluesky:v4.2.9
 
 RUN apt-get install less vim
 
 RUN mkdir -p /usr/src/blueskyweb/
 WORKDIR /usr/src/blueskyweb/
 
-RUN pip install \
-    tornado==4.5.1 \
-    motor==1.1 \
-    requests==2.18.1 \
-    celery==4.1.1 \
-    docker==2.4.2 \
-    ipify==1.0.0
+COPY requirements.txt /usr/src/blueskyweb/
+COPY constraints.txt /usr/src/blueskyweb/
+RUN pip install -r requirements.txt -c constraints.txt
 
 RUN pip install pytest ipython
 
