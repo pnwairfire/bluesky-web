@@ -333,10 +333,10 @@ DEFAULTS = {
             },
             # TODO: Keep an eye out for mpi hysplit failing
             #   with exit code 132 for NAM3k runs
-            "national_3-km": {
-                "title": "National 3-km",
-                "domain_id": "NAM3km"
-            },
+            # "national_3-km": {
+            #     "title": "National 3-km",
+            #     "domain_id": "NAM3km"
+            # },
             "pacific_northwest_1.33-km": {
                 "title": "Pacific Northwest 1.33-km",
                 "domain_id": "PNW1.33km"
