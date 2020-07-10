@@ -24,7 +24,7 @@ the "config" key, and with other keys added.  If 'verbose=true' is specifed
 in the query string, then the reponse will be of the following structure:
 
     {
-        "bluesky_version": "4.1.14",
+        "bluesky_version": "4.2.9",
         "counts": { ... }
         "fires": [ ... ],
         "processing": [ ... ],
@@ -67,7 +67,7 @@ specifies configuration data and other control parameters.
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/fuelbeds/
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/run/fuelbeds/
  - method: POST
  - post data: (see the General Information > Request section above, as well as the examples below)
 
@@ -75,7 +75,7 @@ specifies configuration data and other control parameters.
 
 An example with fire location data specified as a geojson
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/fuelbeds/" -H 'Content-Type: application/json' -d '{
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/fuelbeds/" -H 'Content-Type: application/json' -d '{
         "fires": [
             {
                 "id": "SF11C14225236095807750",
@@ -122,7 +122,7 @@ specify a subset of the modules normally run by this API.
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/emissions/
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/run/emissions/
  - method: POST
  - post data: (see the General Information > Request section above, as well as the examples below)
 
@@ -168,7 +168,7 @@ An example with fire location data specified as geojson
         ]
     }' > dev/data/emissions-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/emissions/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/emissions/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/emissions-input.json | python -m json.tool | less
 
@@ -214,7 +214,7 @@ modules, and with fire location data specified as lat + lng + size.
         ]
     }' > dev/data/consumption-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/emissions/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/emissions/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/consumption-input.json | python -m json.tool | less
 
@@ -255,6 +255,6 @@ lat + lng + size.
         ]
     }' > dev/data/fuelbeds-through-emissions-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/emissions/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/emissions/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/fuelbeds-through-emissions-input.json | python -m json.tool | less

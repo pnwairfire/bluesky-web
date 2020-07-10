@@ -62,33 +62,33 @@ def get_routes(path_prefix):
         (r"/api/ping/?", Ping),
 
         # Getting information about met domains
-        (r"/api/v(1|4.1)/met/domains/?", DomainInfo),
-        (r"/api/v(1|4.1)/met/domains/([^/]+)/?", DomainInfo),
+        (r"/api/v(1|4.1|4.2)/met/domains/?", DomainInfo),
+        (r"/api/v(1|4.1|4.2)/met/domains/([^/]+)/?", DomainInfo),
 
         # Getting information about all met data archives
-        (r"/api/v(1|4.1)/met/archives/?", MetArchivesInfo),
+        (r"/api/v(1|4.1|4.2)/met/archives/?", MetArchivesInfo),
         # Getting information about specific met archive or
         # collection ('standard', 'special', 'fast', etc.)
-        (r"/api/v(1|4.1)/met/archives/([^/]+)/?", MetArchivesInfo),
+        (r"/api/v(1|4.1|4.2)/met/archives/([^/]+)/?", MetArchivesInfo),
         # Checking specific date avaialbility
-        (r"/api/v(1|4.1)/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailability),
+        (r"/api/v(1|4.1|4.2)/met/archives/([^/]+)/([0-9-]+)/?", MetArchiveAvailability),
 
         # Initiating runs
-        (r"/api/v(1|4.1)/run/(fuelbeds|emissions|dispersion|all)/?", RunExecute),
-        (r"/api/v(1|4.1)/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecute),
+        (r"/api/v(1|4.1|4.2)/run/(fuelbeds|emissions|dispersion|all)/?", RunExecute),
+        (r"/api/v(1|4.1|4.2)/run/(plumerise|dispersion|all)/([^/]+)/?", RunExecute),
         # Getting information about runs
         # Note: The following paths are supported for backwards compatibility:
-        #       - /api/v(1|4.1)/run/<guid>/status/
-        #       - /api/v(1|4.1)/run/<guid>/output/
+        #       - /api/v(1|4.1|4.2)/run/<guid>/status/
+        #       - /api/v(1|4.1|4.2)/run/<guid>/output/
         #     the current paths are:
-        #       - /api/v(1|4.1)/runs/<guid>/
-        #       - /api/v(1|4.1)/runs/<guid>/output/
-        (r"/api/v(1|4.1)/runs/?", RunsInfo),
-        (r"/api/v(1|4.1)/runs/({})/?".format('|'.join(RunStatuses.statuses)),
+        #       - /api/v(1|4.1|4.2)/runs/<guid>/
+        #       - /api/v(1|4.1|4.2)/runs/<guid>/output/
+        (r"/api/v(1|4.1|4.2)/runs/?", RunsInfo),
+        (r"/api/v(1|4.1|4.2)/runs/({})/?".format('|'.join(RunStatuses.statuses)),
             RunsInfo),
-        (r"/api/v(1|4.1)/runs/([^/]+)/?", RunStatus),
-        (r"/api/v(1|4.1)/run/([^/]+)/status/?", RunStatus),
-        (r"/api/v(1|4.1)/runs?/([^/]+)/output/?", RunOutput),
+        (r"/api/v(1|4.1|4.2)/runs/([^/]+)/?", RunStatus),
+        (r"/api/v(1|4.1|4.2)/run/([^/]+)/status/?", RunStatus),
+        (r"/api/v(1|4.1|4.2)/runs?/([^/]+)/output/?", RunOutput),
     ]
     if path_prefix:
         path_prefix = path_prefix.strip('/')

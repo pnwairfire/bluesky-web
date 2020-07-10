@@ -407,7 +407,7 @@ class BlueskyProcessorBase(object, metaclass=abc.ABCMeta):
 class BlueskyV1OutputProcessor(BlueskyProcessorBase):
 
     def _process(self, data):
-        # covnerts data from v4.1 to v1 output structure
+        # converts data from v4.1/v4.2 to v1 output structure
 
         if data.get('fires'):
             data['fire_information'] = [
@@ -477,11 +477,30 @@ class BlueskyV4_1OutputProcessor(BlueskyProcessorBase):
         if data.get('config'):
             data['run_config'] = data.pop('config')
 
+        # TODO: move export->localsave->visualization->dispersion->[images|kmzs]
+        #   to export->localsave->visualization->[images|kmzs]
+        #   (if other targets are under export->localsave->visualization,
+        #    leave them in place)
+
+        return data
+
+class BlueskyV4_2OutputProcessor(BlueskyProcessorBase):
+
+    def _process(self, data):
+        # covnerts older output data from v1 to v4.2 output structure
+        if data.get('fire_information'):
+            data['fires'] = Blueskyv4_0To4_1().marshal(
+                data.pop('fire_information'))
+
+        if data.get('config'):
+            data['run_config'] = data.pop('config')
+
         return data
 
 OUTPUT_PROCESSORS = {
     '1': BlueskyV1OutputProcessor,
-    '4.1': BlueskyV4_1OutputProcessor
+    '4.1': BlueskyV4_1OutputProcessor,
+    '4.2': BlueskyV4_2OutputProcessor
 }
 
 def apply_output_processor(api_version, output_stream):

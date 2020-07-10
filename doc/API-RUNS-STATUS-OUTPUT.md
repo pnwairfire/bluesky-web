@@ -1,11 +1,11 @@
 
-## GET /api/v4.1/runs/<guid>
+## GET /api/v4.2/runs/<guid>
 
 This API returns the status of a specific dispersion run
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/runs/<guid> (/api/v4.1/run/<guid>/status is also supported for backwards compatibility)
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/runs/<guid> (/api/v4.2/run/<guid>/status is also supported for backwards compatibility)
  - method: GET
 
 ### Response
@@ -47,7 +47,7 @@ Note:
 
 ### Example:
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/abc123/"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/runs/abc123/"
 
 An enqueued run:
 
@@ -105,7 +105,7 @@ A completed run:
                 "version": "0.1.0",
                 "consume_version": "5.0.2"
             },
-            "bluesky_version": "4.1.14",
+            "bluesky_version": "4.2.9",
             "dispersion": {
                 "version": "0.1.0",
                 "vsmoke_version": "0.1.0"
@@ -134,13 +134,13 @@ A completed run:
 
 
 
-## GET /api/v4.1/runs/[<status>/]
+## GET /api/v4.2/runs/[<status>/]
 
 This API returns the status of multiple runs
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/runs/[<status>/]
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/runs/[<status>/]
  - optional query args:
   - limit (int)
   - offset (int)
@@ -195,7 +195,7 @@ See notes under status API response, above
 
 All statuses, with limit and offset
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/?limit=2&offset=1" |python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/runs/?limit=2&offset=1" |python -m json.tool
 
 
     {
@@ -207,7 +207,7 @@ All statuses, with limit and offset
             {
                 "percent": 100,
                 "version_info": {
-                    "bluesky_version": "4.1.14",
+                    "bluesky_version": "4.2.9",
                     "emissions": {
                         "eflookup_version": "3.1.2",
                         "version": "0.1.0",
@@ -255,7 +255,7 @@ All statuses, with limit and offset
 
 Only enqueued runs
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/enqueued" |python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/runs/enqueued" |python -m json.tool
 
     {
         "total": 1,
@@ -283,13 +283,13 @@ Only enqueued runs
 
 
 
-## GET /api/v4.1/runs/<guid>/output
+## GET /api/v4.2/runs/<guid>/output
 
 This API returns the output location for a specific run
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/runs/<guid>/output (/api/v4.1/run/<guid>/output is also supported for backwards compatibility)
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/runs/<guid>/output (/api/v4.2/run/<guid>/output is also supported for backwards compatibility)
  - method: GET
 
 ### Response
@@ -300,7 +300,7 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
 
 #### Plumerise run output
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/8915adc2-d026-11e9-878c-0242c0a8d006/output"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/runs/8915adc2-d026-11e9-878c-0242c0a8d006/output"
 
     ...TODO: Fill in example...
 
@@ -308,7 +308,7 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
 
 #### Dispersion run output
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/runs/test-asynch-request-20190905T211302/output"
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/runs/test-asynch-request-20190905T211302/output"
 
     {
         "root_url": "http://localhost:8886/bluesky-web-output/test-asynch-request-20190905T211302",
@@ -377,7 +377,7 @@ Varies based on type of run - plumerise, hsyplit dispersion, or vsmoke
             }
         },
         "version_info": {
-            "bluesky_version": "4.1.14",
+            "bluesky_version": "4.2.9",
             "fuelbeds": {
                 "version": "0.1.0",
                 "fccsmap_version": "2.1.0"

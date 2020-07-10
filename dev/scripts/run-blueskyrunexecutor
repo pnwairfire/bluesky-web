@@ -123,6 +123,35 @@ FIRES_DATA = {
                 ]
             }
         ]
+    },
+    # v4.2 input is the same as v4.1
+    '4.2': {
+        "fires": [
+            {
+                "id": "SF11C14225236095807750",
+                "event_id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "start": None,  # WILL BE FILLED IN
+                                "end": None,  # WILL BE FILLED IN
+                                "specified_points": [
+                                    {
+                                        "lat": None,  # WILL BE FILLED IN
+                                        "lng": None,  # WILL BE FILLED IN
+                                        "area": None,  # WILL BE FILLED IN
+                                    }
+                                ],
+                                "ecoregion": "western",
+                                "utc_offset": None,  # WILL BE FILLED IN
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
     }
 }
 
@@ -172,7 +201,7 @@ Run fuelbeds though dispersion in process:
     -v $HOME/Met:/data/Met/ \\
     -v $PWD/dev/data/output/:/data/bluesky/output/ \\
     -w /usr/src/blueskyweb/ \\
-    bluesky-web {script_name} --log-level=DEBUG -v 4.1 \\
+    bluesky-web {script_name} --log-level=DEBUG -v 4.2 \\
     --mongodb-url mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \\
     -s 2019-07-26T00:00:00 -n 12 \\
     -a 500 --lat 45.12 --lng -120 \\

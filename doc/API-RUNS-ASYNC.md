@@ -6,7 +6,7 @@ requires timeprofile data.)
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/plumerise/<archive_type>/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/run/plumerise/<archive_type>/" \
  - method: POST
  - post data:
 
@@ -77,7 +77,7 @@ An example with fire location data specified as a single point
         ]
     }' > dev/data/plumerise-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/plumerise/ca-nv_6-km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/plumerise/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/plumerise-input.json
 
@@ -94,7 +94,7 @@ which is currently the only such model supported).
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/<archive_type>/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/run/dispersion/<archive_type>/" \
  - method: POST
  - post data:
 
@@ -204,7 +204,7 @@ one hour.
                                                 18808.46359175,
                                                 33617.0209525,
                                                 48425.57831325001,
-                                                63234.135674000005,
+                                                63234.235674000005,
                                                 78042.69303475,
                                                 92851.25039550001,
                                                 107659.80775625001,
@@ -248,7 +248,7 @@ one hour.
         }
     }' > dev/data/dispersion-hysplit-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/ca-nv_6-km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/dispersion/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-hysplit-input.json | python -m json.tool
 
@@ -318,7 +318,7 @@ however, override any of these.  For example:
         }
     }' > dev/data/dispersion-hysplit-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/ca-nv_6-km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/dispersion/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-hysplit-input.json | python -m json.tool
 
@@ -401,7 +401,7 @@ require emissions data.
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/all/<archive_type>/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/run/all/<archive_type>/" \
  - method: POST
  - post data:
 
@@ -471,7 +471,7 @@ status and output API requests (described below).
         ]
     }' > dev/data/all-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/all/ca-nv_6-km/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/all/ca-nv_6-km/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/all-input.json | python -m json.tool
 
@@ -490,7 +490,7 @@ only such model supported).
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/run/dispersion/" \
  - method: POST
  - post data:
 
@@ -609,7 +609,7 @@ and consumption data.
         }
     }'  > dev/data/dispersion-vsmoke-input.json
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/dispersion/" \
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/dispersion/" \
         -H 'Content-Type: application/json' \
         -d @dev/data/dispersion-vsmoke-input.json | python -m json.tool
 
@@ -637,7 +637,7 @@ consumption and emissions data.
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/run/all/" \
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/run/all/" \
  - method: POST
  - post data:
 
@@ -663,7 +663,7 @@ status and output API requests (described below).
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/run/all/" -H 'Content-Type: application/json' -d '
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/run/all/" -H 'Content-Type: application/json' -d '
     {
         "config": {
             "emissions": {

@@ -26,7 +26,7 @@ os.makedirs(DEV_LOG_DIR, exist_ok=True)
 EPILOG_STR = """
 Running only through emissions
 
-  $ {script_name} -v 4.1 --emissions \\
+  $ {script_name} -v 4.2 --emissions \\
         -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG
 
@@ -34,19 +34,19 @@ Running only through emissions
 
 Run through plumerise
 
-  $ {script_name} -v 4.1 --plumerise \\
+  $ {script_name} -v 4.2 --plumerise \\
         -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG
 
 
 Full run (ingestiont through visualization)
 
-  $ {script_name} -v 4.1 \\
+  $ {script_name} -v 4.2 \\
         -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG -s 2019-06-11T00:00:00 -n 12 \\
         --met-archive ca-nv_4-km
 
-  $ {script_name} -v 4.1 \\
+  $ {script_name} -v 4.2 \\
         -r http://localhost:8887/bluesky-web/ \\
         --log-level=DEBUG -s `date -d"-1 day" +%Y-%m-%dT00:00:00` -n 12 \\
         --met-archive ca-nv_4-km
@@ -146,6 +146,66 @@ FIRES_DATA = {
         ]
     },
     '4.1': {
+        "fires": [
+            {
+                "meta": {
+                    "vsmoke": {
+                        "ws": 12,
+                        "wd": 232
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
+                },
+                "id": "SF11C14225236095807750",
+                "type": "wildfire",
+                "fuel_type": "natural",
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "start": None,  # WILL BE FILLED IN
+                                "end": None,  # WILL BE FILLED IN
+                                # specified_points or polygon WILL BE FILLED IN
+                                "ecoregion": "western",
+                                "utc_offset": None,  # WILL BE FILLED IN
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "meta": {
+                    "vsmoke": {
+                        "ws": 12,
+                        "wd": 232
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Activity Fire near Yosemite, CA"
+                },
+                "id": "ljo4tosghsjfdsdkf",
+                "type": "rx",
+                "fuel_type": "activity",
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "start": None,  # WILL BE FILLED IN
+                                "end": None,  # WILL BE FILLED IN
+                                "ecoregion": "western",
+                                "utc_offset": None,  # WILL BE FILLED IN
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    # 4.2 input data is the same as for 4.1
+    '4.2': {
         "fires": [
             {
                 "meta": {

@@ -54,7 +54,7 @@ REQUIRED_ARGS = [
     {
         'short': '-v',
         'long': '--api-version',
-        'help': "1 or 4.1"
+        'help': "1, 4.1, or v4.2"
     }
 ]
 

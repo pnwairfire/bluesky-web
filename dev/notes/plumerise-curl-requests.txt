@@ -1,6 +1,6 @@
 Initiate plumerise:
 
-    curl "$BLUESKY_API_ROOT_URL/bluesky-web-test/api/v4.1/run/plumerise/NAM84/" \
+    curl "$BLUESKY_API_ROOT_URL/bluesky-web-test/api/v4.2/run/plumerise/NAM84/" \
         -H 'Content-Type: application/json' -d '{
             "fires": [
                 {
@@ -36,8 +36,8 @@ Initiate plumerise:
 
 Check status:
 
-    curl "$BLUESKY_API_ROOT_URL/bluesky-web-test/api/v4.1/runs/$RUN_ID/"
+    curl "$BLUESKY_API_ROOT_URL/bluesky-web-test/api/v4.2/runs/$RUN_ID/"
 
 Get output:
 
-    curl $BLUESKY_API_ROOT_URL/bluesky-web-test/api/v4.1/runs/$RUN_ID/output
+    curl $BLUESKY_API_ROOT_URL/bluesky-web-test/api/v4.2/runs/$RUN_ID/output

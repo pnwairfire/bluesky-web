@@ -24,11 +24,11 @@ if [ "$show_help" = true ] ; then
     echo "Options:"
     echo "   -h/--help        - show this help message"
     echo "   -u/--root-url    - root url of "
-    echo "   -v/--api-version -  1 or 4.1"
+    echo "   -v/--api-version -  1, 4.1, or 4.2"
     echo "   -m/--mode        - 'fuelbeds', 'emissons', or 'both'"
     echo ""
     echo "Usage:"
-    echo "   $0 -v 4.1 -m fuelbeds"
+    echo "   $0 -v 4.2 -m fuelbeds"
     echo "   $0 -v 1 -m emissions -u http://localhost:8887/bluesky-web/"
     echo ""
     exit 0
@@ -44,8 +44,8 @@ if [ "$MODE" != "fuelbeds" ] && [ "$MODE" != "emissions" ] && [ "$MODE" != "both
     exit 1
 fi
 
-if [ "$API_VERSION" != "1" ] && [ "$API_VERSION" != "4.1" ]; then
-    echo "ERROR: Specify -v / --api-version as '1' for '4.1'"
+if [ "$API_VERSION" != "1" ] && [ "$API_VERSION" != "4.1" ] && [ "$API_VERSION" != "4.2" ]; then
+    echo "ERROR: Specify -v / --api-version as '1', '4.1', or '4.2'"
     exit 1
 fi
 
@@ -109,7 +109,7 @@ if [ $API_VERSION = 1 ]; then
             }
         ]
     }'
-elif [ $API_VERSION = 4.1 ]; then
+elif [ $API_VERSION = 4.1 ] || [ $API_VERSION = 4.2 ] ; then
     POST_DATA='{
         "config": {
             "emissions": {

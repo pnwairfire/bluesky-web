@@ -27,5 +27,5 @@ curl -D - "$BLUESKY_API_ROOT_URL/api/v1/run/dispersion/DRI4km/?_m=fuelbeds" -H '
 
 
 ##
-## TODO: Add v4.1 requests
+## TODO: Add v4.1 and v4.2 requests
 ##

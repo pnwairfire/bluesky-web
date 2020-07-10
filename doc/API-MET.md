@@ -4,7 +4,7 @@ This API returns information about all domains with ARL data
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/met/domains/
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/met/domains/
  - method: GET
 
 ### Response
@@ -37,7 +37,7 @@ This API returns information about all domains with ARL data
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/domains/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/met/domains/" | python -m json.tool
     {
         "domains": [
             {
@@ -73,7 +73,7 @@ This API returns information about a specific domain with ARL data
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/met/domains/<domain_id>/
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/met/domains/<domain_id>/
  - method: GET
 
 ### Response
@@ -103,7 +103,7 @@ This API returns information about a specific domain with ARL data
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/domains/DRI4km/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/met/domains/DRI4km/" | python -m json.tool
     {
         "domain": {
             "id": "DRI4km",
@@ -136,7 +136,7 @@ This API returns the dates for which a specific domain has ARL data
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/met/archives/[<archive_type>/]
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/met/archives/[<archive_type>/]
  - method: GET
  - optional query args:
   - available (bool) -- filter by availability
@@ -183,7 +183,7 @@ This API returns the dates for which a specific domain has ARL data
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/met/archives/" | python -m json.tool
     {
         "archives": [
             {
@@ -222,7 +222,7 @@ This API returns the dates for which a specific domain has ARL data
         ]
     }
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/special/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/met/archives/special/" | python -m json.tool
     {
         "archives": [
             {
@@ -253,7 +253,7 @@ This API returns the dates for which a specific domain has ARL data
 
 ### Request
 
- - url: $BLUESKY_API_ROOT_URL/api/v4.1/met/archives/<archive_id>
+ - url: $BLUESKY_API_ROOT_URL/api/v4.2/met/archives/<archive_id>
  - method: GET
 
 ### Response
@@ -280,7 +280,7 @@ This API returns the dates for which a specific domain has ARL data
 
 ### Example
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/national_12-km/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/met/archives/national_12-km/" | python -m json.tool
     {
         "archive": {
             "group": "standard",
@@ -320,7 +320,7 @@ date range
 
 ### Request
 
- - url:  $BLUESKY_API_ROOT_URL/api/v4.1/met/archives/<archive_id>/<date>/
+ - url:  $BLUESKY_API_ROOT_URL/api/v4.2/met/archives/<archive_id>/<date>/
  - method: GET
  - optional query args: 'date_range'
 
@@ -338,7 +338,7 @@ date range
 
 #### Date available
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
     {
         "alternatives": [
             "2014-05-29",
@@ -348,7 +348,7 @@ date range
         "available": true
     }
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/ca-nv_6-km/2014-05-30/?date_range=1" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/met/archives/ca-nv_6-km/2014-05-30/?date_range=1" | python -m json.tool
     {
         "alternatives": [
             "2014-05-29",
@@ -359,7 +359,7 @@ date range
 
 #### Date not available, with alternatives
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
     {
         "alternatives": [
             "2014-05-29",
@@ -370,7 +370,7 @@ date range
 
 #### Date not available, no alternatives
 
-    $ curl "$BLUESKY_API_ROOT_URL/api/v4.1/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
+    $ curl "$BLUESKY_API_ROOT_URL/api/v4.2/met/archives/ca-nv_6-km/2014-05-30/" | python -m json.tool
     {
         "alternatives": [],
         "available": false
