@@ -422,19 +422,19 @@ DEFAULTS = {
         },
         "special": {
             "FW00Z_1km": {
-                "title": "Colorado/Wyoming",
+                "title": "00Z FW 1.27km (Colorado/Wyoming)",
                 "domain_id": "FW00Z"
             },
             "FW06Z_1km": {
-                "title": "Northern California",
+                "title": "06Z FW 1.27km (Northern California)",
                 "domain_id": "FW06Z"
             },
             "FW12Z_1km": {
-                "title": "Central California",
+                "title": "12Z FW 1.27km (Central California)",
                 "domain_id": "FW12Z"
             },
             "FW18Z_1km": {
-                "title": "Northern California",
+                "title": "18Z FW 1.27km (Northern California)",
                 "domain_id": "FW18Z"
             },
             "ca-nv_2km-sep-2015": {
