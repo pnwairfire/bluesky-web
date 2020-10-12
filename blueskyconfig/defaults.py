@@ -299,6 +299,24 @@ DEFAULTS = {
            "arl_index_file": "arl12hrindex.csv",
            "time_step": 1
        },
+        "FW00Z": {
+            "grid": {
+                "spacing": 1,
+                "projection": "LCC",
+                "boundary": {
+                    "ne": {"lat": 43.35, "lng": -103.2},
+                    "sw": {"lat": 38.65, "lng": -108.8}
+                },
+                "grid_size_options": {
+                    "1.0": "xy(km): 500 x 500",
+                    "0.75": "xy(km): 430 x 430",
+                    "0.50": "xy(km): 350 x 350",
+                    "0.25": "xy(km): 250 x 250",
+                }
+            },
+            "arl_index_file": "FW00Z-1km_arlindex.csv",
+            "time_step": 1
+       },
         "FW06Z": {
             "grid": {
                 "spacing": 1,
@@ -315,6 +333,42 @@ DEFAULTS = {
                 }
             },
             "arl_index_file": "FW06Z-1km_arlindex.csv",
+            "time_step": 1
+       },
+        "FW12Z": {
+            "grid": {
+                "spacing": 1,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lat": 34.65, "lng": -123.3},
+                    "ne": {"lat": 39.35, "lng": -117.7}
+                },
+                "grid_size_options": {
+                    "1.0": "xy(km): 500 x 500",
+                    "0.75": "xy(km): 430 x 430",
+                    "0.50": "xy(km): 350 x 350",
+                    "0.25": "xy(km): 250 x 250",
+                }
+            },
+            "arl_index_file": "FW12Z-1km_arlindex.csv",
+            "time_step": 1
+       },
+        "FW18Z": {
+            "grid": {
+                "spacing": 1,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lat": 37.65, "lng": -124.8},
+                    "ne": {"lat": 42.35, "lng": -119.2}
+                },
+                "grid_size_options": {
+                    "1.0": "xy(km): 500 x 500",
+                    "0.75": "xy(km): 430 x 430",
+                    "0.50": "xy(km): 350 x 350",
+                    "0.25": "xy(km): 250 x 250",
+                }
+            },
+            "arl_index_file": "FW18Z-1km_arlindex.csv",
             "time_step": 1
        }
     },
@@ -367,8 +421,20 @@ DEFAULTS = {
             }
         },
         "special": {
+            "FW00Z_1km": {
+                "title": "Colorado/Wyoming",
+                "domain_id": "FW06Z"
+            },
             "FW06Z_1km": {
-                "title": "Fire Weather 1.27km (Northern Arizona)",
+                "title": "Northern California",
+                "domain_id": "FW06Z"
+            },
+            "FW12Z_1km": {
+                "title": "Central California",
+                "domain_id": "FW06Z"
+            },
+            "FW18Z_1km": {
+                "title": "Northern California",
                 "domain_id": "FW06Z"
             },
             "ca-nv_2km-sep-2015": {
