@@ -423,7 +423,7 @@ DEFAULTS = {
         "special": {
             "FW00Z_1km": {
                 "title": "Colorado/Wyoming",
-                "domain_id": "FW06Z"
+                "domain_id": "FW00Z"
             },
             "FW06Z_1km": {
                 "title": "Northern California",
@@ -431,11 +431,11 @@ DEFAULTS = {
             },
             "FW12Z_1km": {
                 "title": "Central California",
-                "domain_id": "FW06Z"
+                "domain_id": "FW12Z"
             },
             "FW18Z_1km": {
                 "title": "Northern California",
-                "domain_id": "FW06Z"
+                "domain_id": "FW18Z"
             },
             "ca-nv_2km-sep-2015": {
                 "title": "Rough Fire",
