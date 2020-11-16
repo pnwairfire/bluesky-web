@@ -304,8 +304,8 @@ DEFAULTS = {
                 "spacing": 1,
                 "projection": "LCC",
                 "boundary": {
-                    "ne": {"lat": 43.35, "lng": -103.2},
-                    "sw": {"lat": 38.65, "lng": -108.8}
+                    "sw": {"lat": 35.15, "lng": -93.8},
+                    "ne": {"lat": 39.85, "lng": -88.2}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 500 x 500",
@@ -322,8 +322,8 @@ DEFAULTS = {
                 "spacing": 1,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lat": 37.65, "lng": -124.8},
-                    "ne": {"lat": 42.35, "lng": -119.2}
+                    "sw": {"lat": 29.65, "lng": -92.8},
+                    "ne": {"lat": 34.35, "lng": -87.2}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 500 x 500",
@@ -340,8 +340,8 @@ DEFAULTS = {
                 "spacing": 1,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lat": 34.65, "lng": -123.3},
-                    "ne": {"lat": 39.35, "lng": -117.7}
+                    "sw": {"lat": 35.15, "lng": -93.8},
+                    "ne": {"lat": 39.85, "lng": -88.2}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 500 x 500",
@@ -358,8 +358,8 @@ DEFAULTS = {
                 "spacing": 1,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lat": 37.65, "lng": -124.8},
-                    "ne": {"lat": 42.35, "lng": -119.2}
+                    "sw": {"lat": 29.65, "lng": -92.8},
+                    "ne": {"lat": 34.35, "lng": -87.2}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 500 x 500",
@@ -422,19 +422,19 @@ DEFAULTS = {
         },
         "special": {
             "FW00Z_1km": {
-                "title": "00Z FW 1.27km (Colorado/Wyoming)",
+                "title": "00Z FW 1.27km (Missouri)",
                 "domain_id": "FW00Z"
             },
             "FW06Z_1km": {
-                "title": "06Z FW 1.27km (Northern California)",
+                "title": "06Z FW 1.27km (Mississippi)",
                 "domain_id": "FW06Z"
             },
             "FW12Z_1km": {
-                "title": "12Z FW 1.27km (Central California)",
+                "title": "12Z FW 1.27km (Missouri)",
                 "domain_id": "FW12Z"
             },
             "FW18Z_1km": {
-                "title": "18Z FW 1.27km (Northern California)",
+                "title": "18Z FW 1.27km (Mississippi)",
                 "domain_id": "FW18Z"
             },
             "ca-nv_2km-sep-2015": {
