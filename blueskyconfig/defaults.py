@@ -479,6 +479,18 @@ DEFAULTS = {
         "NAM3km": {
             "DISPERSION_OFFSET": 1
         }
+        # ,"FW00Z": {
+        #     "DISPERSION_OFFSET": 1
+        # }
+        ,"FW06Z": {
+            "DISPERSION_OFFSET": 1
+        }
+        # ,"FW12Z": {
+        #     "DISPERSION_OFFSET": 1
+        # }
+        # ,"FW18Z": {
+        #     "DISPERSION_OFFSET": 1
+        # }
     },
     # These prevent users from setting values to low or high
     "hysplit_settings_restrictions": {
