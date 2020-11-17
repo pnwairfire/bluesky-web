@@ -308,8 +308,7 @@ class BlueSkyRunExecutor(object):
             "met_root_dir": met_root_dir,
             "arl": {
                 "index_filename_pattern":
-                    self.archive_info['arl_index_file'],
-                "fewer_arl_files": True
+                    self.archive_info['arl_index_file']
             }
         }
 

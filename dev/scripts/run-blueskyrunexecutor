@@ -37,7 +37,6 @@ INPUT = {
         },
         "findmetdata": {
             "arl": {
-                "fewer_arl_files": True,
                 "index_filename_pattern": None,  # WILL BE FILLED IN
             },
             "met_root_dir": None  # WILL BE FILLED IN
