@@ -447,9 +447,9 @@ class BlueSkyRunExecutor(object):
             "IMAGE_OPACITY_FACTOR": "0.7"
         }
         bkml_con["DispersionGridOutput"] = {
-            "HOURLY_COLORS_PM25": "GreyColorBar,RedColorBar",
-            "THREE_HOUR_COLORS_PM25": "GreyColorBar,RedColorBar",
-            "DAILY_COLORS_PM25": "GreyColorBar,RedColorBar"
+            "HOURLY_COLORS": "GreyColorBar,RedColorBar",
+            "THREE_HOUR_COLORS": "GreyColorBar,RedColorBar",
+            "DAILY_COLORS": "GreyColorBar,RedColorBar"
         }
 
         # we want daily images produced for all timezones in which fires
