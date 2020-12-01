@@ -299,78 +299,78 @@ DEFAULTS = {
            "arl_index_file": "arl12hrindex.csv",
            "time_step": 1
        },
-        "FW00Z": {
-            "grid": {
-                "spacing": 1,
-                "projection": "LCC",
-                "boundary": {
-                    "sw": {"lat": 35.15, "lng": -93.8},
-                    "ne": {"lat": 39.85, "lng": -88.2}
-                },
-                "grid_size_options": {
-                    "1.0": "xy(km): 500 x 500",
-                    "0.75": "xy(km): 430 x 430",
-                    "0.50": "xy(km): 350 x 350",
-                    "0.25": "xy(km): 250 x 250",
-                }
-            },
-            "arl_index_file": "FW00Z-1km_arlindex.csv",
-            "time_step": 1
-       },
-        "FW06Z": {
-            "grid": {
-                "spacing": 1,
-                "projection": "LCC",
-                "boundary": {
-                    "sw": {"lat": 29.65, "lng": -92.8},
-                    "ne": {"lat": 34.35, "lng": -87.2}
-                },
-                "grid_size_options": {
-                    "1.0": "xy(km): 500 x 500",
-                    "0.75": "xy(km): 430 x 430",
-                    "0.50": "xy(km): 350 x 350",
-                    "0.25": "xy(km): 250 x 250",
-                }
-            },
-            "arl_index_file": "FW06Z-1km_arlindex.csv",
-            "time_step": 1
-       },
-        "FW12Z": {
-            "grid": {
-                "spacing": 1,
-                "projection": "LCC",
-                "boundary": {
-                    "sw": {"lat": 35.15, "lng": -93.8},
-                    "ne": {"lat": 39.85, "lng": -88.2}
-                },
-                "grid_size_options": {
-                    "1.0": "xy(km): 500 x 500",
-                    "0.75": "xy(km): 430 x 430",
-                    "0.50": "xy(km): 350 x 350",
-                    "0.25": "xy(km): 250 x 250",
-                }
-            },
-            "arl_index_file": "FW12Z-1km_arlindex.csv",
-            "time_step": 1
-       },
-        "FW18Z": {
-            "grid": {
-                "spacing": 1,
-                "projection": "LCC",
-                "boundary": {
-                    "sw": {"lat": 29.65, "lng": -92.8},
-                    "ne": {"lat": 34.35, "lng": -87.2}
-                },
-                "grid_size_options": {
-                    "1.0": "xy(km): 500 x 500",
-                    "0.75": "xy(km): 430 x 430",
-                    "0.50": "xy(km): 350 x 350",
-                    "0.25": "xy(km): 250 x 250",
-                }
-            },
-            "arl_index_file": "FW18Z-1km_arlindex.csv",
-            "time_step": 1
-       }
+       #  "FW00Z": {
+       #      "grid": {
+       #          "spacing": 1,
+       #          "projection": "LCC",
+       #          "boundary": {
+       #              "sw": {"lat": 35.15, "lng": -93.8},
+       #              "ne": {"lat": 39.85, "lng": -88.2}
+       #          },
+       #          "grid_size_options": {
+       #              "1.0": "xy(km): 500 x 500",
+       #              "0.75": "xy(km): 430 x 430",
+       #              "0.50": "xy(km): 350 x 350",
+       #              "0.25": "xy(km): 250 x 250",
+       #          }
+       #      },
+       #      "arl_index_file": "FW00Z-1km_arlindex.csv",
+       #      "time_step": 1
+       # },
+       #  "FW06Z": {
+       #      "grid": {
+       #          "spacing": 1,
+       #          "projection": "LCC",
+       #          "boundary": {
+       #              "sw": {"lat": 29.65, "lng": -92.8},
+       #              "ne": {"lat": 34.35, "lng": -87.2}
+       #          },
+       #          "grid_size_options": {
+       #              "1.0": "xy(km): 500 x 500",
+       #              "0.75": "xy(km): 430 x 430",
+       #              "0.50": "xy(km): 350 x 350",
+       #              "0.25": "xy(km): 250 x 250",
+       #          }
+       #      },
+       #      "arl_index_file": "FW06Z-1km_arlindex.csv",
+       #      "time_step": 1
+       # },
+       #  "FW12Z": {
+       #      "grid": {
+       #          "spacing": 1,
+       #          "projection": "LCC",
+       #          "boundary": {
+       #              "sw": {"lat": 35.15, "lng": -93.8},
+       #              "ne": {"lat": 39.85, "lng": -88.2}
+       #          },
+       #          "grid_size_options": {
+       #              "1.0": "xy(km): 500 x 500",
+       #              "0.75": "xy(km): 430 x 430",
+       #              "0.50": "xy(km): 350 x 350",
+       #              "0.25": "xy(km): 250 x 250",
+       #          }
+       #      },
+       #      "arl_index_file": "FW12Z-1km_arlindex.csv",
+       #      "time_step": 1
+       # },
+       #  "FW18Z": {
+       #      "grid": {
+       #          "spacing": 1,
+       #          "projection": "LCC",
+       #          "boundary": {
+       #              "sw": {"lat": 29.65, "lng": -92.8},
+       #              "ne": {"lat": 34.35, "lng": -87.2}
+       #          },
+       #          "grid_size_options": {
+       #              "1.0": "xy(km): 500 x 500",
+       #              "0.75": "xy(km): 430 x 430",
+       #              "0.50": "xy(km): 350 x 350",
+       #              "0.25": "xy(km): 250 x 250",
+       #          }
+       #      },
+       #      "arl_index_file": "FW18Z-1km_arlindex.csv",
+       #      "time_step": 1
+       # }
     },
     "archives": {
         "fast": {
@@ -421,22 +421,22 @@ DEFAULTS = {
             }
         },
         "special": {
-            "FW00Z_1km": {
-                "title": "00Z FW 1.27km (Missouri)",
-                "domain_id": "FW00Z"
-            },
-            "FW06Z_1km": {
-                "title": "06Z FW 1.27km (Mississippi)",
-                "domain_id": "FW06Z"
-            },
-            "FW12Z_1km": {
-                "title": "12Z FW 1.27km (Missouri)",
-                "domain_id": "FW12Z"
-            },
-            "FW18Z_1km": {
-                "title": "18Z FW 1.27km (Mississippi)",
-                "domain_id": "FW18Z"
-            },
+            # "FW00Z_1km": {
+            #     "title": "00Z FW 1.27km (Missouri)",
+            #     "domain_id": "FW00Z"
+            # },
+            # "FW06Z_1km": {
+            #     "title": "06Z FW 1.27km (Mississippi)",
+            #     "domain_id": "FW06Z"
+            # },
+            # "FW12Z_1km": {
+            #     "title": "12Z FW 1.27km (Missouri)",
+            #     "domain_id": "FW12Z"
+            # },
+            # "FW18Z_1km": {
+            #     "title": "18Z FW 1.27km (Mississippi)",
+            #     "domain_id": "FW18Z"
+            # },
             "ca-nv_2km-sep-2015": {
                 "title": "Rough Fire",
                 "domain_id": "DRI2km"
