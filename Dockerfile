@@ -7,9 +7,9 @@ WORKDIR /usr/src/blueskyweb/
 
 COPY requirements.txt /usr/src/blueskyweb/
 COPY constraints.txt /usr/src/blueskyweb/
-RUN pip install -r requirements.txt -c constraints.txt
+RUN pip3 install -r requirements.txt -c constraints.txt
 
-RUN pip install pytest ipython
+RUN pip3 install pytest ipython
 
 
 ARG COUNTRY
