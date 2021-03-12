@@ -472,7 +472,7 @@ DEFAULTS = {
         "KHMAX": 72, # number of hours after which particles are removed
         # Note: MPI and NCPUS are not allowed to be overridden
         "MPI": True,
-        "NCPUS": 3
+        "NCPUS": 4
     },
     # These are met-specific defaults for internal hysplit settings
     "hysplit_met_specific": {
