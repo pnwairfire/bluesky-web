@@ -14,7 +14,7 @@ import threading
 import traceback
 import uuid
 
-import ipify
+import ipify2
 import tornado.log
 from celery import Celery
 from bluesky import (

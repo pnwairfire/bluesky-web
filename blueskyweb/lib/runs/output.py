@@ -6,7 +6,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import json
 import os
 
-import ipify
+import ipify2
 import requests
 import tornado.log
 from bluesky.marshal import Blueskyv4_0To4_1
