@@ -178,8 +178,8 @@ DEFAULTS = {
                 "spacing": 3,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -125.0, "lat": 22},
-                    "ne": {"lng": -63.0, "lat": 49}
+                    "sw": {"lng": -122.0, "lat": 27.0},
+                    "ne": {"lng": -65.0, "lat": 50.0}
                 },
                 "grid_size_options": {
                     "1.0": "xy(km): 6700 x 2000",
