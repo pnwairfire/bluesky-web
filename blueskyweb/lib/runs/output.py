@@ -9,18 +9,20 @@ import os
 import ipify2
 import requests
 import tornado.log
+import urllib.request
 from bluesky.marshal import Blueskyv4_0To4_1
 from bluesky.models import fires
 
 from blueskyworker.tasks import process_runtime, apply_output_processor
 
 try:
-    IP_ADDRESS = ipify.get_ip()
+    IP_ADDRESS = ipify2.get_ipv4()
 except:
     # IP_ADDRESS is only used to see if worker is running on
     # same machine as web server.  If ipify fails, we'll just
     # resort to loading all output as if from remote server
     IP_ADDRESS = None
+tornado.log.gen_log.info(f'IP_ADDRESS (in output.py): {IP_ADDRESS}')
 
 
 # PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
