@@ -26,29 +26,32 @@ os.makedirs(DEV_LOG_DIR, exist_ok=True)
 EPILOG_STR = """
 Running only through emissions
 
-  $ {script_name} -v 4.2 --emissions \\
+  $ {script_name} --log-level=DEBUG -v 4.2 --emissions \\
         -r http://localhost:8887/bluesky-web/ \\
-        --log-level=DEBUG
 
   (Change root url for test and prod envs.)
 
 Run through plumerise
 
-  $ {script_name} -v 4.2 --plumerise \\
+  $ {script_name} --log-level=DEBUG -v 4.2 --plumerise \\
         -r http://localhost:8887/bluesky-web/ \\
-        --log-level=DEBUG
 
 
 Full run (ingestiont through visualization)
 
-  $ {script_name} -v 4.2 \\
+  $ {script_name} --log-level=DEBUG -v 4.2 \\
         -r http://localhost:8887/bluesky-web/ \\
-        --log-level=DEBUG -s 2019-06-11T00:00:00 -n 12 \\
+        --latitude 45 -s 2019-07-26T00:00:00 -n 12 \\
+        --met-archive pacific_northwest_4-km
+
+  $ {script_name} --log-level=DEBUG -v 4.2 \\
+        -r http://localhost:8887/bluesky-web/ \\
+        -s 2019-06-11T00:00:00 -n 12 \\
         --met-archive ca-nv_4-km
 
-  $ {script_name} -v 4.2 \\
+  $ {script_name} --log-level=DEBUG -v 4.2 \\
         -r http://localhost:8887/bluesky-web/ \\
-        --log-level=DEBUG -s `date -d"-1 day" +%Y-%m-%dT00:00:00` -n 12 \\
+        -s `date -d"-1 day" +%Y-%m-%dT00:00:00` -n 12 \\
         --met-archive ca-nv_4-km
 
 (On unix, use `date -v-1d +%Y-%m-%dT00:00:00`.)
