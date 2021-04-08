@@ -4,4 +4,4 @@ ipython
 affabric>=1.0.0,<2.0.0
 afscripting>=1.1.2,<2.0.0
 pyaml==16.12.2
-requests==2.18.1
+requests==2.20.0
