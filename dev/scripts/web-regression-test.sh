@@ -213,7 +213,7 @@ response=$(curl "$ROOT_URL/api/v1/run/emissions/" --write-out "$WRITE_OUT_PATTER
                 "species": ["PM2.5"]
             }
         },
-        "modules": ["fuelbeds", "consumption", "emissions"],
+        "modules": ["fuelbeds", "ecoregion", "consumption", "emissions"],
         "fire_information": [
             {
                 "event_of": {
@@ -345,7 +345,6 @@ for v in 4.1 4.2; do
                                         ],
                                         "area": 2398.94477979842
                                     },
-                                    "ecoregion": "southern",
                                     "utc_offset": "-09:00"
                                 }
                             ]
@@ -374,7 +373,7 @@ for v in 4.1 4.2; do
                     "species": ["PM2.5"]
                 }
             },
-            "modules": ["fuelbeds", "consumption", "emissions"],
+            "modules": ["fuelbeds", "ecoregion", "consumption", "emissions"],
             "fires": [
                 {
                     "id": "SF11C14225236095807750",
@@ -396,7 +395,6 @@ for v in 4.1 4.2; do
                                         ],
                                         "area": 2398.94477979842
                                     },
-                                    "ecoregion": "southern",
                                     "utc_offset": "-09:00"
                                 }
                             ]

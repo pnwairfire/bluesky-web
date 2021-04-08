@@ -148,7 +148,7 @@ class BlueSkyRunExecutor(object):
             'default': ['fuelbeds']
         },
         'emissions': {
-            'default': ['consumption', 'emissions'],
+            'default': ['ecoregion', 'consumption', 'emissions'],
             'other_allowed': ['fuelbeds']
         },
         # TODO: for dispersion requests, instead of running findmetdata, get

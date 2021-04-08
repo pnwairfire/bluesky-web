@@ -13,7 +13,7 @@ import time
 import uuid
 from io import BytesIO
 
-FIRES_JSON = '{"modules": ["fuelbeds","consumption","emissions"], "today": "2017-07-12", "runtime": {"total": "0.0h 0.0m 0s", "end": "2017-07-12T18:27:05Z", "start": "2017-07-12T18:27:05Z"},  "fires": [{"id": "SF11C14225236095807750","type": "natural""event_of": {"id": "SF11E826544","name": "Natural Fire near Yosemite, CA"},"activity": [{"active_areas": [{"start": "2015-11-24T17:00:00","end": "2015-11-25T17:00:00","utc_offset": "-07:00","specified_points": [{"area": 10000,"ecoregion": "western","lat": 37.909644,"lng": -119.7615805}],"ecoregion": "western"}]}]}], "config": {}, "counts": {"fires": 1}}'
+FIRES_JSON = '{"modules": ["fuelbeds","ecoregion","consumption","emissions"], "today": "2017-07-12", "runtime": {"total": "0.0h 0.0m 0s", "end": "2017-07-12T18:27:05Z", "start": "2017-07-12T18:27:05Z"},  "fires": [{"id": "SF11C14225236095807750","type": "natural""event_of": {"id": "SF11E826544","name": "Natural Fire near Yosemite, CA"},"activity": [{"active_areas": [{"start": "2015-11-24T17:00:00","end": "2015-11-25T17:00:00","utc_offset": "-07:00","specified_points": [{"area": 10000,"ecoregion": "western","lat": 37.909644,"lng": -119.7615805}],"ecoregion": "western"}]}]}], "config": {}, "counts": {"fires": 1}}'
 
 client = docker.from_env()
 

@@ -61,7 +61,7 @@ fi
 MODULES_SECTION=
 if [ "$MODE" == "both" ]; then
     # using a different fccs id that what's actually at the location
-    MODULES_SECTION='"modules": ["fuelbeds","consumption","emissions"],'
+    MODULES_SECTION='"modules": ["fuelbeds","ecoregion","consumption","emissions"],'
 fi
 
 POST_DATA=

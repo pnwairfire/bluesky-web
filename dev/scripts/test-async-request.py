@@ -112,7 +112,6 @@ FIRES_DATA = {
                         "end": None,  # WILL BE FILLED IN
                         "location": {
                             "area": None,  # WILL BE FILLED IN
-                            "ecoregion": "western",
                             # 'latitude' & longitude or geojson WILL BE FILLED IN
                             "utc_offset": None,  # WILL BE FILLED IN
                         }
@@ -139,7 +138,6 @@ FIRES_DATA = {
                         "end": None,  # WILL BE FILLED IN
                         "location": {
                             "area": None,  # WILL BE FILLED IN
-                            "ecoregion": "western",
                             # 'latitude' & longitude or geojson WILL BE FILLED IN
                             "utc_offset": None,  # WILL BE FILLED IN
                         }
@@ -171,7 +169,6 @@ FIRES_DATA = {
                                 "start": None,  # WILL BE FILLED IN
                                 "end": None,  # WILL BE FILLED IN
                                 # specified_points or polygon WILL BE FILLED IN
-                                "ecoregion": "western",
                                 "utc_offset": None,  # WILL BE FILLED IN
                             }
                         ]
@@ -198,7 +195,6 @@ FIRES_DATA = {
                             {
                                 "start": None,  # WILL BE FILLED IN
                                 "end": None,  # WILL BE FILLED IN
-                                "ecoregion": "western",
                                 "utc_offset": None,  # WILL BE FILLED IN
                             }
                         ]
@@ -231,7 +227,6 @@ FIRES_DATA = {
                                 "start": None,  # WILL BE FILLED IN
                                 "end": None,  # WILL BE FILLED IN
                                 # specified_points or polygon WILL BE FILLED IN
-                                "ecoregion": "western",
                                 "utc_offset": None,  # WILL BE FILLED IN
                             }
                         ]
@@ -258,7 +253,6 @@ FIRES_DATA = {
                             {
                                 "start": None,  # WILL BE FILLED IN
                                 "end": None,  # WILL BE FILLED IN
-                                "ecoregion": "western",
                                 "utc_offset": None,  # WILL BE FILLED IN
                             }
                         ]

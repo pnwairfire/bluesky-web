@@ -205,7 +205,7 @@ Run fuelbeds though dispersion in process:
     -s 2019-07-26T00:00:00 -n 12 \\
     -a 500 --lat 45.12 --lng -120 \\
     --met-archive pacific_northwest_4-km \\
-    fuelbeds consumption emissions \\
+    fuelbeds ecoregion consumption emissions \\
     timeprofile findmetdata plumerise \\
     dispersion visualization
 
