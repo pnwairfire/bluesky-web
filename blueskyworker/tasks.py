@@ -47,7 +47,7 @@ try:
 except:
     # this should only happen in dev, if working without internet connection
     IP_ADDRESS = 'localhost'
-tornado.log.gen_log.info(f'IP_ADDRESS (in tasks): {IP_ADDRESS}')
+tornado.log.gen_log.info('IP_ADDRESS (in tasks.py): %s', IP_ADDRESS)
 HOSTNAME = os.environ.get('PUBLIC_HOSTNAME') or IP_ADDRESS
 
 ##

@@ -22,7 +22,7 @@ except:
     # same machine as web server.  If ipify fails, we'll just
     # resort to loading all output as if from remote server
     IP_ADDRESS = None
-tornado.log.gen_log.info(f'IP_ADDRESS (in output.py): {IP_ADDRESS}')
+tornado.log.gen_log.info('IP_ADDRESS (in output.py): %s', IP_ADDRESS)
 
 
 # PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
@@ -53,6 +53,8 @@ tornado.log.gen_log.info(f'IP_ADDRESS (in output.py): {IP_ADDRESS}')
 #     return False
 
 def is_same_host(run):
+    tornado.log.gen_log.info('server ip %s vs. IP_ADDRESS: %s',
+        run['server']['ip'], IP_ADDRESS)
     return run['server']['ip'] == IP_ADDRESS
 
 ##
