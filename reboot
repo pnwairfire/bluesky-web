@@ -46,6 +46,10 @@ echo "  Rebuild docker images: $rebuild"
 echo "  Clear data: $clear_data"
 echo "  docker-compose YAML file: $yaml_file"
 
+bluesky_version=$(head -n 1 .bluesky-version)
+echo "Using bluesky version $bluesky_version"
+cat Dockerfile-unversioned |sed -e "s/__BLUESKY_VERSION__/$bluesky_version/g" > Dockerfile
+
 # call `down` on all known yaml files, in case previously used yaml file
 # is different than this one.
 docker-compose -p bluesky-web -f dev/docker-compose.yml down --remove-orphans

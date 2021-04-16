@@ -14,3 +14,4 @@ fabfile.py
 deploy-all-envs
 production-and-test-environments.md
 .private/
+Dockerfile
