@@ -361,6 +361,11 @@ OPTIONAL_ARGS = [
         'default': 'ca-nv_4-km'
     },
     {
+        'long': "--single-fire",
+        'help': ', '.join(HYSPLIT_OPTIONS),
+        'action': 'store_true'
+    },
+    {
         'long': "--hysplit-options",
         'help': ', '.join(HYSPLIT_OPTIONS)
     },
@@ -538,7 +543,13 @@ def create_initial_request(args):
 
     REQUEST.update(FIRES_DATA[args.api_version])
 
-    for i in range(2):
+    request_fires = (REQUEST['fire_information']
+        if args.api_version == '1' else REQUEST['fires'])
+
+    if args.single_fire:
+        request_fires.pop()
+
+    for i in range(len(request_fires)):
         lat = args.latitude + ((i-0.5)/10.0)
         polygon =                         [
             [args.longitude - 0.03, lat + 0.02],
@@ -548,12 +559,12 @@ def create_initial_request(args):
             [args.longitude - 0.03, lat + 0.02]
         ]
         if args.api_version == '1':
-            REQUEST['fire_information'][i]['growth'][0]['start'] = local_start_str
-            REQUEST['fire_information'][i]['growth'][0]['end'] = local_end_str
-            REQUEST['fire_information'][i]['growth'][0]['location']['utc_offset'] = args.utc_offset
-            REQUEST['fire_information'][i]['growth'][0]['location']['area'] = args.area
+            request_fires[i]['growth'][0]['start'] = local_start_str
+            request_fires[i]['growth'][0]['end'] = local_end_str
+            request_fires[i]['growth'][0]['location']['utc_offset'] = args.utc_offset
+            request_fires[i]['growth'][0]['location']['area'] = args.area
             if args.polygon:
-                REQUEST['fire_information'][i]['growth'][0]['location']['geojson'] = {
+                request_fires[i]['growth'][0]['location']['geojson'] = {
                     "type": "MultiPolygon",
                     "coordinates": [
                         [
@@ -562,20 +573,20 @@ def create_initial_request(args):
                     ]
                 }
             else:
-                REQUEST['fire_information'][i]['growth'][0]['location']['latitude'] = lat
-                REQUEST['fire_information'][i]['growth'][0]['location']['longitude'] = args.longitude
+                request_fires[i]['growth'][0]['location']['latitude'] = lat
+                request_fires[i]['growth'][0]['location']['longitude'] = args.longitude
 
         else:
-            REQUEST['fires'][i]['activity'][0]['active_areas'][0]["start"] = local_start_str
-            REQUEST['fires'][i]['activity'][0]['active_areas'][0]["end"] = local_end_str
-            REQUEST['fires'][i]['activity'][0]['active_areas'][0]["utc_offset"] = args.utc_offset
+            request_fires[i]['activity'][0]['active_areas'][0]["start"] = local_start_str
+            request_fires[i]['activity'][0]['active_areas'][0]["end"] = local_end_str
+            request_fires[i]['activity'][0]['active_areas'][0]["utc_offset"] = args.utc_offset
             if args.polygon:
-                REQUEST['fires'][i]['activity'][0]['active_areas'][0]['polygon'] = {
+                request_fires[i]['activity'][0]['active_areas'][0]['polygon'] = {
                     'perimeter': polygon,
                     'area': args.area
                 }
             else:
-                REQUEST['fires'][i]['activity'][0]['active_areas'][0]["specified_points"] = [
+                request_fires[i]['activity'][0]['active_areas'][0]["specified_points"] = [
                     {
                         "lat": lat,
                         "lng": args.longitude,
@@ -647,11 +658,6 @@ if __name__ == "__main__":
     if args.hysplit_options:
         for k, v in HYSPLIT_OPTIONS[args.hysplit_options].items():
             query[k] = v
-        if 'grid_size' in HYSPLIT_OPTIONS[args.hysplit_options]:
-            # can only specify 'grid_size' option for single-fire runs
-            data = json.loads(data)
-            data['fire_information'].pop()
-            data = json.dumps(data)
 
     url = '?'.join([url, urllib.parse.urlencode(query)])
     data = post(args, url, data, "Initiating Run")
