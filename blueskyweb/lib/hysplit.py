@@ -21,8 +21,8 @@ class ErrorMessages(object):
         " dispersion_speed or number_of_particles.")
     GRID_CONFLICTS_WITH_OTHER_OPTIONS = ("You can't specify 'grid',"
         " 'USER_DEFINED_GRID', or 'compute_grid' in the hysplit"
-        " config along with options 'dispersion_speed' or "
-        " 'grid_resolution'.")
+        " config along with options 'dispersion_speed', "
+        " 'grid_resolution', or 'grid_size'.")
     TOO_MANY_GRID_SPECIFICATIONS = ("You can't specify more than one of "
         "the following in the hysplit config: 'grid', "
         "'USER_DEFINED_GRID', or 'compute_grid'.")
@@ -82,14 +82,16 @@ class HysplitConfigurator(object):
         # get query_parameters
         speed = self._hysplit_query_params.get('dispersion_speed')
         res = self._hysplit_query_params.get('grid_resolution')
+        size = self._hysplit_query_params.get('grid_size')
         num_par = self._hysplit_query_params.get('number_of_particles')
 
         self._grid_resolution_factor = 1.0
-        if any([k is not None for k in (speed, res, num_par)]):
+        self._grid_size_factor = 1.0
+        if any([k is not None for k in (speed, res, num_par, size)]):
             if (speed or num_par) and 'NUMPAR' in self._hysplit_config:
                 self._handle_error(400, ErrorMessages.NUMPAR_CONFLICTS_WITH_OTHER_OPTIONS)
 
-            if (speed or res) and any([self._hysplit_config.get(k) for k in
+            if (speed or res or size) and any([self._hysplit_config.get(k) for k in
                     ('grid', 'USER_DEFINED_GRID', 'compute_grid')]):
                 self._handle_error(400, ErrorMessages.GRID_CONFLICTS_WITH_OTHER_OPTIONS)
 
@@ -105,6 +107,7 @@ class HysplitConfigurator(object):
                         ErrorMessages.INVALID_DISPERSION_SPEED.format(speed))
                 self._hysplit_config['NUMPAR'] = speed_options[speed]['numpar']
                 self._grid_resolution_factor = speed_options[speed]['grid_resolution_factor']
+                self._grid_size_factor = speed_options[speed]['grid_size_factor']
 
             else:
                 if num_par is not None:
@@ -123,19 +126,18 @@ class HysplitConfigurator(object):
                             ErrorMessages.INVALID_GRID_RESOLUTION.format(res))
                     self._grid_resolution_factor = res_options[res]
 
+                if size is not None:
+                    if size <= 0 or size > 1:
+                        self._handle_error(400,
+                            "grid_size ({}) must be > 0 and <= 100".format(size))
+                    self._grid_size_factor = size
+
         else:
             if len([v for v in [k in self._hysplit_config for k in
                     ('grid', 'USER_DEFINED_GRID', 'compute_grid')] if v]) > 1:
                 self._handle_error(400,
                     ErrorMessages.TOO_MANY_GRID_SPECIFICATIONS)
 
-        self._grid_size_factor = 1.0
-        size = self._hysplit_query_params.get('grid_size')
-        if size is not None:
-            if size <= 0 or size > 1:
-                self._handle_error(400,
-                    "grid_size ({}) must be > 0 and <= 100".format(size))
-            self._grid_size_factor = size
 
     def _fill_in_defaults(self):
         # fill config with defaults

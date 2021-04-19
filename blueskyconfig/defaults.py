@@ -491,26 +491,17 @@ DEFAULTS = {
         # For PGv3 standard runs
         "dispersion_speed": {
             "faster": {
-                # TODO: Change to:
-                #  - grid size factor 25%
-                #  - grid_resolution_factor 1.0 or greater
-                #  - numpar reduced from 'balanced' setting
+                "grid_size_factor": 0.25,
                 "grid_resolution_factor": 1.5,
                 "numpar": 1000
             },
             "balanced": {
-                # TODO: Change to:
-                #  - grid size factor 33%
-                #  - grid_resolution_factor 1.0
-                #  - numpar reduced from 'slower' setting
+                "grid_size_factor": 0.5,
                 "grid_resolution_factor": 1.0,
                 "numpar": 2000
             },
             "slower": {
-                # TODO: Change to:
-                #  - grid size factor 50%
-                #  - grid_resolution_factor 1.0
-                #  - numpar what we use in daily runs
+                "grid_size_factor": 1.0,
                 "grid_resolution_factor": 0.5,
                 "numpar": 3000
             }
