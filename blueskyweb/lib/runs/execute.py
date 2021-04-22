@@ -115,6 +115,7 @@ class BlueSkyRunExecutor(object):
                 else self._run_asynchronously)
 
         else:
+            await self._configure_fuelbeds(data)
             await self._configure_emissions(data)
 
             # fuelbeds or emissions request; default is to run in process
@@ -283,6 +284,14 @@ class BlueSkyRunExecutor(object):
     ##
     ## Configuration
     ##
+
+    ## Fuelbeds
+
+    async def _configure_fuelbeds(self, data):
+        tornado.log.gen_log.debug('Configuring fuelbeds')
+        data['config'] = data.get('config', {})
+        data['config']['fuelbeds'] = data['config'].get('fuelbeds', {})
+        data['config']['fuelbeds']['ignored_fuelbeds'] = []
 
     ## Emissions
 
