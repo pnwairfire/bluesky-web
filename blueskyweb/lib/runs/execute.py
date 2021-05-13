@@ -446,6 +446,10 @@ class BlueSkyRunExecutor(object):
         bkml_con = hy_con["blueskykml_config"]
         bkml_con["SmokeDispersionKMLOutput"] = bkml_con.get("SmokeDispersionKMLOutput", {})
         bkml_con["SmokeDispersionKMLOutput"]["INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS"] = "False"
+        bkml_con["DispersionGridInput"] = {
+            "LAYERS": [0],
+            "PARAMETERS": "PM25 VisualRange"
+        }
         bkml_con["DispersionImages"] = bkml_con.get("DispersionImages", {})
         bkml_con["GreyColorBar"] = {
             "DEFINE_RGB": "true",
@@ -455,11 +459,23 @@ class BlueSkyRunExecutor(object):
             "BLUE": "0 200 175 150 125 100 75 50 25",
             "IMAGE_OPACITY_FACTOR": "0.7"
         }
+        bkml_con["GrayColorBarVisualRange"] = {
+            "DEFINE_RGB": "true",
+            "DATA_LEVELS": "0.0 1.0 3.0 5.0 10.0 25.0 50 100 300",
+            "RED": "25 75 100 125 150 175 200 0",
+            "GREEN": "25 75 100 125 150 175 200 0",
+            "BLUE": "25 75 100 125 150 175 200 0",
+            "IMAGE_OPACITY_FACTOR": "0.7"
+        }
         bkml_con["DispersionGridOutput"] = {
             "HOURLY_COLORS_PM25": "GreyColorBar,RedColorBar",
             "THREE_HOUR_COLORS_PM25": "GreyColorBar,RedColorBar",
-            "DAILY_COLORS_PM25": "GreyColorBar,RedColorBar"
+            "DAILY_COLORS_PM25": "GreyColorBar,RedColorBar",
+            "HOURLY_COLORS_VISUALRANGE": "GrayColorBarVisualRange",
+            "THREE_HOUR_COLORS_VISUALRANGE": "GrayColorBarVisualRange",
+            "DAILY_COLORS_VISUALRANGE": "GrayColorBarVisualRange"
         }
+
 
         # we want daily images produced for all timezones in which fires
         # are located
