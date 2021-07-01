@@ -462,9 +462,9 @@ class BlueSkyRunExecutor(object):
         bkml_con["GrayColorBarVisualRange"] = {
             "DEFINE_RGB": "true",
             "DATA_LEVELS": "0.0 1.0 3.0 5.0 10.0 25.0 50 100 300",
-            "RED": "0 25 75 100 125 150 175 200",
-            "GREEN": "0 25 75 100 125 150 175 200",
-            "BLUE": "0 25 75 100 125 150 175 200",
+            "RED": "25 75 100 125 150 175 200 0",
+            "GREEN": "25 75 100 125 150 175 200 0",
+            "BLUE": "25 75 100 125 150 175 200 0",
             "IMAGE_OPACITY_FACTOR": "0.7"
         }
         bkml_con["DispersionGridOutput"] = {
