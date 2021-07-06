@@ -465,7 +465,6 @@ class BlueSkyRunExecutor(object):
             "RED": "5 25 75 100 125 150 175 200 255",
             "GREEN": "5 25 75 100 125 150 175 200 255",
             "BLUE": "5 25 75 100 125 150 175 200 255",
-            "BACKGROUND_COLOR_HEX": "#FFFFFF",
             "IMAGE_OPACITY_FACTOR": "0.7"
         }
         bkml_con["DispersionGridOutput"] = {
