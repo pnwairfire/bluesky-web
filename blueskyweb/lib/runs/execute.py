@@ -459,21 +459,21 @@ class BlueSkyRunExecutor(object):
             "BLUE": "0 200 175 150 125 100 75 50 25",
             "IMAGE_OPACITY_FACTOR": "0.7"
         }
-        bkml_con["GrayColorBarVisualRange"] = {
+        bkml_con["RainbowColorBarVisualRange"] = {
             "DEFINE_RGB": "true",
-            "DATA_LEVELS": "-0.1 0.0 1.0 3.0 5.0 10.0 25.0 50 100 300",
-            "RED": "0 25 75 100 125 150 175 200 0",
-            "GREEN": "0 25 75 100 125 150 175 200 0",
-            "BLUE": "0 25 75 100 125 150 175 200 0",
+            "DATA_LEVELS": "0 0.035 0.076 0.150 0.25  0.5 1 2 3 4 5 100",
+            "RED": "43 114 199 255 255 255 154 0 13 0 0",
+            "GREEN": "10 39 21 0 102  255 205 255 152 0 0",
+            "BlUE": "120 137 133 0 0 0 50 0 186 255 0",
             "IMAGE_OPACITY_FACTOR": "0.7"
         }
         bkml_con["DispersionGridOutput"] = {
             "HOURLY_COLORS_PM25": "GreyColorBar,RedColorBar",
             "THREE_HOUR_COLORS_PM25": "GreyColorBar,RedColorBar",
             "DAILY_COLORS_PM25": "GreyColorBar,RedColorBar",
-            "HOURLY_COLORS_VISUALRANGE": "GrayColorBarVisualRange",
-            "THREE_HOUR_COLORS_VISUALRANGE": "GrayColorBarVisualRange",
-            "DAILY_COLORS_VISUALRANGE": "GrayColorBarVisualRange"
+            "HOURLY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
+            "THREE_HOUR_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
+            "DAILY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange"
         }
 
 
