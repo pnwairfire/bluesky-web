@@ -293,6 +293,64 @@ class BlueSkyRunExecutor(object):
         data['config']['fuelbeds'] = data['config'].get('fuelbeds', {})
         data['config']['fuelbeds']['ignored_fuelbeds'] = []
 
+    ## Consumption
+
+    async def _configure_fuelbeds(self, data):
+        tornado.log.gen_log.debug('Configuring consumption')
+        data['config'] = data.get('config', {})
+        data['config']['consumption'] = data['config'].get('consumption', {})
+        data['config']['consumption']['fuel_loadings'] = {
+            "0": {
+                "overstory_loading": 0.000000,
+                "midstory_loading": 0.000000,
+                "understory_loading": 0.000000,
+                "snags_c1_foliage_loading": 0.000000,
+                "snags_c1wo_foliage_loading": 0.000000,
+                "snags_c1_wood_loading": 0.000000,
+                "snags_c2_loading": 0.000000,
+                "snags_c3_loading": 0.000000,
+                "shrubs_primary_loading": 9.821751,
+                "shrubs_secondary_loading": 0.000000,
+                "shrubs_primary_perc_live": 75.000000,
+                "shrubs_secondary_perc_live": 0.000000,
+                "nw_primary_loading": 0.000000,
+                "nw_secondary_loading": 0.000000,
+                "nw_primary_perc_live": 0.000000,
+                "nw_secondary_perc_live": 0.000000,
+                "w_sound_0_quarter_loading": 0.500000,
+                "w_sound_quarter_1_loading": 0.250000,
+                "w_sound_1_3_loading": 0.250000,
+                "w_sound_3_9_loading": 0.000000,
+                "w_sound_9_20_loading": 0.000000,
+                "w_sound_gt20_loading": 0.000000,
+                "w_rotten_3_9_loading": 0.000000,
+                "w_rotten_9_20_loading": 0.000000,
+                "w_rotten_gt20_loading": 0.000000,
+                "w_stump_sound_loading": 0.000000,
+                "w_stump_rotten_loading": 0.000000,
+                "w_stump_lightered_loading": 0.000000,
+                "litter_depth": 2.000000,
+                "litter_loading": 4.650000,
+                "lichen_depth": 0.000000,
+                "lichen_loading": 0.000000,
+                "moss_depth": 0.000000,
+                "moss_loading": 0.000000,
+                "basal_accum_loading": 0.000000,
+                "squirrel_midden_loading": 0.000000,
+                "ladderfuels_loading": 0.000000,
+                "duff_lower_depth": 0.000000,
+                "duff_lower_loading": 0.000000,
+                "duff_upper_depth": 0.100000,
+                "duff_upper_loading": 0.600000,
+                "pile_clean_loading": 0.000000,
+                "pile_dirty_loading": 0.000000,
+                "pile_vdirty_loading": 0.000000,
+                "total_available_fuel_loading": 16.071751,
+                "efg_natural": 7,
+                "efg_activity": 7
+            }
+        }
+
     ## Emissions
 
     async def _configure_emissions(self, data):
