@@ -299,8 +299,9 @@ class BlueSkyRunExecutor(object):
         tornado.log.gen_log.debug('Configuring consumption')
         data['config'] = data.get('config', {})
         data['config']['consumption'] = data['config'].get('consumption', {})
-        data['config']['consumption']['fuel_loadings'] = {
-            "0": {
+        data['config']['consumption']['fuel_loadings']  = data['config']['consumption'].get('fuel_loadings', {})
+        if "0" not in data['config']['consumption']['fuel_loadings']:
+            data['config']['consumption']['fuel_loadings']["0"] = {
                 "overstory_loading": 0.000000,
                 "midstory_loading": 0.000000,
                 "understory_loading": 0.000000,
@@ -349,7 +350,6 @@ class BlueSkyRunExecutor(object):
                 "efg_natural": 7,
                 "efg_activity": 7
             }
-        }
 
     ## Emissions
 
