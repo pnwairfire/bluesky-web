@@ -295,7 +295,7 @@ class BlueSkyRunExecutor(object):
 
     ## Consumption
 
-    async def _configure_fuelbeds(self, data):
+    async def _configure_consumption(self, data):
         tornado.log.gen_log.debug('Configuring consumption')
         data['config'] = data.get('config', {})
         data['config']['consumption'] = data['config'].get('consumption', {})
