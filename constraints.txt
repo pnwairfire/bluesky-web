@@ -10,7 +10,7 @@ billiard==3.5.0.5
 bluesky==4.1.31
 blueskykml==2.4.3
 blueskyutils==0.4.0
-celery==4.1.1
+celery==5.2.2
 certifi==2019.11.28
 chardet==3.0.4
 Click==7.0
