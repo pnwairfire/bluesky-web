@@ -263,24 +263,6 @@ DEFAULTS = {
             "arl_index_file": None, # TODO: set correctly
             "time_step": 1
         },
-        "Bend-OR-1km": {
-            "grid": {
-                "spacing": 1,
-                "projection": "LCC",
-                "boundary": {
-                    "sw": {"lng": -121.7421, "lat": 43.7762},
-                    "ne": {"lng": -120.9540, "lat": 44.3425}
-                },
-                "grid_size_options": {
-                    "1.0": "xy(km): 1100 x 800",
-                    "0.75": "xy(km): 900 x 600",
-                    "0.50": "xy(km): 600 x 400",
-                    "0.25": "xy(km): 300 x 200"
-                }
-            },
-            "arl_index_file": "arl12hrindex.csv",
-            "time_step": 1
-        },
         "Bend-OR-333m": {
            "grid": {
                "spacing": 0.333,
@@ -448,10 +430,6 @@ DEFAULTS = {
             "MT-2018-1km00Z": {
                 "title": "NWS 1km 00Z Montana",
                 "domain_id": "NWS-00Z-1km-2018-MT",
-            },
-            "Bend-OR-1km-2015": {
-                "title": "Bend, OR 1km 2015",
-                "domain_id": "Bend-OR-1km",
             },
             "Bend-OR-333m-2015": {
                 "title": "Bend, OR 333m 2015",
