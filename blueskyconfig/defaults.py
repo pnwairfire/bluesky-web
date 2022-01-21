@@ -227,42 +227,6 @@ DEFAULTS = {
             "arl_index_file": 'AK12km_ARL_index.csv',
             "time_step": 1
         },
-        "NWS-06Z-1km-2018-CA-NV": {
-            "grid": {
-                "spacing": 1,
-                "projection": "LCC",
-                "boundary": {
-                    "sw": {"lng": -125.3, "lat": 39.5},
-                    "ne": {"lng": -121, "lat": 44.4}
-                },
-                "grid_size_options": {
-                    "1.0": None,
-                    "0.75": None,
-                    "0.50": None,
-                    "0.25": None
-                }
-            },
-            "arl_index_file": None, # TODO: set correctly
-            "time_step": 1
-        },
-        "NWS-00Z-1km-2018-MT": {
-            "grid": {
-                "spacing": 1,
-                "projection": "LCC",
-                "boundary": {
-                    "sw": {"lng": -115.8, "lat": 44.7},
-                    "ne": {"lng": -110.6, "lat": 49.2}
-                },
-                "grid_size_options": {
-                    "1.0": None,
-                    "0.75": None,
-                    "0.50": None,
-                    "0.25": None
-                }
-            },
-            "arl_index_file": None, # TODO: set correctly
-            "time_step": 1
-        },
         "Bend-OR-333m": {
            "grid": {
                "spacing": 0.333,
@@ -422,14 +386,6 @@ DEFAULTS = {
             "ca-nv_2km-sep-2015": {
                 "title": "Rough Fire",
                 "domain_id": "DRI2km"
-            },
-            "CA-OR-2018-1km06Z": {
-                "title": "NWS 1km 06Z CA/OR",
-                "domain_id": "NWS-06Z-1km-2018-CA-NV",
-            },
-            "MT-2018-1km00Z": {
-                "title": "NWS 1km 00Z Montana",
-                "domain_id": "NWS-00Z-1km-2018-MT",
             },
             "Bend-OR-333m-2015": {
                 "title": "Bend, OR 333m 2015",

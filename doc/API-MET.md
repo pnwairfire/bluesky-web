@@ -187,36 +187,27 @@ This API returns the dates for which a specific domain has ARL data
     {
         "archives": [
             {
-                "id": "CA-OR-2018-1km06Z",
-                "group": "special",
-                "domain_id": "NWS-06Z-1km-2018-CA-NV",
-                "begin": null,
-                "end": null,
-                "title": "NWS 1km 06Z CA/OR"
-            },
-            {
-                "id": "MT-2018-1km00Z",
-                "group": "special",
-                "domain_id": "NWS-00Z-1km-2018-MT",
-                "begin": null,
-                "end": null,
-                "title": "NWS 1km 00Z Montana"
-            },
-            {
-                "id": "national_3-km",
+                "availability": [
+                    {
+                        "first_hour": "2018-01-01T00:00:00",
+                        "last_hour": "2022-01-25T00:00:00"
+                    }
+                ],
+                "begin": "2018-01-01T00:00:00",
+                "domain_id": "NAM84",
+                "end": "2022-01-25T00:00:00",
                 "group": "standard",
-                "domain_id": "NAM3km",
-                "begin": null,
-                "end": null,
-                "title": "National 3-km"
+                "id": "national_12-km",
+                "latest_forecast": "2022-01-21T12:00:00",
+                "title": "National 12-km"
             },
             {
-                "id": "pacific_northwest_1.33-km",
-                "group": "standard",
-                "domain_id": "PNW1.33km",
                 "begin": null,
+                "domain_id": "GFS",
                 "end": null,
-                "title": "Pacific Northwest 1.33-km"
+                "group": "standard",
+                "id": "global",
+                "title": "Global"
             },
             ...
         ]
@@ -226,21 +217,29 @@ This API returns the dates for which a specific domain has ARL data
     {
         "archives": [
             {
-                "id": "CA-OR-2018-1km06Z",
+                "availability": [
+                    {
+                        "first_hour": "2015-09-01T00:00:00",
+                        "last_hour": "2015-09-13T11:00:00"
+                    }
+                ],
+                "begin": "2015-09-01T00:00:00",
+                "domain_id": "DRI2km",
+                "end": "2015-09-13T11:00:00",
                 "group": "special",
-                "domain_id": "NWS-06Z-1km-2018-CA-NV",
-                "begin": null,
-                "end": null,
-                "title": "NWS 1km 06Z CA/OR"
+                "id": "ca-nv_2km-sep-2015",
+                "latest_forecast": "2015-09-10T12:00:00",
+                "title": "Rough Fire"
             },
             {
-                "id": "MT-2018-1km00Z",
-                "group": "special",
-                "domain_id": "NWS-00Z-1km-2018-MT",
                 "begin": null,
+                "domain_id": "NWS-06Z-1km-2018-CA-NV",
                 "end": null,
-                "title": "NWS 1km 00Z Montana"
-            }
+                "group": "special",
+                "id": "CA-OR-2018-1km06Z",
+                "title": "NWS 1km 06Z CA/OR"
+            },
+            ...
         ]
     }
 
