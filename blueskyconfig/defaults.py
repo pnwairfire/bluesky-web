@@ -390,6 +390,18 @@ DEFAULTS = {
             "Bend-OR-333m-2015": {
                 "title": "Bend, OR 333m 2015",
                 "domain_id": "Bend-OR-333m",
+            },
+            "fasmee-2020-nam-12km": {
+                "title": "FASMEE 2020 NAM-12km",
+                "domain_id": "NAM84"
+            },
+            "fasmee-2020-cansac-4km": {
+                "title": "FASMEE 2020 CANSAC-4km"
+                "domain_id": "DRI4km"
+            },
+            "fasmee-2020-nam-3km": {
+                "title": "FASMEE 2020 NAM-3km",
+                "domain_id": "NAM3km"
             }
         }
     },
