@@ -396,7 +396,7 @@ DEFAULTS = {
                 "domain_id": "NAM84"
             },
             "fasmee-2020-cansac-4km": {
-                "title": "FASMEE 2020 CANSAC-4km"
+                "title": "FASMEE 2020 CANSAC-4km",
                 "domain_id": "DRI4km"
             },
             "fasmee-2020-nam-3km": {
