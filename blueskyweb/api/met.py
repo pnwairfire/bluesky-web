@@ -30,7 +30,11 @@ class DomainInfo(RequestHandlerBase):
         r = {
             "id": domain_id,
             "boundary": grid_config['boundary'],
-            "grid_size_options": grid_config['grid_size_options']
+            "grid_size_options": {
+                k: f"xy(km): {grid_config['grid_size_options'][k]['x']} x {grid_config['grid_size_options'][k]['y']}"
+                    for k in grid_config['grid_size_options']
+            },
+            "grid_size_options_numeric": grid_config['grid_size_options']
         }
         r['resolution_km'] = grid_config['spacing']
         if grid_config['projection'] == 'LatLon':

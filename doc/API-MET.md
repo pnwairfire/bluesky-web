@@ -20,6 +20,12 @@ This API returns information about all domains with ARL data
                     "0.75": "xy(km): <dist km> x <dist km>",
                     "0.25": "xy(km): <dist km> x <dist km>"
                 },
+                "grid_size_options_numeric": {
+                    "1.0": {"x": <dist km>, "y": <dist km>},
+                    "0.50": {"x": <dist km>, "y": <dist km>},
+                    "0.75": {"x": <dist km>, "y": <dist km>},
+                    "0.25": {"x": <dist km>, "y": <dist km>}
+                },
                 "boundary": {
                     "ne": {
                         "lat": <lat>,
@@ -47,6 +53,12 @@ This API returns information about all domains with ARL data
                     "0.25": "xy(km): 300 x 200",
                     "0.50": "xy(km): 600 x 300",
                     "1.0": "xy(km): 1300 x 600"
+                },
+                "grid_size_options_numeric": {
+                    "0.75": {"x": 1000, "y": 500},
+                    "0.25": {"x": 300, "y": 200},
+                    "0.50": {"x": 600, "y": 300},
+                    "1.0": {"x": 1300, "y": 600}
                 },
                 "boundary": {
                     "ne": {
@@ -88,6 +100,12 @@ This API returns information about a specific domain with ARL data
                 "0.75": "xy(km): <dist km> x <dist km>",
                 "0.25": "xy(km): <dist km> x <dist km>"
             },
+            "grid_size_options_numeric": {
+                "1.0": {"x": <dist km>, "y": <dist km>},
+                "0.50": {"x": <dist km>, "y": <dist km>},
+                "0.75": {"x": <dist km>, "y": <dist km>},
+                "0.25": {"x": <dist km>, "y": <dist km>}
+            },
             "boundary": {
                 "ne": {
                     "lat": <lat>,
@@ -110,9 +128,15 @@ This API returns information about a specific domain with ARL data
             "resolution_km": 2,
             "grid_size_options": {
                 "1.0": "xy(km): 1100 x 800",
-                "0.50": "xy(km): 600 x 400",
                 "0.75": "xy(km): 900 x 600",
+                "0.50": "xy(km): 600 x 400",
                 "0.25": "xy(km): 300 x 200"
+            },
+            "grid_size_options_numeric": {
+                "1.0": {"x": 1100, "y": 800},
+                "0.75": {"x": 900, "y": 600},
+                "0.50": {"x": 600, "y": 400},
+                "0.25": {"x": 300, "y": 200}
             },
             "boundary": {
                 "sw": {
