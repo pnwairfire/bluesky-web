@@ -526,9 +526,9 @@ class BlueSkyRunExecutor(object):
             "IMAGE_OPACITY_FACTOR": "0.7"
         }
         bkml_con["DispersionGridOutput"] = {
-            "HOURLY_COLORS_PM25": "GreyColorBar,RedColorBar",
-            "THREE_HOUR_COLORS_PM25": "GreyColorBar,RedColorBar",
-            "DAILY_COLORS_PM25": "GreyColorBar,RedColorBar",
+            "HOURLY_COLORS_PM25": "GreyColorBar",
+            "THREE_HOUR_COLORS_PM25": "GreyColorBar",
+            "DAILY_COLORS_PM25": "GreyColorBar",
             "HOURLY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
             "THREE_HOUR_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
             "DAILY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange"
