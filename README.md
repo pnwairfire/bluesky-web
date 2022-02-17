@@ -104,3 +104,11 @@ run query on command line
         --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
         blueskyweb --eval 'db.met_files.findOne()'
 
+Or with db dsn
+
+    docker exec -ti bluesky-web-mongo \
+        mongo mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \
+         --ssl --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
+        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        --eval 'db.met_files.findOne()'
+
