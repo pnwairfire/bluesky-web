@@ -408,6 +408,7 @@ DEFAULTS = {
     # These are defaults for internal hysplit settings
     # (i.e. what's passed on to the pipeline)
     "hysplit": {
+        "ensure_dummy_fire": False, # don't add dummy fire
         "NUMPAR": 2000,
         "MAXPAR": 1000000000, # don"t want to ever hit MAXPAR
         "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
