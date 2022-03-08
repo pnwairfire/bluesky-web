@@ -361,29 +361,34 @@ class TestHysplitConfiguratorConfigureGrid(object):
         assert e.value.status_code == 400
         assert e.value.msg == hysplit.ErrorMessages.TOO_MANY_GRID_SPECIFICATIONS
 
+    ##
+    ## 'grid'
+    ##
 
-    def test_with_grid(self):
-        input_data = {
-            "config": {
-                "dispersion": {
-                    "hysplit": {
-                        # 'grid'
-                        "grid": {
-                            "spacing": 2,
-                            "projection": "LCC",
-                            "boundary": {
-                                "sw": {"lng": -100.0, "lat": 30.0},
-                                "ne": {"lng": -60.0, "lat": 40.0}
-                            }
+    GRID_INPUT_DATA = {
+        "config": {
+            "dispersion": {
+                "hysplit": {
+                    # 'grid'
+                    "grid": {
+                        "spacing": 2,
+                        "projection": "LCC",
+                        "boundary": {
+                            "sw": {"lng": -100.0, "lat": 30.0},
+                            "ne": {"lng": -60.0, "lat": 40.0}
                         }
                     }
                 }
-            },
-            "fires": [
-                {"activity": [{"active_areas": [{
-                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
-            ]
-        }
+            }
+        },
+        "fires": [
+            {"activity": [{"active_areas": [{
+                "specified_points": [{"lat": 35.0, "lng": -80.0, "area": 10}]}]}]},
+        ]
+    }
+
+    def test_with_grid_equal_to_archive_boundary(self):
+        input_data = copy.deepcopy(self.GRID_INPUT_DATA)
         hycon = hysplit.HysplitConfigurator(
             {}, handle_error, input_data, ARCHIVE_INFO)
         assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
@@ -398,43 +403,166 @@ class TestHysplitConfiguratorConfigureGrid(object):
         }
         assert hycon._hysplit_config['grid'] == expected_grid
 
-
-    def test_user_defined_grid(self):
-        input_data = {
-            "config": {
-                "dispersion": {
-                    "hysplit": {
-                        # 'USER_DEFINED_GRID'
-                        "USER_DEFINED_GRID": True,
-                        "CENTER_LATITUDE": 40,
-                        "CENTER_LONGITUDE": -80,
-                        "HEIGHT_LATITUDE": 20,
-                        "WIDTH_LONGITUDE": 40,
-                        "SPACING_LONGITUDE": 2,
-                        "SPACING_LATITUDE": 2,
-                    }
-                }
-            },
-            "fires": [
-                {"activity": [{"active_areas": [{
-                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
-            ]
+    def test_with_grid_within_archive_boundary(self):
+        input_data = copy.deepcopy(self.GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["grid"]["boundary"]["sw"]["lat"] = 32
+        input_data["config"]["dispersion"]["hysplit"]["grid"]["boundary"]["sw"]["lng"] = -95
+        input_data["config"]["dispersion"]["hysplit"]["grid"]["boundary"]["ne"]["lat"] = 38
+        input_data["config"]["dispersion"]["hysplit"]["grid"]["boundary"]["ne"]["lng"] = -65
+        hycon = hysplit.HysplitConfigurator(
+            {}, handle_error, input_data, ARCHIVE_INFO)
+        assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
+        assert 'compute_grid' not in hycon._hysplit_config
+        expected_grid = {
+            "spacing": 2,
+            "projection": "LCC",
+            "boundary": {
+                "sw": {"lng": -95.0, "lat": 32.0},
+                "ne": {"lng": -65.0, "lat": 38.0}
+            }
         }
+        assert hycon._hysplit_config['grid'] == expected_grid
+
+    def test_with_grid_too_far_south(self):
+        input_data = copy.deepcopy(self.GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["grid"]["boundary"]["sw"]["lat"] = 28
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                {}, handle_error, input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.GRID_OUTSIDE_MET_BOUNDS
+
+    def test_with_grid_too_far_west(self):
+        input_data = copy.deepcopy(self.GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["grid"]["boundary"]["sw"]["lng"] = -101
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                {}, handle_error, input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.GRID_OUTSIDE_MET_BOUNDS
+
+    def test_with_grid_too_far_north(self):
+        input_data = copy.deepcopy(self.GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["grid"]["boundary"]["ne"]["lat"] = 50
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                {}, handle_error, input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.GRID_OUTSIDE_MET_BOUNDS
+
+    def test_with_grid_too_far_east(self):
+        input_data = copy.deepcopy(self.GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["grid"]["boundary"]["ne"]["lng"] = -55
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                {}, handle_error, input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.GRID_OUTSIDE_MET_BOUNDS
+
+
+    ##
+    ## 'USER_DEFINED_GRID'
+    ##
+
+    USER_DEFINED_GRID_INPUT_DATA = {
+        "config": {
+            "dispersion": {
+                "hysplit": {
+                    # 'USER_DEFINED_GRID'
+                    "USER_DEFINED_GRID": True,
+                    "CENTER_LATITUDE": 35,
+                    "CENTER_LONGITUDE": -80,
+                    "HEIGHT_LATITUDE": 10,
+                    "WIDTH_LONGITUDE": 40,
+                    "SPACING_LONGITUDE": 2,
+                    "SPACING_LATITUDE": 2,
+                }
+            }
+        },
+        "fires": [
+            {"activity": [{"active_areas": [{
+                "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
+        ]
+    }
+
+
+    def test_user_defined_grid_equal_to_archive_boundary(self):
+        input_data = copy.deepcopy(self.USER_DEFINED_GRID_INPUT_DATA)
         hycon = hysplit.HysplitConfigurator(
             {}, handle_error, input_data, ARCHIVE_INFO)
         assert 'grid' not in hycon._hysplit_config
         assert 'compute_grid' not in hycon._hysplit_config
         expected_params = {
             "USER_DEFINED_GRID": True,
-            "CENTER_LATITUDE": 40,
+            "CENTER_LATITUDE": 35,
             "CENTER_LONGITUDE": -80,
-            "HEIGHT_LATITUDE": 20,
+            "HEIGHT_LATITUDE": 10,
             "WIDTH_LONGITUDE": 40,
             "SPACING_LONGITUDE": 2,
             "SPACING_LATITUDE": 2,
         }
         for k in expected_params:
             assert hycon._hysplit_config[k] == expected_params[k]
+
+    def test_user_defined_grid_within_archive_boundary(self):
+        input_data = copy.deepcopy(self.USER_DEFINED_GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["HEIGHT_LATITUDE"] = 8
+        input_data["config"]["dispersion"]["hysplit"]["WIDTH_LONGITUDE"] = 30
+        hycon = hysplit.HysplitConfigurator(
+            {}, handle_error, input_data, ARCHIVE_INFO)
+        assert 'grid' not in hycon._hysplit_config
+        assert 'compute_grid' not in hycon._hysplit_config
+        expected_params = {
+            "USER_DEFINED_GRID": True,
+            "CENTER_LATITUDE": 35,
+            "CENTER_LONGITUDE": -80,
+            "HEIGHT_LATITUDE": 8,
+            "WIDTH_LONGITUDE": 30,
+            "SPACING_LONGITUDE": 2,
+            "SPACING_LATITUDE": 2,
+        }
+        for k in expected_params:
+            assert hycon._hysplit_config[k] == expected_params[k]
+
+    def test_user_defined_grid_too_far_south(self):
+        input_data = copy.deepcopy(self.USER_DEFINED_GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["CENTER_LATITUDE"] = 32
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                {}, handle_error, input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.USER_DEFINED_GRID_OUTSIDE_MET_BOUNDS
+
+    def test_user_defined_grid_too_far_west(self):
+        input_data = copy.deepcopy(self.USER_DEFINED_GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["CENTER_LONGITUDE"] = -85
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                {}, handle_error, input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.USER_DEFINED_GRID_OUTSIDE_MET_BOUNDS
+
+    def test_user_defined_grid_too_far_north(self):
+        input_data = copy.deepcopy(self.USER_DEFINED_GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["CENTER_LATITUDE"] = 38
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                {}, handle_error, input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.USER_DEFINED_GRID_OUTSIDE_MET_BOUNDS
+
+    def test_user_defined_grid_too_far_east(self):
+        input_data = copy.deepcopy(self.USER_DEFINED_GRID_INPUT_DATA)
+        input_data["config"]["dispersion"]["hysplit"]["CENTER_LONGITUDE"] = -75
+        with pytest.raises(MockHTTPError) as e:
+            hycon = hysplit.HysplitConfigurator(
+                {}, handle_error, input_data, ARCHIVE_INFO)
+        assert e.value.status_code == 400
+        assert e.value.msg == hysplit.ErrorMessages.USER_DEFINED_GRID_OUTSIDE_MET_BOUNDS
+
+    ##
+    ## 'compute_grid'
+    ##
 
     def test_compute_grid(self):
         input_data = {
@@ -455,6 +583,10 @@ class TestHysplitConfiguratorConfigureGrid(object):
         assert 'grid' not in hycon._hysplit_config
         assert 'USER_DEFINED_GRID' not in hycon._hysplit_config
         assert hycon._hysplit_config['compute_grid'] == True
+
+    ##
+    ## default grid
+    ##
 
     def test_use_default_grid(self):
         input_data = {

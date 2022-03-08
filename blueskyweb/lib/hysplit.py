@@ -26,6 +26,8 @@ class ErrorMessages(object):
     TOO_MANY_GRID_SPECIFICATIONS = ("You can't specify more than one of "
         "the following in the hysplit config: 'grid', "
         "'USER_DEFINED_GRID', or 'compute_grid'.")
+    GRID_OUTSIDE_MET_BOUNDS = "User specified 'grid' extends outside of met domain"
+    USER_DEFINED_GRID_OUTSIDE_MET_BOUNDS = "User defined grid extends outside of met domain"
     INVALID_DISPERSION_SPEED = 'Invalid value for dispersion_speed: {}'
     INVALID_NUMBER_OF_PARTICLES = 'Invalid value for number_of_particles: {}'
     INVALID_GRID_RESOLUTION = 'Invalid value for grid_resolution: {}'
@@ -167,7 +169,31 @@ class HysplitConfigurator(object):
             if self._grid_size_factor != 1.0:
                 self._configure_hysplit_reduced_grid()
 
-        # else, nothing to do, since user configured grid
+        else:
+            # Make sure any user-defined grid is within the domain bounds
+            if self._hysplit_config.get('grid'):
+                a_boundary = self._archive_info['grid']["boundary"]
+                u_boundary = self._hysplit_config["grid"]["boundary"]
+                if (u_boundary["sw"]["lat"] < a_boundary["sw"]["lat"]
+                        or u_boundary["sw"]["lng"] < a_boundary["sw"]["lng"]
+                        or u_boundary["ne"]["lat"] > a_boundary["ne"]["lat"]
+                        or u_boundary["ne"]["lng"] > a_boundary["ne"]["lng"]):
+                    self._handle_error(400, ErrorMessages.GRID_OUTSIDE_MET_BOUNDS)
+
+            elif self._hysplit_config.get('USER_DEFINED_GRID'):
+                a_boundary = self._archive_info['grid']["boundary"]
+                half_height_lat = self._hysplit_config["HEIGHT_LATITUDE"] / 2
+                half_width_lng = self._hysplit_config["WIDTH_LONGITUDE"] / 2
+                sw_lat = self._hysplit_config["CENTER_LATITUDE"] - half_height_lat
+                sw_lng = self._hysplit_config["CENTER_LONGITUDE"] - half_width_lng
+                ne_lat = self._hysplit_config["CENTER_LATITUDE"] + half_height_lat
+                ne_lng = self._hysplit_config["CENTER_LONGITUDE"] + half_width_lng
+                if (sw_lat < a_boundary["sw"]["lat"]
+                        or sw_lng < a_boundary["sw"]["lng"]
+                        or ne_lat > a_boundary["ne"]["lat"]
+                        or ne_lng > a_boundary["ne"]["lng"]):
+                    self._handle_error(400, ErrorMessages.USER_DEFINED_GRID_OUTSIDE_MET_BOUNDS)
+
 
     def _configure_hysplit_reduced_grid(self):
         """Reduces the hyplit grid by a factor between 0.0 and 1.0,
