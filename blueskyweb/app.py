@@ -20,6 +20,7 @@ from blueskymongo.client import BlueSkyWebDB, RunStatuses
 # and have dispatcher try to dynamically import and run the
 # appropriate hander, returning 404 if not implemented
 from .api.ping import Ping
+from .api.config import ConfigDefaults
 from .api.met import DomainInfo, MetArchivesInfo, MetArchiveAvailability
 
 DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
@@ -60,6 +61,8 @@ def get_routes(path_prefix):
     from .api.run import RunExecute, RunStatus, RunOutput, RunsInfo
     routes = [
         (r"/api/ping/?", Ping),
+
+        (r"/api/v(1|4.1|4.2)/config/defaults?", ConfigDefaults),
 
         # Getting information about met domains
         (r"/api/v(1|4.1|4.2)/met/domains/?", DomainInfo),
