@@ -21,15 +21,11 @@ import tornado.log
 import blueskyconfig
 
 __all__ = [
-    "DOMAINS",
     "BoundaryNotDefinedError",
     "InvalidArchiveError",
     "UnavailableArchiveError",
     "MetArchiveDB"
 ]
-
-DOMAINS = blueskyconfig.get('domains')
-ARCHIVES = blueskyconfig.get('archives')
 
 class BoundaryNotDefinedError(ValueError):
     pass
@@ -49,17 +45,17 @@ ONE_DAY = datetime.timedelta(days=1)
 
 def get_archive_info(archive_id):
     if archive_id:
-        for v in ARCHIVES.values():
+        for v in blueskyconfig.get('archives').values():
             if archive_id in v:
                 archive_info = v[archive_id]
                 return dict(archive_info, id=archive_id,
-                    **DOMAINS[archive_info['domain_id']])
+                    **(blueskyconfig.get('domains')[archive_info['domain_id']]))
         raise InvalidArchiveError(archive_id)
 
 
 def validate_archive_id(archive_id):
     if archive_id:
-        for v in ARCHIVES.values():
+        for v in blueskyconfig.get('archives').values():
             if archive_id in v:
                 return archive_id
         raise InvalidArchiveError(archive_id)

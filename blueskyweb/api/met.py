@@ -25,8 +25,12 @@ KM_PER_DEG_LAT = 111
 
 class DomainInfo(RequestHandlerBase):
 
+    @property
+    def DOMAINS(self):
+        return blueskyconfig.get('domains')
+
     def _marshall(self, domain_id):
-        grid_config = met.db.DOMAINS[domain_id]['grid']
+        grid_config = self.DOMAINS[domain_id]['grid']
         r = {
             "id": domain_id,
             "boundary": grid_config['boundary'],
@@ -44,20 +48,21 @@ class DomainInfo(RequestHandlerBase):
         return r
 
     def get(self, api_version, domain_id=None):
+        domains = self.DOMAINS
         if domain_id:
-            if domain_id not in met.db.DOMAINS:
+            if domain_id not in domains:
                 self._raise_error(404, "Domain does not exist")
             else:
                 self.write({'domain': self._marshall(domain_id)})
         else:
-            self.write({'domains': [self._marshall(d) for d in met.db.DOMAINS]})
+            self.write({'domains': [self._marshall(d) for d in domains]})
 
 
 ##
 ## Archives
 ##
 
-ARCHIVES = blueskyconfig.get('archives')
+
 
 class MetArchiveBaseHander(RequestHandlerBase):
 
@@ -67,13 +72,16 @@ class MetArchiveBaseHander(RequestHandlerBase):
 
 class MetArchivesInfo(MetArchiveBaseHander):
 
+    @property
+    def ARCHIVES(self):
+        return blueskyconfig.get('archives')
+
     async def _marshall(self, archive_group, archive_id):
-        r = dict(ARCHIVES[archive_group][archive_id], id=archive_id,
+        r = dict(self.ARCHIVES[archive_group][archive_id], id=archive_id,
             group=archive_group)
         availability = await self.met_archives_db.get_availability(archive_id)
         r.update(availability)
         return r
-
 
     def write_archives(self, archives):
         available = self.get_boolean_arg('available')
@@ -85,23 +93,24 @@ class MetArchivesInfo(MetArchiveBaseHander):
         self.write({"archives": archives})
 
     async def get(self, api_version, identifier=None):
+        archives = self.ARCHIVES
         if not identifier:
             # Note: 'await' expressions in comprehensions are not supported
             archives = []
-            for archive_group in ARCHIVES:
-                for archive_id in ARCHIVES[archive_group]:
+            for archive_group in archives:
+                for archive_id in archives[archive_group]:
                     archives.append(await self._marshall(archive_group, archive_id))
             self.write_archives(archives)
 
-        elif identifier in ARCHIVES:
+        elif identifier in archives:
             archives = []
-            for archive_id in ARCHIVES[identifier]:
+            for archive_id in archives[identifier]:
                 archives.append(await self._marshall(identifier, archive_id))
             self.write_archives(archives)
 
         else:
-            for archive_group in ARCHIVES:
-                if identifier in ARCHIVES[archive_group]:
+            for archive_group in archives:
+                if identifier in archives[archive_group]:
                     self.write({"archive": await self._marshall(archive_group, identifier)})
                     break
             else:
