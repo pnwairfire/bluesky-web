@@ -1,7 +1,6 @@
 {
     "comments": [
-        "Note: domain grid information provided by Susan and STI.",
-        " Bounding box info can also be determined by running chk_arl",
+        "Note: Bounding box info can also be determined by running chk_arl",
         " For example:",
         "  $ chk_arl file /data/ARL/DRI/2km/2016040400/wrfout_d3.2016040400.f00-11_12hr01.arl |grep corner",
         "    Lower left corner:   32.5980 -124.2761",

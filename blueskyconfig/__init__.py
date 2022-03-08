@@ -38,15 +38,27 @@ class ConfigManagerSingleton():
 
     # this should never be used, but could if 'cache_ttl_minutes' is
     # accidentally deleted from the config defaults
-    _DEFAULT_TTL = 60
+    _DEFAULT_TTL_SECONDS = 60
+
+    @property
+    def ttl_minutes(self):
+        if hasattr(self._data, 'config'):
+            ttl = self._data.config.get('cache_ttl_minutes')
+            if ttl is not None:
+                return ttl * 60
+
+            ttl = self._data.config.get('cache_ttl_seconds')
+            if ttl is not None:
+                return ttl
+
+        return self._DEFAULT_TTL_SECONDS
 
     def _load_config_from_file(self):
         with open(self._config_json_file) as f:
             self._data.config = json.loads(f.read())
+            ttl = self._data.config.get('cache_ttl_minutes')
             self._data.expire_at = datetime.datetime.now() + datetime.timedelta(
-                minutes=self._data.config.get('cache_ttl_minutes')
-                    or self._DEFAULT_TTL)
-
+                seconds=self.ttl_minutes)
 
     @property
     def config(self):
