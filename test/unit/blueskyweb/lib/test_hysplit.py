@@ -636,6 +636,7 @@ class TestHysplitOptions(object):
             'NUMPAR': 2000,
             'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
             'VERTICAL_LEVELS': [100],
+            'ensure_dummy_fire': False,
             'grid': {
                 'boundary': {
                     'ne': {'lat': 40.0, 'lng': -60.0},
@@ -675,6 +676,7 @@ class TestHysplitOptions(object):
             'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
             'VERTICAL_LEVELS': [100],
             'DISPERSION_OFFSET': 1,
+            'ensure_dummy_fire': False,
             'grid': {
                 'boundary': {
                     'ne': {'lat': 40.0, 'lng': -60.0},
@@ -838,6 +840,7 @@ class TestHysplitOptions(object):
             'NUMPAR': 1000,
             'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
             'VERTICAL_LEVELS': [100],
+            'ensure_dummy_fire': False,
             'grid': {
                 'boundary': {
                     'ne': {'lat': 40.0, 'lng': -60.0},
@@ -875,6 +878,7 @@ class TestHysplitOptions(object):
             'NUMPAR': 3000,
             'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
             'VERTICAL_LEVELS': [100],
+            'ensure_dummy_fire': False,
             'grid': {
                 'boundary': {
                     'ne': {'lat': 40.0, 'lng': -60.0},
@@ -913,6 +917,7 @@ class TestHysplitOptions(object):
             'NUMPAR': 2000,
             'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
             'VERTICAL_LEVELS': [100],
+            'ensure_dummy_fire': False,
             'grid': {
                 'boundary': {
                     'ne': {'lat': 40.0, 'lng': -60.0},
@@ -949,6 +954,7 @@ class TestHysplitOptions(object):
             'NUMPAR': 4500,
             'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
             'VERTICAL_LEVELS': [100],
+            'ensure_dummy_fire': False,
             'grid': {
                 'boundary': {
                     'ne': {'lat': 40.0, 'lng': -60.0},
@@ -986,6 +992,7 @@ class TestHysplitOptions(object):
             'NUMPAR': 4500,
             'VERTICAL_EMISLEVELS_REDUCTION_FACTOR': 5,
             'VERTICAL_LEVELS': [100],
+            'ensure_dummy_fire': False,
             'grid': {
                 'boundary': {
                     'ne': {'lat': 40.0, 'lng': -60.0},
