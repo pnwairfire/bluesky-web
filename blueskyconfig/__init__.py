@@ -30,6 +30,9 @@ class ConfigManagerSingleton():
     def __init__(self, config_json_file=DEFAULT_CONFIG_JSON_FILE):
         self._config_json_file = config_json_file
 
+        # store overrides
+        self._overrides = None
+
         # __init__ will be called each time __new__ is called. So, we need to
         # keep track of initialization to abort subsequent reinitialization
         if not hasattr(self, '_initialized'):
@@ -39,6 +42,14 @@ class ConfigManagerSingleton():
     # this should never be used, but could if 'cache_ttl_minutes' is
     # accidentally deleted from the config defaults
     _DEFAULT_TTL_SECONDS = 60
+
+    @property
+    def overrides(self):
+        return self._overrides
+
+    @overrides.setter
+    def overrides(self, overrides):
+        self._overrides = overrides
 
     @property
     def ttl_minutes(self):
@@ -55,7 +66,13 @@ class ConfigManagerSingleton():
 
     def _load_config_from_file(self):
         with open(self._config_json_file) as f:
-            self._data.config = json.loads(f.read())
+            config = json.loads(f.read())
+            if self.overrides:
+                # merges in-place
+                afconfig.merge_configs(config, self.overrides)
+
+            self._data.config = config
+
             ttl = self._data.config.get('cache_ttl_minutes')
             self._data.expire_at = datetime.datetime.now() + datetime.timedelta(
                 seconds=self.ttl_minutes)
@@ -76,8 +93,7 @@ class ConfigManagerSingleton():
 
 def apply_overrides(overrides):
     if overrides:
-        # merges in-place
-        afconfig.merge_configs(ConfigManagerSingleton().config, overrides)
+        ConfigManagerSingleton.overrides = overrides
 
 def get(*args):
     return copy.deepcopy(afconfig.get_config_value(
