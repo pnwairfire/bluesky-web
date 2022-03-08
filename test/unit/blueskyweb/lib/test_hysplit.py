@@ -823,7 +823,7 @@ class TestHysplitOptions(object):
             },
             "fires": [
                 {"activity": [{"active_areas": [{
-                    "specified_points": [{"lat": 31.0, "lng": -64.0, "area": 10}]}]}]},
+                    "specified_points": [{"lat": 34.0, "lng": -64.0, "area": 10}]}]}]},
             ]
         }
         hycon = hysplit.HysplitConfigurator(
@@ -843,8 +843,8 @@ class TestHysplitOptions(object):
             'ensure_dummy_fire': False,
             'grid': {
                 'boundary': {
-                    'ne': {'lat': 40.0, 'lng': -60.0},
-                    'sw': {'lat': 30.0, 'lng': -100.0}
+                    'ne': {'lat': 35.25, 'lng': -60.0},
+                    'sw': {'lat': 32.75, 'lng': -70.0}
                 },
                 'projection': 'LCC',
                 'spacing': 3.0
