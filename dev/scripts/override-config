@@ -36,4 +36,5 @@ if __name__ == "__main__":
     blueskyconfig.apply_overrides(args.config_file_options)
     blueskyconfig.apply_overrides(args.config_options)
 
-    sys.stdout.write(json.dumps(blueskyconfig.config, sort_keys=True, indent=2))
+    sys.stdout.write(json.dumps(blueskyconfig.ConfigManagerSingleton().config,
+        sort_keys=True, indent=2))

@@ -1,15 +1,13 @@
-"""blueskyconfig.defaults"""
-
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
-
-DEFAULTS = {
-    # Note: domain grid information provided by Susan and STI.
-    #  Bounding box info can also be determined by running chk_arl
-    #  For example:
-    #   $ chk_arl file /data/ARL/DRI/2km/2016040400/wrfout_d3.2016040400.f00-11_12hr01.arl |grep corner
-    #     Lower left corner:   32.5980 -124.2761
-    #    Upper right corner:   41.8444 -113.0910
+{
+    "comments": [
+        "Note: domain grid information provided by Susan and STI.",
+        " Bounding box info can also be determined by running chk_arl",
+        " For example:",
+        "  $ chk_arl file /data/ARL/DRI/2km/2016040400/wrfout_d3.2016040400.f00-11_12hr01.arl |grep corner",
+        "    Lower left corner:   32.5980 -124.2761",
+        "   Upper right corner:   41.8444 -113.0910"
+    ],
+    "cache_ttl_minutes": 60,
     "domains": {
         "NAM84": {
             "grid": {
@@ -23,7 +21,7 @@ DEFAULTS = {
                     "1.0": {"x": 7800, "y": 2400},
                     "0.75": {"x": 5800, "y": 1800},
                     "0.50": {"x": 3900, "y": 1200},
-                    "0.25": {"x": 1900, "y": 600},
+                    "0.25": {"x": 1900, "y": 600}
                 }
             },
             "arl_index_file": "NAM84_ARL_index.csv",
@@ -44,7 +42,7 @@ DEFAULTS = {
                     "0.25": {"x": 1900, "y": 600}
                 }
             },
-            "arl_index_file": None, # TODO: set correctly
+            "arl_index_file": "GFS192_ARL_index.csv",
             "time_step": 3
         },
         "PNW1.33km": {
@@ -170,7 +168,7 @@ DEFAULTS = {
                     "0.25": {"x": 400, "y": 100}
                 }
             },
-            "arl_index_file": None, # TODO: set correctly
+            "arl_index_file": "arl12hrindex.csv",
             "time_step": 1
         },
         "NAM3km": {
@@ -206,12 +204,12 @@ DEFAULTS = {
                     "0.25": {"x": 300, "y": 200}
                 }
             },
-            "arl_index_file": None, # TODO: set correctly
+            "arl_index_file": null,
             "time_step": 1
         },
         "Alaska12km": {
             "grid": {
-                "spacing": 12, # 0.08
+                "spacing": 12,
                 "projection": "LCC",
                 "boundary": {
                     "sw": {"lng": -174.5, "lat": 50.0},
@@ -224,7 +222,7 @@ DEFAULTS = {
                     "0.25": {"x": 2200, "y": 500}
                 }
             },
-            "arl_index_file": 'AK12km_ARL_index.csv',
+            "arl_index_file": "AK12km_ARL_index.csv",
             "time_step": 1
         },
         "Bend-OR-333m": {
@@ -244,83 +242,85 @@ DEFAULTS = {
            },
            "arl_index_file": "arl12hrindex.csv",
            "time_step": 1
-       },
-       #  "FW00Z": {
-       #      "grid": {
-       #          "spacing": 1,
-       #          "projection": "LCC",
-       #          "boundary": {
-       #              "sw": {"lat": 35.15, "lng": -93.8},
-       #              "ne": {"lat": 39.85, "lng": -88.2}
-       #          },
-       #          "grid_size_options": {
-       #              "1.0": {"x": 500, "y": 500},
-       #              "0.75": {"x": 430, "y": 430},
-       #              "0.50": {"x": 350, "y": 350},
-       #              "0.25": {"x": 250, "y": 250},
-       #          }
-       #      },
-       #      "arl_index_file": "FW00Z-1km_arlindex.csv",
-       #      "time_step": 1
-       # },
-       #  "FW06Z": {
-       #      "grid": {
-       #          "spacing": 1,
-       #          "projection": "LCC",
-       #          "boundary": {
-       #              "sw": {"lat": 29.65, "lng": -92.8},
-       #              "ne": {"lat": 34.35, "lng": -87.2}
-       #          },
-       #          "grid_size_options": {
-       #              "1.0": {"x": 500, "y": 500},
-       #              "0.75": {"x": 430, "y": 430},
-       #              "0.50": {"x": 350, "y": 350},
-       #              "0.25": {"x": 250, "y": 250},
-       #          }
-       #      },
-       #      "arl_index_file": "FW06Z-1km_arlindex.csv",
-       #      "time_step": 1
-       # },
-       #  "FW12Z": {
-       #      "grid": {
-       #          "spacing": 1,
-       #          "projection": "LCC",
-       #          "boundary": {
-       #              "sw": {"lat": 35.15, "lng": -93.8},
-       #              "ne": {"lat": 39.85, "lng": -88.2}
-       #          },
-       #          "grid_size_options": {
-       #              "1.0": {"x": 500, "y": 500},
-       #              "0.75": {"x": 430, "y": 430},
-       #              "0.50": {"x": 350, "y": 350},
-       #              "0.25": {"x": 250, "y": 250},
-       #          }
-       #      },
-       #      "arl_index_file": "FW12Z-1km_arlindex.csv",
-       #      "time_step": 1
-       # },
-       #  "FW18Z": {
-       #      "grid": {
-       #          "spacing": 1,
-       #          "projection": "LCC",
-       #          "boundary": {
-       #              "sw": {"lat": 29.65, "lng": -92.8},
-       #              "ne": {"lat": 34.35, "lng": -87.2}
-       #          },
-       #          "grid_size_options": {
-       #              "1.0": {"x": 500, "y": 500},
-       #              "0.75": {"x": 430, "y": 430},
-       #              "0.50": {"x": 350, "y": 350},
-       #              "0.25": {"x": 250, "y": 250},
-       #          }
-       #      },
-       #      "arl_index_file": "FW18Z-1km_arlindex.csv",
-       #      "time_step": 1
-       # }
+       }
+   },
+   "unused_domains": {
+      "FW00Z": {
+             "grid": {
+                 "spacing": 1,
+                 "projection": "LCC",
+                 "boundary": {
+                     "sw": {"lat": 35.15, "lng": -93.8},
+                     "ne": {"lat": 39.85, "lng": -88.2}
+                 },
+                 "grid_size_options": {
+                     "1.0": {"x": 500, "y": 500},
+                     "0.75": {"x": 430, "y": 430},
+                     "0.50": {"x": 350, "y": 350},
+                     "0.25": {"x": 250, "y": 250}
+                 }
+             },
+             "arl_index_file": "FW00Z-1km_arlindex.csv",
+             "time_step": 1
+        },
+         "FW06Z": {
+             "grid": {
+                 "spacing": 1,
+                 "projection": "LCC",
+                 "boundary": {
+                     "sw": {"lat": 29.65, "lng": -92.8},
+                     "ne": {"lat": 34.35, "lng": -87.2}
+                 },
+                 "grid_size_options": {
+                     "1.0": {"x": 500, "y": 500},
+                     "0.75": {"x": 430, "y": 430},
+                     "0.50": {"x": 350, "y": 350},
+                     "0.25": {"x": 250, "y": 250}
+                 }
+             },
+             "arl_index_file": "FW06Z-1km_arlindex.csv",
+             "time_step": 1
+        },
+         "FW12Z": {
+             "grid": {
+                 "spacing": 1,
+                 "projection": "LCC",
+                 "boundary": {
+                     "sw": {"lat": 35.15, "lng": -93.8},
+                     "ne": {"lat": 39.85, "lng": -88.2}
+                 },
+                 "grid_size_options": {
+                     "1.0": {"x": 500, "y": 500},
+                     "0.75": {"x": 430, "y": 430},
+                     "0.50": {"x": 350, "y": 350},
+                     "0.25": {"x": 250, "y": 250}
+                 }
+             },
+             "arl_index_file": "FW12Z-1km_arlindex.csv",
+             "time_step": 1
+        },
+         "FW18Z": {
+             "grid": {
+                 "spacing": 1,
+                 "projection": "LCC",
+                 "boundary": {
+                     "sw": {"lat": 29.65, "lng": -92.8},
+                     "ne": {"lat": 34.35, "lng": -87.2}
+                 },
+                 "grid_size_options": {
+                     "1.0": {"x": 500, "y": 500},
+                     "0.75": {"x": 430, "y": 430},
+                     "0.50": {"x": 350, "y": 350},
+                     "0.25": {"x": 250, "y": 250}
+                 }
+             },
+             "arl_index_file": "FW18Z-1km_arlindex.csv",
+             "time_step": 1
+        }
     },
     "archives": {
         "fast": {
-            # TODO: add entries here once archives are available
+
         },
         "standard": {
             "national_12-km": {
@@ -331,8 +331,6 @@ DEFAULTS = {
                 "title": "Global",
                 "domain_id": "GFS"
             },
-            # TODO: Keep an eye out for mpi hysplit failing
-            #   with exit code 132 for NAM3k runs
             "national_3-km": {
                 "title": "National 3-km",
                 "domain_id": "NAM3km"
@@ -367,29 +365,13 @@ DEFAULTS = {
             }
         },
         "special": {
-            # "FW00Z_1km": {
-            #     "title": "00Z FW 1.27km (Missouri)",
-            #     "domain_id": "FW00Z"
-            # },
-            # "FW06Z_1km": {
-            #     "title": "06Z FW 1.27km (Mississippi)",
-            #     "domain_id": "FW06Z"
-            # },
-            # "FW12Z_1km": {
-            #     "title": "12Z FW 1.27km (Missouri)",
-            #     "domain_id": "FW12Z"
-            # },
-            # "FW18Z_1km": {
-            #     "title": "18Z FW 1.27km (Mississippi)",
-            #     "domain_id": "FW18Z"
-            # },
             "ca-nv_2km-sep-2015": {
                 "title": "Rough Fire",
                 "domain_id": "DRI2km"
             },
             "Bend-OR-333m-2015": {
                 "title": "Bend, OR 333m 2015",
-                "domain_id": "Bend-OR-333m",
+                "domain_id": "Bend-OR-333m"
             },
             "fasmee-2020-nam-12km": {
                 "title": "FASMEE 2020 NAM-12km",
@@ -405,37 +387,50 @@ DEFAULTS = {
             }
         }
     },
-    # These are defaults for internal hysplit settings
-    # (i.e. what's passed on to the pipeline)
+    "unused_archives": {
+        "special": {
+            "FW00Z_1km": {
+                "title": "00Z FW 1.27km (Missouri)",
+                "domain_id": "FW00Z"
+            },
+            "FW06Z_1km": {
+                "title": "06Z FW 1.27km (Mississippi)",
+                "domain_id": "FW06Z"
+            },
+            "FW12Z_1km": {
+                "title": "12Z FW 1.27km (Missouri)",
+                "domain_id": "FW12Z"
+            },
+            "FW18Z_1km": {
+                "title": "18Z FW 1.27km (Mississippi)",
+                "domain_id": "FW18Z"
+            }
+        }
+    },
     "hysplit": {
-        "ensure_dummy_fire": False, # don't add dummy fire
+        "ensure_dummy_fire": false,
         "NUMPAR": 2000,
-        "MAXPAR": 1000000000, # don"t want to ever hit MAXPAR
+        "MAXPAR": 1000000000,
         "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
         "VERTICAL_LEVELS": [100],
         "INITD": 0,
         "NINIT": 0,
         "DELT": 0.0,
-        "KHMAX": 72, # number of hours after which particles are removed
-        # Note: MPI and NCPUS are not allowed to be overridden
-        "MPI": True,
+        "KHMAX": 72,
+        "MPI": true,
         "NCPUS": 4
     },
-    # These are met-specific defaults for internal hysplit settings
     "hysplit_met_specific": {
         "NAM3km": {
             "DISPERSION_OFFSET": 1
         }
     },
-    # These prevent users from setting values to low or high
     "hysplit_settings_restrictions": {
         "TOP_OF_MODEL_DOMAIN": {
             "max": 30000.0
         }
     },
-    # These are options that get translated to internal hysplit settings
     "hysplit_options": {
-        # For PGv3 standard runs
         "dispersion_speed": {
             "faster": {
                 "grid_size_factor": 0.25,
@@ -453,18 +448,12 @@ DEFAULTS = {
                 "numpar": 3000
             }
         },
-        # For PGv3 advanced and expert runs
         "number_of_particles": {
-            # TODO: Change these to match the values
-            #   in the 'dispersion_speed' translations, above
             "low": 1000,
             "medium": 2000,
             "high": 3000
         },
         "grid_resolution": {
-            # TODO: change to something like:
-            # - 'nominal': 1.0
-            # - 'sub-sample': something less that 1.0
             "low": 1.5,
             "medium": 1.0,
             "high": 0.5
