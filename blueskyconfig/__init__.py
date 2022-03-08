@@ -56,8 +56,8 @@ class ConfigManagerSingleton():
         if not hasattr(self._data, 'config'):
             tornado.log.gen_log.debug("Initial load of config from file")
             self._load_config_from_file()
-        elif self._data.expire_at > datetime.datetime.now():
-            tornado.log.gen_log.debug("Cache expired - reloading from file")
+        elif self._data.expire_at < datetime.datetime.now():
+            tornado.log.gen_log.debug(f"Cache expired ({self._data.expire_at} vs. {datetime.datetime.now()}) - reloading from file")
             self._load_config_from_file()
 
         return self._data.config
