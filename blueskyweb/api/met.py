@@ -48,14 +48,14 @@ class DomainInfo(RequestHandlerBase):
         return r
 
     def get(self, api_version, domain_id=None):
-        domains = self.DOMAINS
+        DOMAINS = self.DOMAINS
         if domain_id:
             if domain_id not in domains:
                 self._raise_error(404, "Domain does not exist")
             else:
                 self.write({'domain': self._marshall(domain_id)})
         else:
-            self.write({'domains': [self._marshall(d) for d in domains]})
+            self.write({'domains': [self._marshall(d) for d in DOMAINS]})
 
 
 ##
@@ -93,24 +93,25 @@ class MetArchivesInfo(MetArchiveBaseHander):
         self.write({"archives": archives})
 
     async def get(self, api_version, identifier=None):
-        archives = self.ARCHIVES
+        ARCHIVES = self.ARCHIVES
         if not identifier:
             # Note: 'await' expressions in comprehensions are not supported
             archives = []
-            for archive_group in archives:
-                for archive_id in archives[archive_group]:
+
+            for archive_group in ARCHIVES:
+                for archive_id in ARCHIVES[archive_group]:
                     archives.append(await self._marshall(archive_group, archive_id))
             self.write_archives(archives)
 
-        elif identifier in archives:
+        elif identifier in ARCHIVES:
             archives = []
-            for archive_id in archives[identifier]:
+            for archive_id in ARCHIVES[identifier]:
                 archives.append(await self._marshall(identifier, archive_id))
             self.write_archives(archives)
 
         else:
-            for archive_group in archives:
-                if identifier in archives[archive_group]:
+            for archive_group in ARCHIVES:
+                if identifier in ARCHIVES[archive_group]:
                     self.write({"archive": await self._marshall(archive_group, identifier)})
                     break
             else:
