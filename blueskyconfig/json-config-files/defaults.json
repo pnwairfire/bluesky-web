@@ -407,10 +407,6 @@
         }
     },
     "hysplit": {
-        "binaries": {
-            "hysplit": "hycs_std-v5.1",
-            "hysplit_mpi": "hycm_std-v5.1"
-        },
         "ensure_dummy_fire": false,
         "NUMPAR": 2000,
         "MAXPAR": 1000000000,
