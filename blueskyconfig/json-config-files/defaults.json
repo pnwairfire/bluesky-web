@@ -6,7 +6,7 @@
         "    Lower left corner:   32.5980 -124.2761",
         "   Upper right corner:   41.8444 -113.0910"
     ],
-    "cache_ttl_minutes": 60,
+    "cache_ttl_minutes": 1,
     "domains": {
         "NAM84": {
             "grid": {
