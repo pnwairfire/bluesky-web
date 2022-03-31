@@ -421,7 +421,7 @@
         "DELT": 0.0,
         "KHMAX": 72,
         "MPI": true,
-        "NCPUS": 4
+        "NCPUS": 6
     },
     "hysplit_met_specific": {
         "NAM3km": {
