@@ -241,7 +241,25 @@
            },
            "arl_index_file": "arl12hrindex.csv",
            "time_step": 1
-       }
+        },
+        "FW06Z": {
+             "grid": {
+                 "spacing": 1,
+                 "projection": "LCC",
+                 "boundary": {
+                     "sw": {"lat": 33.8440, "lng": -107.2520},
+                     "ne": {"lat": 38.0680, "lng": -102.7508}
+                 },
+                 "grid_size_options": {
+                     "1.0": {"x": 500, "y": 500},
+                     "0.75": {"x": 430, "y": 430},
+                     "0.50": {"x": 350, "y": 350},
+                     "0.25": {"x": 250, "y": 250}
+                 }
+             },
+             "arl_index_file": "FW06Z-1km_arlindex.csv",
+             "time_step": 1
+        }
    },
    "unused_domains": {
       "FW00Z": {
@@ -260,24 +278,6 @@
                  }
              },
              "arl_index_file": "FW00Z-1km_arlindex.csv",
-             "time_step": 1
-        },
-         "FW06Z": {
-             "grid": {
-                 "spacing": 1,
-                 "projection": "LCC",
-                 "boundary": {
-                     "sw": {"lat": 33.8440, "lng": -107.2520},
-                     "ne": {"lat": 38.0680, "lng": -102.7508}
-                 },
-                 "grid_size_options": {
-                     "1.0": {"x": 500, "y": 500},
-                     "0.75": {"x": 430, "y": 430},
-                     "0.50": {"x": 350, "y": 350},
-                     "0.25": {"x": 250, "y": 250}
-                 }
-             },
-             "arl_index_file": "FW06Z-1km_arlindex.csv",
              "time_step": 1
         },
          "FW12Z": {
