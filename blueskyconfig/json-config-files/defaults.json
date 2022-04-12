@@ -361,6 +361,10 @@
             "alaska_12-km": {
                 "title": "Alaska 12-km",
                 "domain_id": "Alaska12km"
+            },
+            "FW06Z_1km": {
+                "title": "06Z FW 1.27km (New Mexico)",
+                "domain_id": "FW06Z"
             }
         },
         "special": {
@@ -391,10 +395,6 @@
             "FW00Z_1km": {
                 "title": "00Z FW 1.27km (Missouri)",
                 "domain_id": "FW00Z"
-            },
-            "FW06Z_1km": {
-                "title": "06Z FW 1.27km (Mississippi)",
-                "domain_id": "FW06Z"
             },
             "FW12Z_1km": {
                 "title": "12Z FW 1.27km (Missouri)",
