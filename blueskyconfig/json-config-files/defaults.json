@@ -259,16 +259,14 @@
              },
              "arl_index_file": "FW06Z-1km_arlindex.csv",
              "time_step": 1
-        }
-   },
-   "unused_domains": {
-      "FW00Z": {
+        },
+        "FW00Z": {
              "grid": {
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                     "sw": {"lat": 35.15, "lng": -93.8},
-                     "ne": {"lat": 39.85, "lng": -88.2}
+                     "sw": {"lat": 44.7079, "lng": -116.69995},
+                     "ne": {"lat": 49.2113, "lng": -111.74765}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -279,7 +277,9 @@
              },
              "arl_index_file": "FW00Z-1km_arlindex.csv",
              "time_step": 1
-        },
+        }
+   },
+   "unused_domains": {
          "FW12Z": {
              "grid": {
                  "spacing": 1,
@@ -362,6 +362,10 @@
                 "title": "Alaska 12-km",
                 "domain_id": "Alaska12km"
             },
+            "FW00Z_1km": {
+                "title": "00Z FW 1.27km (Montana/Idaho)",
+                "domain_id": "FW00Z"
+            },
             "FW06Z_1km": {
                 "title": "06Z FW 1.27km (New Mexico)",
                 "domain_id": "FW06Z"
@@ -392,10 +396,6 @@
     },
     "unused_archives": {
         "special": {
-            "FW00Z_1km": {
-                "title": "00Z FW 1.27km (Missouri)",
-                "domain_id": "FW00Z"
-            },
             "FW12Z_1km": {
                 "title": "12Z FW 1.27km (Missouri)",
                 "domain_id": "FW12Z"
