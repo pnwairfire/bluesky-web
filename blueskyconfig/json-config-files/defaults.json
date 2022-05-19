@@ -461,5 +461,52 @@
             "medium": 1.0,
             "high": 0.5
         }
+    },
+    "visualization": {
+        "targets": ["dispersion", "trajectories"],
+        "dispersion": {
+            "hysplit": {
+                "websky_version": "2",
+                "images_dir": "images/",
+                "data_dir": "data/",
+                "create_summary_json": true,
+                "blueskykml_config": {
+                    "SmokeDispersionKMLOutput": {
+                        "INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS": false
+                    },
+                    "DispersionGridInput": {
+                        "LAYERS": [0],
+                        "PARAMETERS": "PM25 VisualRange"
+                    },
+                    "DispersionImages": {
+                        "DAILY_IMAGES_UTC_OFFSETS": "auto"
+                    },
+                    "DispersionGridOutput": {
+                        "HOURLY_COLORS_PM25": "GreyColorBar",
+                        "THREE_HOUR_COLORS_PM25": "GreyColorBar",
+                        "DAILY_COLORS_PM25": "GreyColorBar",
+                        "HOURLY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
+                        "THREE_HOUR_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
+                        "DAILY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange"
+                    },
+                    "GreyColorBar": {
+                        "DEFINE_RGB": "true",
+                        "DATA_LEVELS": "0 1 12 35 55 150 250 350 500 2000",
+                        "RED": " 0 200 175 150 125 100 75 50 25",
+                        "GREEN": "0 200 175 150 125 100 75 50 25",
+                        "BLUE": "0 200 175 150 125 100 75 50 25",
+                        "IMAGE_OPACITY_FACTOR": "0.7"
+                    },
+                    "RainbowColorBarVisualRange": {
+                        "DEFINE_RGB": "true",
+                        "DATA_LEVELS": "0 1 2 3 4 5 10 20 100",
+                        "RED": "255 154 0 13 0 153 204 0",
+                        "GREEN": "255 205 255 152 0 204 229 0",
+                        "BlUE": "0 50 0 186 255 255 255 0",
+                        "IMAGE_OPACITY_FACTOR": "0.7"
+                    }
+                }
+            }
+        }
     }
 }

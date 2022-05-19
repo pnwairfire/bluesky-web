@@ -17,6 +17,7 @@ import tornado.web
 from bluesky.marshal import Blueskyv4_0To4_1
 from bluesky.models import fires
 
+import blueskyconfig
 from blueskymongo.client import RunStatuses
 from blueskyweb.lib import met, hysplit
 from blueskyweb.lib.runs import output
@@ -498,48 +499,32 @@ class BlueSkyRunExecutor(object):
         data['config']['visualization']["dispersion"] =  data['config']['visualization'].get('dispersion', {})
         data['config']['visualization']["dispersion"]["hysplit"] = data['config']['visualization']["dispersion"].get("hysplit", {})
         hy_con = data['config']['visualization']["dispersion"]["hysplit"]
-        hy_con["images_dir"] = "images/"
-        hy_con["data_dir"] = "data/"
-        hy_con["create_summary_json"] = True
+        default_hy_con = blueskyconfig.get('visualization')["dispersion"]["hysplit"]
+        hy_con["websky_version"] = default_hy_con["websky_version"]
+        hy_con["images_dir"] = default_hy_con["images_dir"]
+        hy_con["data_dir"] = default_hy_con["data_dir"]
+        hy_con["create_summary_json"] = default_hy_con["create_summary_json"]
         hy_con["blueskykml_config"] = hy_con.get("blueskykml_config", {})
         bkml_con = hy_con["blueskykml_config"]
+        default_bkml_con = default_hy_con["blueskykml_config"]
+
         bkml_con["SmokeDispersionKMLOutput"] = bkml_con.get("SmokeDispersionKMLOutput", {})
-        bkml_con["SmokeDispersionKMLOutput"]["INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS"] = "False"
-        bkml_con["DispersionGridInput"] = {
-            "LAYERS": [0],
-            "PARAMETERS": "PM25 VisualRange"
-        }
+        bkml_con["SmokeDispersionKMLOutput"]["INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS"] = default_bkml_con["SmokeDispersionKMLOutput"]["INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS"]
+        bkml_con["DispersionGridInput"] = default_bkml_con["DispersionGridInput"]
         bkml_con["DispersionImages"] = bkml_con.get("DispersionImages", {})
-        bkml_con["GreyColorBar"] = {
-            "DEFINE_RGB": "true",
-            "DATA_LEVELS": "0 1 12 35 55 150 250 350 500 2000",
-            "RED": " 0 200 175 150 125 100 75 50 25",
-            "GREEN": "0 200 175 150 125 100 75 50 25",
-            "BLUE": "0 200 175 150 125 100 75 50 25",
-            "IMAGE_OPACITY_FACTOR": "0.7"
-        }
-        bkml_con["RainbowColorBarVisualRange"] = {
-            "DEFINE_RGB": "true",
-            "DATA_LEVELS": "0 1 2 3 4 5 10 20 100",
-            "RED": "255 154 0 13 0 153 204 0",
-            "GREEN": "255 205 255 152 0 204 229 0",
-            "BlUE": "0 50 0 186 255 255 255 0",
-            "IMAGE_OPACITY_FACTOR": "0.7"
-        }
-        bkml_con["DispersionGridOutput"] = {
-            "HOURLY_COLORS_PM25": "GreyColorBar",
-            "THREE_HOUR_COLORS_PM25": "GreyColorBar",
-            "DAILY_COLORS_PM25": "GreyColorBar",
-            "HOURLY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
-            "THREE_HOUR_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
-            "DAILY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange"
-        }
-
-
-        # we want daily images produced for all timezones in which fires
-        # are located
+        # we want daily images produced for all timezones in which fires are located
         if not bkml_con["DispersionImages"].get("DAILY_IMAGES_UTC_OFFSETS"):
-            bkml_con["DispersionImages"]["DAILY_IMAGES_UTC_OFFSETS"] = 'auto'
+            bkml_con["DispersionImages"]["DAILY_IMAGES_UTC_OFFSETS"] = default_bkml_con["DispersionImages"]["DAILY_IMAGES_UTC_OFFSETS"]
+
+        bkml_con["DispersionGridOutput"] = default_bkml_con["DispersionGridOutput"]
+        all_schemes = set()
+        for series, schemes in bkml_con["DispersionGridOutput"].items():
+            if hasattr(schemes, "lower"):
+                schemes = [s.strip() for s in schemes.split(',')]
+            all_schemes = all_schemes.union(schemes)
+        for scheme in all_schemes:
+            bkml_con["DispersionGridOutput"][scheme] = default_bkml_con[scheme]
+
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
