@@ -463,7 +463,6 @@
         }
     },
     "visualization": {
-        "targets": ["dispersion", "trajectories"],
         "dispersion": {
             "hysplit": {
                 "websky_version": "2",
