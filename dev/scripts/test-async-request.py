@@ -27,14 +27,14 @@ EPILOG_STR = """
 Running only through emissions
 
   $ {script_name} --log-level=DEBUG -v 4.2 --emissions \\
-        -r http://localhost:8887/bluesky-web/ \\
+        -r http://localhost:8887/bluesky-web/
 
   (Change root url for test and prod envs.)
 
 Run through plumerise
 
   $ {script_name} --log-level=DEBUG -v 4.2 --plumerise \\
-        -r http://localhost:8887/bluesky-web/ \\
+        -r http://localhost:8887/bluesky-web/
 
 
 Full run (ingestiont through visualization)
