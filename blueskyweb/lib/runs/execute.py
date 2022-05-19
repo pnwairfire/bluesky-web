@@ -495,8 +495,9 @@ class BlueSkyRunExecutor(object):
         data['config'] = data.get('config', {})
         data['config']['visualization'] =  data['config'].get('visualization', {})
         data['config']['visualization']["target"] = "dispersion"
-        data['config']['visualization']["hysplit"] = data['config']['visualization'].get("hysplit", {})
-        hy_con = data['config']['visualization']["hysplit"]
+        data['config']['visualization']["dispersion"] =  data['config']['visualization'].get('dispersion', {})
+        data['config']['visualization']["dispersion"]["hysplit"] = data['config']['visualization']["dispersion"].get("hysplit", {})
+        hy_con = data['config']['visualization']["dispersion"]["hysplit"]
         hy_con["images_dir"] = "images/"
         hy_con["data_dir"] = "data/"
         hy_con["create_summary_json"] = True
