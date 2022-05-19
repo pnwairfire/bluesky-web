@@ -471,7 +471,7 @@
                 "create_summary_json": true,
                 "blueskykml_config": {
                     "SmokeDispersionKMLOutput": {
-                        "INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS": false
+                        "INCLUDE_DISCLAIMER_IN_FIRE_PLACEMARKS": "False"
                     },
                     "DispersionGridInput": {
                         "LAYERS": [0],
