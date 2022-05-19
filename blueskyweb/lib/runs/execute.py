@@ -497,7 +497,10 @@ class BlueSkyRunExecutor(object):
         data['config']['visualization'] =  data['config'].get('visualization', {})
         data['config']['visualization']["target"] = "dispersion"
         data['config']['visualization']["dispersion"] =  data['config']['visualization'].get('dispersion', {})
-        data['config']['visualization']["dispersion"]["hysplit"] = data['config']['visualization']["dispersion"].get("hysplit", {})
+        data['config']['visualization']["dispersion"]["hysplit"] = (
+            data['config']['visualization'].pop('hysplit', {})
+                or data['config']['visualization']["dispersion"].get("hysplit", {})
+        )
         hy_con = data['config']['visualization']["dispersion"]["hysplit"]
         default_hy_con = blueskyconfig.get('visualization')["dispersion"]["hysplit"]
         hy_con["websky_version"] = default_hy_con["websky_version"]
