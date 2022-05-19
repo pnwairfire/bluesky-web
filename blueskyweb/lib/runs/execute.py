@@ -526,7 +526,7 @@ class BlueSkyRunExecutor(object):
                 schemes = [s.strip() for s in schemes.split(',')]
             all_schemes = all_schemes.union(schemes)
         for scheme in all_schemes:
-            bkml_con["DispersionGridOutput"][scheme] = default_bkml_con[scheme]
+            bkml_con[scheme] = default_bkml_con[scheme]
 
         tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
