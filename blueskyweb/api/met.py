@@ -48,14 +48,14 @@ class DomainInfo(RequestHandlerBase):
         return r
 
     def get(self, api_version, domain_id=None):
-        DOMAINS = self.DOMAINS
+        domains = self.DOMAINS
         if domain_id:
             if domain_id not in domains:
                 self._raise_error(404, "Domain does not exist")
             else:
                 self.write({'domain': self._marshall(domain_id)})
         else:
-            self.write({'domains': [self._marshall(d) for d in DOMAINS]})
+            self.write({'domains': [self._marshall(d) for d in domains]})
 
 
 ##
