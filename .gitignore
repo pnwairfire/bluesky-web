@@ -10,7 +10,8 @@ db/
 dev/data/
 dev-private/
 dev/ssl/
-fabfile.py
+fabfile*
+*fabric*
 deploy-all-envs
 production-and-test-environments.md
 .private/
