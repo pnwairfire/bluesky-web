@@ -18,7 +18,7 @@ if [ $# -eq 5 ]
   then
     OUTPUT_FILE=$5
 else
-    OUTPUT_FILE=/dev/null
+    OUTPUT_FILE=/tmp/bluesky-web-regrssion-test-`date +"%Y%m%dT%H%M%S"`.log
 fi
 
 echo -n "" > $OUTPUT_FILE
