@@ -175,8 +175,8 @@
                 "spacing": 3,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -122.0, "lat": 27.0},
-                    "ne": {"lng": -65.0, "lat": 50.0}
+                    "sw": {"lng": -130.0,"lat": 22.5},
+                    "ne": {"lng": -60.0,"lat": 52.5}
                 },
                 "grid_size_options": {
                     "1.0": {"x": 6700, "y": 2000},
