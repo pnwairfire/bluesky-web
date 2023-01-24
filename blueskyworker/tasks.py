@@ -345,7 +345,7 @@ def prune_activity_for_plumerise(a):
                 slice_dict(sp, {'lat', 'lng', 'area', 'plumerise'})
                     for sp in aa['specified_points']
             ]
-        elif aa.get(perimeter):
+        elif aa.get('perimeter'):
             new_aa['perimeter'] = slice_dict(aa['perimeter'],
                 {'polygon', 'area', 'plumerise'})
         new_a['active_areas'].append(new_aa)
