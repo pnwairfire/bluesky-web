@@ -51,13 +51,19 @@ class RunExecute(RequestHandlerBase):
 
         executor = BlueSkyRunExecutor(api_version, mode, archive_id,
             self._raise_error, self, self.settings, hysplit_query_params)
+
+        scheduleFor = self.get_datetime_arg('schedule_for', None)
+        tornado.log.gen_log.info("schedule_for: %s", scheduleFor)
+
         # The default is for fuelbeds and emissions to be run in process and
         # all other modes asynchronously.  Allow fuelbeds and emissions to
-        # be run asynchronously, but never allow other modes to be run in
-        # process.
+        # be run asynchronously (if either '_a' or 'schedule_for' are specified),
+        # but never allow other modes to be run in process.
         execute_mode = (ExecuteMode.ASYNC if (self.get_query_argument(
-            '_a', default=None) is not None) else None)
-        await executor.execute(data, execute_mode=execute_mode)
+            '_a', default=None) is not None or scheduleFor) else None)
+
+        await executor.execute(data, execute_mode=execute_mode,
+            scheduleFor=scheduleFor)
 
     def write(self, val):
         """Overrides super's write in order log response data

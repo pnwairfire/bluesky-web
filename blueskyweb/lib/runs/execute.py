@@ -58,7 +58,7 @@ class BlueSkyRunExecutor(object):
         self.settings = settings
         self.hysplit_query_params = hysplit_query_params
 
-    async def execute(self, data, execute_mode=None):
+    async def execute(self, data, execute_mode=None, scheduleFor=None):
         # TODO: should no configuration be allowed at all?  or only some? if
         #  any restrictions, check here or check in specific _configure_*
         #  methods, below
@@ -80,7 +80,7 @@ class BlueSkyRunExecutor(object):
             tornado.log.gen_log.debug("BSP input data (before modules and"
                 " config are popped, and run_id is set, in BlueSkyRunner): %s",
                 json.dumps(data))
-            await f(data)
+            await f(data, scheduleFor=scheduleFor)
 
         except tornado.web.Finish as e:
             # this was intentionally raised; re-raise it
@@ -235,7 +235,7 @@ class BlueSkyRunExecutor(object):
             await self.settings['mongo_db']._archive_run(run)
 
 
-    async def _run_asynchronously(self, data):
+    async def _run_asynchronously(self, data, scheduleFor=None):
         await self._check_for_existing_run_id(data['run_id'])
 
         queue_name = self.archive_id or 'no-met'
@@ -249,7 +249,9 @@ class BlueSkyRunExecutor(object):
         settings = {k:v for k, v in self.settings.items() if k != 'mongo_db'}
         tornado.log.gen_log.debug("About to enqueue run %s",
             data.get('run_id'))
-        run_bluesky.apply_async(args=args, kwargs=settings, queue=queue_name)
+
+        run_bluesky.apply_async(args=args, kwargs=settings, queue=queue_name,
+            eta=scheduleFor)
         # TODO: specify callback in record_run, calling
         #    self.output_stream.write in callback, so we can handle failure?
         self.settings['mongo_db'].record_run(data['run_id'],
@@ -257,7 +259,13 @@ class BlueSkyRunExecutor(object):
             initiated_at=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
         self.output_stream.write({"run_id": data['run_id']})
 
-    async def _run_in_process(self, data):
+    async def _run_in_process(self, data, **kwargs):
+        """Runs bluesky in the web process
+
+        Note that none of the kwargs are referenced or used.  They are in
+        the signature to make calls to _run_in_process compatible with
+        calls to _run_asynchronously
+        """
         # We need the outer try block to handle any exception raised
         # before the bluesky thread is started. If an exception is
         # encountered in the seperate thread, it's handling
