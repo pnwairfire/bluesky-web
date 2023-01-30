@@ -38,15 +38,21 @@ app.conf.update(
 @app.task
 def go(output_filename):
     logging.debug("generating output file: %s", output_filename)
-    print("SDFSDFSDF")
-    with open(output_filename, 'w') as f:
+    with open(output_filename, 'a') as f:
         f.write('went ' + datetime.datetime.utcnow().isoformat())
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
+
     output_filename = '/usr/src/blueskyweb/go-foo.txt'
     logging.debug("output file: %s", output_filename)
+
+    logging.debug("Run asyn now: %s", output_filename)
     go.apply_async(args=[output_filename], queue='no-met')
+
+    logging.debug("Run asyn in 10 seconds: %s", output_filename)
+    eta = datetime.datetime.now() + datetime.timedelta(seconds=10)
+    go.apply_async(args=[output_filename], queue='no-met', eta=eta)
 
 
 if __name__ == "__main__":
