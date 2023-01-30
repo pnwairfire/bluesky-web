@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 
 """test-async-request.py: for ad hoc testing the web service's handling of
 requests that result in executing bsp asynchrounously"""
@@ -410,6 +410,11 @@ OPTIONAL_ARGS = [
         'short': '-o',
         'long': '--output-file',
         'help': 'write final output to file'
+    },
+    {
+        'long': '--seconds-in-future',
+        'help': 'Start the run in this many seconds',
+        'type': int
     }
 ]
 
@@ -470,6 +475,7 @@ def get(args, url, title, ignore_fail=False):
 def post(args, url, data, desc):
     if not hasattr(data, 'lower'):
         data = json.dumps(data)
+    logging.debug("url: %s", url)
     response = requests.post(url, data=data, headers=HEADERS)
     write_to_req_resp_file(args, desc,
         url + 'fuelbeds/', data, response.content)
@@ -658,6 +664,10 @@ if __name__ == "__main__":
     if args.hysplit_options:
         for k, v in HYSPLIT_OPTIONS[args.hysplit_options].items():
             query[k] = v
+
+    if args.seconds_in_future:
+        query['schedule_for'] = (datetime.datetime.utcnow()
+            + datetime.timedelta(seconds=args.seconds_in_future)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     url = '?'.join([url, urllib.parse.urlencode(query)])
     data = post(args, url, data, "Initiating Run")
