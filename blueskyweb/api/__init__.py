@@ -7,6 +7,7 @@ import datetime
 import json
 
 import tornado.web
+import tornado.log
 
 class RequestHandlerBase(tornado.web.RequestHandler):
 
@@ -72,7 +73,6 @@ class RequestHandlerBase(tornado.web.RequestHandler):
 
     def get_datetime_arg(self, key, default=None):
         val = self.get_query_argument(key, None)
-        tornado.log.gen_log.error('%s: %s', key, val)
         if val is not None:
             try:
                 # parse the datetime and convert to UTC
