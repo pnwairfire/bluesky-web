@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import datetime
 import json
 
 import tornado.web
@@ -65,6 +66,25 @@ class RequestHandlerBase(tornado.web.RequestHandler):
 
     def get_float_arg(self, key, default=None):
         return self._get_numerical_arg(key, default, float)
+
+
+    DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
+
+    def get_datetime_arg(self, key, default=None):
+        val = self.get_query_argument(key, None)
+        tornado.log.gen_log.error('%s: %s', key, val)
+        if val is not None:
+            try:
+                # parse the datetime and convert to UTC
+                d = datetime.datetime.strptime(val, self.DATETIME_FORMAT)
+                t = d.utctimetuple()[0:6]
+                return datetime.datetime(*t)
+            except ValueError as e:
+                self._raise_error(400, "Invalid datetime value '{}' "
+                    "for query arg {}. Use format {}".format(
+                        val, key, self.DATETIME_FORMAT))
+        return val
+
 
     ##
     ## Errors
