@@ -49,8 +49,8 @@
                 "spacing": 1.33,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lng": -126, "lat": 41.5},
-                    "ne": {"lng": -114.6, "lat": 49.4}
+                    "sw": {"lat": 41.75, "lng": -126.0},
+                    "ne": {"lat": 49.25, "lng": -111.0}
                 },
                 "grid_size_options": {
                     "1.0": {"x": 1300, "y": 600},

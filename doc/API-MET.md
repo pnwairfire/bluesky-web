@@ -61,13 +61,13 @@ This API returns information about all domains with ARL data
                     "1.0": {"x": 1300, "y": 600}
                 },
                 "boundary": {
-                    "ne": {
-                        "lat": 49.4,
-                        "lng": -114.6
-                    },
                     "sw": {
-                        "lat": 41.5,
-                        "lng": -126
+                        "lat": 41.75,
+                        "lng": -126.0
+                    },
+                    "ne": {
+                        "lat": 49.25,
+                        "lng": -111.0
                     }
                 },
                 "id": "PNW1.33km"
