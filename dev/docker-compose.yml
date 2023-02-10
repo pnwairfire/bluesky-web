@@ -100,6 +100,19 @@ services:
       --output-url-scheme=http --output-url-port=8886
       --output-url-path-prefix= --bluesky-log-level=DEBUG
       -c /etc/bluesky-web/config.json
+  admin:
+    # stdin_open: true
+    # tty: true
+    image: bluesky-web-admin
+    container_name: bluesky-web-admin
+    volumes:
+    - ../blueskyadmin/svelte.config.js:/blueskyadmin/svelte.config.js
+    - ../blueskyadmin/vite.config.js:/blueskyadmin/vite.config.js
+    - ../blueskyadmin/src/:/blueskyadmin/src/
+    - ../blueskyadmin/static/:/blueskyadmin/static/
+    ports:
+    - 8882:8882
+    command: npm run dev
   nginx:
     container_name: bluesky-web-nginx
     image: bluesky-web-nginx
@@ -107,9 +120,11 @@ services:
     - 8887:80
     volumes:
     - ./logs/nginx/:/var/log/nginx/
+    - ../nginx.conf:/etc/nginx/conf.d/default.conf
     links:
     - web1
     - web2
+    - admin
   output_web:
     image: python:3.5-alpine
     container_name: bluesky-web-output

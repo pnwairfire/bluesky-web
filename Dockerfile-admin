@@ -1,0 +1,22 @@
+FROM node:19.6.0-alpine3.16
+
+MAINTAINER jdubowy@gmail.com
+
+RUN mkdir -p /blueskyadmin/
+WORKDIR /blueskyadmin/
+
+# Copy both package.json & package-lock.json
+COPY blueskyadmin/package*.json /blueskyadmin/
+COPY blueskyadmin/.npmrc /blueskyadmin/
+RUN npm install
+
+COPY blueskyadmin/svelte.config.js /blueskyadmin/svelte.config.js
+COPY blueskyadmin/vite.config.js /blueskyadmin/vite.config.js
+COPY blueskyadmin/src/ /blueskyadmin/src/
+COPY blueskyadmin/static/ /blueskyadmin/static/
+
+RUN npm run build
+
+EXPOSE 8882
+
+CMD npm run preview

@@ -62,6 +62,7 @@ if [ "$rebuild" = true ] ; then
     docker build -t bluesky-web . \
         --build-arg COUNTRY=US --build-arg STATE=WA \
         --build-arg CITY=Seattle --build-arg ORGANIZATION=FooBar
+    docker build -t bluesky-web-admin -f Dockerfile-admin .
     docker build -t bluesky-web-nginx -f Dockerfile-nginx .
     docker build -t bluesky-web-mongo -f Dockerfile-mongo .\
         --build-arg COUNTRY=US --build-arg STATE=WA \
