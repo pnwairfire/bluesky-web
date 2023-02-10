@@ -3,12 +3,14 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [sveltekit()],
- 	server: {
+	server: {
+		host: '0.0.0.0',
  		port: 8882,
  		strictPort: false,
- 	},
- 	preview: {
+	},
+	preview: {
+ 		host: '0.0.0.0',
  		port: 8882,
 		strictPort: false,
- 	}
+	}
 });
