@@ -19,4 +19,4 @@ RUN npm run build
 
 EXPOSE 8882
 
-CMD npm run preview
+CMD PORT=8882 node build/
