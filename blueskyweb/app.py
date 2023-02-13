@@ -59,6 +59,7 @@ def get_routes(path_prefix):
     # before blueskyworker.tasks is imported in .api.v1.run
     from .api.run import RunExecute, RunStatus, RunOutput, RunsInfo
     from .api.run import RunExecute, RunStatus, RunOutput, RunsInfo
+    from .api.queue import QueueInfo
     routes = [
         (r"/api/ping/?", Ping),
 
@@ -92,6 +93,7 @@ def get_routes(path_prefix):
         (r"/api/v(1|4.1|4.2)/runs/([^/]+)/?", RunStatus),
         (r"/api/v(1|4.1|4.2)/run/([^/]+)/status/?", RunStatus),
         (r"/api/v(1|4.1|4.2)/runs?/([^/]+)/output/?", RunOutput),
+        (r"/api/v(1|4.1|4.2)/queue?/?", QueueInfo),
     ]
     if path_prefix:
         path_prefix = path_prefix.strip('/')
