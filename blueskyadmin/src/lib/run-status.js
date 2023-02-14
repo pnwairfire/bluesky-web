@@ -1,5 +1,5 @@
 
-export const statuses = {
+export const runStatuses = {
     "Enqueued": "enqueued",
     "Dequeued": "dequeued",
     "Running": "running",
@@ -12,7 +12,18 @@ export const statuses = {
     "Failed": "failed"
 }
 
-export const reverseRunStatusMappings = Object.keys(statuses).reduce((r,k) => {
-    r[statuses[k]] = k
+export const reverseRunStatusMappings = Object.keys(runStatuses).reduce((r,k) => {
+    r[runStatuses[k]] = k
     return r
 }, {})
+
+
+export function translateRunStatus(s) {
+    if (runStatuses[s])
+        return runStatuses[s]
+
+    else if (reverseRunStatusMappings[s])
+        return s
+
+    return null
+}

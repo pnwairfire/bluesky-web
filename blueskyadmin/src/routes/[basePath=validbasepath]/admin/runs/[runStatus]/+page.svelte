@@ -1,44 +1,25 @@
 <script>
-	import { Table } from 'sveltestrap';
-
+	import { Table, Nav, NavItem, NavLink  } from 'sveltestrap';
 	import { reverseRunStatusMappings } from '$lib/run-status'
 
   /** @type {import('./$types').PageData} */
   export let data;
 
-    const apiUrl = data.basePath
-    const runs = [] // TODO: fetch
+  const apiUrl = data.basePath
+  const runs = [] // TODO: fetch
 </script>
 
-<h1>Runs in state '{reverseRunStatusMappings[data.runStatus]}'</h1>
 
-<Table bordered>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>First Name</th>
-      <th>Last Name</th>
-      <th>Username</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>Larry</td>
-      <td>the Bird</td>
-      <td>@twitter</td>
-    </tr>
-  </tbody>
-</Table>
+<div>
+	<Nav>
+		{#each Object.keys(reverseRunStatusMappings) as s, i}
+		  <NavItem>
+		    <NavLink href={s}>{reverseRunStatusMappings[s]}</NavLink>
+		  </NavItem>
+		{/each}
+	</Nav>
+
+	<h1>Runs in state '{reverseRunStatusMappings[data.runStatus]}'</h1>
+
+	<div>TODO....</div>
+</div>

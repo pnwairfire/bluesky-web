@@ -1,18 +1,16 @@
 import { error } from '@sveltejs/kit';
-import { statuses } from '$lib/run-status'
+import { translateRunStatus } from '$lib/run-status'
 
 /** @type {import('./$types').PageLoad} */
 export function load({ params, route, url }) {
+  console.log('url', url)
+  const runStatus = translateRunStatus(params.runStatus)
 
-  if (params.runStatus === statuses.Enqueued) {
-    //const url =
-    const runs = [] // TODO: fetch
+  if (runStatus) {
     return {
-      params: params,
-      route: route,
       url: url,
+      basePath: params.basePath,
       runStatus: params.runStatus,
-      runs: runs
     }
   }
   throw error(404, 'Not found');

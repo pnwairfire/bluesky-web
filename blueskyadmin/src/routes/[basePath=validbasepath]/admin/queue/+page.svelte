@@ -1,5 +1,5 @@
 <script>
-    import { Container, Nav, NavItem, NavLink, Table } from 'sveltestrap';
+    import { Container, Table } from 'sveltestrap';
 
     /** @type {import('./$types').PageData} */
     export let data;
