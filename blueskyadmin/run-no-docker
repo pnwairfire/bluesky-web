@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-nvm use v19.0.4
+nvm use v19.4.0
 npm run dev
