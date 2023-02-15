@@ -10,7 +10,7 @@
 
 {@debug data}
 
-    <Container>
+    <Container fluid={true}>
 		<!-- sveltestrap  dropdown wasn't working, so using bootstrap classes directly -->
 		<div class="dropdown my-2">
 			<button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">

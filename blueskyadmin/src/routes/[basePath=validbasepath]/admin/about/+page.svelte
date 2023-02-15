@@ -1,10 +1,14 @@
+<script>
+    import { Container } from 'sveltestrap';
+</script>
+
 <svelte:head>
 	<title>About</title>
 	<meta name="description" content="About BlueSky Web" />
 </svelte:head>
 
-<div>
-	<h1>About BlueSky Web</h1>
+<Container fluid={true}>
+	<h5>About BlueSky Web</h5>
 
 	<p>...</p>
-</div>
+</Container>
