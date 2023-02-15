@@ -32,11 +32,11 @@
                           <tbody>
                             {#each data.queueInfo[category][pool] as run}
                                 <tr>
-                                  <th>{run.run_id}</th>
-                                  <th>{run.modules.join(', ')}</th>
-                                  <th>{run.api_version}</th>
-                                  <th>{run.priority}</th>
-                                  <th>{run.schedule_for}</th>
+                                  <td>{run.run_id}</td>
+                                  <td>{run.modules.join(', ')}</td>
+                                  <td>{run.api_version}</td>
+                                  <td>{run.priority}</td>
+                                  <td>{run.schedule_for}</td>
                                 </tr>
                             {/each}
                           </tbody>
