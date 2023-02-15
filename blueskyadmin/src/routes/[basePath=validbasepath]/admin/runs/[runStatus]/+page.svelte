@@ -1,25 +1,25 @@
 <script>
-	import { Table, Nav, NavItem, NavLink  } from 'sveltestrap';
-	import { reverseRunStatusMappings } from '$lib/run-status'
+	import { Container, Nav, NavItem, NavLink, Table } from 'sveltestrap';
+	import { runStatuses } from '$lib/run-status'
 
   /** @type {import('./$types').PageData} */
   export let data;
 
-  const apiUrl = data.basePath
-  const runs = [] // TODO: fetch
 </script>
 
 
-<div>
+<Container fluid="true">
 	<Nav>
-		{#each Object.keys(reverseRunStatusMappings) as s, i}
+		{#each Object.keys(runStatuses) as s, i}
 		  <NavItem>
-		    <NavLink href={s}>{reverseRunStatusMappings[s]}</NavLink>
+		    <NavLink href={s}>{runStatuses[s]}</NavLink>
 		  </NavItem>
 		{/each}
 	</Nav>
-
-	<h1>Runs in state '{reverseRunStatusMappings[data.runStatus]}'</h1>
-
-	<div>TODO....</div>
-</div>
+	<h1>{runStatuses[data.runStatus]}</h1>
+	{#if data.error}
+        {data.error}
+    {:else}
+		<div>TODO....</div>
+	{/if}
+</Container>
