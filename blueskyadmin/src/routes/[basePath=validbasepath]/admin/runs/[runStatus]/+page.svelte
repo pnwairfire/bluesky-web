@@ -1,5 +1,5 @@
 <script>
-    import { Container, Nav, NavItem, NavLink, Table } from 'sveltestrap';
+    import { Container, Table } from 'sveltestrap';
     import { runStatuses } from '$lib/run-status'
 
     /** @type {import('./$types').PageData} */
@@ -10,16 +10,19 @@
 
 {@debug data}
 
-<Container fluid="true">
-    <Nav>
-        {#each Object.keys(runStatuses) as s, i}
-          <NavItem>
-            <NavLink href={s}>{runStatuses[s]}</NavLink>
-          </NavItem>
-        {/each}
-    </Nav>
-    <h1>{status}</h1>
     <Container>
+		<!-- sveltestrap  dropdown wasn't working, so using bootstrap classes directly -->
+		<div class="dropdown my-2">
+			<button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+		    {status}
+			</button>
+			<ul class="dropdown-menu">
+				{#each Object.keys(runStatuses) as s, i}
+					<li><a class="dropdown-item" href={s}>{runStatuses[s]}</a></li>
+				{/each}
+			</ul>
+		</div>
+
         {#if data.error}
             {data.error}
         {:else if !data.runsData || ! data.runsData.runs}
@@ -49,4 +52,3 @@
             </Table>
         {/if}
     </Container>
-</Container>
