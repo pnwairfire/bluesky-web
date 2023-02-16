@@ -1,5 +1,6 @@
 <script>
-    import { Button, Container, Table } from 'sveltestrap';
+    import { goto } from '$app/navigation';
+    import { Container, Table } from 'sveltestrap';
     import { runStatuses } from '$lib/run-status'
 
     /** @type {import('./$types').PageData} */
@@ -35,17 +36,15 @@
         {:else}
             <div>
                 <div class="my-3">
-                    {#if data.page > 0}
-                        <a href={`?page=${data.page-1}`}>
-                            <Button outline dark>&lt;</Button>
-                        </a>
-                    {/if}
+                    <a class={`btn btn-outline-dark ${(data.page === 0) ? (' disabled') : ('')}`}
+                            href={`?page=${data.page-1}`}>
+                        &lt;
+                    </a>
                     <span>{first} - {last} of {total}</span>
-                    {#if last < total}
-                        <a href={`?page=${data.page+1}`}>
-                            <Button outline dark>&gt;</Button>
-                        </a>
-                    {/if}
+                    <a class={`btn btn-outline-dark ${(last >= total) ? (' disabled') : ('')}`}
+                            href={`?page=${data.page+1}`}>
+                        &gt;
+                    </a>
                 </div>
                 <Table bordered hover striped size="sm" responsive>
                   <thead>
