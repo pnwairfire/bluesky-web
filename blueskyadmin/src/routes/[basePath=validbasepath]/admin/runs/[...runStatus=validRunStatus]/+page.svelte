@@ -1,5 +1,6 @@
 <script>
-    export let data
+    /** @type {import('./$types').PageData} */
+    export let data;
 
     import { goto } from '$app/navigation';
     import { Container, Table } from 'sveltestrap';

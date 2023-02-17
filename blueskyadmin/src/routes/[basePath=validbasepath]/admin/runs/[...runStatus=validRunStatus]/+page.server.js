@@ -13,7 +13,7 @@ export async function load({ fetch, params, route, url }) {
   const basePath = params.basePath
   const runStatus = params.runStatus
 
-  if (runStatuses[runStatus]) {
+  if (!runStatus || runStatuses[runStatus]) {
     try {
       let page = url.searchParams.get('page')
       const offset = page * limit
