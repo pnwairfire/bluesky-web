@@ -32,7 +32,9 @@
                               <th>Modules</th>
                               <th>API version</th>
                               <th>Priority</th>
-                              <th>Scheduled For</th>
+                              {#if category === 'scheduled'}
+                                <th>Scheduled For</th>
+                              {/if}
                             </tr>
                           </thead>
                           <tbody>
@@ -41,8 +43,10 @@
                                   <td>{run.run_id}</td>
                                   <td>{run.modules.join(', ')}</td>
                                   <td>{run.api_version}</td>
-                                  <td>{run.priority}</td>
-                                  <td>{run.schedule_for}</td>
+                                  <td>{run.priority || 'n/a'}</td>
+                                  {#if category === 'scheduled'}
+                                    <td>{run.schedule_for}</td>
+                                  {/if}
                                 </tr>
                             {/each}
                           </tbody>
