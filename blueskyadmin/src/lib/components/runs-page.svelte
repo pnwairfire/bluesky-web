@@ -1,0 +1,71 @@
+<script>
+    export let data
+
+    import { goto } from '$app/navigation';
+    import { Container, Table } from 'sveltestrap';
+    import { runStatuses } from '$lib/run-status'
+
+    let status = data.runStatus ? runStatuses[data.runStatus] : 'All Runs'
+    const total = data.runsData.total
+    const first = (data.runsData) && (data.limit*data.page +1)
+    const last = (data.runsData) && Math.min(data.limit*data.page + data.limit, total)
+</script>
+
+{@debug data}
+
+    <Container fluid={true}>
+        <!-- sveltestrap  dropdown wasn't working, so using bootstrap classes directly -->
+        <div class="dropdown my-2">
+            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {status}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/`}>All Runs</a></li>
+                {#each Object.keys(runStatuses) as s, i}
+                    <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/${s}/`}>{runStatuses[s]}</a></li>
+                {/each}
+            </ul>
+        </div>
+
+        {#if data.error}
+            {data.error}
+        {:else if !data.runsData || ! data.runsData.runs}
+            <div>No data</div>
+        {:else if data.runsData.runs.length === 0}
+            <div>No runs on record</div>
+        {:else}
+            <div>
+                <div class="my-3">
+                    <a class={`btn btn-outline-dark ${(data.page === 0) ? (' disabled') : ('')}`}
+                            href={`?page=${data.page-1}`}>
+                        &lt;
+                    </a>
+                    <span>{first} - {last} of {total}</span>
+                    <a class={`btn btn-outline-dark ${(last >= total) ? (' disabled') : ('')}`}
+                            href={`?page=${data.page+1}`}>
+                        &gt;
+                    </a>
+                </div>
+                <Table bordered hover striped size="sm" responsive>
+                  <thead>
+                    <tr>
+                      <th>Run Id</th>
+                      <th>status</th>
+                      <th>Percent Complete</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {#each data.runsData.runs as run}
+                        <tr>
+                          <td>{run.run_id}</td>
+                          <td>{run.status.status}</td>
+                          <td>{run.status.perc}</td>
+                          <td>{run.status.ts}</td>
+                        </tr>
+                    {/each}
+                  </tbody>
+                </Table>
+            </div>
+        {/if}
+    </Container>
