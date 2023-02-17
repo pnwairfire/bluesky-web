@@ -4,12 +4,10 @@
 
 	/** @type {import('./$types').LayoutData} */
 	export let data;
-
-	data.basePath
 </script>
 
 <div class="app">
-	<Header basePath={data.basePath} />
+	<Header basePath={data.basePath} pathname={data.pathname} />
 
 	<main>
 		<slot />
