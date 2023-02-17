@@ -48,24 +48,32 @@
                     </a>
                 </div>
                 <Table bordered hover striped size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>Run Id</th>
-                      <th>status</th>
-                      <th>Percent Complete</th>
-                      <th>Time</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {#each data.runsData.runs as run}
+                    <thead>
                         <tr>
-                          <td>{run.run_id}</td>
-                          <td>{run.status.status}</td>
-                          <td>{run.status.perc}</td>
-                          <td>{run.status.ts}</td>
+                            <th>Run Id</th>
+                            <th>status</th>
+                            <th>Percent Complete</th>
+                            <th>Time</th>
+                            <th>Output</th>
                         </tr>
-                    {/each}
-                  </tbody>
+                    </thead>
+                    <tbody>
+                        {#each data.runsData.runs as run}
+                            <tr>
+                                <td>{run.run_id}</td>
+                                <td>{run.status.status}</td>
+                                <td>{run.status.perc}</td>
+                                <td>{run.status.ts}</td>
+                                <td>
+                                    {#if run.output_url}
+                                        <a href={run.output_url} target="_blank">output</a>
+                                    {:else}
+                                        n/a
+                                    {/if}
+                                </td>
+                            </tr>
+                      {/each}
+                    </tbody>
                 </Table>
             </div>
         {/if}
