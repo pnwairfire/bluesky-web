@@ -4,7 +4,5 @@ import { dev } from '$app/environment';
 // it in dev so that we get hot module replacement
 export const csr = dev;
 
-// We can't pre-render, since the route has the 'basePath' slug
-// since there's no dynamic data here, we can prerender
-// it so that it gets served as a static asset in production
+// We can't pre-render, since the route has the 'basePath' slug.
 //export const prerender = true;
