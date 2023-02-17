@@ -161,7 +161,7 @@ services:
     - RABBITMQ_URL=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q no-met-plumerise,ca-nv_4-km-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise,pacific_northwest_4-km-plumerise
-      -c 5 -A blueskyworker.tasks worker
+      -c 1 -A blueskyworker.tasks worker
       -l INFO -f /var/log/blueskyworker/bluesky-web-worker-plumerise.log
   worker:
     # stdin_open: true
@@ -187,7 +187,7 @@ services:
     - RABBITMQ_URL=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
     command: celery -Q no-met,ca-nv_4-km,ca-nv_6-km,national_12-km,pacific_northwest_4-km
-      -c 5 -A blueskyworker.tasks worker
+      -c 1 -A blueskyworker.tasks worker
       -l INFO -f /var/log/blueskyworker/bluesky-web-worker.log
   ofelia:
     image: mcuadros/ofelia
