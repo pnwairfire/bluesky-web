@@ -1,17 +1,23 @@
 <script>
-    import { Container, Table } from 'sveltestrap';
+    import { Alert, Container, Table } from 'sveltestrap';
 
     /** @type {import('./$types').PageData} */
     export let data;
 
+    const labels = {
+        in_queue: "In Queue",
+        executing: "Currently Executing",
+        scheduled: "Scheduled For Later",
+    }
 </script>
+
 
 <Container fluid="true">
     {#if data.error}
         {data.error}
     {:else}
         {#each Object.keys(data.queueInfo) as category, i}
-            <b>{category}</b>
+            <Alert class="mt-3" color="dark">{labels[category] || category}</Alert>
             {#each Object.keys(data.queueInfo[category]) as pool, j}
                 <div class="m-3">
                     <b>{pool}</b>
