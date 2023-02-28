@@ -11,10 +11,11 @@ RUN pip3 install -r requirements.txt -c constraints.txt
 
 RUN pip3 install pytest ipython
 
-ARG COUNTRY=US
-ARG STATE=WA
-ARG CITY=Seattle
-ARG ORGANIZATION=FooBar
+
+ARG COUNTRY
+ARG STATE
+ARG CITY
+ARG ORGANIZATION
 
 COPY generate-ssl-cert.sh /usr/local/bin/
 RUN /usr/local/bin/generate-ssl-cert.sh \
