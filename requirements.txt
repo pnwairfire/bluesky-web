@@ -1,6 +1,6 @@
-celery==4.1.1
+celery==5.2.7
 docker==2.4.2
 ipify2==1.0.2
 motor==1.1
-requests==2.22.0
+requests==2.28.2
 tornado==4.5.1

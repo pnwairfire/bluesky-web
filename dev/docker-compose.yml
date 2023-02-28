@@ -160,9 +160,11 @@ services:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
     - RABBITMQ_URL=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q no-met-plumerise,ca-nv_4-km-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise,pacific_northwest_4-km-plumerise
-      -c 1 -A blueskyworker.tasks worker
-      -l INFO -f /var/log/blueskyworker/bluesky-web-worker-plumerise.log
+    - C_FORCE_ROOT=True
+    command: celery -A blueskyworker.tasks worker
+      -Q no-met-plumerise,ca-nv_4-km-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise,pacific_northwest_4-km-plumerise
+      -c 1 -l INFO
+      -f /var/log/blueskyworker/bluesky-web-worker-plumerise.log
   worker:
     # stdin_open: true
     # tty: true
@@ -186,9 +188,11 @@ services:
     - MONGODB_URL=mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb
     - RABBITMQ_URL=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
-    command: celery -Q no-met,ca-nv_4-km,ca-nv_6-km,national_12-km,pacific_northwest_4-km
-      -c 1 -A blueskyworker.tasks worker
-      -l INFO -f /var/log/blueskyworker/bluesky-web-worker.log
+    - C_FORCE_ROOT=True
+    command: celery -A blueskyworker.tasks worker
+      -Q no-met,ca-nv_4-km,ca-nv_6-km,national_12-km,pacific_northwest_4-km
+      -c 1 -l INFO
+      -f /var/log/blueskyworker/bluesky-web-worker.log
   ofelia:
     image: mcuadros/ofelia
     container_name: bluesky-web-ofelia

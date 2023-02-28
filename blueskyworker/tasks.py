@@ -35,10 +35,10 @@ app = Celery('blueskyworker.tasks', broker=RABBITMQ_URL)
 app.conf.update(
     task_ignore_result=True,
     broker_use_ssl={
-        'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
-        'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',
-        'ssl_ca_certs': '/etc/ssl/bluesky-web-client.pem',
-        'ssl_cert_reqs': ssl.CERT_NONE
+        'keyfile': '/etc/ssl/bluesky-web-client-cert.key',
+        'certfile': '/etc/ssl/bluesky-web-client-cert.crt',
+        'ca_certs': '/etc/ssl/bluesky-web-client.pem',
+        'cert_reqs': ssl.CERT_NONE
     }
 )
 
