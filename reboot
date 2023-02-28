@@ -59,17 +59,11 @@ if [ "$rebuild" = true ] ; then
     sudo rm dev/data/rabbitmq/.erlang.cookie
     find . -name __pycache__ -exec sudo rm -r {} \;
     find . -name '.pytest_cache' -exec sudo rm -r {} \;
-    docker build -t bluesky-web . \
-        --build-arg COUNTRY=US --build-arg STATE=WA \
-        --build-arg CITY=Seattle --build-arg ORGANIZATION=FooBar
+    docker build -t bluesky-web .
     docker build -t bluesky-web-admin -f Dockerfile-admin .
     docker build -t bluesky-web-nginx -f Dockerfile-nginx .
-    docker build -t bluesky-web-mongo -f Dockerfile-mongo .\
-        --build-arg COUNTRY=US --build-arg STATE=WA \
-        --build-arg CITY=Seattle --build-arg ORGANIZATION=FooBar
-    docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .\
-        --build-arg COUNTRY=US --build-arg STATE=WA \
-        --build-arg CITY=Seattle --build-arg ORGANIZATION=FooBar
+    docker build -t bluesky-web-mongo -f Dockerfile-mongo .
+    docker build -t bluesky-web-rabbitmq -f Dockerfile-rabbitmq .
 fi
 if [ "$clear_data" = true ] ; then
     sudo rm -r dev/data/*
