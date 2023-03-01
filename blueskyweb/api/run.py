@@ -169,8 +169,9 @@ class RunsInfo(RunStatusBase):
         # default limit to 10, and cap it at 25
         limit = min(int(self.get_query_argument('limit', 10)), 25)
         offset = int(self.get_query_argument('offset', 0))
-        runs, total_count = await self.settings['mongo_db'].find_runs(status=status,
-            limit=limit, offset=offset)
+        run_id = self.get_query_argument('run_id', None)
+        runs, total_count = await self.settings['mongo_db'].find_runs(
+            status=status, limit=limit, offset=offset, run_id=run_id)
         for run in runs:
             await self.process(run)
 

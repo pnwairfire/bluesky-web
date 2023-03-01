@@ -104,8 +104,11 @@ class BlueSkyWebDB(object):
             run.pop('_id')
         return run
 
-    async def find_runs(self, status=None, limit=None, offset=None):
+    async def find_runs(self, status=None, limit=None, offset=None, run_id=None):
         query = {'history.0.status': status} if status else {}
+        if run_id:
+            # TODO: protect against sql-injection types of attacks
+            query['run_id'] = { '$regex': run_id }
         tornado.log.gen_log.debug('query, limit, offset: %s, %s, %s',
             query, limit, offset)
 
