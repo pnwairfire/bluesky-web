@@ -3,30 +3,59 @@
     export let data;
 
     import { goto } from '$app/navigation';
-    import { Container, Table } from 'sveltestrap';
+    import { Container, Table, Form, FormGroup, Input } from 'sveltestrap';
     import { runStatuses } from '$lib/run-status'
 
     let status = data.runStatus ? runStatuses[data.runStatus] : 'All Runs'
     const total = data.runsData.total
     const first = (data.runsData) && (data.limit*data.page +1)
     const last = (data.runsData) && Math.min(data.limit*data.page + data.limit, total)
+
+    const runIdQueryStr = data.runId ? `?runId=${data.runId}` : ''
+
+    function onSubmit(e) {
+        const formData = new FormData(e.target);
+
+        const data = {};
+        for (let field of formData) {
+          const [key, value] = field;
+          data[key] = value;
+        }
+        console.log(data)
+    }
 </script>
 
 {@debug data}
 
     <Container fluid={true}>
-        <!-- sveltestrap  dropdown wasn't working, so using bootstrap classes directly -->
-        <div class="dropdown my-2">
-            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            {status}
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/`}>All Runs</a></li>
-                {#each Object.keys(runStatuses) as s, i}
-                    <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/${s}/`}>{runStatuses[s]}</a></li>
-                {/each}
-            </ul>
-        </div>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: white !important;">
+            <div class="container-fluid">
+                <!-- sveltestrap  dropdown wasn't working, so using bootstrap classes directly -->
+                <div class="dropdown my-2">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {status}
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/${runIdQueryStr}`}>All Runs</a></li>
+                        {#each Object.keys(runStatuses) as s, i}
+                            <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/${s}/${runIdQueryStr}`}>{runStatuses[s]}</a></li>
+                        {/each}
+                    </ul>
+                </div>
+
+                <form class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="runId" class="col-form-label">Run Id</label>
+                    </div>
+                    <div class="col-auto">
+                        <input id="runId" name="runId" class="form-control" value={data.runId}>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" on:click={onSubmit}>Find</button>
+                    </div>
+                </form>
+            </div>
+        </nav>
 
         {#if data.error}
             {data.error}

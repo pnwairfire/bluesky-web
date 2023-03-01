@@ -18,9 +18,10 @@ export async function load({ fetch, params, route, url }) {
       let page = url.searchParams.get('page')
       const offset = page * limit
       page = page ? parseInt(page) : 0
-      const runsData = queryRuns(fetch, page, offset, runStatus)
+      const runId = url.searchParams.get('runId')
+      const runsData = queryRuns(fetch, page, offset, runStatus, runId)
       console.log(runsData)
-      return { runStatus, basePath, runsData, page, limit, offset}
+      return { runStatus, basePath, runsData, page, limit, offset, runId}
     } catch(error) {
       console.error(`Error in load loading queue information: ${error}`);
       return { runStatus, basePath, error }
