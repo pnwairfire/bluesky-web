@@ -193,3 +193,13 @@ class RunOutput(RequestHandlerBase):
 
         await BlueSkyRunOutput(api_version, self.settings['mongo_db'],
             self._raise_error, self).process(run_id)
+
+
+class RunStatsMonthly(RequestHandlerBase):
+
+    @tornado.web.asynchronous
+    async def get(self, api_version):
+        monthly = await self.settings['mongo_db'].run_counts_by_month()
+        self.write({
+            'monthly': monthly
+        })

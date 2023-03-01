@@ -180,3 +180,36 @@ class BlueSkyWebDB(object):
     async def delete_all_runs(self):
         r = await self.db.runs.delete_many({})
         return r.deleted_count
+
+
+    ## Stats
+
+    async def run_counts_by_month(self):
+        """Returns run counts, per month, for past 12 months
+        """
+        cursor = self.db.runs.aggregate([
+
+            # TODO: limit by year or time range, based
+            #   on query parameters or default to past year,
+            #   and set argument to `to_list`, below, accordingly
+
+            {
+                '$group': {
+                    '_id': {
+                        "year": {'$substr': [ "$initiated_at", 0, 4 ] },
+                        "month": {'$substr': [ "$initiated_at", 5, 2 ] },
+                    },
+                    'count': { '$sum': 1 }
+                }
+            },
+            {
+                '$sort': {'_id': -1}
+            }
+        ])
+        r = await cursor.to_list(12)
+
+        return [{
+            'year': e['_id']['year'],
+            'month': e['_id']['month'],
+            'count': e['count'],
+        } for e in r]
