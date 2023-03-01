@@ -26,6 +26,9 @@
             <a class={`nav-link ${(pathname && pathname.indexOf('/runs') > -1) ? 'active' : ''}`} href={`/${basePath}/admin/runs`}>Runs Database</a>
           </li>
           <li class="nav-item">
+            <a class={`nav-link ${(pathname && pathname.indexOf('/stats') > -1) ? 'active' : ''}`} href={`/${basePath}/admin/stats`}>Stats</a>
+          </li>
+          <li class="nav-item">
             <a class={`nav-link ${(pathname && pathname.indexOf('/about') > -1) ? 'active' : ''}`} href={`/${basePath}/admin/about`}>About</a>
           </li>
         </ul>
