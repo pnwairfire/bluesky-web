@@ -48,7 +48,7 @@
                     </div>
                     <div class="col-auto">
                         <form class="row g-3 align-items-center">
-                            <a class={"btn btn-warning " + (data.runId ? '' : 'disabled')} href=".">Clear</a>
+                            <a class={"btn btn-warning " + (data.runId ? '' : 'disabled')} href={`/${data.basePath}/admin/runs/${data.runStatus || ''}/`}>Clear</a>
                         </form>
                     </div>
                 </div>
