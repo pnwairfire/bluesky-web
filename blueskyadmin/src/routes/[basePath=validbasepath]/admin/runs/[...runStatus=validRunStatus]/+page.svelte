@@ -12,17 +12,6 @@
     const last = (data.runsData) && Math.min(data.limit*data.page + data.limit, total)
 
     const runIdQueryStr = data.runId ? `?runId=${data.runId}` : ''
-
-    function onSubmit(e) {
-        const formData = new FormData(e.target);
-
-        const data = {};
-        for (let field of formData) {
-          const [key, value] = field;
-          data[key] = value;
-        }
-        console.log(data)
-    }
 </script>
 
 {@debug data}
