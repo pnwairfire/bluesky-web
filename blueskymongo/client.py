@@ -187,12 +187,18 @@ class BlueSkyWebDB(object):
     async def run_counts_by_month(self):
         """Returns run counts, per month, for past 12 months
         """
+        # limit to past year
+        # TOOD: support query parameters to override default of past year,
+        #   and set argument to `to_list`, below, accordingly
+        year_ago = datetime.datetime.now() - datetime.timedelta(days=365)
+        since = datetime.date(year_ago.year, year_ago.month, 1).strftime("%Y-%m-%dT00:00:00")
+
         cursor = self.db.runs.aggregate([
-
-            # TODO: limit by year or time range, based
-            #   on query parameters or default to past year,
-            #   and set argument to `to_list`, below, accordingly
-
+            {
+                "$match": {
+                    "initiated_at": { "$gte": "2022-03-01T00:00:00" }
+                }
+            },
             {
                 '$group': {
                     '_id': {
