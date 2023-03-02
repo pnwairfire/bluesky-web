@@ -57,7 +57,10 @@ def get_routes(path_prefix):
     #    os.environ["MONGODB_URL"] = settings['mongodb_url']
     #    os.environ["RABBITMQ_URL"] = settings['rabbitmq_url']
     # before blueskyworker.tasks is imported in .api.v1.run
-    from .api.run import RunExecute, RunStatus, RunOutput, RunsInfo, RunStatsMonthly
+    from .api.run import (
+        RunExecute, RunStatus, RunOutput, RunsInfo,
+        RunStatsMonthly, RunStatsDaily
+    )
     from .api.queue import QueueInfo
     routes = [
         (r"/api/ping/?", Ping),
@@ -88,6 +91,7 @@ def get_routes(path_prefix):
         #       - /api/v(1|4.1|4.2)/runs/<guid>/output/
         (r"/api/v(1|4.1|4.2)/runs/?", RunsInfo),
         (r"/api/v(1|4.1|4.2)/runs/stats/monthly/?", RunStatsMonthly),
+        (r"/api/v(1|4.1|4.2)/runs/stats/daily/?", RunStatsDaily),
         (r"/api/v(1|4.1|4.2)/runs/({})/?".format('|'.join(RunStatuses.statuses)),
             RunsInfo),
         (r"/api/v(1|4.1|4.2)/runs/([^/]+)/?", RunStatus),

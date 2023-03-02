@@ -218,3 +218,36 @@ class BlueSkyWebDB(object):
             'month': e['_id']['month'],
             'count': e['count'],
         } for e in r]
+
+    async def run_counts_by_day(self):
+        """Returns run counts, per day, for past 30 days
+        """
+        # TOOD: support query parameters to override default of past
+        #   30 days, and set argument to `to_list`, below, accordingly
+        month_ago = datetime.datetime.now() - datetime.timedelta(days=30)
+        since_str = month_ago.strftime("%Y-%m-%dT00:00:00")
+
+        cursor = self.db.runs.aggregate([
+            {
+                "$match": {
+                    "initiated_at": { "$gte": since_str }
+                }
+            },
+            {
+                '$group': {
+                    '_id': {
+                        "date": {'$substr': [ "$initiated_at", 0, 10 ] },
+                    },
+                    'count': { '$sum': 1 }
+                }
+            },
+            {
+                '$sort': {'_id': -1}
+            }
+        ])
+        r = await cursor.to_list(30)
+
+        return [{
+            'date': e['_id']['date'],
+            'count': e['count'],
+        } for e in r]

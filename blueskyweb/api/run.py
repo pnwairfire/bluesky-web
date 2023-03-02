@@ -203,3 +203,12 @@ class RunStatsMonthly(RequestHandlerBase):
         self.write({
             'monthly': monthly
         })
+
+class RunStatsDaily(RequestHandlerBase):
+
+    @tornado.web.asynchronous
+    async def get(self, api_version):
+        daily = await self.settings['mongo_db'].run_counts_by_day()
+        self.write({
+            'daily': daily
+        })
