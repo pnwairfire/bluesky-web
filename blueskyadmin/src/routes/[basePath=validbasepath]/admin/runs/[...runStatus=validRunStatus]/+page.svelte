@@ -32,17 +32,26 @@
                     </ul>
                 </div>
 
-                <form class="row g-3 align-items-center">
+                <div class="row g-3">
                     <div class="col-auto">
-                        <label for="runId" class="col-form-label">Run Id</label>
+                        <form class="row g-3 align-items-right">
+                            <div class="col-auto">
+                                <label for="runId" class="col-form-label">Run Id</label>
+                            </div>
+                            <div class="col-auto">
+                                <input id="runId" name="runId" class="form-control" value={data.runId} placeholder="Enter complete or partial run id">
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary" on:click={onSubmit}>Find</button>
+                            </div>
+                        </form>
                     </div>
                     <div class="col-auto">
-                        <input id="runId" name="runId" class="form-control" value={data.runId}>
+                        <form class="row g-3 align-items-center">
+                            <a class={"btn btn-warning " + (data.runId ? '' : 'disabled')} href=".">Clear</a>
+                        </form>
                     </div>
-                    <div class="col-auto">
-                        <button class="btn btn-primary" on:click={onSubmit}>Find</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </nav>
 
