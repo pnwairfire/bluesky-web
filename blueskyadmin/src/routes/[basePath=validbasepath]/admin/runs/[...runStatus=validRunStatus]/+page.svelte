@@ -11,7 +11,7 @@
     const first = (data.runsData) && (data.limit*data.page +1)
     const last = (data.runsData) && Math.min(data.limit*data.page + data.limit, total)
 
-    const runIdQueryStr = data.runId ? `?runId=${data.runId}` : ''
+    const runIdQueryStr = data.runId ? `runId=${data.runId}` : ''
 </script>
 
 {@debug data}
@@ -25,9 +25,9 @@
                     {status}
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/${runIdQueryStr}`}>All Runs</a></li>
+                        <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/?${runIdQueryStr}`}>All Runs</a></li>
                         {#each Object.keys(runStatuses) as s, i}
-                            <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/${s}/${runIdQueryStr}`}>{runStatuses[s]}</a></li>
+                            <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/${s}/?${runIdQueryStr}`}>{runStatuses[s]}</a></li>
                         {/each}
                     </ul>
                 </div>
@@ -65,12 +65,12 @@
             <div>
                 <div class="my-3">
                     <a class={`btn btn-outline-dark ${(data.page === 0) ? (' disabled') : ('')}`}
-                            href={`?page=${data.page-1}`}>
+                            href={`?page=${data.page-1}&${runIdQueryStr}`}>
                         &lt;
                     </a>
                     <span>{first} - {last} of {total}</span>
                     <a class={`btn btn-outline-dark ${(last >= total) ? (' disabled') : ('')}`}
-                            href={`?page=${data.page+1}`}>
+                            href={`?page=${data.page+1}&${runIdQueryStr}`}>
                         &gt;
                     </a>
                 </div>
