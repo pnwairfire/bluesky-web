@@ -88,13 +88,22 @@ See the [API documentation](doc/README.md)
 
 ## Manually connecting to mongodb
 
-start session
+start session as bluesky web user
 
     docker exec -ti bluesky-web-mongo \
         mongo -u blueskyweb -p blueskywebmongopassword --ssl \
         --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
         --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
         blueskyweb
+
+or as root user
+
+    docker exec -ti bluesky-web-mongo \
+        mongo -u blueskywebadmin -p blueskywebmongopasswordadmin --ssl \
+        --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
+        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        blueskyweb --authenticationDatabase admin
+
 
 run query on command line
 
