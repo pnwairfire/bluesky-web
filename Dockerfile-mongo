@@ -1,4 +1,4 @@
-FROM mongo:4.4.18
+FROM mongo:5.0.15
 
 MAINTAINER jdubowy@gmail.com
 
