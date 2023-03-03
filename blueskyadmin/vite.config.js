@@ -12,5 +12,8 @@ export default defineConfig({
  		host: '0.0.0.0',
  		port: 8882,
 		strictPort: false,
-	}
+	},
+	ssr: {
+		noExternal: ['chart.js'],
+	},
 });

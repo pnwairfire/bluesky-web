@@ -1,6 +1,8 @@
 <script>
     import { Alert, Container, Table } from 'sveltestrap';
 
+    import MonthlyCountsGraph from '$lib/components/stats-page/MonthlyCountsGraph.svelte'
+
     /** @type {import('./$types').PageData} */
     export let data;
 </script>
@@ -31,6 +33,7 @@
               </tbody>
             </Table>
         </div>
+        <MonthlyCountsGraph monthly={data.stats.monthly} />
         <h4>Daily</h4>
         <div class="m-3">
             <Table bordered hover striped size="sm" responsive>
