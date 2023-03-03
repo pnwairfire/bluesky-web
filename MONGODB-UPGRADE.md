@@ -47,3 +47,17 @@ this time to 4.0
 Now, you can check out a version of the code using 4.2.24
 
     git checkout mongo-4.2.24
+
+# Mongo 4.2.24 -> 4.4.18
+
+Again, first set setFeatureCompatibilityVersion, this time to 4.2
+
+    docker exec -ti bluesky-web-mongo \
+        mongo -u blueskywebadmin -p blueskywebmongopasswordadmin --ssl \
+        --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
+        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        blueskyweb --authenticationDatabase admin --eval 'db.adminCommand( { setFeatureCompatibilityVersion: "4.2" } )'
+
+Now, check out a version of the code using 4.4.18
+
+    git checkout mongo-4.4.18
