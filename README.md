@@ -91,33 +91,33 @@ See the [API documentation](doc/README.md)
 start session as bluesky web user
 
     docker exec -ti bluesky-web-mongo \
-        mongo -u blueskyweb -p blueskywebmongopassword --ssl \
-        --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
-        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        mongosh -u blueskyweb -p blueskywebmongopassword --tls \
+        --tlsCertificateKeyFile /etc/ssl/bluesky-web-mongod.pem \
+        --tlsAllowInvalidHostnames --tlsAllowInvalidCertificates \
         blueskyweb
 
 or as root user
 
     docker exec -ti bluesky-web-mongo \
-        mongo -u blueskywebadmin -p blueskywebmongopasswordadmin --ssl \
-        --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
-        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        mongosh -u blueskywebadmin -p blueskywebmongopasswordadmin --tls \
+        --tlsCertificateKeyFile /etc/ssl/bluesky-web-mongod.pem \
+        --tlsAllowInvalidHostnames --tlsAllowInvalidCertificates \
         blueskyweb --authenticationDatabase admin
 
 
 run query on command line
 
     docker exec -ti bluesky-web-mongo \
-        mongo -u blueskyweb -p blueskywebmongopassword --ssl \
-        --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
-        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        mongosh -u blueskyweb -p blueskywebmongopassword --tls \
+        --tlsCertificateKeyFile /etc/ssl/bluesky-web-mongod.pem \
+        --tlsAllowInvalidHostnames --tlsAllowInvalidCertificates \
         blueskyweb --eval 'db.met_files.findOne()'
 
 Or with db dsn
 
     docker exec -ti bluesky-web-mongo \
-        mongo mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \
-         --ssl --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
-        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        mongosh mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \
+         --tls --tlsCertificateKeyFile /etc/ssl/bluesky-web-mongod.pem \
+        --tlsAllowInvalidHostnames --tlsAllowInvalidCertificates \
         --eval 'db.met_files.findOne()'
 
