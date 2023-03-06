@@ -7,7 +7,7 @@
 </script>
 
 <div class="app">
-	<Header basePath={data.basePath} pathname={data.pathname} />
+	<Header pathname={data.pathname} />
 
 	<main>
 		<slot />

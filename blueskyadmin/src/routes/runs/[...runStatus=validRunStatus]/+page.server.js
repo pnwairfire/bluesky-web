@@ -10,7 +10,6 @@ import { limit, queryRuns } from '$lib/runs'
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ fetch, params, route, url }) {
   //console.log('url', url)
-  const basePath = params.basePath
   const runStatus = params.runStatus
 
   if (!runStatus || runStatuses[runStatus]) {
@@ -21,10 +20,10 @@ export async function load({ fetch, params, route, url }) {
       const runId = url.searchParams.get('runId')
       const runsData = queryRuns(fetch, page, offset, runStatus, runId)
       console.log(runsData)
-      return { runStatus, basePath, runsData, page, limit, offset, runId}
+      return { runStatus, runsData, page, limit, offset, runId}
     } catch(error) {
       console.error(`Error in load loading queue information: ${error}`);
-      return { runStatus, basePath, error }
+      return { runStatus, error }
     }
   }
   throw error(404, 'Not found');

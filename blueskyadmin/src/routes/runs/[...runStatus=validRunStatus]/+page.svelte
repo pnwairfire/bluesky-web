@@ -2,6 +2,7 @@
     /** @type {import('./$types').PageData} */
     export let data;
 
+    import { base } from '$app/paths';
     import { goto } from '$app/navigation';
     import { Container, Table, Form, FormGroup, Input } from 'sveltestrap';
     import { runStatuses } from '$lib/run-status'
@@ -14,8 +15,6 @@
     const runIdQueryStr = data.runId ? `runId=${data.runId}` : ''
 </script>
 
-{@debug data}
-
     <Container fluid={true}>
         <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: white !important;">
             <div class="container-fluid">
@@ -25,9 +24,9 @@
                     {status}
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/?${runIdQueryStr}`}>All Runs</a></li>
+                        <li><a class="dropdown-item" href={`${base}/admin/runs/?${runIdQueryStr}`}>All Runs</a></li>
                         {#each Object.keys(runStatuses) as s, i}
-                            <li><a class="dropdown-item" href={`/${data.basePath}/admin/runs/${s}/?${runIdQueryStr}`}>{runStatuses[s]}</a></li>
+                            <li><a class="dropdown-item" href={`${base}/admin/runs/${s}/?${runIdQueryStr}`}>{runStatuses[s]}</a></li>
                         {/each}
                     </ul>
                 </div>
@@ -48,7 +47,7 @@
                     </div>
                     <div class="col-auto">
                         <form class="row g-3 align-items-center">
-                            <a class={"btn btn-warning " + (data.runId ? '' : 'disabled')} href={`/${data.basePath}/admin/runs/${data.runStatus || ''}/`}>Clear</a>
+                            <a class={"btn btn-warning " + (data.runId ? '' : 'disabled')} href={`${base}/admin/runs/${data.runStatus || ''}/`}>Clear</a>
                         </form>
                     </div>
                 </div>
