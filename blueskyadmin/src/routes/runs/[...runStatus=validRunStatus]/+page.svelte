@@ -24,9 +24,9 @@
                     {status}
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href={`${base}/admin/runs/?${runIdQueryStr}`}>All Runs</a></li>
+                        <li><a class="dropdown-item" href={`${base}/runs/?${runIdQueryStr}`}>All Runs</a></li>
                         {#each Object.keys(runStatuses) as s, i}
-                            <li><a class="dropdown-item" href={`${base}/admin/runs/${s}/?${runIdQueryStr}`}>{runStatuses[s]}</a></li>
+                            <li><a class="dropdown-item" href={`${base}/runs/${s}/?${runIdQueryStr}`}>{runStatuses[s]}</a></li>
                         {/each}
                     </ul>
                 </div>
@@ -47,7 +47,7 @@
                     </div>
                     <div class="col-auto">
                         <form class="row g-3 align-items-center">
-                            <a class={"btn btn-warning " + (data.runId ? '' : 'disabled')} href={`${base}/admin/runs/${data.runStatus || ''}/`}>Clear</a>
+                            <a class={"btn btn-warning " + (data.runId ? '' : 'disabled')} href={`${base}/runs/${data.runStatus || ''}/`}>Clear</a>
                         </form>
                     </div>
                 </div>
