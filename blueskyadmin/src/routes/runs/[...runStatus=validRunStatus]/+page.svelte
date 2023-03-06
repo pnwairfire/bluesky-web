@@ -41,7 +41,7 @@
                                 <input id="runId" name="runId" class="form-control" value={data.runId} placeholder="Enter complete or partial run id">
                             </div>
                             <div class="col-auto">
-                                <button type="submit" class="btn btn-primary" on:click={onSubmit}>Find</button>
+                                <button type="submit" class="btn btn-primary">Find</button>
                             </div>
                         </form>
                     </div>
