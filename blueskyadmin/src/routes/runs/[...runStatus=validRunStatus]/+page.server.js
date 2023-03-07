@@ -9,6 +9,10 @@ import { limit, queryRuns } from '$lib/runs'
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ fetch, params, route, url }) {
+  return await loadData(params, url, fetch)
+}
+
+async function loadData(params, url, fetch) {
   //console.log('url', url)
   const runStatus = params.runStatus
 
