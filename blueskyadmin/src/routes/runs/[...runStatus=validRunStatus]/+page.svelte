@@ -2,17 +2,19 @@
     /** @type {import('./$types').PageData} */
     export let data;
 
+    console.dir("Data: ", data)
+
     import { base } from '$app/paths';
     import { goto } from '$app/navigation';
     import { Container, Table, Form, FormGroup, Input } from 'sveltestrap';
     import { runStatuses } from '$lib/run-status'
 
-    let status = data.runStatus ? runStatuses[data.runStatus] : 'All Runs'
-    const total = data.runsData.total
-    const first = (data.runsData) && (data.limit*data.page +1)
-    const last = (data.runsData) && Math.min(data.limit*data.page + data.limit, total)
+    $: status = data.runStatus ? runStatuses[data.runStatus] : 'All Runs'
+    $: total = data.runsData.total
+    $: first = (data.runsData) && (data.limit*data.page +1)
+    $: last = (data.runsData) && Math.min(data.limit*data.page + data.limit, total)
 
-    const runIdQueryStr = data.runId ? `runId=${data.runId}` : ''
+    $: runIdQueryStr = data.runId ? `runId=${data.runId}` : ''
 </script>
 
     <Container fluid={true}>
