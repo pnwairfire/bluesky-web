@@ -14,7 +14,10 @@
     {#if data.error}
         {data.error}
     {:else}
-        <h4>Monthly</h4>
+        <div>
+          <span style="font-size: x-large; font-weight: bold;">Monthly</span>
+          <span style="font-style: italic;">(Past Year)</span>
+        </div>
         <Row>
           <Col>
             <div class="m-3">
@@ -42,7 +45,10 @@
             <MonthlyCountsGraph monthly={data.stats.monthly} />
           </Col>
         </Row>
-        <h4>Daily</h4>
+        <div>
+          <span style="font-size: x-large; font-weight: bold;">Daily</span>
+          <span style="font-style: italic;">(Past 30 days)</span>
+        </div>
         <Row>
           <Col>
             <div class="m-3">
