@@ -4,17 +4,40 @@
   import { browser } from '$app/environment';
   import { Chart, registerables } from 'chart.js';
   import { onMount } from 'svelte';
+  import dayjs from 'dayjs'
 
   Chart.register(...registerables);
 
   let barChartElement;
 
+  function fillInMonths (monthly) {
+    const monthlyDict = monthly.reduce((r, m) => {
+      const d = dayjs(`${m.year}-${m.month}-01`)
+      r[d] = m
+      return r
+    }, {})
+    const first = dayjs(`${monthly[0].year}-${monthly[0].month}-01`)
+    const last = dayjs(`${monthly.at(-1).year}-${monthly.at(-1).month}-01`)
+
+    const monthlyComplete = []
+    let d = first
+
+    while (d >= last) {
+      monthlyComplete.push(monthlyDict[d] ||
+        {year: d.format('YYYY'), month: d.format('MM'), count: 0})
+      d = d.subtract(1, 'month')
+    }
+    return monthlyComplete
+  }
+
+  const monthlyComplete = fillInMonths(monthly)
+
   const chartData = {
-    labels: monthly.map(({ year, month }) => `${month}/${year}`),
+    labels: monthlyComplete.map(({ year, month }) => `${month}/${year}`),
     datasets: [
       {
         label: '# Runs',
-        data: monthly.map(({ count }) => count),
+        data: monthlyComplete.map(({ count }) => count),
         backgroundColor: [
           'hsl(347 38% 49%)',
           'hsl(346 65% 63%)',

@@ -19,6 +19,7 @@
 	"type": "module",
 	"dependencies": {
 		"chart.js": "^4.2.1",
+		"dayjs": "^1.11.7",
 		"highcharts": "^10.3.3",
 		"sveltestrap": "^5.10.0"
 	}
