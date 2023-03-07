@@ -199,12 +199,28 @@ class BlueSkyWebDB(object):
                 }
             },
             {
-                '$group': {
-                    '_id': {
-                        "year": {'$substr': [ "$initiated_at", 0, 4 ] },
-                        "month": {'$substr': [ "$initiated_at", 5, 2 ] },
+                "$group": {
+                    "_id": {
+                        "year": {"$substr": [ "$initiated_at", 0, 4 ] },
+                        "month": {"$substr": [ "$initiated_at", 5, 2 ] },
+                        "queue": "$queue",
                     },
-                    'count': { '$sum': 1 }
+                    "count": { "$sum": 1 }
+                }
+            },
+            {
+                "$group": {
+                    "_id": {
+                        "year": "$_id.year",
+                        "month": "$_id.month",
+                    },
+                    "count": { "$sum": '$count' },
+                    "by_queue": {
+                        "$push": {
+                            "queue": '$_id.queue',
+                            "count": '$count'
+                        }
+                    }
                 }
             },
             {
@@ -217,6 +233,7 @@ class BlueSkyWebDB(object):
             'year': e['_id']['year'],
             'month': e['_id']['month'],
             'count': e['count'],
+            'by_queue': sorted(e['by_queue'], key=lambda e: -e["count"])
         } for e in r]
 
     async def run_counts_by_day(self):
@@ -234,20 +251,34 @@ class BlueSkyWebDB(object):
                 }
             },
             {
-                '$group': {
-                    '_id': {
-                        "date": {'$substr': [ "$initiated_at", 0, 10 ] },
+                "$group": {
+                    "_id": {
+                        "date": { "$substr": [ "$initiated_at", 0, 10 ] },
+                        "queue": "$queue",
                     },
-                    'count': { '$sum': 1 }
+                    "count": { "$sum": 1 }
                 }
             },
             {
-                '$sort': {'_id': -1}
+                "$group": {
+                    "_id":  "$_id.date",
+                    "count": { "$sum": "$count"},
+                    "by_queue": {
+                        "$push": {
+                            "queue": "$_id.queue",
+                            "count": "$count"
+                        }
+                    }
+                }
+            },
+            {
+                "$sort": {"_id": -1}
             }
         ])
         r = await cursor.to_list(30)
 
         return [{
-            'date': e['_id']['date'],
+            'date': e['_id'],
             'count': e['count'],
+            'by_queue': sorted(e['by_queue'], key=lambda e: -e["count"])
         } for e in r]
