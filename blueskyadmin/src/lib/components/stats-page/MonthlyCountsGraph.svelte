@@ -27,7 +27,7 @@
         {year: d.format('YYYY'), month: d.format('MM'), count: 0})
       d = d.subtract(1, 'month')
     }
-    return monthlyComplete
+    return monthlyComplete.reverse()
   }
 
   const monthlyComplete = fillInMonths(monthly)

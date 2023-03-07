@@ -26,7 +26,7 @@
         {date: d.format('YYYY-MM-DD'), count: 0})
       d = d.subtract(1, 'day')
     }
-    return dailyComplete
+    return dailyComplete.reverse()
   }
 
   const dailyComplete = fillInMonths(daily)
