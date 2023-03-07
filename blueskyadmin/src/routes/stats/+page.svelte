@@ -1,5 +1,5 @@
 <script>
-    import { Alert, Container, Table } from 'sveltestrap';
+    import { Alert, Col, Container, Row, Table } from 'sveltestrap';
 
     import MonthlyCountsGraph from '$lib/components/stats-page/MonthlyCountsGraph.svelte'
 
@@ -13,27 +13,33 @@
         {data.error}
     {:else}
         <h4>Monthly</h4>
-        <div class="m-3">
-            <Table bordered hover striped size="sm" responsive>
-              <thead>
-                <tr>
-                  <th>Year</th>
-                  <th>Month</th>
-                  <th>Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                {#each data.stats.monthly as monthlyStats}
+        <Row>
+          <Col>
+            <div class="m-3">
+                <Table bordered hover striped size="sm" responsive>
+                  <thead>
                     <tr>
-                      <td>{monthlyStats.year}</td>
-                      <td>{monthlyStats.month}</td>
-                      <td>{monthlyStats.count}</td>
+                      <th>Year</th>
+                      <th>Month</th>
+                      <th>Count</th>
                     </tr>
-                {/each}
-              </tbody>
-            </Table>
-        </div>
-        <MonthlyCountsGraph monthly={data.stats.monthly} />
+                  </thead>
+                  <tbody>
+                    {#each data.stats.monthly as monthlyStats}
+                        <tr>
+                          <td>{monthlyStats.year}</td>
+                          <td>{monthlyStats.month}</td>
+                          <td>{monthlyStats.count}</td>
+                        </tr>
+                    {/each}
+                  </tbody>
+                </Table>
+            </div>
+          </Col>
+          <Col>
+            <MonthlyCountsGraph monthly={data.stats.monthly} />
+          </Col>
+        </Row>
         <h4>Daily</h4>
         <div class="m-3">
             <Table bordered hover striped size="sm" responsive>
