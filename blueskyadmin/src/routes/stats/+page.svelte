@@ -27,6 +27,7 @@
                       <th>Year</th>
                       <th>Month</th>
                       <th>Count</th>
+                      <th>Top Queue</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -35,6 +36,7 @@
                           <td>{monthlyStats.year}</td>
                           <td>{monthlyStats.month}</td>
                           <td>{monthlyStats.count}</td>
+                          <td>{monthlyStats.by_queue[0].queue} ({monthlyStats.by_queue[0].count})</td>
                         </tr>
                     {/each}
                   </tbody>
@@ -57,6 +59,7 @@
                     <tr>
                       <th>Date</th>
                       <th>Count</th>
+                      <th>Top Queue</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -64,6 +67,7 @@
                         <tr>
                           <td>{dailyStats.date}</td>
                           <td>{dailyStats.count}</td>
+                          <td>{dailyStats.by_queue[0].queue} ({dailyStats.by_queue[0].count})</td>
                         </tr>
                     {/each}
                   </tbody>
