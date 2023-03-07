@@ -83,17 +83,17 @@ def prune_scheduled(task):
 
     """
     tornado.log.gen_log.debug(f"***TASK***: {task}")
-    request_args = eval(task["request"]["args"])
     t = {
         "priority": task["priority"],
         "id": task["request"]["id"],
         "type": task["request"]["type"],
-        "api_version": request_args[1],
-        "run_id": request_args[0]['run_id'],
-        "modules": request_args[0]['modules']
     }
+
+    add_request_args(t, task)
+
     if task.get('eta'):
         t['schedule_for'] = task['eta']
+
     return t
 
 def prune_enqueud_or_active(task):
@@ -143,12 +143,30 @@ def prune_enqueud_or_active(task):
             'worker_pid': 14
         }
     """
-    request_args = eval(task["args"])
     t = {
         "id": task["id"],
         "type": task["type"],
-        "api_version": request_args[1],
-        "run_id": request_args[0]['run_id'],
-        "modules": request_args[0]['modules']
     }
+
+    add_request_args(t, task)
+
     return t
+
+def add_request_args(t, task):
+    request_args = task.get("request", {}).get("args") or task.get("args")
+    try:
+        if isinstance(request_args, str):
+            request_args = eval(request_args)
+
+        # tornado.log.gen_log.debug("Request args: %s", request_args)
+        tornado.log.gen_log.debug("  api_version: %s", request_args[1])
+        tornado.log.gen_log.debug("  run_id: %s", request_args[0]['run_id'])
+        tornado.log.gen_log.debug("  modules: %s", request_args[0]['modules'])
+
+        t["api_version"] = request_args[1]
+        t["run_id"] = request_args[0]['run_id']
+        t["modules"] = request_args[0]['modules']
+
+    except Exception as e:
+        tornado.log.gen_log.warn("Failed to parse request args: %s", e)
+        # t["request_args"] = request_args
