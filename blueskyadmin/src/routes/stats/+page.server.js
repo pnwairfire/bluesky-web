@@ -8,8 +8,8 @@ export async function load({ fetch, params, route, url }) {
     try {
         const runId = url.searchParams.get('runId')
         const stats = await queryStats(fetch, runId)
-        console.log(stats)
-        return { stats }
+        //console.log(stats)
+        return { stats, runId }
     } catch(error) {
         console.error(`Error in load loading stats information: ${error}`);
         return {error}

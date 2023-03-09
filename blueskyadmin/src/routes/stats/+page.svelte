@@ -1,16 +1,35 @@
 <script>
+    /** @type {import('./$types').PageData} */
+    export let data;
+
+    import { base } from '$app/paths';
+    import { PUBLIC_STATS_RUNID_OPTIONS } from '$env/static/public';
     import { Alert, Col, Container, Row, Table } from 'sveltestrap';
 
     import MonthlyCountsGraph from '$lib/components/stats-page/MonthlyCountsGraph.svelte'
 
     import DailyCountsGraph from '$lib/components/stats-page/DailyCountsGraph.svelte'
 
-    /** @type {import('./$types').PageData} */
-    export let data;
+    const runIdOptions = PUBLIC_STATS_RUNID_OPTIONS && PUBLIC_STATS_RUNID_OPTIONS.split(',')
 </script>
 
 
 <Container fluid="true">
+    {#if runIdOptions}
+      <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: white !important;">
+        <div class="dropdown my-2">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {data.runId || 'All Runs' }
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href={`${base}/stats/`}>All Runs</a></li>
+                {#each runIdOptions as r, i}
+                    <li><a class="dropdown-item" href={`${base}/stats/?runId=${r}`}>{r}</a></li>
+                {/each}
+            </ul>
+        </div>
+      </nav>
+    {/if}
     {#if data.error}
       {data.error}
     {:else}
