@@ -184,7 +184,7 @@ class BlueSkyWebDB(object):
 
     ## Stats
 
-    async def run_counts_by_month(self):
+    async def run_counts_by_month(self, run_id=None):
         """Returns run counts, per month, for past year
         """
         # TOOD: support query parameters to override default of past year,
@@ -192,7 +192,7 @@ class BlueSkyWebDB(object):
         year_ago = datetime.datetime.now() - datetime.timedelta(days=365)
         since_str = datetime.date(year_ago.year, year_ago.month, 1).strftime("%Y-%m-%dT00:00:00")
 
-        cursor = self.db.runs.aggregate([
+        pipeline = [
             {
                 "$match": {
                     "initiated_at": { "$gte": since_str }
@@ -226,7 +226,17 @@ class BlueSkyWebDB(object):
             {
                 '$sort': {'_id': -1}
             }
-        ])
+        ]
+
+        if run_id:
+            # insert at beginning
+            pipeline.insert(0, {
+                "$match": {
+                    "run_id": { '$regex': run_id }
+                }
+            })
+
+        cursor = self.db.runs.aggregate(pipeline)
         r = await cursor.to_list(12)
 
         return [{
@@ -236,7 +246,7 @@ class BlueSkyWebDB(object):
             'by_queue': sorted(e['by_queue'], key=lambda e: -e["count"])
         } for e in r]
 
-    async def run_counts_by_day(self):
+    async def run_counts_by_day(self, run_id=None):
         """Returns run counts, per day, for past 30 days
         """
         # TOOD: support query parameters to override default of past
@@ -244,7 +254,7 @@ class BlueSkyWebDB(object):
         month_ago = datetime.datetime.now() - datetime.timedelta(days=30)
         since_str = month_ago.strftime("%Y-%m-%dT00:00:00")
 
-        cursor = self.db.runs.aggregate([
+        pipeline = [
             {
                 "$match": {
                     "initiated_at": { "$gte": since_str }
@@ -274,7 +284,17 @@ class BlueSkyWebDB(object):
             {
                 "$sort": {"_id": -1}
             }
-        ])
+        ]
+
+        if run_id:
+            # insert at beginning
+            pipeline.insert(0, {
+                "$match": {
+                    "run_id": { '$regex': run_id }
+                }
+            })
+
+        cursor = self.db.runs.aggregate(pipeline)
         r = await cursor.to_list(30)
 
         return [{

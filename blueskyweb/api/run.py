@@ -199,7 +199,8 @@ class RunStatsMonthly(RequestHandlerBase):
 
     @tornado.web.asynchronous
     async def get(self, api_version):
-        monthly = await self.settings['mongo_db'].run_counts_by_month()
+        run_id = self.get_query_argument('run_id', None)
+        monthly = await self.settings['mongo_db'].run_counts_by_month(run_id=run_id)
         self.write({
             'monthly': monthly
         })
@@ -208,7 +209,8 @@ class RunStatsDaily(RequestHandlerBase):
 
     @tornado.web.asynchronous
     async def get(self, api_version):
-        daily = await self.settings['mongo_db'].run_counts_by_day()
+        run_id = self.get_query_argument('run_id', None)
+        daily = await self.settings['mongo_db'].run_counts_by_day(run_id=run_id)
         self.write({
             'daily': daily
         })
