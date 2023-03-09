@@ -94,14 +94,10 @@ class RunStatusBase(RequestHandlerBase):
             # need to call get_queue_position before converting
             # run['status'] from array to scalar object
             position = await self.settings['mongo_db'].get_queue_position(run)
-            if position is not None:
-                run['queue'] = {
-                    'name': run['queue'],
-                    'position': position
-                }
-            else:
-                tornado.log.gen_log.debug(run)
-                run.pop('queue', None)
+            run['queue'] = {
+                'name': run['queue'],
+                'position': position  # will be None if no longer enqueued
+            }
 
             # Note: history will always be defined; a run is never
             #  recorded in the db without adding to the history
