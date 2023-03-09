@@ -12,12 +12,15 @@
 
 <Container fluid="true">
     {#if data.error}
-        {data.error}
+      {data.error}
     {:else}
-        <div class="header">
-          <span class="text">Monthly</span>
-          <span class="caption">(Past Year)</span>
-        </div>
+      <div class="header">
+        <span class="text">Monthly</span>
+        <span class="caption">(Past Year)</span>
+      </div>
+      {#if !data.stats.monthly || data.stats.monthly.length ===0 }
+        <div>No Data</div>
+      {:else}
         <Row>
           <Col>
             <div class="m-3">
@@ -47,10 +50,14 @@
             <MonthlyCountsGraph monthly={data.stats.monthly} />
           </Col>
         </Row>
-        <div class="header">
-          <span class="text">Daily</span>
-          <span class="caption">(Past 30 days)</span>
-        </div>
+      {/if}
+      <div class="header">
+        <span class="text">Daily</span>
+        <span class="caption">(Past 30 days)</span>
+      </div>
+      {#if !data.stats.monthly || data.stats.monthly.length ===0 }
+        <div>No Data</div>
+      {:else}
         <Row>
           <Col>
             <div class="m-3">
@@ -78,6 +85,7 @@
             <DailyCountsGraph daily={data.stats.daily} />
           </Col>
         </Row>
+      {/if}
     {/if}
 </Container>
 
