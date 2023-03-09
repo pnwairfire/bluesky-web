@@ -11,3 +11,18 @@ export async function queryRuns(fetch, page, offset, runStatus, runId) {
     const runsData = await res.json();
     return runsData
 }
+
+export async function queryStats(fetch, runId) {
+    const runIdQueryStr = (runId) ? (`?run_id=${runId}`) : ('')
+    const [monthlyRes, dailyRes] = await Promise.all([
+      fetch(`${PUBLIC_API_URL}/runs/stats/monthly${runIdQueryStr}`, {mode:"no-cors"}),
+      fetch(`${PUBLIC_API_URL}/runs/stats/daily${runIdQueryStr}`, {mode:"no-cors"}),
+    ])
+    const monthly = await monthlyRes.json();
+    const daily = await dailyRes.json();
+
+    return {
+        monthly: monthly.monthly,
+        daily: daily.daily
+    }
+}
