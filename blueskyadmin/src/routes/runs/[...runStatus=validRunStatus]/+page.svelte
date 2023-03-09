@@ -79,6 +79,7 @@
                     <thead>
                         <tr>
                             <th>Run Id</th>
+                            <th>Queue</th>
                             <th>status</th>
                             <th>Percent Complete</th>
                             <th>Time</th>
@@ -89,6 +90,7 @@
                         {#each data.runsData.runs as run}
                             <tr>
                                 <td>{run.run_id}</td>
+                                <td>{run.queue ? run.queue.name : 'n/a'}</td>
                                 <td>{run.status.status}</td>
                                 <td>{run.status.perc}</td>
                                 <td>{run.status.ts}</td>
