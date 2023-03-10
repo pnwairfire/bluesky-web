@@ -10,7 +10,9 @@
 
     import DailyCountsGraph from '$lib/components/stats-page/DailyCountsGraph.svelte'
 
-    const runIdOptions = PUBLIC_STATS_RUNID_OPTIONS && PUBLIC_STATS_RUNID_OPTIONS.split(',')
+    const runIdOptions = PUBLIC_STATS_RUNID_OPTIONS && JSON.parse(PUBLIC_STATS_RUNID_OPTIONS)
+
+    $: displayedRunId = runIdOptions[data.runId] || data.runId || 'All Runs'
 </script>
 
 
@@ -19,12 +21,12 @@
       <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: white !important;">
         <div class="dropdown my-2">
             <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            {data.runId || 'All Runs' }
+            { displayedRunId }
             </button>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href={`${base}/stats/`}>All Runs</a></li>
-                {#each runIdOptions as r, i}
-                    <li><a class="dropdown-item" href={`${base}/stats/?runId=${r}`}>{r}</a></li>
+                {#each Object.keys(runIdOptions) as r, i}
+                    <li><a class="dropdown-item" href={`${base}/stats/?runId=${r}`}>{runIdOptions[r]}</a></li>
                 {/each}
             </ul>
         </div>
