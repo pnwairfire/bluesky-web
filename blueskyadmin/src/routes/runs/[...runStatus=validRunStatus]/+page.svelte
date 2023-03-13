@@ -6,13 +6,31 @@
 
     import { base } from '$app/paths';
     import { goto } from '$app/navigation';
-    import { Container, Table, Form, FormGroup, Input } from 'sveltestrap';
+    import { onMount } from 'svelte';
+    import {
+        Col, Container, Form, FormGroup, Input, Row, Table
+    } from 'sveltestrap';
+    import dayjs from 'dayjs'
+    import dayJsUtc from 'dayjs/plugin/utc'
+    dayjs.extend(dayJsUtc)
     import { runStatuses } from '$lib/run-status'
 
     $: status = data.runStatus ? runStatuses[data.runStatus] : 'All Runs'
     $: total = data.runsData.total
     $: first = (data.runsData) && (data.limit*data.page +1)
-    $: last = (data.runsData) && Math.min(data.limit*data.page + data.limit, total)
+    $: last = (data.runsData) && Math.min(
+        data.limit*data.page + data.limit, total)
+
+    function formatTime(t) {
+        return dayjs.utc(t).format("D MMM YYYY - HH:mm:ss UTC")
+    }
+
+    $: currentTime = dayjs.utc().format()
+    onMount( () => {
+        const interval = setInterval(()=>{
+            currentTime = formatTime() // for format current time
+        }, 1000);
+    });
 
     $: runIdQueryStr = data.runId ? `runId=${data.runId}` : ''
 </script>
@@ -65,15 +83,22 @@
         {:else}
             <div>
                 <div class="my-3">
-                    <a class={`btn btn-outline-dark ${(data.page === 0) ? (' disabled') : ('')}`}
-                            href={`?page=${data.page-1}&${runIdQueryStr}`}>
-                        &lt;
-                    </a>
-                    <span>{first} - {last} of {total}</span>
-                    <a class={`btn btn-outline-dark ${(last >= total) ? (' disabled') : ('')}`}
-                            href={`?page=${data.page+1}&${runIdQueryStr}`}>
-                        &gt;
-                    </a>
+                    <Row>
+                        <Col>
+                            <a class={`btn btn-outline-dark ${(data.page === 0) ? (' disabled') : ('')}`}
+                                    href={`?page=${data.page-1}&${runIdQueryStr}`}>
+                                &lt;
+                            </a>
+                            <span>{first} - {last} of {total}</span>
+                            <a class={`btn btn-outline-dark ${(last >= total) ? (' disabled') : ('')}`}
+                                    href={`?page=${data.page+1}&${runIdQueryStr}`}>
+                                &gt;
+                            </a>
+                        </Col>
+                        <Col style="text-align: right;">
+                            Current time: {currentTime}
+                        </Col>
+                    </Row>
                 </div>
                 <Table bordered hover striped size="sm" responsive>
                     <thead>
@@ -93,7 +118,7 @@
                                 <td>{run.queue ? run.queue.name : 'n/a'}</td>
                                 <td>{run.status.status}</td>
                                 <td>{run.status.perc}</td>
-                                <td>{run.status.ts}</td>
+                                <td>{formatTime(run.status.ts)}</td>
                                 <td>
                                     {#if run.output_url}
                                         <a href={run.output_url} target="_blank">output</a>
