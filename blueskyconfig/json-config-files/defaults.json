@@ -414,7 +414,7 @@
         "ensure_dummy_fire": false,
         "NUMPAR": 2000,
         "MAXPAR": 10000000,
-        "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
+        "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 10,
         "VERTICAL_LEVELS": [100],
         "INITD": 0,
         "NINIT": 0,

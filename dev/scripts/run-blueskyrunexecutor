@@ -56,7 +56,7 @@ INPUT = {
                 "NCPUS": 2,
                 "NINIT": 0,
                 "NUMPAR": 1000,
-                "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
+                "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 10,
                 "VERTICAL_LEVELS": [
                     100
                 ],
