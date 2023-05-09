@@ -76,7 +76,7 @@
         <span class="text">Daily</span>
         <span class="caption">(Past 30 days)</span>
       </div>
-      {#if !data.stats.monthly || data.stats.monthly.length ===0 }
+      {#if !data.stats.daily || data.stats.daily.length ===0 }
         <div>No Data</div>
       {:else}
         <Row>
