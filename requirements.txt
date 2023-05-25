@@ -3,4 +3,4 @@ docker==2.4.2
 ipify2==1.0.2
 motor==1.1
 requests==2.28.2
-tornado==4.5.1
+tornado==6.3.2
