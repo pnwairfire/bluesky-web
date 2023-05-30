@@ -8,7 +8,7 @@
 
   Chart.register(...registerables);
 
-  let barChartElement;
+  $: barChartElement = null;
 
   function fillInMonths (daily) {
     const dailyDict = daily.reduce((r, d) => {
@@ -31,7 +31,7 @@
 
   const dailyComplete = fillInMonths(daily)
 
-  const chartData = {
+  $: chartData = {
     labels: dailyComplete.map(({ date }) => date),
     datasets: [
       {
