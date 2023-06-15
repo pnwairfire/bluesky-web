@@ -91,13 +91,14 @@ class RunStatusBase(RequestHandlerBase):
 
     async def process(self, run):
         if not self.get_boolean_arg('raw'):
-            # need to call get_queue_position before converting
-            # run['status'] from array to scalar object
-            position = await self.settings['mongo_db'].get_queue_position(run)
-            run['queue'] = {
-                'name': run['queue'],
-                'position': position  # will be None if no longer enqueued
-            }
+            if 'queue' in run:
+                # need to call get_queue_position before converting
+                # run['status'] from array to scalar object
+                position = await self.settings['mongo_db'].get_queue_position(run)
+                run['queue'] = {
+                    'name': run['queue'],
+                    'position': position  # will be None if no longer enqueued
+                }
 
             # Note: history will always be defined; a run is never
             #  recorded in the db without adding to the history
