@@ -6,6 +6,7 @@ import datetime
 import fnmatch
 import json
 import os
+import sys
 
 
 def parse_args():
@@ -19,6 +20,7 @@ def parse_args():
     return parser.parse_args()
 
 def find_output_files(root_dir, pattern):
+    print("Finding files like {} in {}".format(pattern, root_dir))
     result = []
     for root, dirs, files in os.walk(root_dir):
         for name in files:
@@ -47,10 +49,14 @@ def bucket(output_file):
 if __name__ == "__main__":
     args = parse_args()
     files = find_output_files(args.output_root_dir, args.output_file_pattern)
+    print("Processing {} output files".format(len(files)))
     counts = {}
-    for f in files:
+    for i, f in enumerate(files):
+        if i % 10 == 0:
+            sys.stdout.write('.')
         b = bucket(f)
         counts[b] = counts.get(b, 0) + 1
+    sys.stdout.write('\n')
 
     for b in counts:
-        print(f"{b}: {counts[b]}")
+        print("{}: {}".format(b, counts[b]))
