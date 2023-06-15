@@ -270,6 +270,10 @@ class BlueSkyRunExecutor(object):
         # before the bluesky thread is started. If an exception is
         # encountered in the seperate thread, it's handling
         try:
+            run_id = data['run_id']
+            self.settings['mongo_db'].record_run(run_id,
+                RunStatuses.Running, modules=data["modules"],
+                initiated_at=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
             output_stream = apply_output_processor(self.api_version,
                 self.output_stream)
             # Runs bluesky in a separate thread so that run configurations
@@ -283,12 +287,19 @@ class BlueSkyRunExecutor(object):
             # 500 if necessary
             t.join()
             if t.exception:
+                self.settings['mongo_db'].record_run(run_id, RunStatuses.Failed)
                 self.handle_error(500, str(t.exception),
                     exception=t.exception)
+            else:
+                self.settings['mongo_db'].record_run(run_id, RunStatuses.Completed)
+
 
         except Exception as e:
+            self.settings['mongo_db'].record_run(run_id, RunStatuses.Failed)
             tornado.log.gen_log.debug(traceback.format_exc())
             self.handle_error(500, str(e), exception=e)
+
+
 
     ##
     ## Configuration
