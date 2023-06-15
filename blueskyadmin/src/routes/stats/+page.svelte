@@ -65,6 +65,7 @@
                     {/each}
                   </tbody>
                 </Table>
+                <div>Total Count: {data.stats.monthly.reduce((r,e) => r+e.count, 0)}</div>
             </div>
           </Col>
           <Col>
@@ -100,6 +101,7 @@
                     {/each}
                   </tbody>
                 </Table>
+                <div>Total Count: {data.stats.daily.reduce((r,e) => r+e.count, 0)}</div>
             </div>
           </Col>
           <Col>
