@@ -60,7 +60,7 @@
                           <td>{monthlyStats.year}</td>
                           <td>{monthlyStats.month}</td>
                           <td>{monthlyStats.count}</td>
-                          <td>{monthlyStats.by_queue[0].queue} ({monthlyStats.by_queue[0].count})</td>
+                          <td>{monthlyStats.by_queue[0].queue || '(none)'} ({monthlyStats.by_queue[0].count})</td>
                         </tr>
                     {/each}
                   </tbody>
@@ -95,7 +95,7 @@
                         <tr>
                           <td>{dailyStats.date}</td>
                           <td>{dailyStats.count}</td>
-                          <td>{dailyStats.by_queue[0].queue} ({dailyStats.by_queue[0].count})</td>
+                          <td>{dailyStats.by_queue[0].queue || 'none'} ({dailyStats.by_queue[0].count})</td>
                         </tr>
                     {/each}
                   </tbody>

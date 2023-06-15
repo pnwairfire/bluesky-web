@@ -117,7 +117,7 @@
                                 <td>{run.run_id}</td>
                                 <td>{run.queue ? run.queue.name : 'n/a'}</td>
                                 <td>{run.status.status}</td>
-                                <td>{run.status.perc}</td>
+                                <td>{run.status.perc || 'n/a'}</td>
                                 <td>{formatTime(run.status.ts)}</td>
                                 <td>
                                     {#if run.output_url}
