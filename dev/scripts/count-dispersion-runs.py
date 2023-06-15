@@ -3,7 +3,7 @@
 
 import argparse
 import datetime
-import fnmatch
+import glob
 import json
 import os
 import sys
@@ -14,19 +14,14 @@ def parse_args():
 
     parser.add_argument('-d', '--output-root-dir', required=True,
         help="Directoring containing output/")
-    parser.add_argument('-p', '--output-file-pattern',
-        default="output.json", help="Directoring containing output/")
+    parser.add_argument('-p', '--glob-pattern',
+        default="**/output.json", help="Directoring containing output/")
 
     return parser.parse_args()
 
 def find_output_files(root_dir, pattern):
     print("Finding files like {} in {}".format(pattern, root_dir))
-    result = []
-    for root, dirs, files in os.walk(root_dir):
-        for name in files:
-            if fnmatch.fnmatch(name, pattern):
-                result.append(os.path.join(root, name))
-    return result
+    return glob.glob(os.path.join(root_dir, pattern))
 
 def bucket(output_file):
     try:
@@ -48,7 +43,7 @@ def bucket(output_file):
 
 if __name__ == "__main__":
     args = parse_args()
-    files = find_output_files(args.output_root_dir, args.output_file_pattern)
+    files = find_output_files(args.output_root_dir, args.glob_pattern)
     print("Processing {} output files".format(len(files)))
     counts = {}
     for i, f in enumerate(files):
