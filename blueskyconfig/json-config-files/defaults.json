@@ -265,8 +265,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 43.8005,"lng": -116.5550},
-                    "ne": {"lat": 48.0912,"lng": -111.9084}
+                    "sw": {"lat": 34.1046,"lng": -108.7733},
+                    "ne": {"lat": 38.5953,"lng": -103.9267}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -285,8 +285,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                     "sw": {"lat": 35.15, "lng": -93.8},
-                     "ne": {"lat": 39.85, "lng": -88.2}
+                     "sw": {"lat": 34.1046,"lng": -108.7733},
+                     "ne": {"lat": 38.5953,"lng": -103.9267}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
