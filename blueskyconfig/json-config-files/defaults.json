@@ -242,24 +242,6 @@
            "arl_index_file": "arl12hrindex.csv",
            "time_step": 1
         },
-        "FW06Z": {
-             "grid": {
-                 "spacing": 1,
-                 "projection": "LCC",
-                 "boundary": {
-                     "sw": {"lat": 33.8440, "lng": -107.2520},
-                     "ne": {"lat": 38.0680, "lng": -102.7508}
-                 },
-                 "grid_size_options": {
-                     "1.0": {"x": 500, "y": 500},
-                     "0.75": {"x": 430, "y": 430},
-                     "0.50": {"x": 350, "y": 350},
-                     "0.25": {"x": 250, "y": 250}
-                 }
-             },
-             "arl_index_file": "FW06Z-1km_arlindex.csv",
-             "time_step": 1
-        },
         "FW00Z": {
              "grid": {
                  "spacing": 1,
@@ -277,16 +259,14 @@
              },
              "arl_index_file": "FW00Z-1km_arlindex.csv",
              "time_step": 1
-        }
-   },
-   "unused_domains": {
+        },
          "FW12Z": {
              "grid": {
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                     "sw": {"lat": 34.1046,"lng": -108.7733},
-                     "ne": {"lat": 38.5953,"lng": -103.9267}
+                    "sw": {"lat": 34.1046,"lng": -108.7733},
+                    "ne": {"lat": 38.5953,"lng": -103.9267}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -296,6 +276,26 @@
                  }
              },
              "arl_index_file": "FW12Z-1km_arlindex.csv",
+             "time_step": 1
+        }
+   },
+   "unused_domains": {
+        "FW06Z": {
+             "grid": {
+                 "spacing": 1,
+                 "projection": "LCC",
+                 "boundary": {
+                     "sw": {"lat": 33.8440, "lng": -107.2520},
+                     "ne": {"lat": 38.0680, "lng": -102.7508}
+                 },
+                 "grid_size_options": {
+                     "1.0": {"x": 500, "y": 500},
+                     "0.75": {"x": 430, "y": 430},
+                     "0.50": {"x": 350, "y": 350},
+                     "0.25": {"x": 250, "y": 250}
+                 }
+             },
+             "arl_index_file": "FW06Z-1km_arlindex.csv",
              "time_step": 1
         },
          "FW18Z": {
@@ -363,12 +363,12 @@
                 "domain_id": "Alaska12km"
             },
             "FW00Z_1km": {
-                "title": "00Z FW 1.27km (Montana/Idaho)",
+                "title": "00Z FW 1.27km Northern NM",
                 "domain_id": "FW00Z"
             },
-            "FW06Z_1km": {
-                "title": "06Z FW 1.27km (New Mexico)",
-                "domain_id": "FW06Z"
+            "FW12Z_1km": {
+                "title": "12Z FW 1.27km Northern NM",
+                "domain_id": "FW12Z"
             }
         },
         "special": {
@@ -396,9 +396,9 @@
     },
     "unused_archives": {
         "special": {
-            "FW12Z_1km": {
-                "title": "12Z FW 1.27km (Missouri)",
-                "domain_id": "FW12Z"
+            "FW06Z_1km": {
+                "title": "06Z FW 1.27km (New Mexico)",
+                "domain_id": "FW06Z"
             },
             "FW18Z_1km": {
                 "title": "18Z FW 1.27km (Mississippi)",
