@@ -247,8 +247,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 34.1046,"lng": -108.7733},
-                    "ne": {"lat": 38.5953,"lng": -103.9267}
+                    "sw": {"lat": 37.75,"lng": -125.5},
+                    "ne": {"lat": 44.25,"lng": -120.5}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -283,8 +283,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 34.1046,"lng": -108.7733},
-                    "ne": {"lat": 38.5953,"lng": -103.9267}
+                    "sw": {"lat": 37.75,"lng": -125.5},
+                    "ne": {"lat": 44.25,"lng": -120.5}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -363,7 +363,7 @@
                 "domain_id": "Alaska12km"
             },
             "FW00Z_1km": {
-                "title": "00Z FW 1.27km Northern NM",
+                "title": "00Z FW 1.27km California/Oregon",
                 "domain_id": "FW00Z"
             },
             "FW06Z_1km": {
@@ -371,7 +371,7 @@
                 "domain_id": "FW06Z"
             },
             "FW12Z_1km": {
-                "title": "12Z FW 1.27km Northern NM",
+                "title": "12Z FW 1.27km California/Oregon",
                 "domain_id": "FW12Z"
             },
             "FW18Z_1km": {
