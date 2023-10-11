@@ -15,6 +15,8 @@
     dayjs.extend(dayJsUtc)
     import { runStatuses } from '$lib/run-status'
 
+    import { PUBLIC_PGV3_URL } from '$env/static/public';
+
     $: status = data.runStatus ? runStatuses[data.runStatus] : 'All Runs'
     $: total = data.runsData.total
     $: first = (data.runsData) && (data.limit*data.page +1)
@@ -109,7 +111,9 @@
                             <th>Percent Complete</th>
                             <th>Time</th>
                             <th>Output</th>
-                            <th>PGv3</th>
+                            {#if PUBLIC_PGV3_URL}
+                                <th>PGv3</th>
+                            {/if}
                         </tr>
                     </thead>
                     <tbody>
@@ -127,13 +131,15 @@
                                         n/a
                                     {/if}
                                 </td>
-                                <td>
-                                    {#if run.pgv3_url}
-                                        <a href={run.pgv3_url} target="_blank">view</a>
-                                    {:else}
-                                        n/a
-                                    {/if}
-                                </td>
+                                {#if PUBLIC_PGV3_URL}
+                                    <td>
+                                        {#if run.pgv3_url}
+                                            <a href={run.pgv3_url} target="_blank">view</a>
+                                        {:else}
+                                            n/a
+                                        {/if}
+                                    </td>
+                                {/if}
                             </tr>
                       {/each}
                     </tbody>
