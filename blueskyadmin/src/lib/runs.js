@@ -13,7 +13,7 @@ export async function queryRuns(fetch, page, offset, runStatus, runId) {
         if (r.run_id.endsWith('-dispersion'))
             r.pgv3_url = `${PUBLIC_PGV3_URL}dispersionresults.php?scenario_id=${r.run_id.replace('-dispersion', '')}`
         else if (r.run_id.endsWith('-plumerise'))
-            r.pgv3_url = `${PUBLIC_PGV3_URL}dispersioninputs.php?scenario_id=${r.run_id.replace('-dispersion', '')}`
+            r.pgv3_url = `${PUBLIC_PGV3_URL}dispersioninputs.php?scenario_id=${r.run_id.replace('-plumerise', '')}`
     })
     return runsData
 }
