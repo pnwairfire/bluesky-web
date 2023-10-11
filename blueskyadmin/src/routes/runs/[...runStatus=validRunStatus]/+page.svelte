@@ -109,6 +109,7 @@
                             <th>Percent Complete</th>
                             <th>Time</th>
                             <th>Output</th>
+                            <th>PGv3</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,6 +123,13 @@
                                 <td>
                                     {#if run.output_url}
                                         <a href={run.output_url} target="_blank">output</a>
+                                    {:else}
+                                        n/a
+                                    {/if}
+                                </td>
+                                <td>
+                                    {#if run.pgv3_url}
+                                        <a href={run.pgv3_url} target="_blank">view</a>
                                     {:else}
                                         n/a
                                     {/if}

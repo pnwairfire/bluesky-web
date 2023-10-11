@@ -1,4 +1,4 @@
-import { PUBLIC_API_URL } from '$env/static/public';
+import { PUBLIC_API_URL, PUBLIC_PGV3_URL } from '$env/static/public';
 
 export const limit = 20
 
@@ -9,6 +9,12 @@ export async function queryRuns(fetch, page, offset, runStatus, runId) {
     console.log(`Fetching from ${apiUrl}`)
     const res = await fetch(apiUrl, {mode:"no-cors"});
     const runsData = await res.json();
+    runsData.runs && runsData.runs.forEach(r => {
+        if (r.run_id.endsWith('-dispersion'))
+            r.pgv3_url = `${PUBLIC_PGV3_URL}dispersionresults.php?scenario_id=${r.run_id.replace('-dispersion', '')}`
+        else if (r.run_id.endsWith('-plumerise'))
+            r.pgv3_url = `${PUBLIC_PGV3_URL}dispersioninputs.php?scenario_id=${r.run_id.replace('-dispersion', '')}`
+    })
     return runsData
 }
 
