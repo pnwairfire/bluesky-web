@@ -6,7 +6,7 @@ create file `.env` defining `PUBLIC_API_URL`, `PUBLIC_STATS_RUNID_OPTIONS`, e.g.
 
     PUBLIC_API_URL=http://web1/bluesky-web/api/v4.2`
     PUBLIC_STATS_RUNID_OPTIONS={"emissions":"Emissions","dispersion":"Dispersion"}
-    PUBLIC_PGV3_URL=https://tools.airfire.org/playground/v3.5/
+    ...
 
 ## Running outside of docker
 
