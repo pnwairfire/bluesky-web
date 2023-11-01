@@ -1,5 +1,5 @@
 --extra-index-url https://pypi.airfire.org/simple/
 -f https://pypi.airfire.org/simple/
-ipython
-afscripting>=1.1.2,<2.0.0
-requests==2.18.1
+ipython==8.17.2
+afscripting==2.0.0
+requests==2.25.1
