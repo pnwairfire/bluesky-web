@@ -252,8 +252,6 @@ class BlueSkyRunExecutor(object):
 
         run_bluesky.apply_async(args=args, kwargs=settings, queue=queue_name,
             eta=scheduleFor)
-        # TODO: specify callback in record_run, calling
-        #    self.output_stream.write in callback, so we can handle failure?
         self.settings['mongo_db'].record_run(data['run_id'],
             RunStatuses.Enqueued, queue=queue_name, modules=data["modules"],
             initiated_at=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
