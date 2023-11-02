@@ -4,3 +4,4 @@ ipify2==1.1.0
 motor==3.3.1
 requests==2.31.0
 tornado==6.3.3
+watchdog==3.0.0
