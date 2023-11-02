@@ -53,14 +53,7 @@ class BlueSkyWebDB(object):
             mongodb_url, **client_args)[db_name]
 
     def record_run(self, run_id, status, module=None, log=None, stdout=None,
-            percent_complete=None, status_message=None, callback=None, **data):
-        def _callback(result, error):
-            if error:
-                tornado.log.gen_log.error('Error recording run: %s', error)
-            else:
-                tornado.log.gen_log.debug('Recorded run: %s', result.raw_result)
-            if callback:
-                callback(result, error)
+            percent_complete=None, status_message=None, **data):
 
         spec = {"run_id": run_id}
         # include run_id in doc in case it's an insert
@@ -95,7 +88,11 @@ class BlueSkyWebDB(object):
 
         # There should never be multiple entries, since we're always
         # doing upserts
-        self.db.runs.update_one(spec, doc, upsert=True, callback=_callback)
+        try:
+            result = self.db.runs.update_one(spec, doc, upsert=True)
+            tornado.log.gen_log.debug('Recorded run: %s', result)
+        except Exception as e:
+            tornado.log.gen_log.error('Error recording run: %s', e)
 
     async def find_run(self, run_id):
         run = await self.db.runs.find_one({"run_id": run_id})
