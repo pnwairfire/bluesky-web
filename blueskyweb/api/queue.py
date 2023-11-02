@@ -8,7 +8,6 @@ from . import RequestHandlerBase
 
 class QueueInfo(RequestHandlerBase):
 
-    @tornado.web.asynchronous
     async def get(self, api_version, status=None):
         # See https://docs.celeryq.dev/en/latest/userguide/workers.html#inspecting-workers
 

@@ -29,7 +29,6 @@ class RunExecute(RequestHandlerBase):
     ## Main interface
     ##
 
-    @tornado.web.asynchronous
     async def post(self, api_version, mode=None, archive_id=None):
         if not self.request.body:
             self._raise_error(400, 'empty post data')
@@ -148,7 +147,6 @@ class RunStatusBase(RequestHandlerBase):
 
 class RunStatus(RunStatusBase):
 
-    @tornado.web.asynchronous
     async def get(self, api_version, run_id):
         # TODO: implement using data form mongodb
         run = await self.settings['mongo_db'].find_run(run_id)
@@ -161,7 +159,6 @@ class RunStatus(RunStatusBase):
 
 class RunsInfo(RunStatusBase):
 
-    @tornado.web.asynchronous
     async def get(self, api_version, status=None):
         # default limit to 10, and cap it at 25
         limit = min(int(self.get_query_argument('limit', 10)), 25)
@@ -184,7 +181,6 @@ class RunsInfo(RunStatusBase):
 
 class RunOutput(RequestHandlerBase):
 
-    @tornado.web.asynchronous
     async def get(self, api_version, run_id):
         # TODO: implement using data form mongodb
 
@@ -194,7 +190,6 @@ class RunOutput(RequestHandlerBase):
 
 class RunStatsMonthly(RequestHandlerBase):
 
-    @tornado.web.asynchronous
     async def get(self, api_version):
         run_id = self.get_query_argument('run_id', None)
         monthly = await self.settings['mongo_db'].run_counts_by_month(run_id=run_id)
@@ -204,7 +199,6 @@ class RunStatsMonthly(RequestHandlerBase):
 
 class RunStatsDaily(RequestHandlerBase):
 
-    @tornado.web.asynchronous
     async def get(self, api_version):
         run_id = self.get_query_argument('run_id', None)
         daily = await self.settings['mongo_db'].run_counts_by_day(run_id=run_id)
