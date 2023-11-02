@@ -86,11 +86,10 @@ class MetArchiveDB(object):
         tornado.log.gen_log.debug('Using %s for domain data', mongodb_url)
         client_args = {
             'ssl': True,
-            #'ssl_match_hostname': False, # Note: makes vulnerable to man-in-the-middle attacks
-            'ssl_cert_reqs': ssl.CERT_NONE,
-            # 'ssl_certfile': '/etc/ssl/bluesky-web-client-cert.crt',
-            # 'ssl_keyfile': '/etc/ssl/bluesky-web-client-cert.key',
-            'ssl_ca_certs': '/etc/ssl/bluesky-web-client.pem'
+            #'tlsAllowInvalidHostnames': True, # Note: makes vulnerable to man-in-the-middle attacks
+            'tlsAllowInvalidCertificates': True,
+            # 'tlsCertificateKeyFile': '/etc/ssl/bluesky-web-client-cert.pem',
+            'tlsCAFile': '/etc/ssl/bluesky-web-client.pem'
         }
         self.db = motor.motor_tornado.MotorClient(
             mongodb_url, **client_args)[db_name]
