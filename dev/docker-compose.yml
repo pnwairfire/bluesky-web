@@ -161,7 +161,7 @@ services:
     - RABBITMQ_URL=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
     - C_FORCE_ROOT=True
-    command: watchmedo auto-restart --directory=./ --pattern=*.py --recursive --
+    command: watchmedo auto-restart --directory=./ --pattern="*.py;blueskyconfig/json-config-files/*.json" --recursive --
       celery -A blueskyworker.tasks worker
       -Q no-met-plumerise,ca-nv_4-km-plumerise,ca-nv_6-km-plumerise,national_12-km-plumerise,pacific_northwest_4-km-plumerise
       -c 1 -l INFO
@@ -190,7 +190,7 @@ services:
     - RABBITMQ_URL=amqps://blueskyweb:blueskywebrabbitpassword@rabbit:5671
     - PUBLIC_HOSTNAME=localhost
     - C_FORCE_ROOT=True
-    command: watchmedo auto-restart --directory=./ --pattern=*.py --recursive --
+    command: watchmedo auto-restart --directory=./ --pattern="*.py;blueskyconfig/json-config-files/*.json" --recursive --
       celery -A blueskyworker.tasks worker
       -Q no-met,ca-nv_4-km,ca-nv_6-km,national_12-km,pacific_northwest_4-km
       -c 1 -l INFO
