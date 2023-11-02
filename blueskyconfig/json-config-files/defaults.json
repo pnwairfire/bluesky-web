@@ -408,8 +408,8 @@
     },
     "hysplit": {
         "binaries": {
-            "hysplit": "hycs_std-v5.2",
-            "hysplit_mpi": "hycm_std-v5.2"
+            "hysplit": "hycs_std-v5.2.3",
+            "hysplit_mpi": "hycm_std-v5.2.3"
         },
         "ensure_dummy_fire": false,
         "NUMPAR": 2000,
