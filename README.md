@@ -39,12 +39,12 @@ If you don't want to wait for it to run, manually run it with:
     docker exec bluesky-web-worker \
         arlindexer -d DRI4km -r /data/Met/CANSAC/4km/ARL/ \
         -m mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \
-        --mongo-ssl-ca-certs /etc/ssl/bluesky-web-client.pem
+        --mongo-tls-cafile /etc/ssl/bluesky-web-client.pem
     docker exec bluesky-web-worker \
         arlindexer -d NAM84 -r /data/Met/NAM/12km/ARL/ \
         -p NAM84_ARL_index.csv \
         -m mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb \
-        --mongo-ssl-ca-certs /etc/ssl/bluesky-web-client.pem
+        --mongo-tls-cafile /etc/ssl/bluesky-web-client.pem
 
 Check that service is running:
 
