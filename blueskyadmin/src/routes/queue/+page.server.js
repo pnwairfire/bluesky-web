@@ -3,9 +3,11 @@
  */
 import { PUBLIC_API_URL } from '$env/static/public';
 
+const publicApiUrlNoSlash = PUBLIC_API_URL.replace(/\/$/, '')
+
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ fetch, params, route, url }) {
-    const apiUrl = `${PUBLIC_API_URL}/queue`
+    const apiUrl = `${publicApiUrlNoSlash}/queue`
     console.log(`Fetching from ${apiUrl}`)
 
     try {
