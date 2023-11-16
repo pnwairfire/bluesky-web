@@ -85,7 +85,7 @@ class MetArchiveDB(object):
             or 'blueskyweb')
         tornado.log.gen_log.debug('Using %s for domain data', mongodb_url)
         client_args = {
-            'ssl': True,
+            'tls': True,
             #'tlsAllowInvalidHostnames': True, # Note: makes vulnerable to man-in-the-middle attacks
             'tlsAllowInvalidCertificates': True,
             # 'tlsCertificateKeyFile': '/etc/ssl/bluesky-web-client-cert.pem',
