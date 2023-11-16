@@ -47,7 +47,8 @@ services:
     # Note: '--auth' is automatically added to command if
     #   MONGO_INITDB_ROOT_[USERNAME|PASSWORD] are set, but we need to
     #   set `command` in order to specify `--logpath`
-    command: mongod --auth --logpath /var/log/mongodb/mongodb.log
+    command: mongod --auth
+      --logpath /var/log/mongodb/mongodb.log
       --tlsMode requireTLS
       --tlsCertificateKeyFile /etc/ssl/bluesky-web-mongod.pem
       --tlsAllowInvalidHostnames
