@@ -224,5 +224,5 @@ class MetArchiveDB(object):
         """Compeletely clears the index - i.e. deletes all dates and
         met files recorded in the index.
         """
-        self.db.dates.remove({})
-        self.db.met_files.remove({})
+        self.db.dates.deleteMany({})
+        self.db.met_files.deleteMany({})

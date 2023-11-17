@@ -89,3 +89,10 @@ Again, first set setFeatureCompatibilityVersion, this time to 5.0
 Now, check out a version of the code using 6.0.4
 
     git checkout mongo-6.0.4
+
+# Mongo 6.0.4 -> 6.0.11
+
+Note that the mongo shell `mongo` is replaced by `mongosh` in the
+following command, since it was removed in 6.0.
+
+However, nothing else is needed to upgrade from 6.0.4 to 6.0.11.
