@@ -247,8 +247,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 37.75,"lng": -125.5},
-                    "ne": {"lat": 44.25,"lng": -120.5}
+                    "sw": {"lat": 36.25,"lng": -80.72},
+                    "ne": {"lat": 40.75,"lng": -75.88}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -265,8 +265,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 37.2, "lng": -108.42},
-                    "ne": {"lat": 41.0, "lng": -103.58}
+                    "sw": {"lat": 36.95,"lng": -108.42},
+                    "ne": {"lat": 41.45,"lng": -103.58}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -283,8 +283,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 37.75,"lng": -125.5},
-                    "ne": {"lat": 44.25,"lng": -120.5}
+                    "sw": {"lat": 36.25,"lng": -80.72},
+                    "ne": {"lat": 40.75,"lng": -75.88}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -301,8 +301,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 37.2, "lng": -108.42},
-                    "ne": {"lat": 41.0, "lng": -103.58}
+                    "sw": {"lat": 36.95,"lng": -108.42},
+                    "ne": {"lat": 41.45,"lng": -103.58}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -363,7 +363,7 @@
                 "domain_id": "Alaska12km"
             },
             "FW00Z_1km": {
-                "title": "00Z FW 1.27km California/Oregon",
+                "title": "00Z FW 1.27km Virginia",
                 "domain_id": "FW00Z"
             },
             "FW06Z_1km": {
@@ -371,7 +371,7 @@
                 "domain_id": "FW06Z"
             },
             "FW12Z_1km": {
-                "title": "12Z FW 1.27km California/Oregon",
+                "title": "12Z FW 1.27km Virginia",
                 "domain_id": "FW12Z"
             },
             "FW18Z_1km": {
