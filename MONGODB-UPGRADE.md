@@ -81,9 +81,9 @@ Now, check out a version of the code using 5.0.15
 Again, first set setFeatureCompatibilityVersion, this time to 5.0
 
     docker exec -ti bluesky-web-mongo \
-        mongo -u blueskywebadmin -p blueskywebmongopasswordadmin --ssl \
-        --sslCAFile /etc/ssl/bluesky-web-mongod.pem \
-        --sslAllowInvalidHostnames --sslAllowInvalidCertificates \
+        mongo -u blueskywebadmin -p blueskywebmongopasswordadmin --tls \
+        --tlsCAFile /etc/ssl/bluesky-web-mongod.pem \
+        --tlsAllowInvalidHostnames --tlsAllowInvalidCertificates \
         blueskyweb --authenticationDatabase admin --eval 'db.adminCommand( { setFeatureCompatibilityVersion: "5.0" } )'
 
 Now, check out a version of the code using 6.0.4
