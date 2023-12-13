@@ -104,12 +104,56 @@ class MetArchiveDB(object):
         return d['root_dir']
 
     def _merge_availability_windows(self, avail1, avail2):
+        """Note that there can be situations where one server fails to record
+        index data for a few days, and so there can be time windows with
+        the same first hour but different last hours. e.g.
+
+          avail1: [
+             {'first_hour': '2023-01-01T01:00:00', 'last_hour': '2023-12-15T12:00:00'}
+           ],
+          avail2: [
+             {'first_hour': '2023-01-01T01:00:00', 'last_hour': '2023-12-13T12:00:00'}
+           ]
+
+        In this situation, we want to make sure to pick '2023-12-15T12:00:00'
+        as the final last_hour.
+
+        There could also be situations where one server has data that go back further
+          avail1: [
+             {'first_hour': '2023-01-01T01:00:00', 'last_hour': '2023-12-15T12:00:00'}
+           ],
+          avail2: [
+             {'first_hour': '2022-01-01T01:00:00', 'last_hour': '2023-12-15T12:00:00'}
+           ]
+        In this situation, we want to make sure that the final time window is
+        2022-01-01T01:00:00', to '2023-12-15T12:00:00'
+
+        Finally, one server could go back further and also have more recent. e.g.
+          avail1: [
+             {'first_hour': '2022-01-01T01:00:00', 'last_hour': '2023-12-15T12:00:00'}
+           ],
+          avail2: [
+             {'first_hour': '2023-01-01T01:00:00', 'last_hour': '2023-12-13T12:00:00'}
+           ]
+
+        In this situation, we want to make sure that the final time window is
+        2022-01-01T01:00:00', to '2023-12-15T12:00:00'
+        """
         merged_avail = []
+
         for w in sorted(avail1 + avail2, key=lambda e: e['first_hour']):
             if not merged_avail or merged_avail[-1]['last_hour'] < w['first_hour']:
                 merged_avail.append(w)
             else:
-                merged_avail[-1]['last_hour'] = w['last_hour']
+                # There's overlap between merged_avail[-1] and w.
+                # Update merged_avail[-1] so that its first_hour is the
+                # earlier of the two time windows and its last_hour is
+                # the later of the two.
+                if merged_avail[-1]['first_hour'] > w['first_hour']:
+                    merged_avail[-1]['first_hour'] = w['first_hour']
+                if merged_avail[-1]['last_hour'] < w['last_hour']:
+                    merged_avail[-1]['last_hour'] = w['last_hour']
+
         return merged_avail
 
     async def get_availability(self, archive_id=None):
