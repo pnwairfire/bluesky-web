@@ -154,7 +154,7 @@ class BlueSkyWebDB(object):
                 'initiated_at': {'$lte': run['initiated_at']},
                 'queue': run['queue']
             }
-            return await self.db.runs.find(query).count()
+            return await self.db.runs.count_documents(query)
 
         # else, returns None -> i.e. not in queue
 
