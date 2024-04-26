@@ -409,7 +409,8 @@
     "hysplit": {
         "binaries": {
             "hysplit": "hycs_std-v5.2.3",
-            "hysplit_mpi": "hycm_std-v5.2.3"
+            "hysplit_mpi": "hycm_std-v5.2.3-mpich",
+            "MPI": "/usr/bin/mpiexec.mpich"
         },
         "ensure_dummy_fire": false,
         "NUMPAR": 2000,
