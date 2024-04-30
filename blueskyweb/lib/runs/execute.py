@@ -323,6 +323,7 @@ class BlueSkyRunExecutor(object):
                     "/data/30m-FCCS/LF2022_FCCS_220_AK/Tif/LA22_FCCS_220.tif",
                     "/data/30m-FCCS/LF2022_FCCS_220_HI/Tif/LH22_FCCS_220.tif"
                 ]
+            # else, '1km' is already the default, so no need to do anything
 
 
 
