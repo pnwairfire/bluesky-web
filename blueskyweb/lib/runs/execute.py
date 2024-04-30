@@ -48,7 +48,8 @@ class ExecuteMode(object):
 class BlueSkyRunExecutor(object):
 
     def __init__(self, api_version, mode, archive_id, handle_error_func,
-            output_stream, settings, hysplit_query_params):
+            output_stream, settings, hysplit_query_params,
+            fuelbeds_query_params):
         self.api_version = api_version
         self.mode = mode
         self.archive_id = archive_id # may be None
@@ -57,6 +58,7 @@ class BlueSkyRunExecutor(object):
         self.output_stream = output_stream
         self.settings = settings
         self.hysplit_query_params = hysplit_query_params
+        self.fuelbeds_query_params = fuelbeds_query_params
 
     async def execute(self, data, execute_mode=None, scheduleFor=None):
         # TODO: should no configuration be allowed at all?  or only some? if
@@ -310,6 +312,20 @@ class BlueSkyRunExecutor(object):
         data['config'] = data.get('config', {})
         data['config']['fuelbeds'] = data['config'].get('fuelbeds', {})
         data['config']['fuelbeds']['ignored_fuelbeds'] = []
+        if self.fuelbeds_query_params['fccs_resolution']:
+            if self.fuelbeds_query_params['fccs_resolution'] not in ('1km', '30m'):
+                self.handle_error(400, "If specified, 'fccs_resolution' must be '1km' or '30m'")
+                return
+            if self.fuelbeds_query_params['fccs_resolution'] == '30m':
+                tornado.log.gen_log.debug('Configuring fuelbeds to use 30m FCCS')
+                data['config']['fuelbeds']["fccs_fuelload_files"] = [
+                    "/data/30m-FCCS/LF2022_FCCS_220_CONUS/Tif/LC22_FCCS_220.tif",
+                    "/data/30m-FCCS/LF2022_FCCS_220_AK/Tif/LA22_FCCS_220.tif",
+                    "/data/30m-FCCS/LF2022_FCCS_220_HI/Tif/LH22_FCCS_220.tif"
+                ]
+
+
+
 
     ## Consumption
 

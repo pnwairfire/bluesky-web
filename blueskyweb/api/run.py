@@ -47,9 +47,13 @@ class RunExecute(RequestHandlerBase):
             'number_of_particles': self.get_query_argument('number_of_particles', None),
             'grid_size': self.get_float_arg('grid_size', default=None)
         }
+        fuelbeds_query_params = {
+            'fccs_resolution': self.get_query_argument('fccs_resolution', None),
+        }
 
         executor = BlueSkyRunExecutor(api_version, mode, archive_id,
-            self._raise_error, self, self.settings, hysplit_query_params)
+            self._raise_error, self, self.settings, hysplit_query_params,
+            fuelbeds_query_params)
 
         scheduleFor = self.get_datetime_arg('schedule_for', None)
         tornado.log.gen_log.info("schedule_for: %s", scheduleFor)

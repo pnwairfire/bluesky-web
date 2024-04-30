@@ -59,6 +59,7 @@ services:
     container_name: bluesky-web-1
     volumes:
     - ../:/usr/src/blueskyweb/
+    - $HOME/30m-FCCS/:/data/30m-FCCS/
     - ./logs/web/:/var/log/blueskyweb/
     - ./config.json:/etc/bluesky-web/config.json
     - /var/run/docker.sock:/var/run/docker.sock
@@ -85,6 +86,7 @@ services:
     container_name: bluesky-web-2
     volumes:
     - ../:/usr/src/blueskyweb/
+    - $HOME/30m-FCCS/:/data/30m-FCCS/
     - ./logs/web/:/var/log/blueskyweb/
     - ./config.json:/etc/bluesky-web/config.json
     - /var/run/docker.sock:/var/run/docker.sock
