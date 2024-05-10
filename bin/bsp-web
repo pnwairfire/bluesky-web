@@ -12,13 +12,13 @@ import afscripting as scripting
 
 try:
     from blueskyweb.app import main, DEFAULT_SETTINGS
-    from blueskyconfig import apply_overrides
+    from blueskyconfig import ConfigManagerSingleton
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
     from blueskyweb.app import main, DEFAULT_SETTINGS
-    from blueskyconfig import apply_overrides
+    from blueskyconfig import ConfigManagerSingleton
 
 REQUIRED_ARGS = [
     {
@@ -29,6 +29,14 @@ REQUIRED_ARGS = [
 ]
 
 OPTIONAL_ARGS = [
+    {
+        'long': '--config-overrides-file',
+        'help': ('config overrides file that will be reloaded periodically to pick'
+            ' up any updates.  Files are loaded in the order they are specified'
+            ' so that each one overrides any specified before it.'),
+        "action": "append",
+        "dest": 'config_overrides_files'
+    },
     {
         'long': '--path-prefix',
         'help': "Url root path prefix to apply to all routes; e.g. '/bluesky-web'"
@@ -83,7 +91,9 @@ Examples
 
    $ {script_name} --log-level=DEBUG -d --path-prefix=bluesky \\
         --mongodb-url=mongodb://localhost:27018/blueskyweb \\
-        --rabbitmq-url=amqps://localhost:5671
+        --rabbitmq-url=amqps://localhost:5671 \\
+        --config-overrides-file /etc/bluesky-web/config-overrides.json \\
+        --config-overrides-file /etc/bluesky-web/config-final-overrides.json
 
 Example curl Requests
 
@@ -101,8 +111,12 @@ if __name__ == "__main__":
     # but we'll configure logging oureselves in app.main
     scripting.args.add_logging_options(parser)
     args = parser.parse_args()
-    apply_overrides(args.config_file_options)
-    apply_overrides(args.config_options)
+
+    for o in args.config_overrides_files:
+        ConfigManagerSingleton().add_overrides_file(o)
+
+    ConfigManagerSingleton().add_overrides(args.config_file_options)
+    ConfigManagerSingleton().add_overrides(args.config_options)
 
     try:
         main(**args.__dict__)

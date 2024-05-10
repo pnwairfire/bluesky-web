@@ -9,12 +9,12 @@ import sys
 from afscripting import args as scripting_args
 
 try:
-    import blueskyconfig
+    from blueskyconfig import ConfigManagerSingleton
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
-    import blueskyconfig
+    from blueskyconfig import ConfigManagerSingleton
 
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
@@ -22,19 +22,37 @@ EPILOG_STR = """
 Examples
 
    $ {script_name}
-   $ {script_name} --config-file ./dev/config.json
+
+   $ {script_name} --log-level DEBUG \\
+       --config-overrides-file ./dev/config-overrides.json \\
+       --config-overrides-file ./dev/config-final-overrides.json \\
+       -I foo=100 -C bar=baz
 
 Example curl Requests
 
     $ curl "http://localhost:8887/blueskyweb/api/ping/"
  """.format(script_name=sys.argv[0])
 
+OPTIONAL_ARGS = [
+    {
+        'long': '--config-overrides-file',
+        'help': ('config overrides file that will be reloaded periodically to pick'
+            ' up any updates.  Files are loaded in the order they are specified'
+            ' so that each one overrides any specified before it.'),
+        "action": "append",
+        "dest": 'config_overrides_files'
+    }
+]
+
 if __name__ == "__main__":
-    parser, args = scripting_args.parse_args([], [], epilog=EPILOG_STR,
-        support_configuration_options_short_names=True)
+    parser, args = scripting_args.parse_args([], OPTIONAL_ARGS,
+        epilog=EPILOG_STR, support_configuration_options_short_names=True)
 
-    blueskyconfig.apply_overrides(args.config_file_options)
-    blueskyconfig.apply_overrides(args.config_options)
+    for o in args.config_overrides_files:
+        ConfigManagerSingleton().add_overrides_file(o)
 
-    sys.stdout.write(json.dumps(blueskyconfig.ConfigManagerSingleton().config,
+    ConfigManagerSingleton().add_overrides(args.config_file_options)
+    ConfigManagerSingleton().add_overrides(args.config_options)
+
+    sys.stdout.write(json.dumps(ConfigManagerSingleton().config,
         sort_keys=True, indent=2))
