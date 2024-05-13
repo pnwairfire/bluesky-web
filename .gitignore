@@ -12,6 +12,7 @@ dev-private/
 dev/ssl/
 fabfile*
 *fabric*
+config-overrides
 deploy-all-envs
 production-and-test-environments.md
 .private/
