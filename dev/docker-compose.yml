@@ -62,7 +62,7 @@ services:
     - $HOME/30m-FCCS/:/data/30m-FCCS/
     - ./logs/web/:/var/log/blueskyweb/
     - ./config-overrides.json:/etc/bluesky-web/config-overrides.json
-    - ./config-overrides.json:/etc/bluesky-web/config-final-overrides.json
+    - ./config-final-overrides.json:/etc/bluesky-web/config-final-overrides.json
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
@@ -91,7 +91,7 @@ services:
     - $HOME/30m-FCCS/:/data/30m-FCCS/
     - ./logs/web/:/var/log/blueskyweb/
     - ./config-overrides.json:/etc/bluesky-web/config-overrides.json
-    - ./config-overrides.json:/etc/bluesky-web/config-final-overrides.json
+    - ./config-final-overrides.json:/etc/bluesky-web/config-final-overrides.json
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
