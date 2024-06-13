@@ -131,7 +131,7 @@ class HysplitConfigurator(object):
                 if size is not None:
                     if size <= 0 or size > 1:
                         self._handle_error(400,
-                            "grid_size ({}) must be > 0 and <= 100".format(size))
+                            "grid_size ({}) must be > 0 and <= 1".format(size))
                     self._grid_size_factor = size
 
         else:
