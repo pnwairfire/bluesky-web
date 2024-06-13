@@ -325,7 +325,7 @@ class BlueSkyRunExecutor(object):
             # else, '1km' is already the default, so no need to do anything
 
 
-    ## Fuelbeds
+    ## Ecoregion
 
     async def _configure_ecoregion(self, data):
         tornado.log.gen_log.debug('Configuring ecoregion')
