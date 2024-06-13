@@ -326,6 +326,13 @@ class BlueSkyRunExecutor(object):
             # else, '1km' is already the default, so no need to do anything
 
 
+    ## Fuelbeds
+
+    async def _configure_ecoregion(self, data):
+        tornado.log.gen_log.debug('Configuring ecoregion')
+        data['config'] = data.get('config', {})
+        data['config']['ecoregion'] = data['config'].get('ecoregion', {})
+        data['config']['ecoregion']['try_nearby_on_failure'] = True
 
 
     ## Consumption
