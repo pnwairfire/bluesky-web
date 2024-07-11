@@ -26,6 +26,60 @@
             "arl_index_file": "NAM84_ARL_index.csv",
             "time_step": 3
         },
+        "USFSWest": {
+            "grid": {
+                "spacing": 8,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lat": 30.5, "lng": -123.5},
+                    "ne": {"lat": 48.5, "lng": -98.0}
+                },
+                "grid_size_options": {
+                    "1.0": {"x": 7800, "y": 2400},
+                    "0.75": {"x": 5800, "y": 1800},
+                    "0.50": {"x": 3900, "y": 1200},
+                    "0.25": {"x": 1900, "y": 600}
+                }
+            },
+            "arl_index_file": "arlindex.csv",
+            "time_step": 1
+        },
+        "USFSEast": {
+            "grid": {
+                "spacing": 8,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lat": 29.5, "lng": -95.0},
+                    "ne": {"lat": 47.5, "lng": -71.0}
+                },
+                "grid_size_options": {
+                    "1.0": {"x": 7800, "y": 2400},
+                    "0.75": {"x": 5800, "y": 1800},
+                    "0.50": {"x": 3900, "y": 1200},
+                    "0.25": {"x": 1900, "y": 600}
+                }
+            },
+            "arl_index_file": "arlindex.csv",
+            "time_step": 1
+        },
+        "USFSAK": {
+            "grid": {
+                "spacing": 8,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lat": 55.5, "lng": -166.0},
+                    "ne": {"lat": 69.5, "lng": -138.5}
+                },
+                "grid_size_options": {
+                    "1.0": {"x": 7800, "y": 2400},
+                    "0.75": {"x": 5800, "y": 1800},
+                    "0.50": {"x": 3900, "y": 1200},
+                    "0.25": {"x": 1900, "y": 600}
+                }
+            },
+            "arl_index_file": "arlindex.csv",
+            "time_step": 1
+        },
         "GFS": {
             "grid": {
                 "spacing": 50,
@@ -325,6 +379,18 @@
             "national_12-km": {
                 "title": "National 12-km",
                 "domain_id": "NAM84"
+            },
+            "usfs_west_8-km": {
+                "title": "USFS West 8km",
+                "domain_id": "USFSWest"
+            },
+            "usfs_east_8-km": {
+                "title": "USFS East 8km",
+                "domain_id": "USFSEast"
+            },
+            "usfs_ak_8-km": {
+                "title": "USFS AK 8km",
+                "domain_id": "USFSAK"
             },
             "global":{
                 "title": "Global",

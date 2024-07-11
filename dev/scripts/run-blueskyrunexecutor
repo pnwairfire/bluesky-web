@@ -322,6 +322,9 @@ def parse_args():
 
 MET_ROOT_DIRS = {
     "national_12-km": "/data/Met/NAM/12km/ARL/",
+    "usfs_west_8-km": "/data/Met/USFSWest/8km/ARL/",
+    "usfs_east_8-km": "/data/Met/USFSEast/8km/ARL/",
+    "usfs_ak_8-km": "/data/Met/USFSAK/8km/ARL/",
     "national_3-km": "/data/Met/NAM/3km/ARL/",
     "pacific_northwest_1.33-km": "/data/Met/PNW/1.33km/ARL/",
     "pacific_northwest_4-km": "/data/Met/PNW/4km/ARL/",
