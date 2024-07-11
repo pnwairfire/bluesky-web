@@ -28,7 +28,7 @@
         },
         "USFSWest": {
             "grid": {
-                "spacing": 8,
+                "spacing": 6,
                 "projection": "LCC",
                 "boundary": {
                     "sw": {"lat": 30.5, "lng": -123.5},
@@ -46,7 +46,7 @@
         },
         "USFSEast": {
             "grid": {
-                "spacing": 8,
+                "spacing": 6,
                 "projection": "LCC",
                 "boundary": {
                     "sw": {"lat": 29.5, "lng": -95.0},
@@ -64,7 +64,7 @@
         },
         "USFSAK": {
             "grid": {
-                "spacing": 8,
+                "spacing": 6,
                 "projection": "LCC",
                 "boundary": {
                     "sw": {"lat": 55.5, "lng": -166.0},
