@@ -174,11 +174,17 @@ class BlueSkyRunExecutor(object):
         if 'timeprofile' not in data['fires'][0]['activity'][0]['active_areas'][0]:
             modules.append('timeprofile')
 
+        # just look at first location of first fire
+        if 'localmet' not in fires.Fire(data['fires'][0]).locations[0]:
+            tornado.log.gen_log.debug(f'localmet not in location data')
+            modules.extend(['findmetdata', 'localmet'])
+
         modules.append('plumerise')
 
         if not exclude_extrafiles:
             modules.append('extrafiles')
 
+        tornado.log.gen_log.debug("Plumerise modules be run: {}".format(', '.join(modules)))
         return modules
 
     def _set_modules(self, data):
