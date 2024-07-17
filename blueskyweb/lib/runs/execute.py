@@ -81,7 +81,7 @@ class BlueSkyRunExecutor(object):
 
             tornado.log.gen_log.debug("BSP input data (before modules and"
                 " config are popped, and run_id is set, in BlueSkyRunner): %s",
-                json.dumps(data))
+                json.dumps(data)[:100])
             await f(data, scheduleFor=scheduleFor)
 
         except tornado.web.Finish as e:
