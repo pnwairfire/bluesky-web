@@ -432,7 +432,7 @@ class BlueSkyRunExecutor(object):
         tornado.log.gen_log.debug('Configuring localmet')
         data['config'] = data.get('config', {})
         data['config']['localmet'] = {
-            "time_step": met.db._archive_info['time_step']
+            "time_step": self.archive_info['time_step']
         }
 
     ## Plumerise
