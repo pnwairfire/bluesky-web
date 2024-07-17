@@ -174,10 +174,12 @@ class BlueSkyRunExecutor(object):
         if 'timeprofile' not in data['fires'][0]['activity'][0]['active_areas'][0]:
             modules.append('timeprofile')
 
-        # just look at first location of first fire
-        if 'localmet' not in fires.Fire(data['fires'][0]).locations[0]:
-            tornado.log.gen_log.debug(f'localmet not in location data')
-            modules.extend(['findmetdata', 'localmet'])
+        # For now, don't run localmet before plumerise. The bulk profiler
+        # takes too long in the plumerise request.  We need to investigate.
+        ## just look at first location of first fire
+        # if 'localmet' not in fires.Fire(data['fires'][0]).locations[0]:
+        #     tornado.log.gen_log.debug(f'localmet not in location data')
+        #     modules.extend(['findmetdata', 'localmet'])
 
         modules.append('plumerise')
 
