@@ -429,19 +429,19 @@
                 "domain_id": "Alaska12km"
             },
             "FW00Z_1km": {
-                "title": "00Z FW 1.27km Virginia",
+                "title": "00Z FW 1.27km Utah",
                 "domain_id": "FW00Z"
             },
             "FW06Z_1km": {
-                "title": "06Z FW 1.27km Colorado",
+                "title": "06Z FW 1.27km CA/OR",
                 "domain_id": "FW06Z"
             },
             "FW12Z_1km": {
-                "title": "12Z FW 1.27km Virginia",
+                "title": "12Z FW 1.27km Utah",
                 "domain_id": "FW12Z"
             },
             "FW18Z_1km": {
-                "title": "18Z FW 1.27km Colorado",
+                "title": "18Z FW 1.27km CA/OR",
                 "domain_id": "FW18Z"
             }
         },
