@@ -423,8 +423,8 @@ class BlueSkyRunExecutor(object):
         data['config']['findmetdata'] = {
             "met_root_dir": met_root_dir,
             "arl": {
-                "index_filename_pattern":
-                    self.archive_info['arl_index_file']
+                "index_filename_pattern": self.archive_info['arl_index_file'],
+                "max_days_out": self.archive_info.get('max_days_out'),
             }
         }
 

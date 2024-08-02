@@ -42,6 +42,7 @@
                 }
             },
             "arl_index_file": "arlindex.csv",
+            "max_days_out": 7,
             "time_step": 1
         },
         "USFSEast": {
@@ -60,6 +61,7 @@
                 }
             },
             "arl_index_file": "arlindex.csv",
+            "max_days_out": 7,
             "time_step": 1
         },
         "USFSAK": {
@@ -78,6 +80,7 @@
                 }
             },
             "arl_index_file": "arlindex.csv",
+            "max_days_out": 7,
             "time_step": 1
         },
         "GFS": {
