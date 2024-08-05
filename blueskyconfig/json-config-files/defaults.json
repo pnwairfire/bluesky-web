@@ -304,8 +304,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 36,"lng": -115},
-                    "ne": {"lat": 40,"lng": -109}
+                    "sw": {"lat": 42.5,"lng": -113},
+                    "ne": {"lat": 46.5,"lng": -106}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -340,8 +340,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 36,"lng": -115},
-                    "ne": {"lat": 40,"lng": -109}
+                    "sw": {"lat": 42.5,"lng": -113},
+                    "ne": {"lat": 46.5,"lng": -106}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -432,7 +432,7 @@
                 "domain_id": "Alaska12km"
             },
             "FW00Z_1km": {
-                "title": "00Z FW 1.27km Utah",
+                "title": "00Z FW 1.27km Wyoming",
                 "domain_id": "FW00Z"
             },
             "FW06Z_1km": {
@@ -440,7 +440,7 @@
                 "domain_id": "FW06Z"
             },
             "FW12Z_1km": {
-                "title": "12Z FW 1.27km Utah",
+                "title": "12Z FW 1.27km Wyoming",
                 "domain_id": "FW12Z"
             },
             "FW18Z_1km": {
