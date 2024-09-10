@@ -8,7 +8,7 @@ import os
 
 import afscripting
 import tornado.ioloop
-#import tornado.log
+import tornado.log
 import tornado.web
 
 from blueskymongo.client import BlueSkyWebDB, RunStatuses
@@ -27,15 +27,44 @@ DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName
 def configure_logging(**settings):
     log_level = settings.get('log_level') or logging.WARNING
     log_format = settings.get('log_format') or DEFAULT_LOG_FORMAT
+    log_file = settings.get('log_file')
 
+    # TODO: update afscripting.args.configure_tornado_logging_from_args
+    #   to support rotating file handler
     # mock the argsparse args object to pass into log config function
-    class Args(object):
-        def __init__(self, **kwargs):
-            [setattr(self, k, v) for k,v in kwargs.items()]
+    # class Args(object):
+    #     def __init__(self, **kwargs):
+    #         [setattr(self, k, v) for k,v in kwargs.items()]
+    #
+    # afscripting.args.configure_tornado_logging_from_args(
+    #     Args(log_message_format=log_format, log_level=log_level,
+    #         log_file=log_file))
 
-    afscripting.args.configure_tornado_logging_from_args(
-        Args(log_message_format=log_format, log_level=log_level,
-            log_file=settings.get('log_file')))
+    # log level
+    if log_level:
+        tornado.log.gen_log.setLevel(log_level)
+
+    # stream vs file
+    # Note, we need to set propagate to False in order to replace
+    # the default stream formatter handler, which outputs log messages
+    # like "DEBUG:tornado.general: ....".  Without doing this, we'll
+    # have double (and differently formatted) log messages if --log-file
+    # is *not* set, and both stream and file messagses (again, differently
+    # formatted) if --log-file *is* set
+    logging.getLogger("tornado.general").propagate = False
+
+    formatter = logging.Formatter(log_format or
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    if log_file:
+        file_handler = logging.handlers.TimedRotatingFileHandler(
+            log_file, when="W0")
+        file_handler.setFormatter(formatter)
+        tornado.log.gen_log.addHandler(file_handler)
+    else:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        tornado.log.gen_log.addHandler(stream_handler)
+
 
 DEFAULT_SETTINGS = {
     'port': 8887,
