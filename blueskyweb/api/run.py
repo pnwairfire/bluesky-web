@@ -35,7 +35,7 @@ class RunExecute(RequestHandlerBase):
             return
 
         request_body = self.request.body.decode()
-        tornado.log.gen_log.debug("Execute API request data: %s", request_body[:100])
+        tornado.log.gen_log.debug("Execute API request data: %s", request_body)
         try:
             data = json.loads(request_body)
         except json.JSONDecodeError as e:
