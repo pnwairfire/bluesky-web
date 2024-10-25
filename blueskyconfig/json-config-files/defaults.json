@@ -32,7 +32,7 @@
                 "projection": "LCC",
                 "boundary": {
                     "sw": {"lat": 30.5, "lng": -125.5},
-                    "ne": {"lat": 48.5, "lng": -98.0}
+                    "ne": {"lat": 49.1, "lng": -98.0}
                 },
                 "grid_size_options": {
                     "1.0": {"x": 7800, "y": 2400},
