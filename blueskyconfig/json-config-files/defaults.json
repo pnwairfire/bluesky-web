@@ -396,7 +396,7 @@
                 "domain_id": "USFSAK"
             },
             "global":{
-                "title": "Global",
+                "title": "GFS 0.5deg",
                 "domain_id": "GFS"
             },
             "national_3-km": {
