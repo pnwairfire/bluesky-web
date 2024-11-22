@@ -52,8 +52,8 @@ cat Dockerfile-unversioned |sed -e "s/__BLUESKY_VERSION__/$bluesky_version/g" > 
 
 # call `down` on all known yaml files, in case previously used yaml file
 # is different than this one.
-docker-compose -p bluesky-web -f dev/docker-compose.yml down --remove-orphans
-docker-compose -p bluesky-web -f $yaml_file down --remove-orphans
+docker compose -p bluesky-web -f dev/docker-compose.yml down --remove-orphans
+docker compose -p bluesky-web -f $yaml_file down --remove-orphans
 if [ "$rebuild" = true ] ; then
     sudo chown -R $UID dev/data/
     sudo rm dev/data/rabbitmq/.erlang.cookie
@@ -79,5 +79,5 @@ if [ "$shut_down" = false ] ; then
         ./dev/logs/worker/dri ./dev/logs/worker/nam \
         ./dev/logs/worker/no-met ./dev/data/mongodb/db \
         ./dev/data/output
-    docker-compose -p bluesky-web -f $yaml_file up
+    docker compose -p bluesky-web -f $yaml_file up
 fi
