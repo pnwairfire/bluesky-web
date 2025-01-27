@@ -152,11 +152,13 @@ class BlueSkyRunOutput(object):
         if export_info:
             vis_info = export_info['localsave'].get('visualization')
             if vis_info:
-                # images
-                self._parse_images(r, vis_info)
+                vis_disp_info = vis_info.get('dispersion')
+                if vis_disp_info:
+                    # images
+                    self._parse_images(r, vis_disp_info, vis_info['sub_directory'])
 
-                # kmzs
-                self._parse_kmzs_info(r, vis_info)
+                    # kmzs
+                    self._parse_kmzs_info(r, vis_disp_info, vis_info['sub_directory'])
 
             disp_info = export_info['localsave'].get('dispersion')
             if disp_info:
@@ -165,27 +167,29 @@ class BlueSkyRunOutput(object):
                     for k in ('netCDF', 'netCDFs') if k.lower() in disp_info})
 
                 # kmzs (vsmoke dispersion produces kmzs)
-                self._parse_kmzs_info(r, disp_info)
+                self._parse_kmzs_info(r, disp_info, disp_info['sub_directory'])
 
         # TODO: list fire_*.csv if specified in output
 
         self.output_stream.write(r)
 
-    def _parse_kmzs_info(self, r, section_info):
+    def _parse_kmzs_info(self, r, section_info, containing_directory):
         kmz_info = section_info.get('kmzs', {})
         if kmz_info:
-            r['kmzs'] = {k: '{}/{}'.format(section_info['sub_directory'], v)
+            r['kmzs'] = {k: '{}/{}'.format(containing_directory, v)
                 for k, v in list(kmz_info.items()) if k in ('fire', 'smoke')}
 
-    def _parse_images(self, r, vis_info):
+    def _parse_images(self, r, vis_info, containing_directory):
         r["images"] = vis_info.get('images')
-        def _parse(r):
-            if "directory" in d:
-                d["directory"] = os.path.join(
-                    vis_info['sub_directory'], d["directory"])
-            else:
+        def _parse(d):
+            if isinstance(d, dict):
                 for e in d:
-                    _parse(e)
+                    if e == "directory":
+                        d["directory"] = os.path.join(
+                            containing_directory, d["directory"])
+                    else:
+                        _parse(d[e])
+        _parse(r["images"])
 
 
     ##
