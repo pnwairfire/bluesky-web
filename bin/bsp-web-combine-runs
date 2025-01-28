@@ -64,7 +64,7 @@ def parse_args():
     parser.add_argument("-e", "--overwrite-existing-output",
         action="store_true")
     parser.add_argument("-c", "--makedispersionkml-config-file",
-        action="append", help="Config file for makedispersionkml")
+        help="Config file for makedispersionkml")
     parser.add_argument("-i", "--bluesky-docker-image",
         default="pnwairfire/bluesky", help="Bluesky docker image name")
     parser.add_argument("--log-level", default="INFO", help="Logging level")
