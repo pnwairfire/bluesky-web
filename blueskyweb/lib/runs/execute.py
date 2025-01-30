@@ -215,6 +215,10 @@ class BlueSkyRunExecutor(object):
                             'extrafiles' in dispersion_modules)) +
                         dispersion_modules)
                 else:
+
+                    # TODO: only run fuelbed modules, emissions modules, and
+                    #   timeprofile if they aren't set in the request data
+
                     _set(self.MODULES['fuelbeds']['default'] +
                         self.MODULES['emissions']['default'] +
                         # vsmoke needs timeprofile but not plumerise
