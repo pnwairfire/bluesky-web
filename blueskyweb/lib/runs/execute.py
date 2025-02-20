@@ -159,7 +159,7 @@ class BlueSkyRunExecutor(object):
         #   running findmetdata if indexed data isn't there or if mongodb
         #   query fails
         'met_dispersion': {
-            'default': ['findmetdata', 'extrafiles',
+            'default': ['findmetdata', 'extrafiles', 'trajectories',
                 'dispersion', 'visualization', 'export']
         },
         'metless_dispersion': {
