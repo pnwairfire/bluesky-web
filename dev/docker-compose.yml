@@ -161,7 +161,7 @@ services:
     # mount met for ofelia
     # Note: met root dir has to be the same on host and in this container,
     #   since bsp container will have the same mount
-    - $HOME/Met/:/data/Met/
+    - /storage/Met/:/data/Met/
     links:
     - mongo
     - rabbit
@@ -190,7 +190,7 @@ services:
     # mount met for ofelia
     # Note: met root dir has to be the same on host and in this container,
     #   since bsp container will have the same mount
-    - $HOME/Met/:/data/Met/
+    - /storage/Met/:/data/Met/
     links:
     - mongo
     - rabbit
