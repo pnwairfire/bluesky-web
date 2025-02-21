@@ -421,6 +421,7 @@ class BlueSkyRunExecutor(object):
         try:
             met_root_dir = await met_archives_db.get_root_dir(self.archive_id)
         except met.db.UnavailableArchiveError as e:
+            tornado.log.gen_log.error(f'Failed to get root dir for {self.archive_id}: {e}')
             msg = "Archive unavailable: {}".format(self.archive_id)
             self.handle_error(404, msg)
 
@@ -503,6 +504,55 @@ class BlueSkyRunExecutor(object):
 
     DEFAULT_HYSPLIT_GRID_LENGTH = 2000
 
+    async def _configure_trajectories(self, data):
+        tornado.log.gen_log.debug('Configuring trajectories')
+        data['config']['trajectories'] = data.get('config', {}).get('trajectories', {})
+
+        first_fire = data['fires'][0]
+
+        if not data['config']['trajectories'].get('start'):
+            first_aa = first_fire['activity'][0]['active_areas'][0]
+            disp_start = data.get('config', {}).get('dispersion', {}).get('start')
+            if first_fire['type'] == 'rx':
+                # if rx, start at ignition time going out 12 hours
+                data['config']['trajectories']['start'] = (
+                    first_aa.get('iginition_start') or disp_start or first_aa.get('start'))
+            else:
+                # if wf, start at beginning of day (which should be dispersion start)
+                data['config']['trajectories']['start'] = disp_start or first_aa.get('start')
+
+        if not data['config']['trajectories'].get('num_hours'):
+            data['config']['trajectories']['num_hours'] = 12
+
+        data['config']['trajectories']['hysplit'] = data['config']['trajectories'].get('hysplit', {})
+        if not data['config']['trajectories']['hysplit'].get('start_hours'):
+            if first_fire['type'] == 'rx':
+                data['config']['trajectories']['hysplit']['start_hours'] = [0,3,6,9,12]
+            else:
+                data['config']['trajectories']['hysplit']['start_hours'] = [0,3,6,9,12,15,18,21,24]
+
+        if not data['config']['trajectories']['hysplit'].get('heights'):
+            data['config']['trajectories']['hysplit']['heights'] = [10, 100, 500, 1000, 2000]
+
+        data['config']['trajectories']['handle_existing'] = "replace"
+        data['config']['trajectories']['output_dir'] = os.path.join(
+            self.settings['output_root_dir'],
+            self.settings['output_url_path_prefix'],
+            '{run_id}', 'trajectories-output')
+        data['config']['trajectories']['working_dir'] = os.path.join(
+            self.settings['output_root_dir'],
+            self.settings['output_url_path_prefix'],
+            '{run_id}', 'trajectories-working')
+
+
+        tornado.log.gen_log.debug("Trajectories start: %s", data['config']['trajectories']['start'])
+        tornado.log.gen_log.debug("Trajectories num hours: %s", data['config']['trajectories']['num_hours'])
+        tornado.log.gen_log.debug("Trajectories start hours: %s", data['config']['trajectories']['hysplit']['start_hours'])
+        tornado.log.gen_log.debug("Trajectories heights: %s", data['config']['trajectories']['hysplit']['heights'])
+        tornado.log.gen_log.debug("Trajectories output dir: %s", data['config']['trajectories']['output_dir'])
+        tornado.log.gen_log.debug("Trajectories working dir: %s", data['config']['trajectories']['working_dir'])
+
+
     async def _configure_dispersion(self, data):
         tornado.log.gen_log.debug('Configuring dispersion')
         if (not data.get('config', {}).get('dispersion', {}) or not
@@ -520,10 +570,11 @@ class BlueSkyRunExecutor(object):
             self.settings['output_root_dir'],
             self.settings['output_url_path_prefix'],
             '{run_id}', 'working')
-        tornado.log.gen_log.debug("Output dir: %s",
-            data['config']['dispersion']['output_dir'])
-        tornado.log.gen_log.debug("Working dir: %s",
-            data['config']['dispersion']['working_dir'])
+
+        tornado.log.gen_log.debug("start: %s", data['config']['dispersion']['start'])
+        tornado.log.gen_log.debug("num hours: %s", data['config']['dispersion']['num_hours'])
+        tornado.log.gen_log.debug("Output dir: %s", data['config']['dispersion']['output_dir'])
+        tornado.log.gen_log.debug("Working dir: %s", data['config']['dispersion']['working_dir'])
 
         if not self.archive_id:
             data['config']['dispersion']['model'] = 'vsmoke'
@@ -547,7 +598,13 @@ class BlueSkyRunExecutor(object):
         #  have to be configured here as well.
         data['config'] = data.get('config', {})
         data['config']['visualization'] =  data['config'].get('visualization', {})
-        data['config']['visualization']["target"] = "dispersion"
+
+        data['config']['visualization']["targets"] = []
+        if "trajectories" in data['modules']:
+            data['config']['visualization']["targets"].append("trajectories")
+        if "dispersion" in data['modules']:
+            data['config']['visualization']["targets"].append("dispersion")
+
         #data['config']['visualization']["dispersion"] =  data['config']['visualization'].get('dispersion', {})
         data['config']['visualization']["hysplit"] = (
             data['config']['visualization'].get('hysplit', {})
