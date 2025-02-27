@@ -46,7 +46,7 @@ Examples
         -o ./combined-output/abc123-xyz789/ \\
         -u https://www.example.com/bluesky-web/ \\
         -c /path/to/makedispersionkml-config.ini \\
-        -i pnwairfire/bluesky:v4.6.10 \\
+        -i pnwairfire/bluesky:v4.6.14 \\
         --log-level DEBUG
 
  """.format(script_name=sys.argv[0])
