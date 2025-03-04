@@ -569,9 +569,9 @@
                         "HOURLY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
                         "THREE_HOUR_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
                         "DAILY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
-                        "CREATE_RGBA_GEOTIFFS": true,
-                        "CREATE_SINGLE_BAND_RAW_PM25_GEOTIFFS": true,
-                        "CREATE_SINGLE_BAND_SMOKE_LEVEL_GEOTIFFS": true
+                        "CREATE_RGBA_GEOTIFFS": "True",
+                        "CREATE_SINGLE_BAND_RAW_PM25_GEOTIFFS": "True",
+                        "CREATE_SINGLE_BAND_SMOKE_LEVEL_GEOTIFFS": "True"
                     },
                     "GreyColorBar": {
                         "DEFINE_RGB": "true",
