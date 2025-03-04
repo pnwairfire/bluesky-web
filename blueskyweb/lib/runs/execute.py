@@ -631,9 +631,11 @@ class BlueSkyRunExecutor(object):
         bkml_con["DispersionGridOutput"] = default_bkml_con["DispersionGridOutput"]
         all_schemes = set()
         for series, schemes in bkml_con["DispersionGridOutput"].items():
-            if hasattr(schemes, "lower"):
-                schemes = [s.strip() for s in schemes.split(',')]
-            all_schemes = all_schemes.union(schemes)
+            if series.find('_COLORS') >= 0:
+                if hasattr(schemes, "lower"):
+                    schemes = [s.strip() for s in schemes.split(',')]
+                all_schemes = all_schemes.union(schemes)
+            # else, it's not one of the color scheme configs
         for scheme in all_schemes:
             bkml_con[scheme] = default_bkml_con[scheme]
 
