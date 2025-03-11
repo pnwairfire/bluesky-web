@@ -453,9 +453,8 @@ class BlueSkyRunExecutor(object):
             '{run_id}', 'plumerise')
         data['config']['plumerise'] = {
             "model": "feps",
-            "feps": {
-                "working_dir": working_dir
-            }
+            'working_dir': working_dir,
+            #'delete_working_dir_if_no_error': False,
         }
 
     ## Extra Files
