@@ -83,13 +83,32 @@
             "max_days_out": 7,
             "time_step": 1
         },
-        "USFSCONUS": {
+        "USFS_CONUS_Big": {
             "grid": {
                 "spacing": 6,
                 "projection": "LCC",
                 "boundary": {
-                    "sw": {"lat": 25.0, "lng": -123.0},
-                    "ne": {"lat": 49.0, "lng": -65.0}
+                    "sw": {"lat": 25.0, "lng": -126.0},
+                    "ne": {"lat": 49.0, "lng": -66.0}
+                },
+                "grid_size_options": {
+                    "1.0": {"x": 7800, "y": 2400},
+                    "0.75": {"x": 5800, "y": 1800},
+                    "0.50": {"x": 3900, "y": 1200},
+                    "0.25": {"x": 1900, "y": 600}
+                }
+            },
+            "arl_index_file": "arlindex.csv",
+            "max_days_out": 7,
+            "time_step": 1
+        },
+        "USFS_CONUS_Small": {
+            "grid": {
+                "spacing": 6,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lat": 25.0, "lng": -119.0},
+                    "ne": {"lat": 50.0, "lng": -74.0}
                 },
                 "grid_size_options": {
                     "1.0": {"x": 7800, "y": 2400},
@@ -432,9 +451,13 @@
                 "title": "USFS AK 8km",
                 "domain_id": "USFSAK"
             },
-            "usfs_conus_8-km": {
-                "title": "USFS CONUS 8km",
-                "domain_id": "USFSCONUS"
+            "usfs_conus_8-km_big": {
+                "title": "USFS CONUS 8km Big",
+                "domain_id": "USFS_CONUS_Big"
+            },
+            "usfs_conus_8-km_small": {
+                "title": "USFS CONUS 8km Small",
+                "domain_id": "USFS_CONUS_Small"
             },
             "global":{
                 "title": "GFS 0.5deg",

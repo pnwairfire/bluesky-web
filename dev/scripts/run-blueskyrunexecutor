@@ -325,7 +325,9 @@ MET_ROOT_DIRS = {
     "usfs_west_8-km": "/data/Met/USFSWest/8km/ARL/",
     "usfs_east_8-km": "/data/Met/USFSEast/8km/ARL/",
     "usfs_ak_8-km": "/data/Met/USFSAK/8km/ARL/",
-    "usfs_conus_8-km": "/data/Met/USFSCONUS/8km/ARL/",
+    # the USFS conus archives/domains reference the same met data
+    "usfs_conus_8-km_big": "/data/Met/USFSCONUS/8km/ARL/",
+    "usfs_conus_8-km_small": "/data/Met/USFSCONUS/8km/ARL/",
     "national_3-km": "/data/Met/NAM/3km/ARL/",
     "hrrr_3-km": "/data/Met/HRRR/3km/ARL",
     "pacific_northwest_1.33-km": "/data/Met/PNW/1.33km/ARL/",
