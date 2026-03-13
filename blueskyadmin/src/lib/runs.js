@@ -5,10 +5,12 @@ const publicPgv3UrlNoSlash = PUBLIC_PGV3_URL && PUBLIC_PGV3_URL.replace(/\/$/, '
 
 export const limit = 20
 
-export async function queryRuns(fetch, page, offset, runStatus, runId) {
+export async function queryRuns(fetch, page, offset, runStatus, runId, queue) {
     let apiUrl = `${publicApiUrlNoSlash}/runs/${runStatus || ''}?limit=${limit}&offset=${offset}`
     if (runId)
         apiUrl += `&run_id=${runId}`
+    if (queue)
+        apiUrl += `&queue=${queue}`
     console.log(`Fetching from ${apiUrl}`)
     const res = await fetch(apiUrl, {mode:"no-cors"});
     const runsData = await res.json();

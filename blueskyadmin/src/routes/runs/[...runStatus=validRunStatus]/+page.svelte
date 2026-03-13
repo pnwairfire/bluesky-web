@@ -34,7 +34,10 @@
         }, 1000);
     });
 
-    $: runIdQueryStr = data.runId ? `runId=${data.runId}` : ''
+    $: runIdQueryStr = [
+        data.runId ? `runId=${data.runId}` : '',
+        data.queue ? `queue=${data.queue}` : ''
+    ].filter(Boolean).join('&')
 </script>
 
     <Container fluid={true}>
@@ -63,13 +66,19 @@
                                 <input id="runId" name="runId" class="form-control" value={data.runId} placeholder="Enter complete or partial run id">
                             </div>
                             <div class="col-auto">
+                                <label for="queue" class="col-form-label">Queue</label>
+                            </div>
+                            <div class="col-auto">
+                                <input id="queue" name="queue" class="form-control" value={data.queue} placeholder="Enter complete or partial queue name">
+                            </div>
+                            <div class="col-auto">
                                 <button type="submit" class="btn btn-primary">Find</button>
                             </div>
                         </form>
                     </div>
                     <div class="col-auto">
                         <form class="row g-3 align-items-center">
-                            <a class={"btn btn-warning " + (data.runId ? '' : 'disabled')} href={`${base}/runs/${data.runStatus || ''}/`}>Clear</a>
+                            <a class={"btn btn-warning " + ((data.runId || data.queue) ? '' : 'disabled')} href={`${base}/runs/${data.runStatus || ''}/`}>Clear</a>
                         </form>
                     </div>
                 </div>
