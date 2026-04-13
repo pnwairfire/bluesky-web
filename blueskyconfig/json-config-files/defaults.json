@@ -638,7 +638,7 @@
                         "THREE_HOUR_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
                         "DAILY_COLORS_VISUALRANGE": "RainbowColorBarVisualRange",
                         "CREATE_RGBA_GEOTIFFS": "False",
-                        "CREATE_SINGLE_BAND_RAW_PM25_GEOTIFFS": "True",
+                        "CREATE_SINGLE_BAND_RAW_PM25_GEOTIFFS": "False",
                         "CREATE_SINGLE_BAND_SMOKE_LEVEL_GEOTIFFS": "False"
                     },
                     "GreyColorBar": {
