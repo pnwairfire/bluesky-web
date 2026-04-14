@@ -253,9 +253,7 @@ class BlueSkyRunner(threading.Thread):
                 data = {}
                 if 'dispersion' in modules:
                     # It's a dispersion run
-                    if m == 'dispersion':
-                        data['raw_data_images'] = extract_raw_data_pngs(fires_manager)
-                    elif m == 'export':
+                    if m == 'export':
                         data['export'] = fires_manager.meta['export']
                 elif m == 'plumerise':
                     # It's not a dispersion run, so this must be a
@@ -271,6 +269,13 @@ class BlueSkyRunner(threading.Thread):
                 self._record_run(RunStatuses.FailedModule, module=m,
                     status_message=e.args and e.args[0])
                 break
+
+        if 'dispersion' in modules:
+            raw_data_images_info = extract_raw_data_pngs(fires_manager)
+            if raw_data_images_info:
+                self._record_run(RunStatuses.ExtractedRawDataImages,
+                    {'raw_data_images': raw_data_images_info})
+
 
         # TODO: handle any of the following individually?
         #   (it would be good if they inherited from a common

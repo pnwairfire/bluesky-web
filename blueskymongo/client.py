@@ -20,6 +20,7 @@ class RunStatusesType(type):
         'RunningModule': 'running_module',
         'CompletedModule': 'completed_module',
         'FailedModule': 'failed_module',
+        "ExtractedRawDataImages": 'extracted_raw_data_images',
         "ProcessingOutput": "processing_output",
         "Completed": "completed",
         "Failed": "failed"
