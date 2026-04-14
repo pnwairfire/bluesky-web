@@ -31,7 +31,6 @@ def extract_raw_data_pngs(fires_manager):
         _upload_images(fires_manager, hysplit_output, wlconfig['docker_image'])
 
         metadata = _parse_metadata(hysplit_output)
-
         metadata.update({
             'aws_region': os.environ.get('AWS_REGION'),
             's3_bucket': os.environ.get('S3_BUCKET'),

@@ -270,11 +270,14 @@ class BlueSkyRunner(threading.Thread):
                     status_message=e.args and e.args[0])
                 break
 
+        # Run weatherlayers after all other modules so that the WL iamges
+        # don't get included in the run data 'images' key, which contains
+        # blueskykml output images
         if 'dispersion' in modules:
             raw_data_images_info = extract_raw_data_pngs(fires_manager)
             if raw_data_images_info:
-                self._record_run(RunStatuses.ExtractedRawDataImages,
-                    {'raw_data_images': raw_data_images_info})
+                data = {'raw_data_images': raw_data_images_info}
+                self._record_run(RunStatuses.ExtractedRawDataImages, **data)
 
 
         # TODO: handle any of the following individually?
