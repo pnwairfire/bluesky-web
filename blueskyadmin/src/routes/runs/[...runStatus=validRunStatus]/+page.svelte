@@ -123,7 +123,7 @@
                             {#if PUBLIC_PGV3_URL}
                                 <th>PGv3</th>
                             {/if}
-                            <th>Run Info</th>
+                            <th>APIs</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -151,7 +151,8 @@
                                     </td>
                                 {/if}
                                 <td>
-                                    <a href={`../api/v4.2/runs/${run.run_id}/output?verbose=true`} target="_blank">info</a>
+                                    <a href={`../api/v4.2/runs/${run.run_id}?verbose=true`} target="_blank">status</a> /
+                                    <a href={`../api/v4.2/runs/${run.run_id}/output?verbose=true`} target="_blank">output</a>
                                 </td>
                             </tr>
                       {/each}
