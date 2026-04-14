@@ -66,7 +66,7 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
-    - ./data/output/:/data/bluesky/output/
+    - /data/bluesky/output/:/data/bluesky/output/
     links:
     - mongo
     - rabbit
@@ -95,7 +95,7 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     # Note: output root dir has to be the same on host and in container,
     #   since bsp container will have the same mount
-    - ./data/output/:/data/bluesky/output/
+    - /data/bluesky/output/:/data/bluesky/output/
     links:
     - mongo
     - rabbit
@@ -144,7 +144,7 @@ services:
     ports:
     - 8886:8886
     volumes:
-    - ./data/output/:/data/bluesky/output/
+    - /data/bluesky/output/:/data/bluesky/output/
     working_dir: /data/bluesky/output/
     command: python -m http.server 8886
   worker_plumerise:
@@ -156,7 +156,7 @@ services:
     volumes:
     - ../:/usr/src/blueskyweb/
     - ./logs/worker/all/:/var/log/blueskyworker/
-    - ./data/output/:/data/bluesky/output/
+    - /data/bluesky/output/:/data/bluesky/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # mount met for ofelia
     # Note: met root dir has to be the same on host and in this container,
@@ -185,7 +185,7 @@ services:
     volumes:
     - ../:/usr/src/blueskyweb/
     - ./logs/worker/all/:/var/log/blueskyworker/
-    - ./data/output/:/data/bluesky/output/
+    - /data/bluesky/output/:/data/bluesky/output/
     - /var/run/docker.sock:/var/run/docker.sock
     # mount met for ofelia
     # Note: met root dir has to be the same on host and in this container,
