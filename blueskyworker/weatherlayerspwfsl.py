@@ -31,14 +31,16 @@ def extract_raw_data_pngs(fires_manager):
         _upload_images(fires_manager, hysplit_output, wlconfig['docker_image'])
 
         metadata = _parse_metadata(hysplit_output)
-        metadata.update({
-            'aws_region': os.environ.get('AWS_REGION'),
-            's3_bucket': os.environ.get('S3_BUCKET'),
-            's3_key_prefix': os.path.join(
-                os.environ.get('S3_BSP_PREFIX', ''),
-                fires_manager.run_id
-            ),
-        })
+        s3_vars = _get_s3_env_vars()
+        if s3_vars:
+            metadata.update({
+                'aws_region': s3_vars.get('AWS_REGION'),
+                's3_bucket': s3_vars.get('S3_BUCKET'),
+                's3_key_prefix': os.path.join(
+                    s3_vars.get('S3_BSP_PREFIX', ''),
+                    fires_manager.run_id),
+                })
+
         return metadata
 
     except Exception as e:
@@ -127,3 +129,24 @@ def _parse_metadata(hysplit_output):
     except Exception as e:
         tornado.log.gen_log.error(f"Error reading metadata file from disk: {e}")
         return {}
+
+def _get_s3_env_vars():
+    # Run the command and capture stdout
+    # shell=True is used if your command relies on shell features (like pipes or redirects)
+    command = 'docker run --rm --entrypoint "/bin/sh" weatherlayers-pwfsl -c "cat /app/.env"'
+    result = subprocess.run(command, capture_output=True, text=True, shell=True)
+
+    env_dict = {}
+    if result.returncode == 0:
+        for line in result.stdout.splitlines():
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+
+            # Split only on the first '=' to handle values that contain '='
+            if '=' in line:
+                key, value = line.split('=', 1)
+                # Optional: strip quotes if your .env file uses them
+                env_dict[key.strip()] = value.strip().strip('"').strip("'")
+
+    return env_dict
