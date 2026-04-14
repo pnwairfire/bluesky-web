@@ -25,6 +25,7 @@ from bluesky.config import Config
 from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
 from .monitor import monitor_run
+from .weatherlayerspwfsl import extractRawDataPngs
 
 # mongodb used for recording run information, status, etc.
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://blueskyweb:blueskywebmongopassword@mongo/blueskyweb'
@@ -252,7 +253,9 @@ class BlueSkyRunner(threading.Thread):
                 data = {}
                 if 'dispersion' in modules:
                     # It's a dispersion run
-                    if m == 'export':
+                    if m == 'dispersion':
+                        extractRawDataPngs(fires_manager)
+                    elif m == 'export':
                         data['export'] = fires_manager.meta['export']
                 elif m == 'plumerise':
                     # It's not a dispersion run, so this must be a

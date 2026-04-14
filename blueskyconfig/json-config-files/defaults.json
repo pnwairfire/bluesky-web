@@ -612,6 +612,10 @@
             "high": 0.5
         }
     },
+    "hysplit_weatherlayers_pwfsl": {
+        "enabled": false,
+        "docker_image": "weatherlayers-pwfsl"
+    },
     "visualization": {
         "dispersion": {
             "hysplit": {
