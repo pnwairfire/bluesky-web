@@ -16,7 +16,12 @@ __all__ = [
 
 def extractRawDataPngs(fires_manager):
     wlconfig = blueskyconfig.get('hysplit_weatherlayers_pwfsl')
-    if not wlconfig.get('enabled') or not fires_manager.dispersion:
+    if not wlconfig.get('enabled'):
+        tornado.log.gen_log.debug("Weatherlayers-pwfsl not enabled")
+        return
+
+    if not fires_manager.dispersion:
+        tornado.log.gen_log.debug("Missing dispersion output information needed to run weatherlayers-pwfsl")
         return
 
     try:
