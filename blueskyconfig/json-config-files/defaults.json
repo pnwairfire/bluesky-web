@@ -613,7 +613,7 @@
         }
     },
     "hysplit_weatherlayers_pwfsl": {
-        "enabled": false,
+        "enabled": true,
         "docker_image": "weatherlayers-pwfsl"
     },
     "visualization": {
