@@ -143,6 +143,8 @@ class BlueSkyRunOutput(object):
             "root_url": run['output_url'],
             "version_info": run.get('version_info') or {}
         }
+        if run.get('raw_data_images'):
+            r['raw_data_images'] = run['raw_data_images']
         run_info = run if 'export' in run else self._load_output(run)
 
         # TODO: refine what runtime info is returned
