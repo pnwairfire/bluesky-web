@@ -10,11 +10,11 @@ import tornado.log
 import blueskyconfig
 
 __all__ = [
-    'extractRawDataPngs'
+    'extract_raw_data_pngs'
 ]
 
 
-def extractRawDataPngs(fires_manager):
+def extract_raw_data_pngs(fires_manager):
     wlconfig = blueskyconfig.get('hysplit_weatherlayers_pwfsl')
     if not wlconfig.get('enabled'):
         tornado.log.gen_log.debug("Weatherlayers-pwfsl not enabled")
