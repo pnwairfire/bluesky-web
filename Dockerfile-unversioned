@@ -5,6 +5,9 @@ USER root
 RUN apt-get update \
     && apt-get install -y less vim
 
+COPY install-docker.sh /tmp/
+RUN /tmp/install-docker.sh
+
 RUN mkdir -p /usr/src/blueskyweb/
 WORKDIR /usr/src/blueskyweb/
 
