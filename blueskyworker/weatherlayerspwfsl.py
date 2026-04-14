@@ -63,7 +63,7 @@ def _extract(hysplit_output, docker_image):
 
     tornado.log.gen_log.info(
         f"Generating raw data pngs in "
-        f"{hysplit_output['directory']}/weather-layers")
+        f"{hysplit_output['directory']}/weatherlayers")
 
     # Need to use sh for docker script, since worker docker container
     # doesn't have bash
@@ -74,7 +74,7 @@ def _extract(hysplit_output, docker_image):
         {docker_image} bsp process \\
         --output-file-type png --output-file-type geotiff \\
         --conc {hysplit_output['directory']}/{hysplit_output['grid_filename']} \\
-        -o {hysplit_output['directory']}/weather-layers
+        -o {hysplit_output['directory']}/weatherlayers
 """
 
     script_name = os.path.join(hysplit_output['directory'], 'run-docker-weatherlayers-process.sh')
@@ -94,7 +94,7 @@ def _upload_images(fires_manager, hysplit_output, docker_image):
         -v {hysplit_output['directory']}:{hysplit_output['directory']} \\
         {docker_image} bsp upload \\
         -k {fires_manager.run_id} \\
-        -o {hysplit_output['directory']}/weather-layers
+        -o {hysplit_output['directory']}/weatherlayers
 """
 
     script_name = os.path.join(hysplit_output['directory'], 'run-docker-weatherlayers-upload.sh')
@@ -114,7 +114,7 @@ def _run_script(script_content, script_name):
 
 def _parse_metadata(hysplit_output):
     try:
-        file_name = os.path.join(hysplit_output['directory'], fires_manager.run_id)
+        file_name = os.path.join(hysplit_output['directory'], 'weatherlayers', 'metadata.json')
         with open(file_name) as f:
             data = json.load(f)
 
