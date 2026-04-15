@@ -7,11 +7,25 @@ import asyncio
 import datetime
 import logging
 import ssl
+import threading
 from urllib.parse import urlparse
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
 logger = logging.getLogger(__name__)
+
+_bg_loop: asyncio.AbstractEventLoop | None = None
+_bg_loop_lock = threading.Lock()
+
+
+def _get_bg_loop() -> asyncio.AbstractEventLoop:
+    """Return a persistent background event loop for use in sync contexts."""
+    global _bg_loop
+    with _bg_loop_lock:
+        if _bg_loop is None or _bg_loop.is_closed():
+            _bg_loop = asyncio.new_event_loop()
+            threading.Thread(target=_bg_loop.run_forever, daemon=True).start()
+    return _bg_loop
 
 
 class RunStatusesType(type):
@@ -101,7 +115,7 @@ class BlueSkyWebDB(object):
             loop = asyncio.get_running_loop()
             loop.create_task(_do())
         except RuntimeError:
-            asyncio.run(_do())
+            asyncio.run_coroutine_threadsafe(_do(), _get_bg_loop())
 
     async def find_run(self, run_id):
         run = await self.db.runs.find_one({"run_id": run_id})
