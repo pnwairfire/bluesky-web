@@ -3,15 +3,15 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2017, AirFire, PNW, USFS"
 
+import asyncio
 import datetime
 import json
+import logging
 import os
 import sys
 import traceback
 
 try:
-    import tornado
-
     import afscripting as scripting
 
     sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../')))
@@ -84,9 +84,9 @@ OPTIONAL_ARGS = [
 ]
 
 def validate_action(args):
-    tornado.log.gen_log.info('action: %s', args.action)
+    logging.info('action: %s', args.action)
     if args.action not in ACTIONS:
-        tornado.log.gen_log.error('Invalid action: %s', args.action)
+        logging.error('Invalid action: %s', args.action)
         sys.exit(1)
 
 def parse_args():
@@ -96,7 +96,7 @@ def parse_args():
     scripting.args.add_arguments(parser, OPTIONAL_ARGS)
     scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
     # Use afscripting to add logging options to the parser object,
-    # but we'll configure logging oureselves
+    # but we'll configure logging ourselves
     scripting.args.add_logging_options(parser)
     args = parser.parse_args()
     args.log_message_format = (args.log_message_format
@@ -106,7 +106,7 @@ def parse_args():
     return args
 
 async def get_root_dirs(db, args):
-    tornado.log.gen_log.info('Getting root dirs')
+    logging.info('Getting root dirs')
     root_dirs = {}
     for t in met.db.ARCHIVES:
         for a in met.db.ARCHIVES[t]:
@@ -117,7 +117,7 @@ async def get_root_dirs(db, args):
     return root_dirs
 
 async def get_availability(db, args):
-    tornado.log.gen_log.info('Getting availability')
+    logging.info('Getting availability')
     return await db.get_availability(archive_id=args.archive_id)
 
 async def check_availability(db, args):
@@ -125,15 +125,15 @@ async def check_availability(db, args):
                 args.date_range)
 
 async def list_obsolete(db, args):
-    tornado.log.gen_log.info('listing obsolete')
+    logging.info('listing obsolete')
     return await db.list_obsolete_archives()
 
 async def prune_obsolete(db, args):
-    tornado.log.gen_log.info('pruning')
+    logging.info('pruning')
     return await db.list_obsolete_archives(prune=True)
 
 async def clear_all(db, args):
-    tornado.log.gen_log.info('clearing')
+    logging.info('clearing')
     await db.clear_index()
     return "Cleared Database" # nested quotes to make valid JSON
 
@@ -153,12 +153,12 @@ async def main():
         sys.exit(1)
 
     except Exception as e:
-        tornado.log.gen_log.debug(traceback.format_exc())
-        tornado.log.gen_log.error(e)
+        logging.debug(traceback.format_exc())
+        logging.error(e)
         sys.exit(1)
 
     sys.stdout.write(json.dumps(data, sort_keys=True, indent=2))
     sys.stdout.write('\n')
 
 if __name__ == "__main__":
-    tornado.ioloop.IOLoop.instance().run_sync(main)
+    asyncio.run(main())

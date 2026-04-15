@@ -16,9 +16,10 @@ import os
 import ssl
 from urllib.parse import urlparse
 
-import motor
-import tornado.log
+from motor.motor_asyncio import AsyncIOMotorClient
 import blueskyconfig
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "BoundaryNotDefinedError",
@@ -83,7 +84,7 @@ class MetArchiveDB(object):
     def __init__(self, mongodb_url):
         db_name = (urlparse(mongodb_url).path.lstrip('/').split('/')[0]
             or 'blueskyweb')
-        tornado.log.gen_log.debug('Using %s for domain data', mongodb_url)
+        logger.debug('Using %s for domain data', mongodb_url)
         client_args = {
             'tls': True,
             #'tlsAllowInvalidHostnames': True, # Note: makes vulnerable to man-in-the-middle attacks
@@ -91,8 +92,7 @@ class MetArchiveDB(object):
             # 'tlsCertificateKeyFile': '/etc/ssl/bluesky-web-client-cert.pem',
             'tlsCAFile': '/etc/ssl/bluesky-web-client.pem'
         }
-        self.db = motor.motor_tornado.MotorClient(
-            mongodb_url, **client_args)[db_name]
+        self.db = AsyncIOMotorClient(mongodb_url, **client_args)[db_name]
 
     async def get_root_dir(self, archive_id):
         # Use met_files collection object directly so that we can
@@ -202,7 +202,7 @@ class MetArchiveDB(object):
         target_date_str = target_date.strftime('%Y-%m-%d')
         end_date_str = (target_date + date_range).strftime('%Y-%m-%d')
 
-        tornado.log.gen_log.debug('Check date availability for %s or between %s and %s',
+        logger.debug('Check date availability for %s or between %s and %s',
             target_date_str, begin_date_str, end_date_str)
 
         pipeline = [
@@ -228,7 +228,7 @@ class MetArchiveDB(object):
         # There should be at most one result
         available_dates = []
         async for e in self.db.dates.aggregate(pipeline):
-            tornado.log.gen_log.debug('found availability: %s', e['complete_dates'])
+            logger.debug('found availability: %s', e['complete_dates'])
             available_dates.extend(e['complete_dates'])
 
         # ***** TEMP *****
@@ -253,9 +253,9 @@ class MetArchiveDB(object):
         async for r in self.db.dates.find({}, {'domain': 1, '_id': 0}):
             try:
                 validate_archive_id(r['domain'])
-                tornado.log.gen_log.info('Valid archive %s', r['domain'])
+                logger.info('Valid archive %s', r['domain'])
             except InvalidArchiveError as e:
-                tornado.log.gen_log.info('Obsolete archive %s', r['domain'])
+                logger.info('Obsolete archive %s', r['domain'])
                 obsolete.append(r['domain'])
                 if prune:
                     q = {'domain': r['domain']}

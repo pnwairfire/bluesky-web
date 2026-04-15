@@ -1,14 +1,17 @@
 """blueskymongo.client"""
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 
+import asyncio
 import datetime
+import logging
 import ssl
 from urllib.parse import urlparse
 
-import motor
-import tornado.log
+from motor.motor_asyncio import AsyncIOMotorClient
+
+logger = logging.getLogger(__name__)
 
 
 class RunStatusesType(type):
@@ -31,7 +34,6 @@ class RunStatusesType(type):
             return self.STATUSES[key]
         elif key == 'statuses':
             return list(self.STATUSES.values())
-        #return super(RunStatus, self).__getattr__(key)
         raise AttributeError(key)
 
 class RunStatuses(metaclass=RunStatusesType):
@@ -44,14 +46,13 @@ class BlueSkyWebDB(object):
         db_name = (urlparse(mongodb_url).path.lstrip('/').split('/')[0]
             or 'blueskyweb')
         client_args = {
-            'ssl': True,
+            'tls': True,
             #'tlsAllowInvalidHostnames': True, # Note: makes vulnerable to man-in-the-middle attacks
             'tlsAllowInvalidCertificates': True,
             # 'tlsCertificateKeyFile': '/etc/ssl/bluesky-web-client-cert.pem',
             'tlsCAFile': '/etc/ssl/bluesky-web-client.pem'
         }
-        self.db = motor.motor_tornado.MotorClient(
-            mongodb_url, **client_args)[db_name]
+        self.db = AsyncIOMotorClient(mongodb_url, **client_args)[db_name]
 
     def record_run(self, run_id, status, module=None, log=None, stdout=None,
             percent_complete=None, status_message=None, **data):
@@ -89,11 +90,18 @@ class BlueSkyWebDB(object):
 
         # There should never be multiple entries, since we're always
         # doing upserts
+        async def _do():
+            try:
+                result = await self.db.runs.update_one(spec, doc, upsert=True)
+                logger.debug('Recorded run: %s', result)
+            except Exception as e:
+                logger.error('Error recording run: %s', e)
+
         try:
-            result = self.db.runs.update_one(spec, doc, upsert=True)
-            tornado.log.gen_log.debug('Recorded run: %s', result)
-        except Exception as e:
-            tornado.log.gen_log.error('Error recording run: %s', e)
+            loop = asyncio.get_running_loop()
+            loop.create_task(_do())
+        except RuntimeError:
+            asyncio.run(_do())
 
     async def find_run(self, run_id):
         run = await self.db.runs.find_one({"run_id": run_id})
@@ -109,8 +117,7 @@ class BlueSkyWebDB(object):
         if queue:
             # TODO: protect against sql-injection types of attacks
             query['queue'] = { '$regex': queue }
-        tornado.log.gen_log.debug('query, limit, offset: %s, %s, %s',
-            query, limit, offset)
+        logger.debug('query, limit, offset: %s, %s, %s', query, limit, offset)
 
         # Count sometimes returns wront vallue if there are
         # 'orphaned' (?) documents. So, use aggregate instead:
@@ -129,7 +136,7 @@ class BlueSkyWebDB(object):
 
             # runs = []
             # async for r in cursor:
-            #     tornado.log.gen_log.debug('run: %s', r)
+            #     logger.debug('run: %s', r)
             #     r.pop('_id')
             #     runs.append(r)
             runs = await cursor.to_list(limit)
@@ -167,8 +174,7 @@ class BlueSkyWebDB(object):
         if run:
             old_run_id = run['run_id']
             run['run_id'] += '-' + datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
-            tornado.log.gen_log.info('Setting run %s with new run_id %s',
-                old_run_id, run['run_id'])
+            logger.info('Setting run %s with new run_id %s', old_run_id, run['run_id'])
             await self.db.runs.update_one({'run_id': old_run_id},
                 {'$set': {'run_id': run['run_id']}})
     # *** Temporarary HACK ***

@@ -5,17 +5,19 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import datetime
 import json
+import logging
 import os
 import re
 import requests
 import uuid
 import traceback
 
-import tornado.log
-import tornado.web
+from fastapi import HTTPException
 
 from bluesky.marshal import Blueskyv4_0To4_1
 from bluesky.models import fires
+
+logger = logging.getLogger(__name__)
 
 import blueskyconfig
 from blueskymongo.client import RunStatuses
@@ -79,19 +81,19 @@ class BlueSkyRunExecutor(object):
 
             f = await self._configure_and_get_run_func(data, execute_mode)
 
-            tornado.log.gen_log.debug("BSP input data (before modules and"
+            logger.debug("BSP input data (before modules and"
                 " config are popped, and run_id is set, in BlueSkyRunner): %s",
                 json.dumps(data)[:100])
             await f(data, scheduleFor=scheduleFor)
 
-        except tornado.web.Finish as e:
+        except HTTPException:
             # this was intentionally raised; re-raise it
             raise
 
         except Exception as e:
             # IF exceptions aren't caught, the traceback is returned as
             # the response body
-            tornado.log.gen_log.debug(traceback.format_exc())
+            logger.debug(traceback.format_exc())
             self.handle_error(500, str(e), exception=e)
 
     ##
@@ -134,7 +136,7 @@ class BlueSkyRunExecutor(object):
         # it has to be set before _run_asynchronously
         if not data.get('run_id'):
             data['run_id'] = str(uuid.uuid1())
-        tornado.log.gen_log.info("%s request for run id: %s", self.mode,
+        logger.info("%s request for run id: %s", self.mode,
             data['run_id'])
 
         # This is really just for PGv3 runs
@@ -178,7 +180,7 @@ class BlueSkyRunExecutor(object):
         # takes too long in the plumerise request.  We need to investigate.
         ## just look at first location of first fire
         # if 'localmet' not in fires.Fire(data['fires'][0]).locations[0]:
-        #     tornado.log.gen_log.debug(f'localmet not in location data')
+        #     logger.debug(f'localmet not in location data')
         #     modules.extend(['findmetdata', 'localmet'])
 
         modules.append('plumerise')
@@ -186,7 +188,7 @@ class BlueSkyRunExecutor(object):
         if not exclude_extrafiles:
             modules.append('extrafiles')
 
-        tornado.log.gen_log.debug("Plumerise modules be run: {}".format(', '.join(modules)))
+        logger.debug("Plumerise modules be run: {}".format(', '.join(modules)))
         return modules
 
     def _set_modules(self, data):
@@ -233,7 +235,7 @@ class BlueSkyRunExecutor(object):
                 self.MODULES[self.mode].get('other_allowed'))
         # There are no other possibilities for self.mode
 
-        tornado.log.gen_log.debug("Modules be run: {}".format(', '.join(data['modules'])))
+        logger.debug("Modules be run: {}".format(', '.join(data['modules'])))
 
     async def _check_for_existing_run_id(self, run_id):
         run = await self.settings['mongo_db'].find_run(run_id)
@@ -255,12 +257,12 @@ class BlueSkyRunExecutor(object):
         if self.mode == 'plumerise':
             queue_name += '-plumerise'
 
-        #tornado.log.gen_log.debug('input: %s', data)
+        #logger.debug('input: %s', data)
         args = (data, self.api_version)
 
         # TODO: figure out how to enqueue without blocking
         settings = {k:v for k, v in self.settings.items() if k != 'mongo_db'}
-        tornado.log.gen_log.debug("About to enqueue run %s",
+        logger.debug("About to enqueue run %s",
             data.get('run_id'))
 
         run_bluesky.apply_async(args=args, kwargs=settings, queue=queue_name,
@@ -307,7 +309,7 @@ class BlueSkyRunExecutor(object):
 
         except Exception as e:
             self.settings['mongo_db'].record_run(run_id, RunStatuses.Failed)
-            tornado.log.gen_log.debug(traceback.format_exc())
+            logger.debug(traceback.format_exc())
             self.handle_error(500, str(e), exception=e)
 
 
@@ -319,7 +321,7 @@ class BlueSkyRunExecutor(object):
     ## Fuelbeds
 
     async def _configure_fuelbeds(self, data):
-        tornado.log.gen_log.debug('Configuring fuelbeds')
+        logger.debug('Configuring fuelbeds')
         data['config'] = data.get('config', {})
         data['config']['fuelbeds'] = data['config'].get('fuelbeds', {})
         data['config']['fuelbeds']['ignored_fuelbeds'] = []
@@ -328,7 +330,7 @@ class BlueSkyRunExecutor(object):
                 self.handle_error(400, "If specified, 'fccs_resolution' must be '1km' or '30m'")
                 return
             if self.fuelbeds_query_params['fccs_resolution'] == '30m':
-                tornado.log.gen_log.debug('Configuring fuelbeds to use 30m FCCS')
+                logger.debug('Configuring fuelbeds to use 30m FCCS')
                 data['config']['fuelbeds']["fccs_fuelload_files"] = [
                     "/data/30m-FCCS/LF2022_FCCS_220_CONUS/Tif/LC22_FCCS_220.tif",
                     "/data/30m-FCCS/LF2022_FCCS_220_AK/Tif/LA22_FCCS_220.tif",
@@ -340,7 +342,7 @@ class BlueSkyRunExecutor(object):
     ## Ecoregion
 
     async def _configure_ecoregion(self, data):
-        tornado.log.gen_log.debug('Configuring ecoregion')
+        logger.debug('Configuring ecoregion')
         data['config'] = data.get('config', {})
         data['config']['ecoregion'] = data['config'].get('ecoregion', {})
         data['config']['ecoregion']['try_nearby_on_failure'] = True
@@ -349,7 +351,7 @@ class BlueSkyRunExecutor(object):
     ## Consumption
 
     async def _configure_consumption(self, data):
-        tornado.log.gen_log.debug('Configuring consumption')
+        logger.debug('Configuring consumption')
         data['config'] = data.get('config', {})
         data['config']['consumption'] = data['config'].get('consumption', {})
         data['config']['consumption']['fuel_loadings']  = data['config']['consumption'].get('fuel_loadings', {})
@@ -407,7 +409,7 @@ class BlueSkyRunExecutor(object):
     ## Emissions
 
     async def _configure_emissions(self, data):
-        tornado.log.gen_log.debug('Configuring emissions')
+        logger.debug('Configuring emissions')
         data['config'] = data.get('config', {})
         data['config']['emissions'] = data['config'].get('emissions', {})
         data['config']['emissions']['model'] = "prichard-oneill"
@@ -415,13 +417,13 @@ class BlueSkyRunExecutor(object):
     ## Findmetdata
 
     async def _configure_findmetdata(self, data):
-        tornado.log.gen_log.debug('Configuring findmetdata')
+        logger.debug('Configuring findmetdata')
         data['config'] = data.get('config', {})
         met_archives_db = met.db.MetArchiveDB(self.settings['mongodb_url'])
         try:
             met_root_dir = await met_archives_db.get_root_dir(self.archive_id)
         except met.db.UnavailableArchiveError as e:
-            tornado.log.gen_log.error(f'Failed to get root dir for {self.archive_id}: {e}')
+            logger.error(f'Failed to get root dir for {self.archive_id}: {e}')
             msg = "Archive unavailable: {}".format(self.archive_id)
             self.handle_error(404, msg)
 
@@ -436,7 +438,7 @@ class BlueSkyRunExecutor(object):
     ## Localmet
 
     async def _configure_localmet(self, data):
-        tornado.log.gen_log.debug('Configuring localmet')
+        logger.debug('Configuring localmet')
         data['config'] = data.get('config', {})
         data['config']['localmet'] = {
             "time_step": self.archive_info['time_step']
@@ -445,7 +447,7 @@ class BlueSkyRunExecutor(object):
     ## Plumerise
 
     async def _configure_plumerise(self, data):
-        tornado.log.gen_log.debug('Configuring plumerise')
+        logger.debug('Configuring plumerise')
         data['config'] = data.get('config', {})
         working_dir = os.path.join(
             self.settings['output_root_dir'],
@@ -460,7 +462,7 @@ class BlueSkyRunExecutor(object):
     ## Extra Files
 
     async def _configure_extrafiles(self, data):
-        tornado.log.gen_log.debug('Configuring extrafiles')
+        logger.debug('Configuring extrafiles')
         data['config'] = data.get('config', {})
         dest_dir = os.path.join(
             self.settings['output_root_dir'],
@@ -504,7 +506,7 @@ class BlueSkyRunExecutor(object):
     DEFAULT_HYSPLIT_GRID_LENGTH = 2000
 
     async def _configure_trajectories(self, data):
-        tornado.log.gen_log.debug('Configuring trajectories')
+        logger.debug('Configuring trajectories')
         data['config']['trajectories'] = data.get('config', {}).get('trajectories', {})
 
         first_fire = data['fires'][0]
@@ -544,16 +546,16 @@ class BlueSkyRunExecutor(object):
             '{run_id}', 'trajectories-working')
 
 
-        tornado.log.gen_log.debug("Trajectories start: %s", data['config']['trajectories']['start'])
-        tornado.log.gen_log.debug("Trajectories num hours: %s", data['config']['trajectories']['num_hours'])
-        tornado.log.gen_log.debug("Trajectories start hours: %s", data['config']['trajectories']['hysplit']['start_hours'])
-        tornado.log.gen_log.debug("Trajectories heights: %s", data['config']['trajectories']['hysplit']['heights'])
-        tornado.log.gen_log.debug("Trajectories output dir: %s", data['config']['trajectories']['output_dir'])
-        tornado.log.gen_log.debug("Trajectories working dir: %s", data['config']['trajectories']['working_dir'])
+        logger.debug("Trajectories start: %s", data['config']['trajectories']['start'])
+        logger.debug("Trajectories num hours: %s", data['config']['trajectories']['num_hours'])
+        logger.debug("Trajectories start hours: %s", data['config']['trajectories']['hysplit']['start_hours'])
+        logger.debug("Trajectories heights: %s", data['config']['trajectories']['hysplit']['heights'])
+        logger.debug("Trajectories output dir: %s", data['config']['trajectories']['output_dir'])
+        logger.debug("Trajectories working dir: %s", data['config']['trajectories']['working_dir'])
 
 
     async def _configure_dispersion(self, data):
-        tornado.log.gen_log.debug('Configuring dispersion')
+        logger.debug('Configuring dispersion')
         if (not data.get('config', {}).get('dispersion', {}) or not
                 data['config']['dispersion'].get('start') or not
                 data['config']['dispersion'].get('num_hours')):
@@ -570,10 +572,10 @@ class BlueSkyRunExecutor(object):
             self.settings['output_url_path_prefix'],
             '{run_id}', 'working')
 
-        tornado.log.gen_log.debug("start: %s", data['config']['dispersion']['start'])
-        tornado.log.gen_log.debug("num hours: %s", data['config']['dispersion']['num_hours'])
-        tornado.log.gen_log.debug("Output dir: %s", data['config']['dispersion']['output_dir'])
-        tornado.log.gen_log.debug("Working dir: %s", data['config']['dispersion']['working_dir'])
+        logger.debug("start: %s", data['config']['dispersion']['start'])
+        logger.debug("num hours: %s", data['config']['dispersion']['num_hours'])
+        logger.debug("Output dir: %s", data['config']['dispersion']['output_dir'])
+        logger.debug("Working dir: %s", data['config']['dispersion']['working_dir'])
 
         if not self.archive_id:
             data['config']['dispersion']['model'] = 'vsmoke'
@@ -588,7 +590,7 @@ class BlueSkyRunExecutor(object):
     ## Visualization
 
     async def _configure_visualization(self, data):
-        tornado.log.gen_log.debug('Configuring visualization')
+        logger.debug('Configuring visualization')
         # Force visualization of dispersion, and let output go into dispersion
         # output directory; in case dispersion model was hysplit, specify
         # images and data sub-directories;
@@ -638,14 +640,14 @@ class BlueSkyRunExecutor(object):
         for scheme in all_schemes:
             bkml_con[scheme] = default_bkml_con[scheme]
 
-        tornado.log.gen_log.debug('visualization config: %s', data['config']['visualization'])
+        logger.debug('visualization config: %s', data['config']['visualization'])
         # TODO: set anything else?
 
     ## Export
 
     async def _configure_export(self, data):
         # we just run export to get image and file information
-        tornado.log.gen_log.debug('Configuring export')
+        logger.debug('Configuring export')
         # dest_dir = data['config']['dispersion']['output_dir'].replace(
         #     'output', 'export')
         # Run id will be

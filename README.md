@@ -1,6 +1,6 @@
 # BlueSky Web
 
-The blueskyweb package contains a tornado web service, wrapping
+The blueskyweb package contains a FastAPI web service, wrapping
 [bluesky][https://github.com/pnwairfire/bluesky],
 that can be started by simply running ```bsp-web```.
 

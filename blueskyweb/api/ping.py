@@ -1,18 +1,17 @@
 """blueskyweb.api.ping"""
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 
-import tornado.web
+from fastapi import APIRouter
 from bluesky import __version__
 
+router = APIRouter()
 
-__all__ = [
-    'Ping'
-]
+__all__ = ['router']
 
-class Ping(tornado.web.RequestHandler):
 
-    def get(self):
-        # TODO: return anything else?
-        self.write({"msg": "pong", "blueskyVersion": __version__})
+@router.get("/api/ping")
+async def ping():
+    # TODO: return anything else?
+    return {"msg": "pong", "blueskyVersion": __version__}

@@ -3,13 +3,15 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import logging
 import os
 import subprocess
 import time
 import threading
 
-import tornado.log
 from bluesky.config import Config
+
+logger = logging.getLogger(__name__)
 
 from blueskymongo.client import RunStatuses
 
@@ -63,10 +65,10 @@ class HysplitMonitor(threading.Thread):
                 # we want percent_complete to be between 3 and 90
                 percent_complete = int((90 * (current_hour / self.num_hours)) + 2)
             except Exception as e:
-                tornado.log.gen_log.info("Failed to check progress: %s", e)
+                logger.info("Failed to check progress: %s", e)
 
         # else, leave at 2
-        tornado.log.gen_log.info("Run %s hysplit %d complete",
+        logger.info("Run %s hysplit %d complete",
             self.fires_manager.run_id, percent_complete)
 
         self.record_run_func(RunStatuses.RunningModule, module=self.m,
@@ -81,16 +83,16 @@ class HysplitMonitor(threading.Thread):
 class monitor_run(object):
 
     def __init__(self, m, fires_manager, record_run_func):
-        tornado.log.gen_log.info("Constructing monitor_run context manager")
+        logger.info("Constructing monitor_run context manager")
         self.m = m
         self.fires_manager = fires_manager
         self.record_run_func = record_run_func
         self.thread = None
 
     def __enter__(self):
-        tornado.log.gen_log.info("Entering monitor_run context manager")
+        logger.info("Entering monitor_run context manager")
         if self._is_hysplit():
-            tornado.log.gen_log.info("Starting thread to monitor hysplit")
+            logger.info("Starting thread to monitor hysplit")
             self.thread = HysplitMonitor(self.m, Config().get(),
                 self.fires_manager, self.record_run_func)
             self.thread.start()
@@ -98,7 +100,7 @@ class monitor_run(object):
     def __exit__(self, e_type, value, tb):
         if self.thread:
             self.thread.terminate = True
-            tornado.log.gen_log.info("joining hysplit monitoring thread")
+            logger.info("joining hysplit monitoring thread")
             self.thread.join()
 
     def _is_hysplit(self):

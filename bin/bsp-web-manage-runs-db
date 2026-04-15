@@ -3,15 +3,15 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2017, AirFire, PNW, USFS"
 
+import asyncio
 import datetime
 import json
+import logging
 import os
 import sys
 import traceback
 
 try:
-    import tornado
-
     import afscripting as scripting
 
     sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../')))
@@ -80,9 +80,9 @@ OPTIONAL_ARGS = [
 ]
 
 def validate_action(args):
-    tornado.log.gen_log.info('action: %s', args.action)
+    logging.info('action: %s', args.action)
     if args.action not in ACTIONS:
-        tornado.log.gen_log.error('Invalid action: %s', args.action)
+        logging.error('Invalid action: %s', args.action)
         sys.exit(1)
 
 def parse_args():
@@ -92,7 +92,7 @@ def parse_args():
     scripting.args.add_arguments(parser, OPTIONAL_ARGS)
     scripting.args.add_arguments(parser, REQUIRED_ARGS, required=True)
     # Use afscripting to add logging options to the parser object,
-    # but we'll configure logging oureselves
+    # but we'll configure logging ourselves
     scripting.args.add_logging_options(parser)
     args = parser.parse_args()
     args.log_message_format = (args.log_message_format
@@ -102,25 +102,25 @@ def parse_args():
     return args
 
 async def get_run(db, args):
-    tornado.log.gen_log.info('Getting run')
+    logging.info('Getting run')
     if not args.run_id:
         raise RuntimeError("Specify --run-id")
     return await db.find_run(args.run_id)
 
 async def get_runs(db, args):
-    tornado.log.gen_log.info('Getting runs')
+    logging.info('Getting runs')
     return await db.find_runs(status=args.status,
         limit=args.limit, offset=args.offset)
 
 async def delete_run(db, args):
-    tornado.log.gen_log.info('Deleting run')
+    logging.info('Deleting run')
     if not args.run_id:
         raise RuntimeError("Specify --run-id")
     deleted = await db.delete_run(args.run_id)
     return "Deleted {} run records".format(deleted)
 
 async def delete_all_runs(db, args):
-    tornado.log.gen_log.info('clearing')
+    logging.info('clearing')
     deleted = await db.delete_all_runs()
     return "Deleted {} run records".format(deleted)
 
@@ -132,12 +132,12 @@ async def main():
         data = await globals()[args.action.replace('-','_')](db, args)
 
     except Exception as e:
-        tornado.log.gen_log.debug(traceback.format_exc())
-        tornado.log.gen_log.error(e)
+        logging.debug(traceback.format_exc())
+        logging.error(e)
         sys.exit(1)
 
     sys.stdout.write(json.dumps(data, sort_keys=True, indent=2))
     sys.stdout.write('\n')
 
 if __name__ == "__main__":
-    tornado.ioloop.IOLoop.instance().run_sync(main)
+    asyncio.run(main())

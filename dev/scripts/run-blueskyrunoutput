@@ -19,13 +19,6 @@ import afscripting as scripting
 
 sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
 
-# Note: tornado, blueskyweb.app.configure_logging and
-#   from blueskyworker.tasks are imported inline so that
-#   the you can run this script with `-h` without needing tornado
-#   and other python pacakges installed in your local (non-docker)
-#   python env
-
-
 DOCKER_RUN_STR = """docker run --rm -ti \\
     --network bluesky-web_default \\
     --link bluesky-web-mongo:mongo \\
@@ -100,7 +93,7 @@ def parse_args():
 def handle_error(status, msg, exception=None):
     logging.error('Failed: %s', msg)
     if exception:
-        tornado.log.gen_log.debug(traceback.format_exc())
+        logging.debug(traceback.format_exc())
         logging.error('Excepton: %s', exception)
     sys.exit(1)
 
@@ -153,12 +146,11 @@ async def main(args):
         sys.stdout.write(data + '\n')
 
 if __name__ == "__main__":
+    import asyncio
+
     with import_error_handler() as i:
         args = parse_args()
 
         os.environ["MONGODB_URL"] = args.mongodb_url
 
-        from functools import partial
-        main = partial(main, args=args)
-        import tornado.ioloop
-        tornado.ioloop.IOLoop.instance().run_sync(main)
+        asyncio.run(main(args))

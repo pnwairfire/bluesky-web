@@ -1,24 +1,32 @@
-import tornado.web
-import tornado.log
+"""blueskyweb.api.queue"""
 
-from blueskyworker.tasks import app
+import logging
 
-from . import RequestHandlerBase
+from fastapi import APIRouter, Request
+
+from . import get_boolean_arg, make_json_response
+
+logger = logging.getLogger(__name__)
+router = APIRouter()
+
+__all__ = ['router']
 
 
-class QueueInfo(RequestHandlerBase):
+@router.get("/api/v{api_version}/queue")
+async def queue_info(api_version: str, request: Request):
+    # See https://docs.celeryq.dev/en/latest/userguide/workers.html#inspecting-workers
+    # Import here to ensure RABBITMQ_URL env var is set before tasks module is imported
+    from blueskyworker.tasks import app
 
-    async def get(self, api_version, status=None):
-        # See https://docs.celeryq.dev/en/latest/userguide/workers.html#inspecting-workers
+    i = app.control.inspect()
 
-        i = app.control.inspect()
-
-        self.write({
-            #"registered": i.registered(),
-            "in_queue": prune_worker_set(i.reserved(), prune_enqueud_or_active),
-            "executing": prune_worker_set(i.active(), prune_enqueud_or_active),
-            "scheduled": prune_worker_set(i.scheduled(), prune_scheduled),
-        })
+    result = {
+        "in_queue": prune_worker_set(i.reserved(), prune_enqueud_or_active),
+        "executing": prune_worker_set(i.active(), prune_enqueud_or_active),
+        "scheduled": prune_worker_set(i.scheduled(), prune_scheduled),
+    }
+    verbose = get_boolean_arg(request, 'verbose')
+    return make_json_response(result, verbose=verbose)
 
 
 def prune_worker_set(r, prune_func):
@@ -81,7 +89,7 @@ def prune_scheduled(task):
         }
 
     """
-    tornado.log.gen_log.debug(f"***TASK***: {task}")
+    logger.debug(f"***TASK***: {task}")
     t = {
         "priority": task["priority"],
         "id": task["request"]["id"],
@@ -157,15 +165,13 @@ def add_request_args(t, task):
         if isinstance(request_args, str):
             request_args = eval(request_args)
 
-        # tornado.log.gen_log.debug("Request args: %s", request_args)
-        tornado.log.gen_log.debug("  api_version: %s", request_args[1])
-        tornado.log.gen_log.debug("  run_id: %s", request_args[0]['run_id'])
-        tornado.log.gen_log.debug("  modules: %s", request_args[0]['modules'])
+        logger.debug("  api_version: %s", request_args[1])
+        logger.debug("  run_id: %s", request_args[0]['run_id'])
+        logger.debug("  modules: %s", request_args[0]['modules'])
 
         t["api_version"] = request_args[1]
         t["run_id"] = request_args[0]['run_id']
         t["modules"] = request_args[0]['modules']
 
     except Exception as e:
-        tornado.log.gen_log.warn("Failed to parse request args: %s", e)
-        # t["request_args"] = request_args
+        logger.warning("Failed to parse request args: %s", e)

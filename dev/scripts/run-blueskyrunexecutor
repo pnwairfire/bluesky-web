@@ -19,11 +19,6 @@ import afscripting as scripting
 
 sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../../')))
 
-# Note: tornado, blueskyweb.app.configure_logging and
-#   from blueskyworker.tasks are imported inline so that
-#   the you can run this script with `-h` without needing tornado
-#   and other python pacakges installed in your local (non-docker)
-#   python env
 import blueskyconfig
 
 DEFAULTS = blueskyconfig.ConfigManagerSingleton().config
@@ -383,7 +378,7 @@ def get_input(args):
 def handle_error(status, msg, exception=None):
     logging.error('Failed: %s', msg)
     if exception:
-        tornado.log.gen_log.debug(traceback.format_exc())
+        logging.debug(traceback.format_exc())
         logging.error('Excepton: %s', exception)
     sys.exit(1)
 
@@ -462,6 +457,8 @@ async def main(args):
         sys.stdout.write(data + '\n')
 
 if __name__ == "__main__":
+    import asyncio
+
     args = parse_args()
     if args.run_asynchronously and not args.rabbitmq_url:
         print("*** Error:  '-r'/'--rabbitmq-url' required when"
@@ -471,7 +468,4 @@ if __name__ == "__main__":
     os.environ["MONGODB_URL"] = args.mongodb_url
     os.environ["RABBITMQ_URL"] = args.rabbitmq_url
 
-    from functools import partial
-    main = partial(main, args=args)
-    import tornado.ioloop
-    tornado.ioloop.IOLoop.instance().run_sync(main)
+    asyncio.run(main(args))

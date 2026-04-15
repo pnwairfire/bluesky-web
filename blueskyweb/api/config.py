@@ -1,14 +1,16 @@
+"""blueskyweb.api.config"""
+
+from fastapi import APIRouter, Request
 
 import blueskyconfig
-from . import RequestHandlerBase
+from . import get_boolean_arg, make_json_response
 
-##
-## Domains
-##
+router = APIRouter()
 
-KM_PER_DEG_LAT = 111
+__all__ = ['router']
 
-class ConfigDefaults(RequestHandlerBase):
 
-    def get(self, api_version):
-        self.write(blueskyconfig.ConfigManagerSingleton().config)
+@router.get("/api/v{api_version}/config/defaults")
+async def config_defaults(api_version: str, request: Request):
+    verbose = get_boolean_arg(request, 'verbose')
+    return make_json_response(blueskyconfig.ConfigManagerSingleton().config, verbose=verbose)

@@ -6,13 +6,14 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import copy
 import datetime
 import json
+import logging
 import os
 import threading
 
-import tornado
-
 # Note: afconfig is installed via afscripting
 import afconfig
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "ConfigManagerSingleton",
@@ -70,13 +71,13 @@ class ConfigManagerSingleton():
         return self._DEFAULT_TTL_SECONDS
 
     def _load_config_from_file(self, config, filename):
-        tornado.log.gen_log.debug(f"Loading config from {filename}")
+        logger.debug(f"Loading config from {filename}")
         with open(filename) as f:
             try:
                 c = json.loads(f.read())
                 afconfig.merge_configs(config, c)
             except Exception as e:
-                tornado.log.gen_log.warn(f"Failed to config from {filename} - {e}")
+                logger.warning(f"Failed to config from {filename} - {e}")
 
     def _load_config(self):
         # note that 'afconfig.merge_configs' merges in-place
@@ -92,7 +93,7 @@ class ConfigManagerSingleton():
 
         # load any overrides loaded when bsp-web was started
         if self._overrides:
-            tornado.log.gen_log.debug(f"Loading static overrides")
+            logger.debug(f"Loading static overrides")
             afconfig.merge_configs(config, self._overrides)
 
         self._data.config = config
@@ -106,11 +107,11 @@ class ConfigManagerSingleton():
         with expiration
         """
         if not hasattr(self._data, 'config'):
-            tornado.log.gen_log.debug("Initial load of config from file")
+            logger.debug("Initial load of config from file")
             self._load_config()
 
         elif self._data.expire_at < datetime.datetime.now():
-            tornado.log.gen_log.debug(f"Cache expired ({self._data.expire_at} vs. {datetime.datetime.now()}) - reloading from file")
+            logger.debug(f"Cache expired ({self._data.expire_at} vs. {datetime.datetime.now()}) - reloading from file")
             self._load_config()
 
         return self._data.config

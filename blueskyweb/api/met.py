@@ -4,18 +4,21 @@ Notes:
  - API version is ignored by the met APIs
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 
 import datetime
-import json
 import re
 
-import tornado.web
+from fastapi import APIRouter, HTTPException, Request
 
 import blueskyconfig
 from blueskyweb.lib import met
-from . import RequestHandlerBase
+from . import get_boolean_arg, make_json_response
+
+router = APIRouter()
+
+__all__ = ['router']
 
 ##
 ## Domains
@@ -23,39 +26,39 @@ from . import RequestHandlerBase
 
 KM_PER_DEG_LAT = 111
 
-class DomainInfo(RequestHandlerBase):
 
-    @property
-    def DOMAINS(self):
-        return blueskyconfig.get('domains')
+def _marshall_domain(domain_id, domains):
+    grid_config = domains[domain_id]['grid']
+    r = {
+        "id": domain_id,
+        "boundary": grid_config['boundary'],
+        "grid_size_options": {
+            k: f"xy(km): {grid_config['grid_size_options'][k]['x']} x {grid_config['grid_size_options'][k]['y']}"
+                for k in grid_config['grid_size_options']
+        },
+        "grid_size_options_numeric": grid_config['grid_size_options']
+    }
+    r['resolution_km'] = grid_config['spacing']
+    if grid_config['projection'] == 'LatLon':
+        r['resolution_km'] *= KM_PER_DEG_LAT
+    return r
 
-    def _marshall(self, domain_id):
-        grid_config = self.DOMAINS[domain_id]['grid']
-        r = {
-            "id": domain_id,
-            "boundary": grid_config['boundary'],
-            "grid_size_options": {
-                k: f"xy(km): {grid_config['grid_size_options'][k]['x']} x {grid_config['grid_size_options'][k]['y']}"
-                    for k in grid_config['grid_size_options']
-            },
-            "grid_size_options_numeric": grid_config['grid_size_options']
-        }
-        r['resolution_km'] = grid_config['spacing']
-        if grid_config['projection'] == 'LatLon':
-            # This uses N/S resolution, which will be different E/W resolution
-            # TODO: Is this appropriate
-            r['resolution_km'] *= KM_PER_DEG_LAT
-        return r
 
-    def get(self, api_version, domain_id=None):
-        domains = self.DOMAINS
-        if domain_id:
-            if domain_id not in domains:
-                self._raise_error(404, "Domain does not exist")
-            else:
-                self.write({'domain': self._marshall(domain_id)})
-        else:
-            self.write({'domains': [self._marshall(d) for d in domains]})
+@router.get("/api/v{api_version}/met/domains")
+async def domain_info(api_version: str, request: Request):
+    domains = blueskyconfig.get('domains')
+    verbose = get_boolean_arg(request, 'verbose')
+    return make_json_response({'domains': [_marshall_domain(d, domains) for d in domains]},
+        verbose=verbose)
+
+
+@router.get("/api/v{api_version}/met/domains/{domain_id}")
+async def domain_info_by_id(api_version: str, domain_id: str, request: Request):
+    domains = blueskyconfig.get('domains')
+    if domain_id not in domains:
+        raise HTTPException(status_code=404, detail="Domain does not exist")
+    verbose = get_boolean_arg(request, 'verbose')
+    return make_json_response({'domain': _marshall_domain(domain_id, domains)}, verbose=verbose)
 
 
 ##
@@ -63,94 +66,96 @@ class DomainInfo(RequestHandlerBase):
 ##
 
 
-
-class MetArchiveBaseHander(RequestHandlerBase):
-
-    def __init__(self, *args, **kwargs):
-        super(MetArchiveBaseHander, self).__init__(*args, **kwargs)
-        self.met_archives_db = met.db.MetArchiveDB(self.settings['mongodb_url'])
-
-class MetArchivesInfo(MetArchiveBaseHander):
-
-    @property
-    def ARCHIVES(self):
-        return blueskyconfig.get('archives')
-
-    async def _marshall(self, archive_group, archive_id):
-        r = dict(self.ARCHIVES[archive_group][archive_id], id=archive_id,
-            group=archive_group)
-        availability = await self.met_archives_db.get_availability(archive_id)
-        r.update(availability)
-        return r
-
-    def write_archives(self, archives):
-        available = self.get_boolean_arg('available')
-        if available is not None:
-            if available:
-                archives = [a for a in archives if a['begin'] and a['end']]
-            else:
-                archives = [a for a in archives if not a['begin'] or not a['end']]
-        self.write({"archives": archives})
-
-    async def get(self, api_version, identifier=None):
-        ARCHIVES = self.ARCHIVES
-        if not identifier:
-            # Note: 'await' expressions in comprehensions are not supported
-            archives = []
-
-            for archive_group in ARCHIVES:
-                for archive_id in ARCHIVES[archive_group]:
-                    archives.append(await self._marshall(archive_group, archive_id))
-            self.write_archives(archives)
-
-        elif identifier in ARCHIVES:
-            archives = []
-            for archive_id in ARCHIVES[identifier]:
-                archives.append(await self._marshall(identifier, archive_id))
-            self.write_archives(archives)
-
-        else:
-            for archive_group in ARCHIVES:
-                if identifier in ARCHIVES[archive_group]:
-                    self.write({"archive": await self._marshall(archive_group, identifier)})
-                    break
-            else:
-                self._raise_error(404, "Archive does not exist")
+async def _marshall_archive(archive_group, archive_id, archives, met_archives_db):
+    r = dict(archives[archive_group][archive_id], id=archive_id, group=archive_group)
+    availability = await met_archives_db.get_availability(archive_id)
+    r.update(availability)
+    return r
 
 
-class MetArchiveAvailability(MetArchiveBaseHander):
+def _filter_by_available(archives, available):
+    if available is None:
+        return archives
+    if available:
+        return [a for a in archives if a['begin'] and a['end']]
+    else:
+        return [a for a in archives if not a['begin'] or not a['end']]
 
-    DATE_MATCHER = re.compile(
-        '^(?P<year>[0-9]{4})-?(?P<month>[0-9]{2})-?(?P<day>[0-9]{2})$')
 
-    async def get(self, api_version, archive_id=None, date_str=None):
-        # archive_id and date will always be defined
-        m = self.DATE_MATCHER.match(date_str)
-        if not m:
-            self._raise_error(400, "Invalid date: {}".format(date_str))
-        date_obj = datetime.date(int(m.group('year')), int(m.group('month')),
-            int(m.group('day')))
+@router.get("/api/v{api_version}/met/archives")
+async def met_archives_info(api_version: str, request: Request):
+    mongodb_url = request.app.state.settings['mongodb_url']
+    met_archives_db = met.db.MetArchiveDB(mongodb_url)
+    archives = blueskyconfig.get('archives')
 
-        try:
-            data = await self.met_archives_db.check_availability(
-                archive_id, date_obj, self.get_date_range())
-            self.write(data)
-        except met.db.InvalidArchiveError:
-            self._raise_error(404, "Archive does not exist")
+    result = []
+    for archive_group in archives:
+        for archive_id in archives[archive_group]:
+            result.append(await _marshall_archive(archive_group, archive_id, archives, met_archives_db))
 
-    DEFAUL_DATE_RANGE = 3
+    available = get_boolean_arg(request, 'available')
+    result = _filter_by_available(result, available)
 
-    def get_date_range(self):
-        try:
-            date_range = self.get_argument('date_range',
-                self.DEFAUL_DATE_RANGE)
-            date_range = int(date_range)
-        except ValueError as e:
-            msg = "Invalid value for date_range: '{}'".format(date_range)
-            self._raise_error(400, msg)
+    verbose = get_boolean_arg(request, 'verbose')
+    return make_json_response({"archives": result}, verbose=verbose)
 
-        if date_range < 1:
-            msg = "date_range must be greater than or equal to 1"
-            self._raise_error(400, msg)
 
-        return date_range
+@router.get("/api/v{api_version}/met/archives/{identifier}")
+async def met_archive_info_by_identifier(api_version: str, identifier: str, request: Request):
+    mongodb_url = request.app.state.settings['mongodb_url']
+    met_archives_db = met.db.MetArchiveDB(mongodb_url)
+    archives = blueskyconfig.get('archives')
+    available = get_boolean_arg(request, 'available')
+    verbose = get_boolean_arg(request, 'verbose')
+
+    if identifier in archives:
+        # It's an archive group
+        result = []
+        for archive_id in archives[identifier]:
+            result.append(await _marshall_archive(identifier, archive_id, archives, met_archives_db))
+        result = _filter_by_available(result, available)
+        return make_json_response({"archives": result}, verbose=verbose)
+
+    else:
+        # Look for a specific archive_id across all groups
+        for archive_group in archives:
+            if identifier in archives[archive_group]:
+                result = await _marshall_archive(archive_group, identifier, archives, met_archives_db)
+                return make_json_response({"archive": result}, verbose=verbose)
+
+        raise HTTPException(status_code=404, detail="Archive does not exist")
+
+
+DATE_MATCHER = re.compile(
+    r'^(?P<year>[0-9]{4})-?(?P<month>[0-9]{2})-?(?P<day>[0-9]{2})$')
+DEFAULT_DATE_RANGE = 3
+
+
+@router.get("/api/v{api_version}/met/archives/{archive_id}/{date_str}")
+async def met_archive_availability(api_version: str, archive_id: str, date_str: str,
+        request: Request):
+    mongodb_url = request.app.state.settings['mongodb_url']
+    met_archives_db = met.db.MetArchiveDB(mongodb_url)
+
+    m = DATE_MATCHER.match(date_str)
+    if not m:
+        raise HTTPException(status_code=400, detail=f"Invalid date: {date_str}")
+    date_obj = datetime.date(int(m.group('year')), int(m.group('month')),
+        int(m.group('day')))
+
+    date_range_str = request.query_params.get('date_range', str(DEFAULT_DATE_RANGE))
+    try:
+        date_range = int(date_range_str)
+    except ValueError:
+        raise HTTPException(status_code=400,
+            detail=f"Invalid value for date_range: '{date_range_str}'")
+    if date_range < 1:
+        raise HTTPException(status_code=400,
+            detail="date_range must be greater than or equal to 1")
+
+    try:
+        data = await met_archives_db.check_availability(archive_id, date_obj, date_range)
+        verbose = get_boolean_arg(request, 'verbose')
+        return make_json_response(data, verbose=verbose)
+    except met.db.InvalidArchiveError:
+        raise HTTPException(status_code=404, detail="Archive does not exist")

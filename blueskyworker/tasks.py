@@ -15,7 +15,6 @@ import traceback
 import uuid
 
 import ipify2
-import tornado.log
 from celery import Celery
 from bluesky import (
     exceptions, models, __version__ as bluesky_version
@@ -24,7 +23,11 @@ from bluesky.config import Config
 
 from blueskymongo.client import BlueSkyWebDB, RunStatuses
 
+import logging
+
 from .monitor import monitor_run
+
+logger = logging.getLogger(__name__)
 from .weatherlayerspwfsl import extract_raw_data_pngs
 
 # mongodb used for recording run information, status, etc.
@@ -48,7 +51,7 @@ try:
 except:
     # this should only happen in dev, if working without internet connection
     IP_ADDRESS = 'localhost'
-tornado.log.gen_log.info('IP_ADDRESS (in tasks.py): %s', IP_ADDRESS)
+logger.info('IP_ADDRESS (in tasks.py): %s', IP_ADDRESS)
 HOSTNAME = os.environ.get('PUBLIC_HOSTNAME') or IP_ADDRESS
 
 ##
@@ -69,7 +72,7 @@ def run_bluesky(input_data, api_version, **settings):
     db = BlueSkyWebDB(MONGODB_URL)
     db.record_run(input_data['run_id'], RunStatuses.Dequeued,
         server={"ip": IP_ADDRESS})
-    tornado.log.gen_log.info("Running %s from queue %s",
+    logger.info("Running %s from queue %s",
         input_data['run_id'],  '/') # TODO: get queue from job process
 
     if hasattr(input_data, 'lower'):
@@ -163,7 +166,7 @@ class BlueSkyRunner(threading.Thread):
 
         except Exception as e:
             self.exception = BlueSkyJobError(str(e))
-            tornado.log.gen_log.debug(traceback.format_exc())
+            logger.debug(traceback.format_exc())
             self._record_run(RunStatuses.Failed,
                 error={"message": str(e)})
             # store exception rather than raise it so
@@ -180,7 +183,7 @@ class BlueSkyRunner(threading.Thread):
             self.settings['output_url_path_prefix'],
             self.run_id))
         os.makedirs(self.output_dir, exist_ok=True) # TODO: is this necessary, or will docker create it?
-        tornado.log.gen_log.debug('Output dir: %s', self.output_dir)
+        logger.debug('Output dir: %s', self.output_dir)
         self.output_json_filename = os.path.join(
             self.output_dir, 'output.json')
         self.output_log_filename = os.path.join(
@@ -242,7 +245,7 @@ class BlueSkyRunner(threading.Thread):
 
         for m in modules:
             try:
-                tornado.log.gen_log.info('Running %s %s',
+                logger.info('Running %s %s',
                     self.run_id, m)
                 fires_manager.modules = [m]
                 self._record_run(RunStatuses.StartingModule, module=m)

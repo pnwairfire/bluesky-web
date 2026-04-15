@@ -4,12 +4,14 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import json
+import logging
 import os
 
 import ipify2
 import requests
-import tornado.log
 import urllib.request
+
+logger = logging.getLogger(__name__)
 from bluesky.marshal import Blueskyv4_0To4_1
 from bluesky.models import fires
 
@@ -22,7 +24,7 @@ except:
     # same machine as web server.  If ipify fails, we'll just
     # resort to loading all output as if from remote server
     IP_ADDRESS = None
-tornado.log.gen_log.info('IP_ADDRESS (in output.py): %s', IP_ADDRESS)
+logger.info('IP_ADDRESS (in output.py): %s', IP_ADDRESS)
 
 
 # PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
@@ -53,7 +55,7 @@ tornado.log.gen_log.info('IP_ADDRESS (in output.py): %s', IP_ADDRESS)
 #     return False
 
 def is_same_host(run):
-    tornado.log.gen_log.info('server ip %s vs. IP_ADDRESS: %s',
+    logger.info('server ip %s vs. IP_ADDRESS: %s',
         run['server']['ip'], IP_ADDRESS)
     return run['server']['ip'] == IP_ADDRESS
 
@@ -203,10 +205,10 @@ class BlueSkyRunOutput(object):
         #   give false negative and checking local shouldn't give false postive
         #   (only do this if is_same_host returns false negative in production)
         if is_same_host(run):
-            tornado.log.gen_log.debug('Loading local output')
+            logger.debug('Loading local output')
             return self._get(run['output_dir'], os.path.exists, open)
         else:
-            tornado.log.gen_log.debug('Loading remote output')
+            logger.debug('Loading remote output')
             return self._get(run['output_url'], remote_exists, remote_open)
 
     def _get(self, output_location, exists_func, open_func):
@@ -219,7 +221,7 @@ class BlueSkyRunOutput(object):
             (local or via http)
          - open_func -- function to open output json file (local or via http)
         """
-        tornado.log.gen_log.debug('Looking for output in %s', output_location)
+        logger.debug('Looking for output in %s', output_location)
         if not exists_func(output_location):
             msg = "Output location doesn't exist: {}".format(output_location)
             self.handle_error(404, msg)

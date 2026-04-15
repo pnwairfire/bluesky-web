@@ -1,13 +1,14 @@
 import json
+import logging
 import os
 import shutil
 import subprocess
 import tempfile
 from datetime import datetime
 
-import tornado.log
-
 import blueskyconfig
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     'extract_raw_data_pngs'
@@ -17,11 +18,11 @@ __all__ = [
 def extract_raw_data_pngs(fires_manager):
     wlconfig = blueskyconfig.get('hysplit_weatherlayers_pwfsl')
     if not wlconfig.get('enabled'):
-        tornado.log.gen_log.debug("Weatherlayers-pwfsl not enabled")
+        logger.debug("Weatherlayers-pwfsl not enabled")
         return
 
     if not fires_manager.dispersion:
-        tornado.log.gen_log.debug("Missing dispersion output information needed to run weatherlayers-pwfsl")
+        logger.debug("Missing dispersion output information needed to run weatherlayers-pwfsl")
         return
 
     try:
@@ -45,25 +46,25 @@ def extract_raw_data_pngs(fires_manager):
 
     except Exception as e:
         import traceback
-        tornado.log.gen_log.error(f"Failed to extract raw pngs: {e}")
-        tornado.log.gen_log.error(f"Stack: {traceback.format_exc()}")
+        logger.error(f"Failed to extract raw pngs: {e}")
+        logger.error(f"Stack: {traceback.format_exc()}")
 
 
 def _extract(hysplit_output, docker_image):
-    tornado.log.gen_log.info("Extracting data images from hysplit output using weatherlayers")
+    logger.info("Extracting data images from hysplit output using weatherlayers")
 
     do_clean_up = False
     if (not os.path.exists(hysplit_output['directory'])
             and os.path.exists(f"{hysplit_output['directory']}.tar.gz")):
         parent_dir = os.path.dirname(hysplit_output['directory'])
-        tornado.log.gen_log.info(
+        logger.info(
             f"Untarring {hysplit_output['directory']}.tar.gz -> {parent_dir}")
         subprocess.run(
             ['tar', '-xzf', f"{hysplit_output['directory']}.tar.gz", '-C', parent_dir],
             check=True)
         do_clean_up = True
 
-    tornado.log.gen_log.info(
+    logger.info(
         f"Generating raw data pngs in "
         f"{hysplit_output['directory']}/weatherlayers")
 
@@ -83,12 +84,12 @@ def _extract(hysplit_output, docker_image):
     _run_script(script_content, script_name)
 
     if do_clean_up:
-        tornado.log.gen_log.info(f"Removing {hysplit_output['directory']}")
+        logger.info(f"Removing {hysplit_output['directory']}")
         shutil.rmtree(hysplit_output['directory'], ignore_errors=True)
 
 
 def _upload_images(fires_manager, hysplit_output, docker_image):
-    tornado.log.gen_log.info("Uploading extracted images to s3")
+    logger.info("Uploading extracted images to s3")
 
     script_content = f"""#!/usr/bin/env sh
 
@@ -104,13 +105,13 @@ def _upload_images(fires_manager, hysplit_output, docker_image):
 
 
 def _run_script(script_content, script_name):
-    tornado.log.gen_log.info(f"Running {script_name}")
+    logger.info(f"Running {script_name}")
 
     with open(script_name, 'w') as f:
         f.write(script_content)
     os.chmod(script_name, 0o755)
 
-    tornado.log.gen_log.debug("About to call subprocess.run")
+    logger.debug("About to call subprocess.run")
     subprocess.run([script_name], check=True)
 
 
@@ -127,7 +128,7 @@ def _parse_metadata(hysplit_output):
             'variables': data.get('variables'),
         }
     except Exception as e:
-        tornado.log.gen_log.error(f"Error reading metadata file from disk: {e}")
+        logger.error(f"Error reading metadata file from disk: {e}")
         return {}
 
 def _get_s3_env_vars():
