@@ -45,6 +45,7 @@ def _marshall_domain(domain_id, domains):
 
 
 @router.get("/api/v{api_version}/met/domains")
+@router.get("/api/v{api_version}/met/domains/")
 async def domain_info(api_version: str, request: Request):
     domains = blueskyconfig.get('domains')
     verbose = get_boolean_arg(request, 'verbose')
@@ -53,6 +54,7 @@ async def domain_info(api_version: str, request: Request):
 
 
 @router.get("/api/v{api_version}/met/domains/{domain_id}")
+@router.get("/api/v{api_version}/met/domains/{domain_id}/")
 async def domain_info_by_id(api_version: str, domain_id: str, request: Request):
     domains = blueskyconfig.get('domains')
     if domain_id not in domains:
@@ -83,6 +85,7 @@ def _filter_by_available(archives, available):
 
 
 @router.get("/api/v{api_version}/met/archives")
+@router.get("/api/v{api_version}/met/archives/")
 async def met_archives_info(api_version: str, request: Request):
     mongodb_url = request.app.state.settings['mongodb_url']
     met_archives_db = met.db.MetArchiveDB(mongodb_url)
@@ -101,6 +104,7 @@ async def met_archives_info(api_version: str, request: Request):
 
 
 @router.get("/api/v{api_version}/met/archives/{identifier}")
+@router.get("/api/v{api_version}/met/archives/{identifier}/")
 async def met_archive_info_by_identifier(api_version: str, identifier: str, request: Request):
     mongodb_url = request.app.state.settings['mongodb_url']
     met_archives_db = met.db.MetArchiveDB(mongodb_url)
@@ -132,6 +136,7 @@ DEFAULT_DATE_RANGE = 3
 
 
 @router.get("/api/v{api_version}/met/archives/{archive_id}/{date_str}")
+@router.get("/api/v{api_version}/met/archives/{archive_id}/{date_str}/")
 async def met_archive_availability(api_version: str, archive_id: str, date_str: str,
         request: Request):
     mongodb_url = request.app.state.settings['mongodb_url']

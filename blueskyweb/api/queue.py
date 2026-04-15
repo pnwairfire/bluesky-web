@@ -13,6 +13,7 @@ __all__ = ['router']
 
 
 @router.get("/api/v{api_version}/queue")
+@router.get("/api/v{api_version}/queue/")
 async def queue_info(api_version: str, request: Request):
     # See https://docs.celeryq.dev/en/latest/userguide/workers.html#inspecting-workers
     # Import here to ensure RABBITMQ_URL env var is set before tasks module is imported

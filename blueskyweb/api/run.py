@@ -28,7 +28,9 @@ __all__ = ['router']
 
 
 @router.post("/api/v{api_version}/run/{mode}/{archive_id}")
+@router.post("/api/v{api_version}/run/{mode}/{archive_id}/")
 @router.post("/api/v{api_version}/run/{mode}")
+@router.post("/api/v{api_version}/run/{mode}/")
 async def run_execute(api_version: str, mode: str, request: Request,
         archive_id: str = None):
     body = await request.body()
@@ -146,6 +148,7 @@ def _estimate_percent_for_running(run):
 ###
 
 @router.get("/api/v{api_version}/runs/stats/monthly")
+@router.get("/api/v{api_version}/runs/stats/monthly/")
 async def run_stats_monthly(api_version: str, request: Request):
     settings = request.app.state.settings
     run_id = request.query_params.get('run_id')
@@ -155,6 +158,7 @@ async def run_stats_monthly(api_version: str, request: Request):
 
 
 @router.get("/api/v{api_version}/runs/stats/daily")
+@router.get("/api/v{api_version}/runs/stats/daily/")
 async def run_stats_daily(api_version: str, request: Request):
     settings = request.app.state.settings
     run_id = request.query_params.get('run_id')
@@ -164,6 +168,7 @@ async def run_stats_daily(api_version: str, request: Request):
 
 
 @router.get("/api/v{api_version}/runs")
+@router.get("/api/v{api_version}/runs/")
 async def runs_info(api_version: str, request: Request):
     settings = request.app.state.settings
     limit = min(int(request.query_params.get('limit', 10)), 25)
@@ -188,7 +193,9 @@ async def runs_info(api_version: str, request: Request):
 
 
 @router.get("/api/v{api_version}/runs/{run_id}/output")
+@router.get("/api/v{api_version}/runs/{run_id}/output/")
 @router.get("/api/v{api_version}/run/{run_id}/output")
+@router.get("/api/v{api_version}/run/{run_id}/output/")
 async def run_output(api_version: str, run_id: str, request: Request):
     settings = request.app.state.settings
     collector = DataCollector()
@@ -206,12 +213,14 @@ async def run_output(api_version: str, run_id: str, request: Request):
 
 
 @router.get("/api/v{api_version}/run/{run_id}/status")
+@router.get("/api/v{api_version}/run/{run_id}/status/")
 async def run_status_compat(api_version: str, run_id: str, request: Request):
     """Backwards-compatible endpoint: /run/{run_id}/status"""
     return await _get_run_status(api_version, run_id, request)
 
 
 @router.get("/api/v{api_version}/runs/{identifier}")
+@router.get("/api/v{api_version}/runs/{identifier}/")
 async def runs_by_identifier(api_version: str, identifier: str, request: Request):
     """Handles both /runs/{status} (list by status) and /runs/{run_id} (single run)."""
     if identifier in RunStatuses.statuses:

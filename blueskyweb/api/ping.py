@@ -12,6 +12,7 @@ __all__ = ['router']
 
 
 @router.get("/api/ping")
+@router.get("/api/ping/")
 async def ping():
     # TODO: return anything else?
     return {"msg": "pong", "blueskyVersion": __version__}
