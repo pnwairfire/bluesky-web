@@ -360,8 +360,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 46.9,"lng": -126.5},
-                    "ne": {"lat": 51.5,"lng": -119.5}
+                    "sw": {"lat": 35.5,"lng": -115.8},
+                    "ne": {"lat": 39.5,"lng": -109.5}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -378,8 +378,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 40,"lng": -125.5},
-                    "ne": {"lat": 44,"lng": -119.5}
+                    "sw": {"lat": 36.5,"lng": -111},
+                    "ne": {"lat": 41.5,"lng": -106}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -396,8 +396,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 46.9,"lng": -126.5},
-                    "ne": {"lat": 51.5,"lng": -119.5}
+                    "sw": {"lat": 35,"lng": -115.5},
+                    "ne": {"lat": 40,"lng": -105.5}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -414,8 +414,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 40,"lng": -125.5},
-                    "ne": {"lat": 44,"lng": -119.5}
+                    "sw": {"lat": 36.5,"lng": -111},
+                    "ne": {"lat": 41.5,"lng": -106}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
