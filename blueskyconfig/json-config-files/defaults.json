@@ -360,8 +360,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 35.5,"lng": -115.8},
-                    "ne": {"lat": 39.5,"lng": -109.5}
+                    "sw": {"lat": 44.4,"lng": -93.7},
+                    "ne": {"lat": 49.4,"lng": -86.7}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -378,8 +378,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 36.5,"lng": -111},
-                    "ne": {"lat": 41.5,"lng": -106}
+                    "sw": {"lat": 36.5,"lng": -109},
+                    "ne": {"lat": 41.5,"lng": -103}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -396,8 +396,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 35,"lng": -115.5},
-                    "ne": {"lat": 40,"lng": -105.5}
+                    "sw": {"lat": 44.4,"lng": -93.7},
+                    "ne": {"lat": 49.4,"lng": -86.7}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -414,8 +414,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 36.5,"lng": -111},
-                    "ne": {"lat": 41.5,"lng": -106}
+                    "sw": {"lat": 36.5,"lng": -109},
+                    "ne": {"lat": 41.5,"lng": -103}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -500,7 +500,7 @@
                 "domain_id": "Alaska12km"
             },
             "FW00Z_1km": {
-                "title": "00Z FW 1.27km (Utah)",
+                "title": "00Z FW 1.27km (NE MN)",
                 "domain_id": "FW00Z"
             },
             "FW06Z_1km": {
@@ -508,7 +508,7 @@
                 "domain_id": "FW06Z"
             },
             "FW12Z_1km": {
-                "title": "12Z FW 1.27km (Utah)",
+                "title": "12Z FW 1.27km (NE MN)",
                 "domain_id": "FW12Z"
             },
             "FW18Z_1km": {
