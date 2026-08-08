@@ -360,8 +360,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 44.4,"lng": -93.7},
-                    "ne": {"lat": 49.4,"lng": -86.7}
+                    "sw": {"lat": 36.5,"lng": -115.0},
+                    "ne": {"lat": 41.5,"lng": -109.0}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -378,8 +378,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 36.5,"lng": -109},
-                    "ne": {"lat": 41.5,"lng": -103}
+                    "sw": {"lat": 39.5,"lng": -125.3},
+                    "ne": {"lat": 44.5,"lng": -119.3}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -396,8 +396,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 44.4,"lng": -93.7},
-                    "ne": {"lat": 49.4,"lng": -86.7}
+                    "sw": {"lat": 36.5,"lng": -115.0},
+                    "ne": {"lat": 41.5,"lng": -109.0}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -414,8 +414,8 @@
                  "spacing": 1,
                  "projection": "LCC",
                  "boundary": {
-                    "sw": {"lat": 36.5,"lng": -109},
-                    "ne": {"lat": 41.5,"lng": -103}
+                    "sw": {"lat": 39.5,"lng": -125.3},
+                    "ne": {"lat": 44.5,"lng": -119.3}
                  },
                  "grid_size_options": {
                      "1.0": {"x": 500, "y": 500},
@@ -500,19 +500,19 @@
                 "domain_id": "Alaska12km"
             },
             "FW00Z_1km": {
-                "title": "00Z FW 1.27km (NE MN)",
+                "title": "00Z FW 1.27km (Utah)",
                 "domain_id": "FW00Z"
             },
             "FW06Z_1km": {
-                "title": "06Z FW 1.27km (Colorado)",
+                "title": "06Z FW 1.27km (CA-OR)",
                 "domain_id": "FW06Z"
             },
             "FW12Z_1km": {
-                "title": "12Z FW 1.27km (NE MN)",
+                "title": "12Z FW 1.27km (Utah)",
                 "domain_id": "FW12Z"
             },
             "FW18Z_1km": {
-                "title": "18Z FW 1.27km (Colorado)",
+                "title": "18Z FW 1.27km (CA-OR)",
                 "domain_id": "FW18Z"
             }
         },
