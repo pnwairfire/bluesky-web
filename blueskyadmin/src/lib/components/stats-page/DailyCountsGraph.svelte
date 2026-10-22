@@ -8,7 +8,8 @@
 
   Chart.register(...registerables);
 
-  $: barChartElement = null;
+  let barChartElement;
+  let chart;
 
   function fillInMonths (daily) {
     const dailyDict = daily.reduce((r, d) => {
@@ -29,7 +30,7 @@
     return dailyComplete.reverse()
   }
 
-  const dailyComplete = fillInMonths(daily)
+  $: dailyComplete = fillInMonths(daily)
 
   $: chartData = {
     labels: dailyComplete.map(({ date }) => date),
@@ -45,7 +46,7 @@
 
   onMount(() => {
     if (browser) {
-      new Chart(barChartElement, {
+      chart = new Chart(barChartElement, {
         type: 'bar',
         data: chartData,
         options: {
@@ -66,7 +67,13 @@
         },
       });
     }
+    return () => chart && chart.destroy();
   });
+
+  $: if (chart) {
+    chart.data = chartData;
+    chart.update();
+  }
 </script>
 
 <main class="main-container">

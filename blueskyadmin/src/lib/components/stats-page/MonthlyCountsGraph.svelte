@@ -9,6 +9,7 @@
   Chart.register(...registerables);
 
   let barChartElement;
+  let chart;
 
   function fillInMonths (monthly) {
     const monthlyDict = monthly.reduce((r, m) => {
@@ -30,9 +31,9 @@
     return monthlyComplete.reverse()
   }
 
-  const monthlyComplete = fillInMonths(monthly)
+  $: monthlyComplete = fillInMonths(monthly)
 
-  const chartData = {
+  $: chartData = {
     labels: monthlyComplete.map(({ year, month }) => `${month}/${year}`),
     datasets: [
       {
@@ -46,7 +47,7 @@
 
   onMount(() => {
     if (browser) {
-      new Chart(barChartElement, {
+      chart = new Chart(barChartElement, {
         type: 'bar',
         data: chartData,
         options: {
@@ -67,7 +68,13 @@
         },
       });
     }
+    return () => chart && chart.destroy();
   });
+
+  $: if (chart) {
+    chart.data = chartData;
+    chart.update();
+  }
 </script>
 
 <main class="main-container">
