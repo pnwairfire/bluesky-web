@@ -16,6 +16,19 @@
         .map(q => `${q.queue || '(none)'}: ${q.count}`)
         .join('\n')
 
+    // Sums per-queue counts across all rows, sorted by descending count
+    const totalsByQueue = (rows) => {
+        const totals = {}
+        rows.forEach(r => r.by_queue.forEach(q => {
+            const name = q.queue || '(none)'
+            totals[name] = (totals[name] || 0) + q.count
+        }))
+        return Object.entries(totals)
+            .sort((a, b) => b[1] - a[1])
+            .map(([queue, count]) => `${queue}: ${count}`)
+            .join(', ')
+    }
+
     let tooltip = null
 
     const showTooltip = (event, byQueue) => {
@@ -86,6 +99,7 @@
                   </tbody>
                 </Table>
                 <div>Total Count: {data.stats.monthly.reduce((r,e) => r+e.count, 0)}</div>
+                <div>Queue Counts: {totalsByQueue(data.stats.monthly)}</div>
             </div>
           </Col>
           <Col>
@@ -127,6 +141,7 @@
                   </tbody>
                 </Table>
                 <div>Total Count: {data.stats.daily.reduce((r,e) => r+e.count, 0)}</div>
+                <div>Queue Counts: {totalsByQueue(data.stats.daily)}</div>
             </div>
           </Col>
           <Col>
