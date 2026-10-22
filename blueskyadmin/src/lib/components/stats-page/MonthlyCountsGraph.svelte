@@ -55,6 +55,13 @@
             legend: {
               display: false,
             },
+            tooltip: {
+              callbacks: {
+                // Per-queue counts listed below the total run count
+                afterLabel: (context) => (monthlyComplete[context.dataIndex].by_queue || [])
+                  .map(({ queue, count }) => `  ${queue || '(none)'}: ${count}`),
+              },
+            },
           },
           scales: {
             y: {
