@@ -12,6 +12,21 @@
 
     const runIdOptions = PUBLIC_STATS_RUNID_OPTIONS && JSON.parse(PUBLIC_STATS_RUNID_OPTIONS)
 
+    const queueTooltip = (byQueue) => byQueue
+        .map(q => `${q.queue || '(none)'}: ${q.count}`)
+        .join('\n')
+
+    let tooltip = null
+
+    const showTooltip = (event, byQueue) => {
+        const rect = event.currentTarget.getBoundingClientRect()
+        tooltip = {x: rect.right + 6, y: rect.top, text: queueTooltip(byQueue)}
+    }
+
+    const hideTooltip = () => {
+        tooltip = null
+    }
+
     $: displayedRunId = runIdOptions[data.runId] || data.runId || 'All Runs'
 </script>
 
@@ -60,7 +75,12 @@
                           <td>{monthlyStats.year}</td>
                           <td>{monthlyStats.month}</td>
                           <td>{monthlyStats.count}</td>
-                          <td>{monthlyStats.by_queue[0].queue || '(none)'} ({monthlyStats.by_queue[0].count})</td>
+                          <td>
+                            {monthlyStats.by_queue[0].queue || '(none)'} ({monthlyStats.by_queue[0].count})
+                            <span class="queue-info" role="img" aria-label={queueTooltip(monthlyStats.by_queue)}
+                                  on:mouseenter={(e) => showTooltip(e, monthlyStats.by_queue)}
+                                  on:mouseleave={hideTooltip}>&#9432;</span>
+                          </td>
                         </tr>
                     {/each}
                   </tbody>
@@ -96,7 +116,12 @@
                         <tr>
                           <td>{dailyStats.date}</td>
                           <td>{dailyStats.count}</td>
-                          <td>{dailyStats.by_queue[0].queue || 'none'} ({dailyStats.by_queue[0].count})</td>
+                          <td>
+                            {dailyStats.by_queue[0].queue || 'none'} ({dailyStats.by_queue[0].count})
+                            <span class="queue-info" role="img" aria-label={queueTooltip(dailyStats.by_queue)}
+                                  on:mouseenter={(e) => showTooltip(e, dailyStats.by_queue)}
+                                  on:mouseleave={hideTooltip}>&#9432;</span>
+                          </td>
                         </tr>
                     {/each}
                   </tbody>
@@ -112,6 +137,10 @@
     {/if}
 </Container>
 
+{#if tooltip}
+  <div class="queue-tooltip" style="left: {tooltip.x}px; top: {tooltip.y}px;">{tooltip.text}</div>
+{/if}
+
 <style>
   .header .text {
      font-size: x-large;
@@ -119,5 +148,20 @@
   }
   .header .caption {
     font-style: italic;
+  }
+  .queue-info {
+    margin-left: 0.25rem;
+    color: #0d6efd;
+  }
+  .queue-tooltip {
+    position: fixed;
+    z-index: 1080;
+    white-space: pre;
+    padding: 0.4rem 0.6rem;
+    background: #000;
+    color: #fff;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    pointer-events: none;
   }
 </style>

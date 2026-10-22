@@ -15,7 +15,7 @@ fabfile*
 config-overrides
 deploy-all-envs
 production-and-test-environments.md
-.private/
+.private
 Dockerfile
 .env*
 .claude/
