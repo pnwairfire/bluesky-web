@@ -175,6 +175,24 @@
             "arl_index_file": "arl12hrindex.csv",
             "time_step": 1
         },
+        "DRI1km": {
+            "grid": {
+                "spacing": 2,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lng": -124.75, "lat": 32.1},
+                    "ne": {"lng": -113.35, "lat": 42.3}
+                },
+                "grid_size_options": {
+                    "1.0": {"x": 1100, "y": 800},
+                    "0.75": {"x": 900, "y": 600},
+                    "0.50": {"x": 600, "y": 400},
+                    "0.25": {"x": 300, "y": 200}
+                }
+            },
+            "arl_index_file": "arl12hrindex.csv",
+            "time_step": 1
+        },
         "DRI1.33km": {
             "grid": {
                 "spacing": 2,
@@ -200,6 +218,24 @@
                 "boundary": {
                     "sw": {"lng": -124.3, "lat": 32.5},
                     "ne": {"lng": -114.0, "lat": 42.0}
+                },
+                "grid_size_options": {
+                    "1.0": {"x": 1100, "y": 800},
+                    "0.75": {"x": 900, "y": 600},
+                    "0.50": {"x": 600, "y": 400},
+                    "0.25": {"x": 300, "y": 200}
+                }
+            },
+            "arl_index_file": "arl12hrindex.csv",
+            "time_step": 1
+        },
+        "DRI3km": {
+            "grid": {
+                "spacing": 2,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lng": -130.9, "lat": 28.625},
+                    "ne": {"lng": -109.2, "lat": 47.75}
                 },
                 "grid_size_options": {
                     "1.0": {"x": 1100, "y": 800},
@@ -479,9 +515,17 @@
                 "title": "Pacific Northwest 4-km",
                 "domain_id": "PNW4km"
             },
+            "ca-nv_1-km": {
+                "title": "CA/NV 1-km",
+                "domain_id": "DRI1km"
+            },
             "ca-nv_1.33-km": {
                 "title": "CA/NV 1.33-km",
                 "domain_id": "DRI1.33km"
+            },
+            "ca-nv_3-km": {
+                "title": "CA/NV 3-km",
+                "domain_id": "DRI3km"
             },
             "ca-nv_4-km": {
                 "title": "CA/NV 4-km",
