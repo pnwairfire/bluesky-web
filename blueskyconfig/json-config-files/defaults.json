@@ -319,6 +319,24 @@
             "arl_index_file": "nam3km_arlindex.csv",
             "time_step": 1
         },
+        "RRFS3km": {
+            "grid": {
+                "spacing": 3,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {"lat": 22, "lng": -133},
+                    "ne": {"lat": 52, "lng": -61}
+                },
+                "grid_size_options": {
+                    "1.0": {"x": 6700, "y": 2000},
+                    "0.75": {"x": 5000, "y": 1500},
+                    "0.50": {"x": 3300, "y": 1000},
+                    "0.25": {"x": 1700, "y": 500}
+                }
+            },
+            "arl_index_file": "nam3km_arlindex.csv",
+            "time_step": 1
+        },
         "HRRR3km": {
             "grid": {
                 "spacing": 3,
@@ -502,6 +520,10 @@
             "national_3-km": {
                 "title": "National 3-km",
                 "domain_id": "NAM3km"
+            },
+            "rrfs_3-km": {
+                "title": "RRFS 3-km",
+                "domain_id": "RRFS3km"
             },
             "hrrr_3-km": {
                 "title": "HRRR 3-km",
