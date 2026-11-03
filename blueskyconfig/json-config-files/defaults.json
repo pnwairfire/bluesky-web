@@ -334,7 +334,7 @@
                     "0.25": {"x": 1700, "y": 500}
                 }
             },
-            "arl_index_file": "nam3km_arlindex.csv",
+            "arl_index_file": "arlindex.csv",
             "time_step": 1
         },
         "HRRR3km": {
