@@ -322,7 +322,6 @@ MET_ROOT_DIRS = {
     "usfs_ak_8-km": "/data/Met/USFSAK/8km/ARL/",
     # the USFS conus archives/domains reference the same met data
     "usfs_conus_8-km_big": "/data/Met/USFSCONUS/8km/ARL/",
-    "usfs_conus_8-km_small": "/data/Met/USFSCONUS/8km/ARL/",
     "national_3-km": "/data/Met/NAM/3km/ARL/",
     "rrfs_3-km": "/data/Met/RRFS/3km/ARL/",
     "hrrr_3-km": "/data/Met/HRRR/3km/ARL",
